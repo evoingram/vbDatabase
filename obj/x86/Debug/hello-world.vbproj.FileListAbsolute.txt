@@ -1,0 +1,5 @@
+E:\vbprojects\bin\Debug\ConsoleApplication.exe
+E:\vbprojects\bin\Debug\ConsoleApplication.pdb
+E:\vbprojects\obj\x86\Debug\hello-world.vbprojAssemblyReference.cache
+E:\vbprojects\obj\x86\Debug\ConsoleApplication.exe
+E:\vbprojects\obj\x86\Debug\ConsoleApplication.pdb
