@@ -12,8 +12,11 @@ Option Explicit
 
 
 Private sCourtDatesID As Long, dHearingStartTime As Date, dHearingEndTime As Date
-Private mApp1 As App1
-Public sApp1 As Long
+Private mApp0 As App0, mApp1 As App1, mApp2 As App2, mApp3 As App3
+Private mApp4 As App4, mApp5 As App5, mApp6 As App6
+Private mCaseInfo As CaseInfo
+Public sApp0 As Long, sApp1 As Long, sApp2 As Long, sApp3 As Long
+Public sApp4 As Long, sApp5 As Long, sApp6 As Long, sCaseID As Long
 
 Public lngNumOfHrs As Long, lngNumOfMins As Long, lngNumOfSecsRem As Long, lngNumOfSecs As Long
 Public lngNumOfHrs1 As Long, lngNumOfMins1 As Long, lngNumOfSecsRem1 As Long, lngNumOfSecs1 As Long
@@ -25,39 +28,6 @@ Public sTitle As String, sWLListID As String
 
 Private mrstRecordset As Recordset
 Private mbooLoaded As Boolean
-
-Public Property Get Party1() As String
-    Party1 = sParty1
-End Property
-
-Public Property Let Party1(rData As String)
-    sParty1 = rData
-End Property
-
-Public Property Get Party1Name() As String
-    Party1Name = sParty1Name
-End Property
-
-Public Property Let Party1Name(rData As String)
-    sParty1Name = rData
-End Property
-
-Public Property Get Party2() As String
-    Party2 = sParty2
-End Property
-
-Public Property Let Party2(rData As String)
-    sParty2 = rData
-End Property
-
-Public Property Get Party2Name() As String
-    Party2Name = sParty2Name
-End Property
-
-Public Property Let Party2Name(rData As String)
-    sParty2Name = rData
-End Property
-
 
 Public Property Get InvoiceNo() As String
     InvoiceNo = sInvoiceNo
@@ -227,21 +197,6 @@ Public Property Let IRC(rData As String)
     sIRC = rData
 End Property
 
-Public Property Get CaseNumber2() As String
-    CaseNumber2 = sCaseNumber2
-End Property
-
-Public Property Let CaseNumber2(rData As String)
-    sCaseNumber2 = rData
-End Property
-
-Public Property Get CaseNumber1() As String
-    CaseNumber1 = sCaseNumber1
-End Property
-
-Public Property Let CaseNumber1(rData As String)
-    sCaseNumber1 = rData
-End Property
 
 Public Property Get ActualQuantity() As String
     ActualQuantity = sActualQuantity
@@ -249,14 +204,6 @@ End Property
 
 Public Property Let ActualQuantity(rData As String)
     sActualQuantity = rData
-End Property
-
-Public Property Get Jurisdiction() As String
-    Jurisdiction = sJurisdiction
-End Property
-
-Public Property Let Jurisdiction(rData As String)
-    sJurisdiction = rData
 End Property
 
 Public Property Get TurnaroundTime() As String
@@ -510,12 +457,12 @@ Public Property Let Time1(rData As String)
     sTime1 = rData
 End Property
 
-Public Property Get CasesID() As String
-    CasesID = sCasesID
+Public Property Get CaseID() As String
+    CaseID = sCaseID
 End Property
 
-Public Property Let CasesID(rData As String)
-    sCasesID = rData
+Public Property Let CaseID(rData As String)
+    sCaseID = rData
 End Property
 
 Public Property Get CasesID1() As String
@@ -546,12 +493,55 @@ Public Property Get ID() As Long
     ID = sCourtDatesID
 End Property
 
+Public Property Get CaseInfo() As CaseInfo
+    'Private mApp1 As App1
+    If (mCaseInfo Is Nothing) Then Set CaseInfo = New CaseInfo
+    Set CaseInfo = mCaseInfo
+End Property
+
+Public Property Get App0() As App0
+    'Private mApp1 As App1
+    If (mApp0 Is Nothing) Then Set App0 = New App0
+    Set App0 = mApp0
+End Property
+
 Public Property Get App1() As App1
     'Private mApp1 As App1
     If (mApp1 Is Nothing) Then Set App1 = New App1
     Set App1 = mApp1
 End Property
 
+
+Public Property Get App2() As App2
+    'Private mApp1 As App1
+    If (mApp2 Is Nothing) Then Set App2 = New App2
+    Set App2 = mApp2
+End Property
+
+
+Public Property Get App3() As App3
+    'Private mApp1 As App1
+    If (mApp3 Is Nothing) Then Set App3 = New App3
+    Set App3 = mApp3
+End Property
+
+Public Property Get App4() As App4
+    'Private mApp1 As App1
+    If (mApp4 Is Nothing) Then Set App4 = New App4
+    Set App4 = mApp4
+End Property
+
+Public Property Get App5() As App5
+    'Private mApp1 As App1
+    If (mApp5 Is Nothing) Then Set App5 = New App5
+    Set App5 = mApp5
+End Property
+
+Public Property Get App6() As App6
+    'Private mApp1 As App1
+    If (mApp6 Is Nothing) Then Set App6 = New App6
+    Set App6 = mApp6
+End Property
 
 
 Private Property Get Recordset() As Recordset
@@ -565,19 +555,13 @@ End Property
 
 Private Sub Load()
     With Recordset
-        'Me.BirthDate = Nz(.Fields("BirthDate").Value)
-        'Me.EmailAddress = Nz(.Fields("EmailAddress").Value)
-        'Me.FirstName = Nz(.Fields("FirstName").Value)
-        'mlngID = Nz(.Fields("ID").Value)
-        'Me.LastName = Nz(.Fields("LastName").Value)
-        'Me.Score = Nz(.Fields("Score").Value)
-        'sApp0 = Nz(.Fields("OrderingID").Value)
+        sApp0 = Nz(.Fields("OrderingID").Value)
         sApp1 = Nz(.Fields("App1").Value)
-        'sApp2 = Nz(.Fields("App2").Value)
-        'sApp3 = Nz(.Fields("App3").Value)
-        'sApp4 = Nz(.Fields("App4").Value)
-        'sApp5 = Nz(.Fields("App5").Value)
-        'sApp6 = Nz(.Fields("App6").Value)
+        sApp2 = Nz(.Fields("App2").Value)
+        sApp3 = Nz(.Fields("App3").Value)
+        sApp4 = Nz(.Fields("App4").Value)
+        sApp5 = Nz(.Fields("App5").Value)
+        sApp6 = Nz(.Fields("App6").Value)
         Me.InvoiceNo = .Fields("InvoiceNo").Value
         'Me.Party1 = Nz(.Fields("Party1").Value)
         'Me.Party2 = Nz(.Fields("Party2").Value)
@@ -638,16 +622,24 @@ Private Sub Load()
         'Me.Notes = Nz(.Fields("Notes").Value)
         'Me.Time = Nz(.Fields("Time").Value)
         'Me.Time1 = Nz(.Fields("Time1").Value)
-        Me.CasesID = Nz(.Fields("CasesID").Value)
+        Me.CaseID = Nz(.Fields("CasesID").Value)
         'Me.CasesID1 = Nz(.Fields("CasesID1").Value)
         'Me.Status = Nz(.Fields("Status").Value)
         Me.UnitPrice = Nz(.Fields("UnitPrice").Value)
         'Me.HearingLocation = Nz(.Fields("HearingLocation").Value)
         'Me. = Nz(.Fields("").Value)
         sCourtDatesID = .Fields("ID").Value
+        sCaseID = .Fields("CasesID").Value
     End With
     mbooLoaded = True
+    mApp0.FindFirst "ID=" & sApp0
     mApp1.FindFirst "ID=" & sApp1
+    mApp2.FindFirst "ID=" & sApp2
+    mApp3.FindFirst "ID=" & sApp3
+    mApp4.FindFirst "ID=" & sApp4
+    mApp5.FindFirst "ID=" & sApp5
+    mApp6.FindFirst "ID=" & sApp6
+    mCaseInfo.FindFirst "ID=" & sCaseID
     'mApp1.SetAppValues (sApp1)
 End Sub
 
@@ -659,13 +651,14 @@ Public Sub Update()
             .AddNew
         End If
         sCourtDatesID = Nz(.Fields("ID").Value)
-        'sApp0 = Nz(.Fields("OrderingID").Value)
+        sApp0 = Nz(.Fields("OrderingID").Value)
         sApp1 = Nz(.Fields("App1").Value)
-        'sApp2 = Nz(.Fields("App2").Value)
-        'sApp3 = Nz(.Fields("App3").Value)
-        'sApp4 = Nz(.Fields("App4").Value)
-        'sApp5 = Nz(.Fields("App5").Value)
-        'sApp6 = Nz(.Fields("App6").Value)
+        sApp2 = Nz(.Fields("App2").Value)
+        sApp3 = Nz(.Fields("App3").Value)
+        sApp4 = Nz(.Fields("App4").Value)
+        sApp5 = Nz(.Fields("App5").Value)
+        sApp6 = Nz(.Fields("App6").Value)
+        sCaseID = Nz(.Fields("CasesID").Value)
         '.Fields("BirthDate").Value = Me.BirthDate
         '.Fields("EmailAddress").Value = Me.EmailAddress
         '.Fields("FirstName").Value = Me.FirstName
@@ -728,7 +721,7 @@ Public Sub Update()
         '.Fields("Notes").Value = Me.Notes
         '.Fields("Time").Value = Me.Time
         '.Fields("Time1").Value = Me.Time1
-        .Fields("CasesID").Value = Me.CasesID
+        .Fields("CasesID").Value = Me.CaseID
         '.Fields("CasesID1").Value = Me.CasesID1
         '.Fields("Status").Value = Me.Status
         .Fields("UnitPrice").Value = Me.UnitPrice
@@ -757,26 +750,14 @@ End Function
 
 Private Sub Class_Initialize()
     Set Recordset = CurrentDb.OpenRecordset("CourtDates", dbOpenDynaset)
-    'Set mApp0 = New App0
-    'sApp1 = Nz(Recordset.Fields("App1").Value)
-    'sApp2 = Nz(.Fields("App2").Value)
-    'sApp3 = Nz(.Fields("App3").Value)
-    'sApp4 = Nz(.Fields("App4").Value)
-    'sApp5 = Nz(.Fields("App5").Value)
-    'sApp6 = Nz(.Fields("App6").Value)
+    Set mApp0 = New App0
     Set mApp1 = New App1
-    'Set mApp2 = New App2
-    'Set mApp3 = New App3
-    'Set mApp4 = New App4
-    'Set mApp5 = New App5
-    'Set mApp6 = New App6
-    
-    '
-'Public Property Get App1() As App1
-    'Private mApp1 As App1
-    'App1 = mApp1
-'End Property
-    'mApp1.FindFirst "ID=" & sApp1
+    Set mApp2 = New App2
+    Set mApp3 = New App3
+    Set mApp4 = New App4
+    Set mApp5 = New App5
+    Set mApp6 = New App6
+    Set mCaseInfo = New CaseInfo
 End Sub
 
 Private Sub Class_Terminate()
@@ -793,20 +774,6 @@ Function NullIfEmptyString(str As String) As Variant
         NullIfEmptyString = strTrimmed
     End If
 End Function
-
-
-
-Public Sub SetValues(ByVal sApp1 As String)
-', ByVal sCompany As String, ByVal sMrMs As String, ByVal sLastName As String, _
-ByVal sFirstName As String, ByVal sEmailAddress As String, ByVal sJobTitle As String, _
-ByVal sBusinessPhone As String, ByVal sAddress As String, ByVal sCity As String, _
-sZIP As String, ByVal sState As String, ByVal sNotes As String
-    ', ByVal sFactoringApproved As CheckBox
-    mApp1.SetAppValues sApp1 ', sCompany, sMrMs, sLastName, sFirstName, sEmailAddress, sJobTitle, _
-    sBusinessPhone, sAddress, sCity, sZIP, sState, sNotes ', sFactoringApproved
-End Sub
-
-
 
 
 
