@@ -8,8 +8,10 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Compare Database
+Private mApp1 As App1
 
 Private sCourtDatesID As Long, dHearingStartTime As Date, dHearingEndTime As Date
+Public sApp1 As Long
 
 Public lngNumOfHrs As Long, lngNumOfMins As Long, lngNumOfSecsRem As Long, lngNumOfSecs As Long
 Public lngNumOfHrs1 As Long, lngNumOfMins1 As Long, lngNumOfSecsRem1 As Long, lngNumOfSecs1 As Long
@@ -21,7 +23,6 @@ Public i As Long
 Public oWordApp As Word.Document, oWordDoc As Word.Application
 Public lAssigneeID As Long, sDueDate As String, bStarred As String, bCompleted As String
 Public sTitle As String, sWLListID As String
-
 
 Private mrstRecordset As Recordset
 Private mbooLoaded As Boolean
@@ -66,13 +67,6 @@ Public Property Let Party2Name(rData As String)
     sParty2Name = rData
 End Property
 
-Public Property Get Company() As String
-    Company = sCompany
-End Property
-
-Public Property Let Company(rData As String)
-    sCompany = rData
-End Property
 
 Public Property Get InvoiceNo() As String
     InvoiceNo = sInvoiceNo
@@ -561,6 +555,12 @@ Public Property Get ID() As Long
     ID = sCourtDatesID
 End Property
 
+Public Property Get App1() As App1
+    'Private mApp1 As App1
+    App1 = mApp1
+End Property
+
+
 Private Property Get Recordset() As Recordset
     Set Recordset = mrstRecordset
 End Property
@@ -578,7 +578,13 @@ Private Sub Load()
         'mlngID = Nz(.Fields("ID").Value)
         'Me.LastName = Nz(.Fields("LastName").Value)
         'Me.Score = Nz(.Fields("Score").Value)
-        
+        'sApp0 = Nz(.Fields("OrderingID").Value)
+        sApp1 = Nz(.Fields("App1").Value)
+        'sApp2 = Nz(.Fields("App2").Value)
+        'sApp3 = Nz(.Fields("App3").Value)
+        'sApp4 = Nz(.Fields("App4").Value)
+        'sApp5 = Nz(.Fields("App5").Value)
+        'sApp6 = Nz(.Fields("App6").Value)
         Me.InvoiceNo = .Fields("InvoiceNo").Value
         'Me.Party1 = Nz(.Fields("Party1").Value)
         'Me.Party2 = Nz(.Fields("Party2").Value)
@@ -648,6 +654,7 @@ Private Sub Load()
         sCourtDatesID = .Fields("ID").Value
     End With
     mbooLoaded = True
+    mApp1.SetAppValues (sApp1)
 End Sub
 
 Public Sub Update()
@@ -658,7 +665,13 @@ Public Sub Update()
             .AddNew
         End If
         sCourtDatesID = Nz(.Fields("ID").Value)
-        
+        'sApp0 = Nz(.Fields("OrderingID").Value)
+        sApp1 = Nz(.Fields("App1").Value)
+        'sApp2 = Nz(.Fields("App2").Value)
+        'sApp3 = Nz(.Fields("App3").Value)
+        'sApp4 = Nz(.Fields("App4").Value)
+        'sApp5 = Nz(.Fields("App5").Value)
+        'sApp6 = Nz(.Fields("App6").Value)
         '.Fields("BirthDate").Value = Me.BirthDate
         '.Fields("EmailAddress").Value = Me.EmailAddress
         '.Fields("FirstName").Value = Me.FirstName
@@ -750,6 +763,26 @@ End Function
 
 Private Sub Class_Initialize()
     Set Recordset = CurrentDb.OpenRecordset("CourtDates", dbOpenDynaset)
+    'Set mApp0 = New App0
+    'sApp1 = Nz(Recordset.Fields("App1").Value)
+    'sApp2 = Nz(.Fields("App2").Value)
+    'sApp3 = Nz(.Fields("App3").Value)
+    'sApp4 = Nz(.Fields("App4").Value)
+    'sApp5 = Nz(.Fields("App5").Value)
+    'sApp6 = Nz(.Fields("App6").Value)
+    Set mApp1 = New App1
+    'Set mApp2 = New App2
+    'Set mApp3 = New App3
+    'Set mApp4 = New App4
+    'Set mApp5 = New App5
+    'Set mApp6 = New App6
+    
+    '
+'Public Property Get App1() As App1
+    'Private mApp1 As App1
+    'App1 = mApp1
+'End Property
+
 End Sub
 
 Private Sub Class_Terminate()
@@ -768,9 +801,15 @@ End Function
 
 
 
-
-
-
+Public Sub SetValues(ByVal sApp1 As String)
+', ByVal sCompany As String, ByVal sMrMs As String, ByVal sLastName As String, _
+ByVal sFirstName As String, ByVal sEmailAddress As String, ByVal sJobTitle As String, _
+ByVal sBusinessPhone As String, ByVal sAddress As String, ByVal sCity As String, _
+sZIP As String, ByVal sState As String, ByVal sNotes As String
+    ', ByVal sFactoringApproved As CheckBox
+    mApp1.SetAppValues sApp1 ', sCompany, sMrMs, sLastName, sFirstName, sEmailAddress, sJobTitle, _
+    sBusinessPhone, sAddress, sCity, sZIP, sState, sNotes ', sFactoringApproved
+End Sub
 
 
 
