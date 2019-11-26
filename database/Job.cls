@@ -9,6 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Compare Database
 
+Private sCourtDatesID As Long, dHearingStartTime As Date, dHearingEndTime As Date
 
 Public lngNumOfHrs As Long, lngNumOfMins As Long, lngNumOfSecsRem As Long, lngNumOfSecs As Long
 Public lngNumOfHrs1 As Long, lngNumOfMins1 As Long, lngNumOfSecsRem1 As Long, lngNumOfSecs1 As Long
@@ -18,27 +19,8 @@ Public i As Long
 'Public theRecognizers As ISpeechObjectTokens
 
 Public oWordApp As Word.Document, oWordDoc As Word.Application
-Private Const qnTRCourtQ As String = "TR-Court-Q"
-Private Const qnShippingOptionsQ As String = "ShippingOptionsQ"
-Private Const qnViewJobFormAppearancesQ As String = "ViewJobFormAppearancesQ"
-Private Const qnTRCourtUnionAppAddrQ As String = "TR-Court-Union-AppAddr"
-Private Const qnOrderingAttorneyInfo As String = "OrderingAttorneyInfo"
-
-Private Const sCompanyEmail As String = "inquiries@aquoco.co"
-Private Const sCompanyFirstName As String = "Erica"
-Private Const sCompanyLastName As String = "Ingram"
-Private Const sCompanyName As String = "A Quo Co."
-Private Const sPCountryCode As String = "001"
-Private Const sCompanyNationalNumber As String = "2064785028"
-Private Const sCompanyAddress As String = "320 West Republican Street Suite 207"
-Private Const sCompanyCity As String = "Seattle"
-Private Const sCompanyState As String = "WA"
-Private Const sCompanyZIP As String = "98119"
-Private Const sZCountryCode As String = "US"
-Private Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
-Private Const sPPTemplateName As String = "Amount only"
-Private Const sTermDays As String = "30"
-Public lAssigneeID As Long, sDueDate As String, bStarred As String, bCompleted As String, sTitle As String, sWLListID As String
+Public lAssigneeID As Long, sDueDate As String, bStarred As String, bCompleted As String
+Public sTitle As String, sWLListID As String
 
 
 Private mrstRecordset As Recordset
@@ -92,20 +74,11 @@ Public Property Let Company(rData As String)
     sCompany = rData
 End Property
 
-Public Property Get CourtDatesID() As String
-    CourtDatesID = sCourtDatesID
+Public Property Get InvoiceNo() As String
+    InvoiceNo = sInvoiceNo
 End Property
 
-Public Property Let CourtDatesID(rData As String)
-    sCourtDatesID = rData
-End Property
-
-
-Public Property Get InvoiceNumber() As String
-    InvoiceNumber = sInvoiceNo
-End Property
-
-Public Property Let InvoiceNumber(rData As String)
+Public Property Let InvoiceNo(rData As String)
     sInvoiceNo = rData
 End Property
 
@@ -478,6 +451,23 @@ Public Property Let HearingDate(rData As Date)
     dHearingDate = rData
 End Property
 
+
+Public Property Get HearingStartTime() As Date
+    HearingStartTime = dHearingStartTime
+End Property
+
+Public Property Let HearingStartTime(rData As Date)
+    dHearingStartTime = rData
+End Property
+
+Public Property Get HearingEndTime() As Date
+    HearingEndTime = dHearingEndTime
+End Property
+
+Public Property Let HearingEndTime(rData As Date)
+    dHearingEndTime = rData
+End Property
+
 Public Property Get MrMs() As String
     MrMs = sMrMs
 End Property
@@ -559,28 +549,16 @@ Public Property Let HearingLocation(rData As String)
     sHearingLocation = rData
 End Property
 
-Public Property Get StartTime() As String
-    StartTime = sStartTime
-End Property
-
-Public Property Let StartTime(rData As String)
-    sStartTime = rData
-End Property
-
-Public Property Get EndTime() As String
-    EndTime = sEndTime
-End Property
-
-Public Property Let EndTime(rData As String)
-    sEndTime = rData
-End Property
-
 Public Property Get URL1() As String
     URL1 = sURL1
 End Property
 
 Public Property Let URL1(rData As String)
     sURL1 = rData
+End Property
+
+Public Property Get ID() As Long
+    ID = sCourtDatesID
 End Property
 
 Private Property Get Recordset() As Recordset
@@ -601,38 +579,37 @@ Private Sub Load()
         'Me.LastName = Nz(.Fields("LastName").Value)
         'Me.Score = Nz(.Fields("Score").Value)
         
-        Me.Party1 = Nz(.Fields("Party1").Value)
-        Me.Party2 = Nz(.Fields("Party2").Value)
-        Me.Party1Name = Nz(.Fields("Party1Name").Value)
-        Me.Party2Name = Nz(.Fields("Party2Name").Value)
-        Me.Company = Nz(.Fields("Company").Value)
-        Me.CourtDatesID = Nz(.Fields("CourtDatesID").Value)
-        Me.InvoiceNumber = Nz(.Fields("InvoiceNo").Value)
-        Me.Email = Nz(.Fields("Email").Value)
-        Me.Description = Nz(.Fields("Description").Value)
+        Me.InvoiceNo = .Fields("InvoiceNo").Value
+        'Me.Party1 = Nz(.Fields("Party1").Value)
+        'Me.Party2 = Nz(.Fields("Party2").Value)
+        'Me.Party1Name = Nz(.Fields("Party1Name").Value)
+        'Me.Party2Name = Nz(.Fields("Party2Name").Value)
+        'Me.Company = Nz(.Fields("Company").Value)
+        'Me.Email = Nz(.Fields("Email").Value)
+        'Me.Description = Nz(.Fields("Description").Value)
         Me.Subtotal = Nz(.Fields("Subtotal").Value)
         Me.InvoiceDate = Nz(.Fields("InvoiceDate").Value)
-        Me.InvoiceTime = Nz(.Fields("InvoiceTime").Value)
-        Me.PaymentTerms = Nz(.Fields("PaymentTerms").Value)
-        Me.Note = Nz(.Fields("Note").Value)
-        Me.Terms = Nz(.Fields("Terms").Value)
-        Me.MinimumAmount = Nz(.Fields("MinimumAmount").Value)
-        Me.Memo = Nz(.Fields("Memo").Value)
-        Me.URL = Nz(.Fields("URL").Value)
-        Me.TemplateID = Nz(.Fields("TemplateID").Value)
-        Me.Line1 = Nz(.Fields("Line").Value)
-        Me.City = Nz(.Fields("City").Value)
-        Me.State = Nz(.Fields("State").Value)
-        Me.ZIP = Nz(.Fields("ZIP").Value)
+        'Me.InvoiceTime = Nz(.Fields("InvoiceTime").Value)
+        'Me.PaymentTerms = Nz(.Fields("PaymentTerms").Value)
+        'Me.Note = Nz(.Fields("Note").Value)
+        'Me.Terms = Nz(.Fields("Terms").Value)
+        'Me.MinimumAmount = Nz(.Fields("MinimumAmount").Value)
+        'Me.Memo = Nz(.Fields("Memo").Value)
+        'Me.URL = Nz(.Fields("URL").Value)
+        'Me.TemplateID = Nz(.Fields("TemplateID").Value)
+        'Me.Line1 = Nz(.Fields("Line").Value)
+        'Me.City = Nz(.Fields("City").Value)
+        'Me.State = Nz(.Fields("State").Value)
+        'Me.ZIP = Nz(.Fields("ZIP").Value)
         Me.Quantity = Nz(.Fields("Quantity").Value)
-        Me.Value = Nz(.Fields("Value").Value)
+        'Me.Value = Nz(.Fields("Value").Value)
         Me.InventoryRateCode = Nz(.Fields("InventoryRateCode").Value)
-        Me.IRC = Nz(.Fields("IRC").Value)
-        Me.CaseNumber1 = Nz(.Fields("CaseNumber1").Value)
-        Me.CaseNumber2 = Nz(.Fields("CaseNumber2").Value)
+        'Me.IRC = Nz(.Fields("IRC").Value)
+        'Me.CaseNumber1 = Nz(.Fields("CaseNumber1").Value)
+        'Me.CaseNumber2 = Nz(.Fields("CaseNumber2").Value)
         Me.ActualQuantity = Nz(.Fields("ActualQuantity").Value)
-        Me.Jurisdiction = Nz(.Fields("Jurisdiction").Value)
-        Me.TurnaroundTime = Nz(.Fields("TurnaroundTime").Value)
+        'Me.Jurisdiction = Nz(.Fields("Jurisdiction").Value)
+        Me.TurnaroundTime = .Fields("TurnaroundTimesCD").Value
         Me.OrderingID = Nz(.Fields("OrderingID").Value)
         Me.AudioLength = Nz(.Fields("AudioLength").Value)
         Me.EstimatedPageCount = Nz(.Fields("EstimatedPageCount").Value)
@@ -641,34 +618,34 @@ Private Sub Load()
         Me.ExpectedAdvanceDate = Nz(.Fields("ExpectedAdvanceDate").Value)
         Me.ExpectedRebateDate = Nz(.Fields("ExpectedRebateDate").Value)
         Me.PaymentSum = Nz(.Fields("PaymentSum").Value)
-        Me.FactoringApproved = Nz(.Fields("FactoringApproved").Value)
+        'Me.FactoringApproved = Nz(.Fields("FactoringApproved").Value)
         Me.BrandingTheme = Nz(.Fields("BrandingTheme").Value)
         Me.FinalPrice = Nz(.Fields("FinalPrice").Value)
-        Me.ClientTranscriptName = Nz(.Fields("ClientTranscriptName").Value)
-        Me.CurrentTranscriptName = Nz(.Fields("CurrentTranscriptName").Value)
-        Me.BalanceDue = Nz(.Fields("BalanceDue").Value)
+        'Me.ClientTranscriptName = Nz(.Fields("ClientTranscriptName").Value)
+        'Me.CurrentTranscriptName = Nz(.Fields("CurrentTranscriptName").Value)
+        'Me.BalanceDue = Nz(.Fields("BalanceDue").Value)
         Me.FactoringCost = Nz(.Fields("FactoringCost").Value)
-        Me.URL1 = Nz(.Fields("URL1").Value)
-        Me.LinkToCSV = Nz(.Fields("LinkToCSV").Value)
-        Me.FirstName = Nz(.Fields("FirstName").Value)
-        Me.LastName = Nz(.Fields("LastName").Value)
+        'Me.URL1 = Nz(.Fields("URL1").Value)
+        'Me.LinkToCSV = Nz(.Fields("LinkToCSV").Value)
+        'Me.FirstName = Nz(.Fields("FirstName").Value)
+        'Me.LastName = Nz(.Fields("LastName").Value)
         Me.HearingDate = Nz(.Fields("HearingDate").Value)
-        Me.MrMs = Nz(.Fields("MrMs").Value)
-        Me.Name = Nz(.Fields("Name").Value)
-        Me.Address1 = Nz(.Fields("Address1").Value)
-        Me.Address2 = Nz(.Fields("Address2").Value)
-        Me.Notes = Nz(.Fields("Notes").Value)
-        Me.Time = Nz(.Fields("Time").Value)
-        Me.Time1 = Nz(.Fields("Time1").Value)
+        Me.HearingStartTime = .Fields("HearingStartTime").Value
+        Me.HearingEndTime = .Fields("HearingEndTime").Value
+        'Me.MrMs = Nz(.Fields("MrMs").Value)
+        'Me.Name = Nz(.Fields("Name").Value)
+        'Me.Address1 = Nz(.Fields("Address1").Value)
+        'Me.Address2 = Nz(.Fields("Address2").Value)
+        'Me.Notes = Nz(.Fields("Notes").Value)
+        'Me.Time = Nz(.Fields("Time").Value)
+        'Me.Time1 = Nz(.Fields("Time1").Value)
         Me.CasesID = Nz(.Fields("CasesID").Value)
-        Me.CasesID1 = Nz(.Fields("CasesID1").Value)
-        Me.Status = Nz(.Fields("Status").Value)
+        'Me.CasesID1 = Nz(.Fields("CasesID1").Value)
+        'Me.Status = Nz(.Fields("Status").Value)
         Me.UnitPrice = Nz(.Fields("UnitPrice").Value)
-        Me.HearingLocation = Nz(.Fields("HearingLocation").Value)
-        Me.StartTime = Nz(.Fields("StartTime").Value)
-        Me.EndTime = Nz(.Fields("EndTime").Value)
+        'Me.HearingLocation = Nz(.Fields("HearingLocation").Value)
         'Me. = Nz(.Fields("").Value)
-        
+        sCourtDatesID = .Fields("ID").Value
     End With
     mbooLoaded = True
 End Sub
@@ -690,34 +667,33 @@ Public Sub Update()
         .Fields("Party2").Value = Me.Party2
         .Fields("Party1Name").Value = Me.Party1Name
         .Fields("Party2Name").Value = Me.Party2Name
-        .Fields("Company").Value = Me.Company
-        .Fields("CourtDatesID").Value = Me.CourtDatesID
-        .Fields("InvoiceNo").Value = Me.InvoiceNumber
-        .Fields("Email").Value = Me.Email
-        .Fields("Description").Value = Me.Description
+        '.Fields("Company").Value = Me.Company
+        .Fields("InvoiceNo").Value = Me.InvoiceNo
+        '.Fields("Email").Value = Me.Email
+        '.Fields("Description").Value = Me.Description
         .Fields("Subtotal").Value = Me.Subtotal
         .Fields("InvoiceDate").Value = Me.InvoiceDate
-        .Fields("InvoiceTime").Value = Me.InvoiceTime
-        .Fields("PaymentTerms").Value = Me.PaymentTerms
-        .Fields("Note").Value = Me.Note
-        .Fields("Terms").Value = Me.Terms
-        .Fields("MinimumAmount").Value = Me.MinimumAmount
-        .Fields("Memo").Value = Me.Memo
-        .Fields("URL").Value = Me.URL
-        .Fields("TemplateID").Value = Me.TemplateID
-        .Fields("Line").Value = Me.Line1
-        .Fields("City").Value = Me.City
-        .Fields("State").Value = Me.State
-        .Fields("ZIP").Value = Me.ZIP
+        '.Fields("InvoiceTime").Value = Me.InvoiceTime
+        '.Fields("PaymentTerms").Value = Me.PaymentTerms
+        '.Fields("Note").Value = Me.Note
+        '.Fields("Terms").Value = Me.Terms
+        '.Fields("MinimumAmount").Value = Me.MinimumAmount
+        '.Fields("Memo").Value = Me.Memo
+        '.Fields("URL").Value = Me.URL
+        '.Fields("TemplateID").Value = Me.TemplateID
+        '.Fields("Line").Value = Me.Line1
+        '.Fields("City").Value = Me.City
+        '.Fields("State").Value = Me.State
+        '.Fields("ZIP").Value = Me.ZIP
         .Fields("Quantity").Value = Me.Quantity
-        .Fields("Value").Value = Me.Value
+        '.Fields("Value").Value = Me.Value
         .Fields("InventoryRateCode").Value = Me.InventoryRateCode
-        .Fields("IRC").Value = Me.IRC
+        '.Fields("IRC").Value = Me.IRC
         .Fields("CaseNumber1").Value = Me.CaseNumber1
         .Fields("CaseNumber2").Value = Me.CaseNumber2
         .Fields("ActualQuantity").Value = Me.ActualQuantity
         .Fields("Jurisdiction").Value = Me.Jurisdiction
-        .Fields("TurnaroundTime").Value = Me.TurnaroundTime
+        .Fields("TurnaroundTimesCD").Value = Me.TurnaroundTime
         .Fields("OrderingID").Value = Me.OrderingID
         .Fields("AudioLength").Value = Me.AudioLength
         .Fields("EstimatedPageCount").Value = Me.EstimatedPageCount
@@ -726,32 +702,32 @@ Public Sub Update()
         .Fields("ExpectedAdvanceDate").Value = Me.ExpectedAdvanceDate
         .Fields("ExpectedRebateDate").Value = Me.ExpectedRebateDate
         .Fields("PaymentSum").Value = Me.PaymentSum
-        .Fields("FactoringApproved").Value = Me.FactoringApproved
+        '.Fields("FactoringApproved").Value = Me.FactoringApproved
         .Fields("BrandingTheme").Value = Me.BrandingTheme
         .Fields("FinalPrice").Value = Me.FinalPrice
-        .Fields("ClientTranscriptName").Value = Me.ClientTranscriptName
-        .Fields("CurrentTranscriptName").Value = Me.CurrentTranscriptName
-        .Fields("BalanceDue").Value = Me.BalanceDue
-        .Fields("FactoringCost").Value = Me.FactoringCost
-        .Fields("URL1").Value = Me.URL1
-        .Fields("LinkToCSV").Value = Me.LinkToCSV
-        .Fields("FirstName").Value = Me.FirstName
-        .Fields("LastName").Value = Me.LastName
+        '.Fields("ClientTranscriptName").Value = Me.ClientTranscriptName
+        '.Fields("CurrentTranscriptName").Value = Me.CurrentTranscriptName
+        '.Fields("BalanceDue").Value = Me.BalanceDue
+        '.Fields("FactoringCost").Value = Me.FactoringCost
+        '.Fields("URL1").Value = Me.URL1
+        '.Fields("LinkToCSV").Value = Me.LinkToCSV
+        '.Fields("FirstName").Value = Me.FirstName
+        '.Fields("LastName").Value = Me.LastName
         .Fields("HearingDate").Value = Me.HearingDate
-        .Fields("MrMs").Value = Me.MrMs
-        .Fields("Name").Value = Me.Name
-        .Fields("Address1").Value = Me.Address1
-        .Fields("Address2").Value = Me.Address2
-        .Fields("Notes").Value = Me.Notes
-        .Fields("Time").Value = Me.Time
-        .Fields("Time1").Value = Me.Time1
+        '.Fields("MrMs").Value = Me.MrMs
+        '.Fields("Name").Value = Me.Name
+        '.Fields("Address1").Value = Me.Address1
+        '.Fields("Address2").Value = Me.Address2
+        '.Fields("Notes").Value = Me.Notes
+        '.Fields("Time").Value = Me.Time
+        '.Fields("Time1").Value = Me.Time1
         .Fields("CasesID").Value = Me.CasesID
-        .Fields("CasesID1").Value = Me.CasesID1
-        .Fields("Status").Value = Me.Status
+        '.Fields("CasesID1").Value = Me.CasesID1
+        '.Fields("Status").Value = Me.Status
         .Fields("UnitPrice").Value = Me.UnitPrice
-        .Fields("HearingLocation").Value = Me.HearingLocation
-        .Fields("StartTime").Value = Me.StartTime
-        .Fields("EndTime").Value = Me.EndTime
+        '.Fields("HearingLocation").Value = Me.HearingLocation
+        .Fields("HearingStartTime").Value = Me.HearingStartTime
+        .Fields("HearingEndTime").Value = Me.HearingEndTime
         .Update
     End With
     mbooLoaded = True
