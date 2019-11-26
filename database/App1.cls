@@ -8,11 +8,15 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Compare Database
+Option Explicit
 
+Private mAppID1 As Long
 Private mCompany As String, mMrMs As String, mLastName As String
 Private mFirstName As String, mEmailAddress As String, mJobTitle As String
 Private mBusinessPhone As String, mAddress As String, mCity As String
+Private mState As String
 Private mZIP As String, mNotes As String, mFactoringApproved As CheckBox
+Public sApp1 As Long
 
 Private mrstRecordset1 As Recordset
 Private mbooLoaded As Boolean
@@ -94,13 +98,6 @@ Public Property Let Notes(rData As String)
     mNotes = rData
 End Property
 
-Public Property Get FactoringApproved() As CheckBox
-    FactoringApproved = mFactoringApproved
-End Property
-Public Property Let FactoringApproved(rData As CheckBox)
-    mFactoringApproved = rData
-End Property
-
 Public Property Get State() As String
     State = mState
 End Property
@@ -108,10 +105,10 @@ Public Property Let State(rData As String)
     mState = rData
 End Property
 
-
-Public Property Get AppID1() As Long
-    AppID1 = sApp1
+Public Property Get ID() As Long
+    ID = sApp1
 End Property
+
 
 Private Property Get RecordsetA1() As Recordset
     Set RecordsetA1 = mrstRecordset1
@@ -140,6 +137,7 @@ sZIP As String, ByVal sNotes As String, sState As String
         'mFactoringApproved = sFactoringApproved
         'mState = sState
         'm_max = max_value
+        mAppID1 = sApp1
         FindFirst "ID=" & sApp1
     mbooLoaded = True
 End Sub

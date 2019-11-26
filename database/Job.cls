@@ -8,17 +8,16 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Compare Database
-Private mApp1 As App1
+Option Explicit
+
 
 Private sCourtDatesID As Long, dHearingStartTime As Date, dHearingEndTime As Date
+Private mApp1 As App1
 Public sApp1 As Long
 
 Public lngNumOfHrs As Long, lngNumOfMins As Long, lngNumOfSecsRem As Long, lngNumOfSecs As Long
 Public lngNumOfHrs1 As Long, lngNumOfMins1 As Long, lngNumOfSecsRem1 As Long, lngNumOfSecs1 As Long
 Public i As Long
-
-'Public SharedRecognizer As SpSharedRecognizer
-'Public theRecognizers As ISpeechObjectTokens
 
 Public oWordApp As Word.Document, oWordDoc As Word.Application
 Public lAssigneeID As Long, sDueDate As String, bStarred As String, bCompleted As String
@@ -26,14 +25,6 @@ Public sTitle As String, sWLListID As String
 
 Private mrstRecordset As Recordset
 Private mbooLoaded As Boolean
-
-Public Property Get OrderingID() As String
-    OrderingID = sOrderingID
-End Property
-
-Public Property Let OrderingID(rData As String)
-    sOrderingID = rData
-End Property
 
 Public Property Get Party1() As String
     Party1 = sParty1
@@ -557,8 +548,10 @@ End Property
 
 Public Property Get App1() As App1
     'Private mApp1 As App1
-    App1 = mApp1
+    If (mApp1 Is Nothing) Then Set App1 = New App1
+    Set App1 = mApp1
 End Property
+
 
 
 Private Property Get Recordset() As Recordset
@@ -616,7 +609,7 @@ Private Sub Load()
         Me.ActualQuantity = Nz(.Fields("ActualQuantity").Value)
         'Me.Jurisdiction = Nz(.Fields("Jurisdiction").Value)
         Me.TurnaroundTime = .Fields("TurnaroundTimesCD").Value
-        Me.OrderingID = Nz(.Fields("OrderingID").Value)
+        'Me.OrderingID = Nz(.Fields("OrderingID").Value)
         Me.AudioLength = Nz(.Fields("AudioLength").Value)
         Me.EstimatedPageCount = Nz(.Fields("EstimatedPageCount").Value)
         Me.StatusesID = Nz(.Fields("StatusesID").Value)
@@ -654,7 +647,8 @@ Private Sub Load()
         sCourtDatesID = .Fields("ID").Value
     End With
     mbooLoaded = True
-    mApp1.SetAppValues (sApp1)
+    mApp1.FindFirst "ID=" & sApp1
+    'mApp1.SetAppValues (sApp1)
 End Sub
 
 Public Sub Update()
@@ -782,12 +776,13 @@ Private Sub Class_Initialize()
     'Private mApp1 As App1
     'App1 = mApp1
 'End Property
-
+    'mApp1.FindFirst "ID=" & sApp1
 End Sub
 
 Private Sub Class_Terminate()
     Recordset.Close
     Set Recordset = Nothing
+    Set mApp1 = Nothing
 End Sub
 
 Function NullIfEmptyString(str As String) As Variant
