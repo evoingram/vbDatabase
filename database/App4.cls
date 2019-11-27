@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "App1"
+Attribute VB_Name = "App4"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -10,15 +10,15 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private mAppID1 As Long
+Private mAppID4 As Long
 Private mCompany As String, mMrMs As String, mLastName As String
 Private mFirstName As String, mEmailAddress As String, mJobTitle As String
 Private mBusinessPhone As String, mAddress As String, mCity As String
 Private mState As String
 Private mZIP As String, mNotes As String, mFactoringApproved As Boolean
-Public sApp1 As Long
+Public sApp4 As Long
 
-Private mrstRecordset1 As Recordset
+Private mrstRecordset4 As Recordset
 Private mbooLoaded As Boolean
 
 Public Property Get Company() As String
@@ -113,21 +113,22 @@ Public Property Let FactoringApproved(rData As Boolean)
 End Property
 
 Public Property Get ID() As Long
-    ID = sApp1
+    ID = sApp4
 End Property
 
 
-Private Property Get RecordsetA1() As Recordset
-    Set RecordsetA1 = mrstRecordset1
+Private Property Get RecordsetA4() As Recordset
+    Set RecordsetA4 = mrstRecordset4
 End Property
 
-Private Property Set RecordsetA1(rData As Recordset)
-    Set mrstRecordset1 = rData
+Private Property Set RecordsetA4(rData As Recordset)
+    Set mrstRecordset4 = rData
 End Property
+
 
 Private Sub Load()
-    With RecordsetA1
-        sApp1 = Nz(.Fields("ID").Value)
+    With RecordsetA4
+        sApp4 = Nz(.Fields("ID").Value)
         Me.Company = Nz(.Fields("Company").Value)
         Me.MrMs = Nz(.Fields("MrMs").Value)
         Me.LastName = Nz(.Fields("LastName").Value)
@@ -146,13 +147,13 @@ Private Sub Load()
 End Sub
 
 Public Sub Update()
-    With RecordsetA1
+    With RecordsetA4
         If mbooLoaded = True Then
             .Edit
         Else
             .AddNew
         End If
-        sApp1 = Nz(.Fields("ID").Value)
+        sApp4 = Nz(.Fields("ID").Value)
         .Fields("Company").Value = Me.Company
         .Fields("MrMs").Value = Me.MrMs
         .Fields("LastName").Value = Me.LastName
@@ -177,23 +178,23 @@ End Sub
 
 Public Function FindFirst(Optional Criteria As Variant) As Boolean
     If IsMissing(Criteria) Then
-        RecordsetA1.MoveFirst
-        FindFirst = Not RecordsetA1.EOF
+        RecordsetA4.MoveFirst
+        FindFirst = Not RecordsetA4.EOF
     Else
-        RecordsetA1.FindFirst Criteria
-        FindFirst = Not RecordsetA1.NoMatch
+        RecordsetA4.FindFirst Criteria
+        FindFirst = Not RecordsetA4.NoMatch
     End If
     If FindFirst Then Load
 End Function
 
 Private Sub Class_Initialize()
-    Set RecordsetA1 = CurrentDb.OpenRecordset("Customers", dbOpenDynaset)
+    Set RecordsetA4 = CurrentDb.OpenRecordset("Customers", dbOpenDynaset)
     
 End Sub
 
 Private Sub Class_Terminate()
-    RecordsetA1.Close
-    Set RecordsetA1 = Nothing
+    RecordsetA4.Close
+    Set RecordsetA4 = Nothing
 End Sub
 
 Function NullIfEmptyString(str As String) As Variant
@@ -204,3 +205,5 @@ Function NullIfEmptyString(str As String) As Variant
         NullIfEmptyString = strTrimmed
     End If
 End Function
+
+

@@ -1,3 +1,4 @@
+Attribute VB_Name = "Stage1"
 
 Option Compare Database
 '============================================================================
@@ -329,7 +330,7 @@ db.Execute (sNewCourtDatesRowSQL)
 Set rstCourtDatesID = CurrentDb.OpenRecordset("SELECT MAX(ID) as IDNo FROM CourtDates")
 sCourtDatesID = rstCourtDatesID.Fields("IDNo").Value
 rstCourtDatesID.Close
-sCourtDatesID = Str(CurrentDb.OpenRecordset("SELECT MAX(ID) FROM CourtDates"))
+sCourtDatesID = str(CurrentDb.OpenRecordset("SELECT MAX(ID) FROM CourtDates"))
 [Forms]![NewMainMenu]![ProcessJobSubformNMM].[Form]![JobNumberField].Value = sCourtDatesID
 
 'come back
@@ -823,12 +824,7 @@ Dim iTurnaroundTimesCD As Integer, iAudioLength As Integer, iEstimatedPageCount 
 Dim iUnitPriceID As Integer
 Dim dInvoiceDate As Date, dExpectedBalanceDate As Date, dExpectedAdvanceDate As Date, dExpectedRebateDate As Date
 Dim cUnitPrice As Currency
-
-Dim sJurisdiction As String
-Dim sUnitPriceRateSrchSQL As String
-
-Dim InsertCustomersTempCourtDatesSQLstring As String
-
+Dim sJurisdiction As String, sUnitPriceRateSrchSQL As String, InsertCustomersTempCourtDatesSQLstring As String
 
 'calculate fields
 Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
@@ -845,23 +841,14 @@ sJurisdiction = rstTempCourtDates.Fields("Jurisdiction").Value
             'king county rate 40 3.10
         
 'Non -Court
-
 '    10 calendar-day turnaround, $2.00 per audio minute 49
 '    same day/overnight, $5.25 per page 42
 
 
 'Court Transcription
-
-'    30 calendar-day turnaround, $3.00/page 39
-'    14 calendar-day turnaround, $3.50/page 41
-'    07 calendar-day turnaround, $4.00/page 62
-'    03 calendar-day turnaround, $4.75/page 57
-'    same day/overnight turnaround, $5.25/page 61
-
-'Court Transcription Volume Discount:
-
 '    electronic copy only (court receives hard copy where applicable)
 '    minimum 15 transcribed audio hours in one order
+'    45 calendar-day turnaround, $2.50/page
 '    30 calendar-day turnaround, $2.65/page 58
 '    14 calendar-day turnaround, $3.25/page 59
 '    07 calendar-day turnaround, $3.75/page 60
@@ -873,145 +860,183 @@ dExpectedAdvanceDate = (Date + iTurnaroundTimesCD) - 2
 dExpectedRebateDate = (Date + iTurnaroundTimesCD) + 28
 iEstimatedPageCount = ((iAudioLength / 60) * 45)
 
-If iAudioLength > 865 Then
-    
-    If ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
-        iUnitPriceID = 58
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("45")) Then iUnitPriceID = 64
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("45")) Then iUnitPriceID = 64
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 58
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) > ("2")) Then iUnitPriceID = 49
-    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    ElseIf ((sJurisdiction) Like ("*" & "Food and Drug Administration" & "*")) Then iUnitPriceID = 37
-    ElseIf ((sJurisdiction) Like ("*" & "fda" & "*")) Then iUnitPriceID = 37
-    ElseIf ((sJurisdiction) Like ("*" & "KCI" & "*")) Then iUnitPriceID = 40
-    ElseIf ((sJurisdiction) Like ("*" & "Weber Oregon" & "*")) Or ((sJurisdiction) Like ("*" & "Weber Nevada" & "*")) _
-        Or ((sJurisdiction) Like ("*" & "Weber Bankruptcy" & "*")) Then iUnitPriceID = 36
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 58
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    Else
-    End If
-    
-    
-    If ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
-        iUnitPriceID = 58
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 64
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    Else
-    End If
-    
-    'if non-court, use audio length as page count for rate calculation
-    If iUnitPriceID = "49" Then
-        iEstimatedPageCount = iAudioLength
-    Else
-    End If
-    
-    If ((sJurisdiction) Like ("*" & "eScribers" & "*")) Then iUnitPriceID = 33
-    
-    If ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
-        iUnitPriceID = 58
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 64
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    Else
-    End If
-    
-    If (sJurisdiction) Like ("*" & "Concord" & "*") Then
+Select Case True
+    Case ((sJurisdiction) Like ("*" & "USBC" & "*")), ((sJurisdiction) Like ("*" & "superior court" & "*")), _
+    ((sJurisdiction) Like ("*" & "Massachusetts" & "*")), ((sJurisdiction) Like ("*" & "Licensing" & "*")), _
+    ((sJurisdiction) Like ("*" & "district court" & "*"))
+        Select Case iTurnaroundTimesCD
+            Case "45"
+                iUnitPriceID = 64
+            Case "30"
+                iUnitPriceID = 58
+            Case "14"
+                iUnitPriceID = 59
+            Case "7"
+                iUnitPriceID = 60
+            Case "3"
+                iUnitPriceID = 42
+            Case Else
+                iUnitPriceID = 61
+        End Select
+    Case (sJurisdiction) Like ("*" & "non-court" & "*"), (sJurisdiction) Like ("*" & "noncourt" & "*")
+        Select Case iTurnaroundTimesCD
+            Case "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"
+                iUnitPriceID = 38
+                iEstimatedPageCount = iAudioLength
+            Case "2"
+                iUnitPriceID = 49
+            Case Else
+                iUnitPriceID = 61
+        End Select
+    Case (sJurisdiction) Like ("*" & "Food and Drug Administration" & "*"), ((sJurisdiction) Like ("*" & "fda" & "*"))
+        iUnitPriceID = 37
+    Case ((sJurisdiction) Like ("*" & "KCI" & "*"))
+        iUnitPriceID = 40
+    Case ((sJurisdiction) Like ("*" & "Weber Oregon" & "*")), ((sJurisdiction) Like ("*" & "Weber Nevada" & "*")), _
+    ((sJurisdiction) Like ("*" & "Weber Bankruptcy" & "*"))
+        iUnitPriceID = 36
+    Case ((sJurisdiction) Like ("*" & "eScribers" & "*")), ((sJurisdiction) Like ("*" & "Concord" & "*"))
         iUnitPriceID = 33
-    Else
-    End If
-
-Else
-    
-    If ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
-        iUnitPriceID = 39
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
-    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 39
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
-    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) > (2)) Then iUnitPriceID = 49
-    ElseIf ((sJurisdiction) Like ("*" & "NonCourt" & "*") And (iTurnaroundTimesCD) > (2)) Then iUnitPriceID = 49
-    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    ElseIf ((sJurisdiction) Like ("*" & "Food and Drug Administration" & "*")) Then iUnitPriceID = 37
-    ElseIf ((sJurisdiction) Like ("*" & "fda" & "*")) Then iUnitPriceID = 37
-    ElseIf ((sJurisdiction) Like ("*" & "KCI" & "*")) Then iUnitPriceID = 40
-    ElseIf ((sJurisdiction) Like ("*" & "Weber Bankruptcy" & "*")) Then iUnitPriceID = 36
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 39
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
-    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-
-
-    ElseIf ((sJurisdiction) Like ("*NonCourt*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    ElseIf ((sJurisdiction) Like ("*NonCourt*") And (iTurnaroundTimesCD) > ("2")) Then iUnitPriceID = 49
-
-    Else
-    
-    End If
-
-    
-     If sJurisdiction Like "*NonCourt*" Then iUnitPriceID = 63
-     If ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
-        iUnitPriceID = 39
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
-    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    Else
-    End If
-    
-    'if non-court, use audio length as page count for rate calculation
-    If iUnitPriceID = "38" Or iUnitPriceID = "46" Then
-        iEstimatedPageCount = iAudioLength
-    Else
-    End If
-    
-    If ((sJurisdiction) Like ("*" & "eScribers" & "*")) Then iUnitPriceID = 33
-    
-    If ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
-        iUnitPriceID = 39
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
-    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
-    Else
-    End If
-    
-    If (sJurisdiction) Like ("*" & "Concord" & "*") Then
-        iUnitPriceID = 33
-    Else
-    End If
-
-End If
+        
+End Select
+'
+'If iAudioLength > 865 Then
+'
+'    If ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
+'        iUnitPriceID = 58
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("45")) Then iUnitPriceID = 64
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("45")) Then iUnitPriceID = 64
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 58
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) > ("2")) Then iUnitPriceID = 49
+'    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    ElseIf ((sJurisdiction) Like ("*" & "Food and Drug Administration" & "*")) Then iUnitPriceID = 37
+'    ElseIf ((sJurisdiction) Like ("*" & "fda" & "*")) Then iUnitPriceID = 37
+'    ElseIf ((sJurisdiction) Like ("*" & "KCI" & "*")) Then iUnitPriceID = 40
+'    ElseIf ((sJurisdiction) Like ("*" & "Weber Oregon" & "*")) Or ((sJurisdiction) Like ("*" & "Weber Nevada" & "*")) _
+'        Or ((sJurisdiction) Like ("*" & "Weber Bankruptcy" & "*")) Then iUnitPriceID = 36
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 58
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    Else
+'    End If
+'
+'
+'    If ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
+'        iUnitPriceID = 58
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 64
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    Else
+'    End If
+'
+'    'if non-court, use audio length as page count for rate calculation
+'    If iUnitPriceID = "49" Then
+'        iEstimatedPageCount = iAudioLength
+'    Else
+'    End If
+'
+'    If ((sJurisdiction) Like ("*" & "eScribers" & "*")) Then iUnitPriceID = 33
+'
+'    If ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
+'        iUnitPriceID = 58
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 64
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 59
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 60
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 42
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    Else
+'    End If
+'
+'    If (sJurisdiction) Like ("*" & "Concord" & "*") Then
+'        iUnitPriceID = 33
+'    Else
+'    End If
+'
+'Else
+'
+'    If ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
+'        iUnitPriceID = 39
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
+'    ElseIf ((sJurisdiction) Like ("*" & "USBC" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 39
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
+'    ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) > (2)) Then iUnitPriceID = 49
+'    ElseIf ((sJurisdiction) Like ("*" & "NonCourt" & "*") And (iTurnaroundTimesCD) > (2)) Then iUnitPriceID = 49
+'    ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    ElseIf ((sJurisdiction) Like ("*" & "Food and Drug Administration" & "*")) Then iUnitPriceID = 37
+'    ElseIf ((sJurisdiction) Like ("*" & "fda" & "*")) Then iUnitPriceID = 37
+'    ElseIf ((sJurisdiction) Like ("*" & "KCI" & "*")) Then iUnitPriceID = 40
+'    ElseIf ((sJurisdiction) Like ("*" & "Weber Bankruptcy" & "*")) Then iUnitPriceID = 36
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("30")) Then iUnitPriceID = 39
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
+'    ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'
+'
+'    ElseIf ((sJurisdiction) Like ("*NonCourt*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    ElseIf ((sJurisdiction) Like ("*NonCourt*") And (iTurnaroundTimesCD) > ("2")) Then iUnitPriceID = 49
+'
+'    Else
+'
+'    End If
+'
+'
+'     If sJurisdiction Like "*NonCourt*" Then iUnitPriceID = 63
+'     If ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
+'        iUnitPriceID = 39
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
+'    ElseIf ((sJurisdiction) Like ("*" & "Licensing" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    Else
+'    End If
+'
+'    'if non-court, use audio length as page count for rate calculation
+'    If iUnitPriceID = "38" Or iUnitPriceID = "46" Then
+'        iEstimatedPageCount = iAudioLength
+'    Else
+'    End If
+'
+'    If ((sJurisdiction) Like ("*" & "eScribers" & "*")) Then iUnitPriceID = 33
+'
+'    If ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("30")) Then
+'        iUnitPriceID = 39
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("14")) Then iUnitPriceID = 41
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("7")) Then iUnitPriceID = 62
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("3")) Then iUnitPriceID = 57
+'    ElseIf ((sJurisdiction) Like ("*" & "district court" & "*") And (iTurnaroundTimesCD) Like ("1")) Then iUnitPriceID = 61
+'    Else
+'    End If
+'
+'    If (sJurisdiction) Like ("*" & "Concord" & "*") Then
+'        iUnitPriceID = 33
+'    Else
+'    End If
+'
+'End If
 
 'get proper rate now that we have UnitPrice ID
-    
-    sUnitPriceRateSrchSQL = "SELECT Rate from UnitPrice where ID = " & iUnitPriceID & ";"
-    Set rs2 = CurrentDb.OpenRecordset(sUnitPriceRateSrchSQL)
-    cUnitPrice = rs2.Fields("Rate").Value
-
+sUnitPriceRateSrchSQL = "SELECT Rate from UnitPrice where ID = " & iUnitPriceID & ";"
+Set rs2 = CurrentDb.OpenRecordset(sUnitPriceRateSrchSQL)
+cUnitPrice = rs2.Fields("Rate").Value
 rs2.Close
 
 'calculate total price estimate
@@ -1023,20 +1048,25 @@ If sSubtotal < 50 Then
     sSubtotal = 50
 Else
 End If
-595599
+
 'insert calculated fields into tempcourtdates
 
-Set rstTempCourtDates = CurrentDb.OpenRecordset("qSelect1TempCourtDates")
-rstTempCourtDates.Edit
-    rstTempCourtDates("InvoiceDate") = dInvoiceDate
-    rstTempCourtDates("UnitPrice") = iUnitPriceID
-    rstTempCourtDates("ExpectedRebateDate") = dExpectedRebateDate
-    rstTempCourtDates("ExpectedAdvanceDate") = dExpectedAdvanceDate
-    rstTempCourtDates("EstimatedPageCount") = iEstimatedPageCount
-    rstTempCourtDates("Subtotal") = sSubtotal
-rstTempCourtDates.Update
-rstTempCourtDates.Close
-
+            db.Execute "UPDATE TempCourtDates SET InvoiceDate = " & dInvoiceDate & ", " & "UnitPrice = " & iUnitPriceID & ", " & "ExpectedRebateDate = " & dExpectedRebateDate _
+             & ", " & "ExpectedAdvanceDate = " & dExpectedAdvanceDate & ", " & "EstimatedPageCount = " & iEstimatedPageCount & ", " & "Subtotal = " & _
+             sSubtotal & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+        'rstTempCustomers.Edit
+'
+'Set rstTempCourtDates = CurrentDb.OpenRecordset("qSelect1TempCourtDates")
+'rstTempCourtDates.Edit
+'    rstTempCourtDates("InvoiceDate") = dInvoiceDate
+'    rstTempCourtDates("UnitPrice") = iUnitPriceID
+'    rstTempCourtDates("ExpectedRebateDate") = dExpectedRebateDate
+'    rstTempCourtDates("ExpectedAdvanceDate") = dExpectedAdvanceDate
+'    rstTempCourtDates("EstimatedPageCount") = iEstimatedPageCount
+'    rstTempCourtDates("Subtotal") = sSubtotal
+'rstTempCourtDates.Update
+'rstTempCourtDates.Close
+'
 
 MsgBox "Transcript Income Info:  " & Chr(13) & "Turnaround:  " & iTurnaroundTimesCD & " calendar days" _
   & Chr(13) & "Audio Length:  " & iAudioLength & " minutes" _
@@ -1282,72 +1312,78 @@ Dim oWordDoc As New Word.Document, oWordEditor As Word.editor, oWordApp As New W
 dDeadline = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtDeadline]
 iAudioLength = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtAudioLength]
 
-sPageRate1 = "3.00" 'get pagerate
-sPageRate2 = "3.50"
-sPageRate3 = "4.00"
-sPageRate4 = "4.75"
-sPageRate5 = "5.25"
+sPageRate10 = "2.50"
 sPageRate6 = "2.65"
 sPageRate7 = "3.25"
 sPageRate8 = "3.75"
 sPageRate9 = "4.25"
+sPageRate5 = "5.25"
+
+sPageRate1 = "3.00" 'get pagerate
+sPageRate2 = "3.50"
+sPageRate3 = "4.00"
+sPageRate4 = "4.75"
+
 iDateDifference = Int(DateDiff("d", Date, dDeadline))
 
-If iAudioLength > 885 Then
-
-        If iDateDifference < 4 And iDateDifference > 0 Then
-            sPageRate = sPageRate5
-        ElseIf iDateDifference < 8 And iDateDifference > 3 Then
-            sPageRate = sPageRate9
-        ElseIf iDateDifference < 15 And iDateDifference > 7 Then
-            sPageRate = sPageRate8
-        ElseIf iDateDifference < 31 And iDateDifference > 14 Then
-            sPageRate = sPageRate7
-        ElseIf iDateDifference < 30 Then
-            sPageRate = sPageRate6
-        Else
-        End If
-        
-Else
-
-        If iDateDifference < 4 And iDateDifference > 0 Then
-            sPageRate = sPageRate5
-        ElseIf iDateDifference < 8 And iDateDifference > 3 Then
-            sPageRate = sPageRate4
-        ElseIf iDateDifference < 15 And iDateDifference > 7 Then
-            sPageRate = sPageRate3
-        ElseIf iDateDifference < 31 And iDateDifference > 14 Then
-            sPageRate = sPageRate2
-        ElseIf iDateDifference < 30 Then
-            sPageRate = sPageRate1
-        Else
-        End If
-
+If iDateDifference < 4 And iDateDifference > 0 Then
+    sPageRate = sPageRate5
+ElseIf iDateDifference < 8 And iDateDifference > 2 Then
+    sPageRate = sPageRate9
+ElseIf iDateDifference < 15 And iDateDifference > 6 Then
+    sPageRate = sPageRate8
+ElseIf iDateDifference < 31 And iDateDifference > 13 Then
+    sPageRate = sPageRate7
+ElseIf iDateDifference > 30 And iDateDifference < 45 Then
+    sPageRate = sPageRate6
+ElseIf iDateDifference > 44 Then
+    sPageRate = sPageRate10
 End If
+'
+'Else
+'
+'        If iDateDifference < 4 And iDateDifference > 0 Then
+'            sPageRate = sPageRate5
+'        ElseIf iDateDifference < 8 And iDateDifference > 3 Then
+'            sPageRate = sPageRate4
+'        ElseIf iDateDifference < 15 And iDateDifference > 7 Then
+'            sPageRate = sPageRate3
+'        ElseIf iDateDifference < 31 And iDateDifference > 14 Then
+'            sPageRate = sPageRate2
+'        ElseIf iDateDifference < 30 Then
+'            sPageRate = sPageRate1
+'        Else
+'        End If
+'
+'End If
 
 
 iPageCount = Int((iAudioLength / 60) * 45) 'calculate PageCount
 
-If iAudioLength > 885 Then
+'If iAudioLength > 885 Then
 
-    sSubtotal1 = sPageRate6 * iPageCount
-    sSubtotal2 = sPageRate7 * iPageCount
-    sSubtotal3 = sPageRate8 * iPageCount
+    sSubtotal6 = sPageRate5 * iPageCount
     sSubtotal4 = sPageRate9 * iPageCount
-    
-Else
-
-    'calculate Subtotal1, Subtotal2, Subtotal3, Subtotal4
-    sSubtotal1 = sPageRate1 * iPageCount
-    sSubtotal2 = sPageRate2 * iPageCount
-    sSubtotal3 = sPageRate3 * iPageCount
-    sSubtotal4 = sPageRate4 * iPageCount
-    
-End If
+    sSubtotal3 = sPageRate8 * iPageCount
+    sSubtotal2 = sPageRate7 * iPageCount
+    sSubtotal1 = sPageRate6 * iPageCount
+    sSubtotal5 = sPageRate10 * iPageCount
+'
+'Else
+'
+'    'calculate Subtotal1, Subtotal2, Subtotal3, Subtotal4
+'    sSubtotal1 = sPageRate1 * iPageCount
+'    sSubtotal2 = sPageRate2 * iPageCount
+'    sSubtotal3 = sPageRate3 * iPageCount
+'    sSubtotal4 = sPageRate4 * iPageCount
+'
+'End If
 
 sPQEmailTemplatePath = "T:\Database\Templates\Stage1s\PriceQuoteEmail-Template.docx"
 sPQEmailCSVPath = "T:\Database\Scripts\InProgressExcels\Temp-Export-PQE.xlsx"
-sQueryName = "SELECT #" & dDeadline & "# AS Deadline, " & iAudioLength & " AS AudioLength, " & iPageCount & " AS PageCount, " & sSubtotal1 & " AS Subtotal1, " & sSubtotal2 & " AS Subtotal2, " & sSubtotal3 & " AS Subtotal3, " & sSubtotal4 & " AS Subtotal4;"
+sQueryName = "SELECT #" & dDeadline & "# AS Deadline, " & iAudioLength & " AS AudioLength, " & iPageCount & " AS PageCount, " _
+& sSubtotal1 & " AS Subtotal1, " & sSubtotal2 & " AS Subtotal2, " & _
+sSubtotal3 & " AS Subtotal3, " & sSubtotal4 & " AS Subtotal4, " & sSubtotal5 & " AS Subtotal5;"
  
 Set db = CurrentDb
 On Error Resume Next
@@ -1465,36 +1501,59 @@ Call pfUpdateCheckboxStatus("TranscriptsReady")
 
 FileCopy sCourtRulesPath7, sCourtRulesPath7a
 
-If sJurisdiction Like "*AVT*" Or sJurisdiction Like "*AVTranz*" Or sJurisdiction Like "*eScribers*" Then
-    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
-    GoTo Line2
-End If
+Select Case True
+    Case sJurisdiction Like "*AVT*", sJurisdiction Like "*AVTranz*", _
+    sJurisdiction Like "*eScribers*", sJurisdiction Like "*FDA*", _
+    sJurisdiction Like "Food and Drug Administration", _
+    sJurisdiction Like "Weber Oregon", sJurisdiction Like "Weber Bankruptcy", _
+    sJurisdiction Like "Weber Nevada"
+        GoTo Line2
+    Case sJurisdiction Like "*USBC*", sJurisdiction Like "*Bankruptcy*"
+        FileCopy sCourtRulesPath1, sCourtRulesPath1a
+        FileCopy sCourtRulesPath2, sCourtRulesPath2a
+        FileCopy sCourtRulesPath3, sCourtRulesPath3a
+        FileCopy sCourtRulesPath4, sCourtRulesPath4a
+        FileCopy sCourtRulesPath5, sCourtRulesPath5a
+        FileCopy sCourtRulesPath6, sCourtRulesPath6a
+    Case sJurisdiction Like "*Superior Court*", sJurisdiction Like "*District Court*", sJurisdiction Like "*Supreme Court*"
+        FileCopy sCourtRulesPath8, sCourtRulesPath8a
+        FileCopy sCourtRulesPath9, sCourtRulesPath9a
+    Case sJurisdiction Like "Massachusetts"
+        FileCopy sCourtRulesPath10, sCourtRulesPath10a
+End Select
 
-If sJurisdiction Like "*FDA*" Or sJurisdiction Like "Food and Drug Administration" Then
-    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
-    GoTo Line2
-End If
-
-If sJurisdiction Like "*USBC*" Or sJurisdiction Like "*Bankruptcy*" Then
-    FileCopy sCourtRulesPath1, sCourtRulesPath1a
-    FileCopy sCourtRulesPath2, sCourtRulesPath2a
-    FileCopy sCourtRulesPath3, sCourtRulesPath3a
-    FileCopy sCourtRulesPath4, sCourtRulesPath4a
-    FileCopy sCourtRulesPath5, sCourtRulesPath5a
-    FileCopy sCourtRulesPath6, sCourtRulesPath6a
-End If
-
-If sJurisdiction Like "*Superior Court*" Or sJurisdiction Like "*District Court*" Or sJurisdiction Like "*Supreme Court*" Then
-    FileCopy sCourtRulesPath8, sCourtRulesPath8a
-    FileCopy sCourtRulesPath9, sCourtRulesPath9a
-End If
-
-If sJurisdiction Like "Weber Oregon" Or sJurisdiction Like "Weber Bankruptcy" Or sJurisdiction Like "Weber Nevada" Then
-    GoTo Line2
-    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
-End If
-
-If sJurisdiction Like "Massachusetts" Then FileCopy sCourtRulesPath10, sCourtRulesPath10a
+'
+'
+'If sJurisdiction Like "*AVT*" Or sJurisdiction Like "*AVTranz*" Or sJurisdiction Like "*eScribers*" Then
+'    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
+'    GoTo Line2
+'End If
+'
+'If sJurisdiction Like "*FDA*" Or sJurisdiction Like "Food and Drug Administration" Then
+'    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
+'    GoTo Line2
+'End If
+'
+'If sJurisdiction Like "*USBC*" Or sJurisdiction Like "*Bankruptcy*" Then
+'    FileCopy sCourtRulesPath1, sCourtRulesPath1a
+'    FileCopy sCourtRulesPath2, sCourtRulesPath2a
+'    FileCopy sCourtRulesPath3, sCourtRulesPath3a
+'    FileCopy sCourtRulesPath4, sCourtRulesPath4a
+'    FileCopy sCourtRulesPath5, sCourtRulesPath5a
+'    FileCopy sCourtRulesPath6, sCourtRulesPath6a
+'End If
+'
+'If sJurisdiction Like "*Superior Court*" Or sJurisdiction Like "*District Court*" Or sJurisdiction Like "*Supreme Court*" Then
+'    FileCopy sCourtRulesPath8, sCourtRulesPath8a
+'    FileCopy sCourtRulesPath9, sCourtRulesPath9a
+'End If
+''
+'If sJurisdiction Like "Weber Oregon" Or sJurisdiction Like "Weber Bankruptcy" Or sJurisdiction Like "Weber Nevada" Then
+'    GoTo Line2
+'    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
+'End If
+'
+'If sJurisdiction Like "Massachusetts" Then FileCopy sCourtRulesPath10, sCourtRulesPath10a
 
 'Call pfCreateCDLabel 'cd label
 Call pfUpdateCheckboxStatus("CDLabel")
@@ -1514,6 +1573,7 @@ sXeroCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-" & 
 
 DoCmd.TransferText acExportDelim, , "SelectXero", sXeroCSVPath, True
 
+'come back xero api
 sURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
 Application.FollowHyperlink (sURL) 'open xero website
 Call pfUpdateCheckboxStatus("InvoiceCompleted")
@@ -1528,26 +1588,17 @@ Call pfUpdateCheckboxStatus("InvoiceCompleted")
 
 Call fWunderlistAddNewJob
 
-
-
 sQuestion = "Want to send Adam an initial income report?"
 sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
-
 If sAnswer = vbNo Then 'Code for No
     MsgBox "No initial income report will be sent.  You're done!"
     
 Else 'Code for yes
+    Call pfGenericExportandMailMerge("Invoice", "Stage1s\CIDIncomeReport")
+    Call pfCommunicationHistoryAdd("CIDIncomeReport")
+    Call pfSendWordDocAsEmail("CIDIncomeReport", "Initial Income Notification") 'initial income report 'emails adam cid report
 
-        Call pfGenericExportandMailMerge("Invoice", "Stage1s\CIDIncomeReport")
-        
-        Call pfCommunicationHistoryAdd("CIDIncomeReport")
-        
-        Call pfSendWordDocAsEmail("CIDIncomeReport", "Initial Income Notification") 'initial income report 'emails adam cid report
-    
 End If
-
-
-
 
 sQuestion = "Want to send an order confirmation to the client?"
 sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -1563,18 +1614,9 @@ Else 'Code for yes
 End If
 
 
-
-
-
 MsgBox "Stage 1 complete."
-
-
-
 Call pfTypeRoughDraftF 'type rough draft prompt
-
-
 Call pfClearGlobals
-
 End Function
 
 
@@ -1950,15 +1992,15 @@ Do While rstOLP.EOF = False
     'split Contents at "|"
     sCSVInfo = Split(sEmailText, "|")
         'then split split contents
-        sSplitInfo = Str(sCSVInfo(1))
+        sSplitInfo = str(sCSVInfo(1))
         sInfoFields = Split(sEmailText, ";")
         sSubmissionDate = Date
-        sYourName = Str(sInfoFields(0))
+        sYourName = str(sInfoFields(0))
         sYourNameA = Split(sYourName, " ")
             sFirstName = sYourNameA(0)
             sLastName = sYourNameA(1)
             'split
-        sAttorneyName = Str(sInfoFields(1))
+        sAttorneyName = str(sInfoFields(1))
         sAttorneyNameA = Split(sYourName, " ")
             sFirstA = sAttorneyNameA(0)
             sLastA = sAttorneyNameA(1)
@@ -1970,7 +2012,7 @@ Do While rstOLP.EOF = False
         sAudioLength = sInfoFields(6)
         sAddress1 = sInfoFields(7)
         sAddress2 = sInfoFields(8)
-        sAddress3 = Str(sInfoFields(9))
+        sAddress3 = str(sInfoFields(9))
         sAddress3A = Split(sYourName, " ")
             sCity = sAddress3A(0)
             sState = sAddress3A(1)
@@ -2003,166 +2045,285 @@ Do While rstOLP.EOF = False
         iEstimatedPageCount = ((sAudioLength / 60) * 45)
         sAccountCode = 400
         
-        'calculate unitprice, inventoryratecode
-        If sAudioLength >= 885 Then
-            If sTurnaround = 30 Then sUnitPrice = 39
-            If sTurnaround = 30 Then sIRC = 17
-            If sTurnaround = 14 Then sUnitPrice = 41
-            If sTurnaround = 14 Then sIRC = 19
-            If sTurnaround = 7 Then sUnitPrice = 62
-            If sTurnaround = 7 Then sIRC = 20
-            If sTurnaround = 3 Then sUnitPrice = 50
-            If sTurnaround = 3 Then sIRC = 84
-            If sTurnaround = 1 Then sUnitPrice = 61
-            If sTurnaround = 1 Then sIRC = 14
+        Select Case sTurnaround
+            Case "45"
+                sUnitPrice = 64
+                sIRC = 96
+                
+            Case "30"
+                sUnitPrice = 39
+                sIRC = 17
+                
+            Case "14"
+                sUnitPrice = 41
+                sIRC = 19
+                
+            Case "7"
+                sUnitPrice = 62
+                sIRC = 20
+                
+            Case "3"
+                sUnitPrice = 50
+                sIRC = 84
+                
+            Case Else
+                sUnitPrice = 61
+                sIRC = 14
+        End Select
         
-        Else
-            If sTurnaround = 30 Then sUnitPrice = 58
-            If sTurnaround = 30 Then sIRC = 78
-            If sTurnaround = 14 Then sUnitPrice = 59
-            If sTurnaround = 14 Then sIRC = 7
-            If sTurnaround = 7 Then sUnitPrice = 60
-            If sTurnaround = 7 Then sIRC = 8
-            If sTurnaround = 3 Then sUnitPrice = 42
-            If sTurnaround = 3 Then sIRC = 90
-            If sTurnaround = 1 Then sUnitPrice = 61
-            If sTurnaround = 1 Then sIRC = 14
-        
-            If sJurisdiction Like "*eScribers*" Then
+        Select Case True
+            Case sJurisdiction Like "*eScribers*"
                 sUnitPrice = 33
                 sIRC = 95
-            End If
-            If sJurisdiction = "FDA" Then
+                
+            Case sJurisdiction = "FDA", sJurisdiction = "Food and Drug Administration"
                 sUnitPrice = 37
                 sIRC = 41
-            End If
-            If sJurisdiction = "Food and Drug Administration" Then
-                sUnitPrice = 37
-                sIRC = 41
-            End If
-            If sJurisdiction Like "*Weber*" Then
+                
+            Case sJurisdiction Like "*Weber*", sJurisdiction Like "*J&J*"
                 sUnitPrice = 36
                 sIRC = 65
-            End If
-            If sJurisdiction Like "*J&J*" Then
-                sUnitPrice = 36
-                sIRC = 43
-            End If
-            If sJurisdiction = "Non-Court" Then
+                
+            Case sJurisdiction = "Non-Court", sJurisdiction = "NonCourt"
                 sUnitPrice = 49
                 sIRC = 86
-            End If
-            If sJurisdiction = "NonCourt" Then
-                sUnitPrice = 49
-                sIRC = 86
-            End If
-            If sJurisdiction Like "*KCI*" Then
+                
+            Case sJurisdiction Like "*KCI*"
                 sUnitPrice = 40
                 sIRC = 56
-            End If
         
-        End If
+        End Select
+        'calculate unitprice, inventoryratecode
+'        If sAudioLength >= 885 Then
+'            If sTurnaround = 30 Then sUnitPrice = 39
+'            If sTurnaround = 30 Then sIRC = 17
+'            If sTurnaround = 14 Then sUnitPrice = 41
+'            If sTurnaround = 14 Then sIRC = 19
+'            If sTurnaround = 7 Then sUnitPrice = 62
+'            If sTurnaround = 7 Then sIRC = 20
+'            If sTurnaround = 3 Then sUnitPrice = 50
+'            If sTurnaround = 3 Then sIRC = 84
+'            If sTurnaround = 1 Then sUnitPrice = 61
+'            If sTurnaround = 1 Then sIRC = 14
+'
+'        Else
+'            If sTurnaround = 30 Then sUnitPrice = 58
+'            If sTurnaround = 30 Then sIRC = 78
+'            If sTurnaround = 14 Then sUnitPrice = 59
+'            If sTurnaround = 14 Then sIRC = 7
+'            If sTurnaround = 7 Then sUnitPrice = 60
+'            If sTurnaround = 7 Then sIRC = 8
+'            If sTurnaround = 3 Then sUnitPrice = 42
+'            If sTurnaround = 3 Then sIRC = 90
+'            If sTurnaround = 1 Then sUnitPrice = 61
+'            If sTurnaround = 1 Then sIRC = 14
+'
+'            If sJurisdiction Like "*eScribers*" Then
+'                sUnitPrice = 33
+'                sIRC = 95
+'            End If
+'            If sJurisdiction = "FDA" Then
+'                sUnitPrice = 37
+'                sIRC = 41
+'            End If
+'            If sJurisdiction = "Food and Drug Administration" Then
+'                sUnitPrice = 37
+'                sIRC = 41
+'            End If
+'            If sJurisdiction Like "*Weber*" Then
+'                sUnitPrice = 36
+'                sIRC = 65
+'            End If
+'            If sJurisdiction Like "*J&J*" Then
+'                sUnitPrice = 36
+'                sIRC = 43
+'            End If
+'            If sJurisdiction = "Non-Court" Then
+'                sUnitPrice = 49
+'                sIRC = 86
+'            End If
+'            If sJurisdiction = "NonCourt" Then
+'                sUnitPrice = 49
+'                sIRC = 86
+'            End If
+'            If sJurisdiction Like "*KCI*" Then
+'                sUnitPrice = 40
+'                sIRC = 56
+'            End If
+'
+'        End If
         
-        'calculate brandingtheme
+        'come back
         sFiled = InputBox("Are we filing this, yes or no?")
         sFactoring = InputBox("Are we factoring this, yes or no?")
         
-        If sFiled = "yes" Or sFiled = "Yes" Or sFiled = "Y" Or sFiled = "y" Then
-        
-            If sFactoring = "yes" Or sFactoring = "Yes" Or sFactoring = "Y" Or sFactoring = "y" Then
+Select Case sFiled
+    
+    Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", "Y", "y", _
+    "yep", "Yep", "YEP", "YA", "Ya", "ya" 'filed
+                
+        Select Case sFactored
+            Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
+            "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
                 sFactoring = True
                 sBrandingTheme = 6
-            Else 'with deposit
+            Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "Nope", _
+            "NOPE", "N", "n" 'with deposit
                 sFactoring = False
                 sBrandingTheme = 8
-            End If
-            
-        Else 'not filed
+        End Select
         
-            If sFactoring = "yes" Or sFactoring = "Yes" Or sFactoring = "Y" Or sFactoring = "y" Then
-                sFactoring = True
-                If sJurisdiction Like "*J&J*" Then
-                    sBrandingTheme = 10
-                ElseIf sJurisdiction Like "*eScribers*" Then sBrandingTheme = 11
-                ElseIf sJurisdiction Like "*FDA*" Or sJurisdiction Like "*Food and Drug Administration*" Then sBrandingTheme = 12
-                ElseIf sJurisdiction Like "*Weber*" Then sBrandingTheme = 12
-                ElseIf sJurisdiction Like "*NonCourt*" Or sJurisdiction Like "*Non-Court*" Then sBrandingTheme = 1
-                Else: sBrandingTheme = 7
-                End If
-            Else 'with deposit
-                sFactoring = False
-                If sJurisdiction Like "*NonCourt*" Or sJurisdiction Like "*Non-Court*" Then
-                    sBrandingTheme = 2
-                Else: sBrandingTheme = 9
-                End If
-            End If
+    Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "NOPE", "Nope", "N", "n" 'not filed
         
-        
-        End If
+         Select Case sFactored
+                Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
+                "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
+                    sFactoring = True
+                    Select Case sJurisdiction
+                        Case "J&J", "J&J Court Transcribers", "J&J Court"
+                            sBrandingTheme = 10
+                        Case "eScribers", "AVT", "AVTranz", "eScribers NH", _
+                            "eScribers Bankruptcy"
+                            sBrandingTheme = 11
+                        Case "FDA", "Food and Drug Administration", "Weber"
+                            sBrandingTheme = 12
+                        Case "NonCourt", "Non-Court", "Noncourt", "NONCOURT"
+                            sBrandingTheme = 1
+                        Case Else
+                            sBrandingTheme = 7
+                    End Select
+                Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "Nope", _
+                "NOPE", "n", "N" 'with deposit
+                    sFactoring = False
+                    Select Case sJurisdiction
+                        Case "NonCourt", "Non-Court", "Noncourt", "NONCOURT"
+                            sBrandingTheme = 2
+                        Case Else
+                            sBrandingTheme = 9
+                    End Select
+            End Select
+End Select
+'
+'        If sFiled = "yes" Or sFiled = "Yes" Or sFiled = "Y" Or sFiled = "y" Then
+'
+'            If sFactoring = "yes" Or sFactoring = "Yes" Or sFactoring = "Y" Or sFactoring = "y" Then
+'                sFactoring = True
+'                sBrandingTheme = 6
+'            Else 'with deposit
+'                sFactoring = False
+'                sBrandingTheme = 8
+'            End If
+'
+'        Else 'not filed
+'
+'            If sFactoring = "yes" Or sFactoring = "Yes" Or sFactoring = "Y" Or sFactoring = "y" Then
+'                sFactoring = True
+'                If sJurisdiction Like "*J&J*" Then
+'                    sBrandingTheme = 10
+'                ElseIf sJurisdiction Like "*eScribers*" Then sBrandingTheme = 11
+'                ElseIf sJurisdiction Like "*FDA*" Or sJurisdiction Like "*Food and Drug Administration*" Then sBrandingTheme = 12
+'                ElseIf sJurisdiction Like "*Weber*" Then sBrandingTheme = 12
+'                ElseIf sJurisdiction Like "*NonCourt*" Or sJurisdiction Like "*Non-Court*" Then sBrandingTheme = 1
+'                Else: sBrandingTheme = 7
+'                End If
+'            Else 'with deposit
+'                sFactoring = False
+'                If sJurisdiction Like "*NonCourt*" Or sJurisdiction Like "*Non-Court*" Then
+'                    sBrandingTheme = 2
+'                Else: sBrandingTheme = 9
+'                End If
+'            End If
+'
+'
+'        End If
                 
-        'place info into tempcourtdates and tempcases
-            Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
-                rstTempCourtDates.AddNew
-                rstTempCourtDates.Fields("SubmissionDate").Value = sSubmissionDate
-                rstTempCourtDates.Fields("FirstName").Value = sFirstName
-                rstTempCourtDates.Fields("LastName").Value = sLastName
-                rstTempCourtDates.Fields("MrMs").Value = "Mrs"
-                rstTempCourtDates.Fields("AFirstName").Value = sFirstA
-                rstTempCourtDates.Fields("ALastName").Value = sLastA
-                rstTempCourtDates.Fields("Company").Value = sCompany
-                rstTempCourtDates.Fields("Notes").Value = sEmail
-                rstTempCourtDates.Fields("EmailAddress").Value = "inquiries@aquoco.co"
-                rstTempCourtDates.Fields("HardCopy").Value = sHardCopy
-                rstTempCourtDates.Fields("Address1").Value = sAddress1
-                rstTempCourtDates.Fields("Address2").Value = sAddress2
-                rstTempCourtDates.Fields("City").Value = sCity
-                rstTempCourtDates.Fields("State").Value = sState
-                rstTempCourtDates.Fields("ZIP").Value = sZIP
-                rstTempCourtDates.Fields("TurnaroundTimesCD").Value = sTurnaround
-                rstTempCourtDates.Fields("AudioLength").Value = sAudioLength
-                rstTempCourtDates.Fields("Address1").Value = sAddress1
-                rstTempCourtDates.Fields("Address2").Value = sAddress2
-                rstTempCourtDates.Fields("Party1").Value = sParty1
-                rstTempCourtDates.Fields("Party2").Value = sParty2
-                rstTempCourtDates.Fields("CaseNumber1").Value = sCaseNumber1
-                rstTempCourtDates.Fields("CaseNumber2").Value = sCaseNumber2
-                rstTempCourtDates.Fields("Judge").Value = sJudge
-                rstTempCourtDates.Fields("Jurisdiction").Value = sJurisdiction
-                rstTempCourtDates.Fields("HearingDate").Value = sHearingDate
-                rstTempCourtDates.Fields("Party1Name").Value = sParty1Name
-                rstTempCourtDates.Fields("Party2Name").Value = sParty2Name
-                rstTempCourtDates.Fields("JudgeTitle").Value = sJudgeTitle
-                rstTempCourtDates.Fields("HearingTitle").Value = sHearingTitle
-                rstTempCourtDates.Fields("HearingEndTime").Value = sHEnd
-                rstTempCourtDates.Fields("HearingStartTime").Value = sHStart
-                rstTempCourtDates.Fields("Location").Value = sLocation
-                rstTempCourtDates.Fields("InvoiceDate").Value = dInvoiceDate
-                rstTempCourtDates.Fields("DueDate").Value = dDueDate
-                rstTempCourtDates.Fields("AccountCode").Value = sAccountCode
-                rstTempCourtDates.Fields("UnitPrice").Value = sUnitPrice
-                rstTempCourtDates.Fields("InventoryRateCode").Value = sIRC
-                rstTempCourtDates.Fields("BrandingTheme").Value = sBrandingTheme
-                rstTempCourtDates.Update
-    '           'SELECT FROM COURTDATES HearingDate, HearingStartTime, HearingEndTime, AudioLength, Location, TurnaroundTimesCD, InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, AccountCode, BrandingTheme FROM [TempCourtDates];"
-                          
+'place info into tempcourtdates and tempcases
+Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
+rstTempCourtDates.MoveFirst
+sTurnaround = rstTempCourtDates.Fields("TurnaroundTimesCD").Value
+rstTempCourtDates.Close
+dInvoiceDate = (Date + sTurnaround) - 2
+dDueDate = (Date + sTurnaround) - 2
+sAccountCode = 400
+
+db.Execute "INSERT INTO TempCourtDates (SubmissionDate, FirstName, LastName, MrMs, AFirstName, ALastName, Company, Notes, EmailAddress, " & _
+"HardCopy, Address1, Address2, City, State, ZIP, TurnaroundTimesCD, AudioLength, Party1, Party2, CaseNumber1, CaseNumber2, Judge, Jurisdiction, " & _
+"HearingDate, Party1Name, Party2Name, JudgeTitle, HearingTitle, HearingEndTime, HearingStartTime, Location, InvoiceDate, DueDate, " & _
+"AccountCode, UnitPrice, InventoryRateCode, BrandingTheme) VALUES (" & _
+sSubmissionDate & ", " & sFirstName & ", " & sLastName & ", " & "Mrs" & ", " & sFirstA & ", " & sLastA & ", " & sCompany & ", " & sEmail & ", " & "inquiries@aquoco.co" & _
+", " & sHardCopy & ", " & sAddress1 & ", " & sAddress2 & ", " & sCity & ", " & sState & ", " & sZIP & ", " & sTurnaround & ", " & sAudioLength & ", " & sParty1 & ", " & _
+sParty2 & ", " & sCaseNumber1 & ", " & sCaseNumber2 & ", " & sJudge & ", " & sJurisdiction & ", " & sHearingDate & ", " & sParty1Name & ", " & sParty2Name & ", " & _
+sJudgeTitle & ", " & sHearingTitle & ", " & sHEnd & ", " & sHStart & ", " & sLocation & ", " & dInvoiceDate & ", " & dDueDate & ", " & sAccountCode & ", " & sUnitPrice & ", " & _
+sIRC & ", " & sBrandingTheme & ");"
+'
+'        'place info into tempcourtdates and tempcases
+'            Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
+'                rstTempCourtDates.AddNew
+'                rstTempCourtDates.Fields("SubmissionDate").Value = sSubmissionDate
+'                rstTempCourtDates.Fields("FirstName").Value = sFirstName
+'                rstTempCourtDates.Fields("LastName").Value = sLastName
+'                rstTempCourtDates.Fields("MrMs").Value = "Mrs"
+'                rstTempCourtDates.Fields("AFirstName").Value = sFirstA
+'                rstTempCourtDates.Fields("ALastName").Value = sLastA
+'                rstTempCourtDates.Fields("Company").Value = sCompany
+'                rstTempCourtDates.Fields("Notes").Value = sEmail
+'                rstTempCourtDates.Fields("EmailAddress").Value = "inquiries@aquoco.co"
+'                rstTempCourtDates.Fields("HardCopy").Value = sHardCopy
+'                rstTempCourtDates.Fields("Address1").Value = sAddress1
+'                rstTempCourtDates.Fields("Address2").Value = sAddress2
+'                rstTempCourtDates.Fields("City").Value = sCity
+'                rstTempCourtDates.Fields("State").Value = sState
+'                rstTempCourtDates.Fields("ZIP").Value = sZIP
+'                rstTempCourtDates.Fields("TurnaroundTimesCD").Value = sTurnaround
+'                rstTempCourtDates.Fields("AudioLength").Value = sAudioLength
+'                rstTempCourtDates.Fields("Address1").Value = sAddress1
+'                rstTempCourtDates.Fields("Address2").Value = sAddress2
+'                rstTempCourtDates.Fields("Party1").Value = sParty1
+'                rstTempCourtDates.Fields("Party2").Value = sParty2
+'                rstTempCourtDates.Fields("CaseNumber1").Value = sCaseNumber1
+'                rstTempCourtDates.Fields("CaseNumber2").Value = sCaseNumber2
+'                rstTempCourtDates.Fields("Judge").Value = sJudge
+'                rstTempCourtDates.Fields("Jurisdiction").Value = sJurisdiction
+'                rstTempCourtDates.Fields("HearingDate").Value = sHearingDate
+'                rstTempCourtDates.Fields("Party1Name").Value = sParty1Name
+'                rstTempCourtDates.Fields("Party2Name").Value = sParty2Name
+'                rstTempCourtDates.Fields("JudgeTitle").Value = sJudgeTitle
+'                rstTempCourtDates.Fields("HearingTitle").Value = sHearingTitle
+'                rstTempCourtDates.Fields("HearingEndTime").Value = sHEnd
+'                rstTempCourtDates.Fields("HearingStartTime").Value = sHStart
+'                rstTempCourtDates.Fields("Location").Value = sLocation
+'                rstTempCourtDates.Fields("InvoiceDate").Value = dInvoiceDate
+'                rstTempCourtDates.Fields("DueDate").Value = dDueDate
+'                rstTempCourtDates.Fields("AccountCode").Value = sAccountCode
+'                rstTempCourtDates.Fields("UnitPrice").Value = sUnitPrice
+'                rstTempCourtDates.Fields("InventoryRateCode").Value = sIRC
+'                rstTempCourtDates.Fields("BrandingTheme").Value = sBrandingTheme
+'                rstTempCourtDates.Update
+'    '           'SELECT FROM COURTDATES HearingDate, HearingStartTime, HearingEndTime, AudioLength, Location, TurnaroundTimesCD, InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, AccountCode, BrandingTheme FROM [TempCourtDates];"
+'
                 'add to tempcases
-                Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
+'                Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
+'
+'                rstTempCases.AddNew
+'                rstTempCases.Fields("HearingTitle").Value = sHearingTitle
+'                rstTempCases.Fields("Party1").Value = sParty1
+'                rstTempCases.Fields("Party1Name").Value = sParty1Name
+'                rstTempCases.Fields("Party2").Value = sParty2
+'                rstTempCases.Fields("Party2Name").Value = sParty2Name
+'                rstTempCases.Fields("CaseNumber1").Value = sCaseNumber1
+'                rstTempCases.Fields("CaseNumber2").Value = sCaseNumber2
+'                rstTempCases.Fields("Jurisdiction").Value = sJurisdiction
+'                rstTempCases.Fields("Judge").Value = sJudge
+'                rstTempCases.Fields("JudgeTitle").Value = sJudgeTitle
+'                rstTempCases.Fields("Notes").Value = sEmail
+'                rstTempCases.Update
+'                rstTempCases.Close
+'                rstTempCourtDates.Close
                 
-                rstTempCases.AddNew
-                rstTempCases.Fields("HearingTitle").Value = sHearingTitle
-                rstTempCases.Fields("Party1").Value = sParty1
-                rstTempCases.Fields("Party1Name").Value = sParty1Name
-                rstTempCases.Fields("Party2").Value = sParty2
-                rstTempCases.Fields("Party2Name").Value = sParty2Name
-                rstTempCases.Fields("CaseNumber1").Value = sCaseNumber1
-                rstTempCases.Fields("CaseNumber2").Value = sCaseNumber2
-                rstTempCases.Fields("Jurisdiction").Value = sJurisdiction
-                rstTempCases.Fields("Judge").Value = sJudge
-                rstTempCases.Fields("JudgeTitle").Value = sJudgeTitle
-                rstTempCases.Fields("Notes").Value = sEmail
-                rstTempCases.Update
-                rstTempCases.Close
-                rstTempCourtDates.Close
+                sNewCourtDatesRowSQL = "INSERT INTO TempCases (HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
+                "Jurisdiction, Judge, JudgeTitle, Notes) VALUES HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
+                "Jurisdiction, Judge, JudgeTitle, Notes FROM [TempCourtDates];"
+                db.Execute (sNewCourtDatesRowSQL)
 
         
         'enter apps into tempcustomers
@@ -2190,7 +2351,7 @@ Do While rstOLP.EOF = False
                 sAudioLength = sCurrentAppString(6)
                 sAddress1 = sCurrentAppString(7)
                 sAddress2 = sCurrentAppString(8)
-                sAddress3 = Str(sCurrentAppString(9))
+                sAddress3 = str(sCurrentAppString(9))
                     'split
                 sParty1 = sCurrentAppString(10)
                 sParty2 = sCurrentAppString(11)
@@ -2205,23 +2366,28 @@ Do While rstOLP.EOF = False
         
                 
                'enter into tempcustomers
-                Set rstTempCustomers = CurrentDb.OpenRecordset("TempCustomers")
-                rstTempCustomers.AddNew
-                rstTempCustomers.Fields("LastName").Value = sLastA
-                rstTempCustomers.Fields("FirstName").Value = sFirstA
-                rstTempCustomers.Fields("Company").Value = sCompany
-                rstTempCustomers.Fields("MrMs").Value = sMrMs
-                rstTempCustomers.Fields("JobTitle").Value = sJobTitle
-                rstTempCustomers.Fields("BusinessPhone").Value = sBusinessPhone
-                rstTempCustomers.Fields("Address").Value = sAddress1 & " " & sAddress2
-                rstTempCustomers.Fields("City").Value = sCity
-                rstTempCustomers.Fields("State").Value = sState
-                rstTempCustomers.Fields("ZIP").Value = sZIP
-                rstTempCustomers.Fields("Notes").Value = sEmail
-                rstTempCustomers.Fields("FactoringApproved").Value = sFactoring
-                tcCID = rstTempCustomers.Fields("ID").Value
-                rstTempCustomers.Update
-                    
+'                Set rstTempCustomers = CurrentDb.OpenRecordset("TempCustomers")
+'                rstTempCustomers.AddNew
+'                rstTempCustomers.Fields("LastName").Value = sLastA
+'                rstTempCustomers.Fields("FirstName").Value = sFirstA
+'                rstTempCustomers.Fields("Company").Value = sCompany
+'                rstTempCustomers.Fields("MrMs").Value = sMrMs
+'                rstTempCustomers.Fields("JobTitle").Value = sJobTitle
+'                rstTempCustomers.Fields("BusinessPhone").Value = sBusinessPhone
+'                rstTempCustomers.Fields("Address").Value = sAddress1 & " " & sAddress2
+'                rstTempCustomers.Fields("City").Value = sCity
+'                rstTempCustomers.Fields("State").Value = sState
+'                rstTempCustomers.Fields("ZIP").Value = sZIP
+'                rstTempCustomers.Fields("Notes").Value = sEmail
+'                rstTempCustomers.Fields("FactoringApproved").Value = sFactoring
+'                tcCID = rstTempCustomers.Fields("ID").Value
+'                rstTempCustomers.Update
+'
+                
+                db.Execute "INSERT INTO TempCourtDates (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, " & _
+                "ZIP, Notes, FactoringApproved) VALUES (" & _
+                sLastName & ", " & sFirstName & ", " & sLastName & ", " & sCompany & ", " & sMrMs & ", " & sJobTitle & ", " & sBusinessPhone & ", " & sAddress1 & " " & sAddress2 & ", " & _
+                sCity & ", " & sState & ", " & sZIP & ", " & sEmail & ", " & sFactoring & ");"
             'move to next appearance
             Next
     
@@ -2293,55 +2459,107 @@ Do While rstOLP.EOF = False
                 sInvoiceNumber = rstTempJob.Fields("InvoiceNo")
                 sCasesID = rstTempJob.Fields("CasesID")
                 
-                'db.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [TempCourtDates].[InvoiceNo] = " & sInvoiceNumber & ";"
+                            
+                db.Execute "UPDATE TempCourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+                'rstTempJob.Edit
+                'rstTempJob.Fields("CasesID") = sCasesID
+                'rstTempJob.Update
+                'sCasesID = rstTempJob.Fields("CasesID")
+                
+                db.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [InvoiceNo] = " & sInvoiceNumber & ";"
                 '"SELECT * FROM TempCourtDates WHERE [InvoiceNo]=" & sInvoiceNumber & ";"
-                Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
-                rstTempCDs.Edit
-                rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
-                rstTempCDs.Update
-                rstTempCDs.Close
-                Set rstTempCDs = Nothing
+                'Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
+                'rstTempCDs.Edit
+                'rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
+                'rstTempCDs.Update
+                'rstTempCDs.Close
+                'Set rstTempCDs = Nothing
                 'db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 
-                Set rstTempCDs = db.OpenRecordset("TempCustomers")
-                rstTempCDs.Edit
-                rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
-                rstTempCDs.Update
-                rstTempCDs.Close
-                Set rstTempCDs = Nothing
+                db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & ";"
+                'Set rstTempCDs = db.OpenRecordset("TempCustomers")
+                'rstTempCDs.Edit
+                'rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
+                'rstTempCDs.Update
+                'rstTempCDs.Close
+                'Set rstTempCDs = Nothing
+                
+                db.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [ID] = " & sCourtDatesID & ";"
+                'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+                'rstTempCDs.Edit
+                'If sCasesID <> "" Then rstTempCDs.Fields("CasesID").Value = sCasesID
+                'rstTempCDs.Update
+                'rstTempCDs.Close
+                'Set rstTempCDs = Nothing
+                
+                db.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [ID] = " & sCourtDatesID & ";"
+                'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+                'rstTempCDs.Edit
+                'rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
+                'rstTempCDs.Update
+                'rstTempCDs.Close
+                'Set rstTempCDs = Nothing
+                
+                db.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [ID] = " & sCourtDatesID & ";"
+                'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+                'rstTempCDs.Edit
+                'rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
+                'rstTempCDs.Update
+                'rstTempCDs.Close
+                'Set rstTempCDs = Nothing
                 
                 
-                'db.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 
-                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-                rstTempCDs.Edit
-                rstTempCDs.Fields("CasesID").Value = sCasesID
-                rstTempCDs.Update
-                rstTempCDs.Close
-                Set rstTempCDs = Nothing
                 
+                'db.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [TempCourtDates].[InvoiceNo] = " & sInvoiceNumber & ";"
+                '"SELECT * FROM TempCourtDates WHERE [InvoiceNo]=" & sInvoiceNumber & ";"
+'                Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
+'                rstTempCDs.Edit
+'                rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
+'                rstTempCDs.Update
+'                rstTempCDs.Close
+'                Set rstTempCDs = Nothing
+                'db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+'
+'                Set rstTempCDs = db.OpenRecordset("TempCustomers")
+'                rstTempCDs.Edit
+'                rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
+'                rstTempCDs.Update
+'                rstTempCDs.Close
+'                Set rstTempCDs = Nothing
+'
+'
+'                'db.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+'
+'                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+'                rstTempCDs.Edit
+'                rstTempCDs.Fields("CasesID").Value = sCasesID
+'                rstTempCDs.Update
+'                rstTempCDs.Close
+'                Set rstTempCDs = Nothing
+'
                 
                 'db.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-                
-                    
-                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-                rstTempCDs.Edit
-                rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
-                rstTempCDs.Update
-                rstTempCDs.Close
-                Set rstTempCDs = Nothing
-                
+'
+'
+'                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+'                rstTempCDs.Edit
+'                rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
+'                rstTempCDs.Update
+'                rstTempCDs.Close
+'                Set rstTempCDs = Nothing
+'
                 
                 'db.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-                
-                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-                rstTempCDs.Edit
-                rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
-                rstTempCDs.Update
-                rstTempCDs.Close
-                Set rstTempCDs = Nothing
-                
-                
+'
+'                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+'                rstTempCDs.Edit
+'                rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
+'                rstTempCDs.Update
+'                rstTempCDs.Close
+'                Set rstTempCDs = Nothing
+'
+'
                 
                 
                 If IsNull(rstCurrentJob!StatusesID) Then
@@ -2363,6 +2581,9 @@ Do While rstOLP.EOF = False
             Call pfCheckFolderExistence 'checks for job folders/rough draft
             
             'import appearancesId from tempcustomers into courtdates
+            
+            
+            
             Set db = CurrentDb
             sTempCustomersSQL = "SELECT * FROM TempCustomers;"
             sCurrentJobSQL = "SELECT * FROM CourtDates WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
@@ -2373,6 +2594,7 @@ Do While rstOLP.EOF = False
             x = 1
             
             rstTempJob.MoveFirst
+            '
             
             Do Until rstTempJob.EOF
             
@@ -2380,30 +2602,67 @@ Do While rstOLP.EOF = False
                 sAppNumber = "App" & x
                 
                 If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
-                
-                
-                    'db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                    Select Case sAppNumber
+                        Case "App1", "App2", "App3", "App4", "App5", "App6"
+                            db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                        Case Else
+                            Exit Do
+                    End Select
                     
-                    Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-                    rstTempCDs.Edit
-                    rstTempCDs.Fields(sAppNumber).Value = sCurrentTempApp
-                    rstTempCDs.Update
-                    rstTempCDs.Close
-                    Set rstTempCDs = Nothing
+                    'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
+                    'rstTempCDs.Edit
+                    'If sAppNumber = "App7" Then
+                    '    rstTempCDs.Update
+                    '    rstTempCDs.Close
+                    '    Set rstTempCDs = Nothing
+                    '    GoTo ExitLoop
+                    'Else
+                    '    rstTempCDs.Fields(sAppNumber).Value = sCurrentTempApp
+                    '    rstTempCDs.Update
+                    '    rstTempCDs.Close
+                    '    Set rstTempCDs = Nothing
+                    'End If
+                    'rstTempJob.MoveNext
                     
-                    
-                    rstTempJob.MoveNext
                 Else:
                     Exit Do
                 End If
-                
-                
                 x = x + 1
-                rstTempJob.MoveNext
-                
-                
             Loop
-                
+
+
+
+
+'            Do Until rstTempJob.EOF
+'
+'                sCurrentTempApp = rstTempJob.Fields("AppID").Value
+'                sAppNumber = "App" & x
+'
+'                If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
+'
+'
+'                    'db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+'
+'                    Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+'                    rstTempCDs.Edit
+'                    rstTempCDs.Fields(sAppNumber).Value = sCurrentTempApp
+'                    rstTempCDs.Update
+'                    rstTempCDs.Close
+'                    Set rstTempCDs = Nothing
+'
+'
+'                    rstTempJob.MoveNext
+'                Else:
+'                    Exit Do
+'                End If
+'
+'
+'                x = x + 1
+'                rstTempJob.MoveNext
+'
+'
+'            Loop
+'
             
             db.Close:   Set db = Nothing
             Set db = CurrentDb
@@ -2440,7 +2699,9 @@ Do While rstOLP.EOF = False
             
             sJurisdiction = rstCurrentCasesID.Fields("Jurisdiction").Value
             
-            If sJurisdiction Like "Weber Nevada" Or sJurisdiction Like "Weber Bankruptcy" Or sJurisdiction Like "Weber Oregon" Or sJurisdiction Like "Food and Drug Administration" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" Or sJurisdiction Like "*eScribers*" Or sJurisdiction Like "*AVTranz*" Then
+            If sJurisdiction Like "Weber Nevada" Or sJurisdiction Like "Weber Bankruptcy" Or sJurisdiction Like "Weber Oregon" _
+            Or sJurisdiction Like "Food and Drug Administration" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" _
+            Or sJurisdiction Like "*eScribers*" Or sJurisdiction Like "*AVTranz*" Then
                 
                 db.Execute "UPDATE Statuses SET AddTrackingNumber = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
                 db.Execute "UPDATE Statuses SET GenerateShippingEM = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
@@ -2501,10 +2762,6 @@ Else 'Code for yes
     Call pfSendWordDocAsEmail("OrderConfirmation", "Transcript Order Confirmation") 'Order Confrmation Email
     
 End If
-
-    
-
-
 End Function
 
 Public Function NewOLEntry()
