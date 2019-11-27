@@ -160,7 +160,7 @@ Public Sub Update()
         .Fields("Judge").Value = Me.Judge
         .Fields("JudgeTitle").Value = Me.JudgeTitle
         .Fields("Notes").Value = Me.Notes
-        .Fields("CasesID").Value = Me.CaseID
+        .Fields("CasesID").Value = Me.ID
         .Update
     End With
     mbooLoaded = True

@@ -37,22 +37,6 @@ Public Property Let InvoiceNo(rData As String)
     sInvoiceNo = rData
 End Property
 
-Public Property Get Email() As String
-    Email = sEmail
-End Property
-
-Public Property Let Email(rData As String)
-    sEmail = rData
-End Property
-
-Public Property Get Description() As String
-    Description = sDescription
-End Property
-
-Public Property Let Description(rData As String)
-    sDescription = rData
-End Property
-
 Public Property Get Subtotal() As String
     Subtotal = sSubtotal
 End Property
@@ -69,102 +53,6 @@ Public Property Let InvoiceDate(rData As String)
     sInvoiceDate = rData
 End Property
 
-Public Property Get InvoiceTime() As String
-    InvoiceTime = sInvoiceTime
-End Property
-
-Public Property Let InvoiceTime(rData As String)
-    sInvoiceTime = rData
-End Property
-
-Public Property Get PaymentTerms() As String
-    PaymentTerms = sPaymentTerms
-End Property
-
-Public Property Let PaymentTerms(rData As String)
-    sPaymentTerms = rData
-End Property
-
-Public Property Get Note() As String
-    Note = sNote
-End Property
-
-Public Property Let Note(rData As String)
-    sNote = rData
-End Property
-
-Public Property Get Terms() As String
-    Terms = sTerms
-End Property
-
-Public Property Let Terms(rData As String)
-    sTerms = rData
-End Property
-
-Public Property Get MinimumAmount() As String
-    MinimumAmount = sMinimumAmount
-End Property
-
-Public Property Let MinimumAmount(rData As String)
-    sMinimumAmount = rData
-End Property
-
-Public Property Get Memo() As String
-    Memo = vmMemo
-End Property
-
-Public Property Let Memo(rData As String)
-    vmMemo = rData
-End Property
-
-Public Property Get URL() As String
-    URL = vlURL
-End Property
-
-Public Property Let URL(rData As String)
-    vlURL = rData
-End Property
-
-Public Property Get TemplateID() As String
-    TemplateID = sTemplateID
-End Property
-
-Public Property Let TemplateID(rData As String)
-    sTemplateID = rData
-End Property
-
-Public Property Get Line1() As String
-    Line1 = sLine1
-End Property
-
-Public Property Let Line1(rData As String)
-    sLine1 = rData
-End Property
-
-Public Property Get City() As String
-    City = sCity
-End Property
-
-Public Property Let City(rData As String)
-    sCity = rData
-End Property
-
-Public Property Get State() As String
-    State = sState
-End Property
-
-Public Property Let State(rData As String)
-    sState = rData
-End Property
-
-Public Property Get ZIP() As String
-    ZIP = sZIP
-End Property
-
-Public Property Let ZIP(rData As String)
-    sZIP = rData
-End Property
-
 Public Property Get Quantity() As String
     Quantity = sQuantity
 End Property
@@ -173,14 +61,7 @@ Public Property Let Quantity(rData As String)
     sQuantity = rData
 End Property
 
-Public Property Get Value() As String
-    Value = sValue
-End Property
-
-Public Property Let Value(rData As String)
-    sValue = rData
-End Property
-
+        
 Public Property Get InventoryRateCode() As String
     InventoryRateCode = sInventoryRateCode
 End Property
@@ -188,15 +69,6 @@ End Property
 Public Property Let InventoryRateCode(rData As String)
     sInventoryRateCode = rData
 End Property
-
-Public Property Get IRC() As String
-    IRC = sIRC
-End Property
-
-Public Property Let IRC(rData As String)
-    sIRC = rData
-End Property
-
 
 Public Property Get ActualQuantity() As String
     ActualQuantity = sActualQuantity
@@ -271,14 +143,6 @@ Public Property Let PaymentSum(rData As String)
     sPaymentSum = rData
 End Property
 
-Public Property Get FactoringApproved() As String
-    FactoringApproved = sFactoringApproved
-End Property
-
-Public Property Let FactoringApproved(rData As String)
-    sFactoringApproved = rData
-End Property
-
 Public Property Get BrandingTheme() As String
     BrandingTheme = sBrandingTheme
 End Property
@@ -295,30 +159,6 @@ Public Property Let FinalPrice(rData As String)
     sFinalPrice = rData
 End Property
 
-Public Property Get ClientTranscriptName() As String
-    ClientTranscriptName = sClientTranscriptName
-End Property
-
-Public Property Let ClientTranscriptName(rData As String)
-    sClientTranscriptName = rData
-End Property
-
-Public Property Get CurrentTranscriptName() As String
-    CurrentTranscriptName = sCurrentTranscriptName
-End Property
-
-Public Property Let CurrentTranscriptName(rData As String)
-    sCurrentTranscriptName = rData
-End Property
-
-Public Property Get Status() As String
-    Status = vStatus
-End Property
-
-Public Property Let Status(rData As String)
-    vStatus = rData
-End Property
-
 Public Property Get UnitPrice() As String
     UnitPrice = sUnitPrice
 End Property
@@ -327,52 +167,12 @@ Public Property Let UnitPrice(rData As String)
     sUnitPrice = rData
 End Property
 
-Public Property Get BalanceDue() As String
-    BalanceDue = sBalanceDue
-End Property
-
-Public Property Let BalanceDue(rData As String)
-    sBalanceDue = rData
-End Property
-
 Public Property Get FactoringCost() As String
     FactoringCost = sFactoringCost
 End Property
 
 Public Property Let FactoringCost(rData As String)
     sFactoringCost = rData
-End Property
-
-Public Property Get vURL() As String
-    vURL = svURL
-End Property
-
-Public Property Let vURL(rData As String)
-    svURL = rData
-End Property
-
-Public Property Get LinkToCSV() As String
-    LinkToCSV = sLinkToCSV
-End Property
-
-Public Property Let LinkToCSV(rData As String)
-    sLinkToCSV = rData
-End Property
-
-Public Property Get FirstName() As String
-    FirstName = sFirstName
-End Property
-
-Public Property Let FirstName(rData As String)
-    sFirstName = rData
-End Property
-
-Public Property Get LastName() As String
-    LastName = sLastName
-End Property
-
-Public Property Let LastName(rData As String)
-    sLastName = rData
 End Property
 
 Public Property Get HearingDate() As Date
@@ -400,93 +200,12 @@ Public Property Let HearingEndTime(rData As Date)
     dHearingEndTime = rData
 End Property
 
-Public Property Get MrMs() As String
-    MrMs = sMrMs
-End Property
-
-Public Property Let MrMs(rData As String)
-    sMrMs = rData
-End Property
-
-
-Public Property Get Name() As String
-    Name = sName
-End Property
-
-Public Property Let Name(rData As String)
-    sName = rData
-End Property
-
-Public Property Get Address1() As String
-    Address1 = sAddress1
-End Property
-
-Public Property Let Address1(rData As String)
-    sAddress1 = rData
-End Property
-
-Public Property Get Address2() As String
-    Address2 = sAddress2
-End Property
-
-Public Property Let Address2(rData As String)
-    sAddress2 = rData
-End Property
-
-Public Property Get Notes() As String
-    Notes = sNotes
-End Property
-
-Public Property Let Notes(rData As String)
-    sNotes = rData
-End Property
-
-Public Property Get Time() As String
-    Time = sTime
-End Property
-
-Public Property Let Time(rData As String)
-    sTime = rData
-End Property
-
-Public Property Get Time1() As String
-    Time1 = sTime1
-End Property
-
-Public Property Let Time1(rData As String)
-    sTime1 = rData
-End Property
-
 Public Property Get CaseID() As String
     CaseID = sCaseID
 End Property
 
 Public Property Let CaseID(rData As String)
     sCaseID = rData
-End Property
-
-Public Property Get CasesID1() As String
-    CasesID1 = vCasesID
-End Property
-
-Public Property Let CasesID1(rData As String)
-    vCasesID = rData
-End Property
-
-Public Property Get HearingLocation() As String
-    HearingLocation = sHearingLocation
-End Property
-
-Public Property Let HearingLocation(rData As String)
-    sHearingLocation = rData
-End Property
-
-Public Property Get URL1() As String
-    URL1 = sURL1
-End Property
-
-Public Property Let URL1(rData As String)
-    sURL1 = rData
 End Property
 
 Public Property Get ID() As Long
@@ -563,37 +282,12 @@ Private Sub Load()
         sApp5 = Nz(.Fields("App5").Value)
         sApp6 = Nz(.Fields("App6").Value)
         Me.InvoiceNo = .Fields("InvoiceNo").Value
-        'Me.Party1 = Nz(.Fields("Party1").Value)
-        'Me.Party2 = Nz(.Fields("Party2").Value)
-        'Me.Party1Name = Nz(.Fields("Party1Name").Value)
-        'Me.Party2Name = Nz(.Fields("Party2Name").Value)
-        'Me.Company = Nz(.Fields("Company").Value)
-        'Me.Email = Nz(.Fields("Email").Value)
-        'Me.Description = Nz(.Fields("Description").Value)
         Me.Subtotal = Nz(.Fields("Subtotal").Value)
         Me.InvoiceDate = Nz(.Fields("InvoiceDate").Value)
-        'Me.InvoiceTime = Nz(.Fields("InvoiceTime").Value)
-        'Me.PaymentTerms = Nz(.Fields("PaymentTerms").Value)
-        'Me.Note = Nz(.Fields("Note").Value)
-        'Me.Terms = Nz(.Fields("Terms").Value)
-        'Me.MinimumAmount = Nz(.Fields("MinimumAmount").Value)
-        'Me.Memo = Nz(.Fields("Memo").Value)
-        'Me.URL = Nz(.Fields("URL").Value)
-        'Me.TemplateID = Nz(.Fields("TemplateID").Value)
-        'Me.Line1 = Nz(.Fields("Line").Value)
-        'Me.City = Nz(.Fields("City").Value)
-        'Me.State = Nz(.Fields("State").Value)
-        'Me.ZIP = Nz(.Fields("ZIP").Value)
         Me.Quantity = Nz(.Fields("Quantity").Value)
-        'Me.Value = Nz(.Fields("Value").Value)
         Me.InventoryRateCode = Nz(.Fields("InventoryRateCode").Value)
-        'Me.IRC = Nz(.Fields("IRC").Value)
-        'Me.CaseNumber1 = Nz(.Fields("CaseNumber1").Value)
-        'Me.CaseNumber2 = Nz(.Fields("CaseNumber2").Value)
         Me.ActualQuantity = Nz(.Fields("ActualQuantity").Value)
-        'Me.Jurisdiction = Nz(.Fields("Jurisdiction").Value)
         Me.TurnaroundTime = .Fields("TurnaroundTimesCD").Value
-        'Me.OrderingID = Nz(.Fields("OrderingID").Value)
         Me.AudioLength = Nz(.Fields("AudioLength").Value)
         Me.EstimatedPageCount = Nz(.Fields("EstimatedPageCount").Value)
         Me.StatusesID = Nz(.Fields("StatusesID").Value)
@@ -601,33 +295,14 @@ Private Sub Load()
         Me.ExpectedAdvanceDate = Nz(.Fields("ExpectedAdvanceDate").Value)
         Me.ExpectedRebateDate = Nz(.Fields("ExpectedRebateDate").Value)
         Me.PaymentSum = Nz(.Fields("PaymentSum").Value)
-        'Me.FactoringApproved = Nz(.Fields("FactoringApproved").Value)
         Me.BrandingTheme = Nz(.Fields("BrandingTheme").Value)
         Me.FinalPrice = Nz(.Fields("FinalPrice").Value)
-        'Me.ClientTranscriptName = Nz(.Fields("ClientTranscriptName").Value)
-        'Me.CurrentTranscriptName = Nz(.Fields("CurrentTranscriptName").Value)
-        'Me.BalanceDue = Nz(.Fields("BalanceDue").Value)
         Me.FactoringCost = Nz(.Fields("FactoringCost").Value)
-        'Me.URL1 = Nz(.Fields("URL1").Value)
-        'Me.LinkToCSV = Nz(.Fields("LinkToCSV").Value)
-        'Me.FirstName = Nz(.Fields("FirstName").Value)
-        'Me.LastName = Nz(.Fields("LastName").Value)
         Me.HearingDate = Nz(.Fields("HearingDate").Value)
         Me.HearingStartTime = .Fields("HearingStartTime").Value
         Me.HearingEndTime = .Fields("HearingEndTime").Value
-        'Me.MrMs = Nz(.Fields("MrMs").Value)
-        'Me.Name = Nz(.Fields("Name").Value)
-        'Me.Address1 = Nz(.Fields("Address1").Value)
-        'Me.Address2 = Nz(.Fields("Address2").Value)
-        'Me.Notes = Nz(.Fields("Notes").Value)
-        'Me.Time = Nz(.Fields("Time").Value)
-        'Me.Time1 = Nz(.Fields("Time1").Value)
         Me.CaseID = Nz(.Fields("CasesID").Value)
-        'Me.CasesID1 = Nz(.Fields("CasesID1").Value)
-        'Me.Status = Nz(.Fields("Status").Value)
         Me.UnitPrice = Nz(.Fields("UnitPrice").Value)
-        'Me.HearingLocation = Nz(.Fields("HearingLocation").Value)
-        'Me. = Nz(.Fields("").Value)
         sCourtDatesID = .Fields("ID").Value
         sCaseID = .Fields("CasesID").Value
     End With
@@ -659,42 +334,13 @@ Public Sub Update()
         sApp5 = Nz(.Fields("App5").Value)
         sApp6 = Nz(.Fields("App6").Value)
         sCaseID = Nz(.Fields("CasesID").Value)
-        '.Fields("BirthDate").Value = Me.BirthDate
-        '.Fields("EmailAddress").Value = Me.EmailAddress
-        '.Fields("FirstName").Value = Me.FirstName
-        '.Fields("LastName").Value = Me.LastName
-        .Fields("Party1").Value = Me.Party1
-        .Fields("Party2").Value = Me.Party2
-        .Fields("Party1Name").Value = Me.Party1Name
-        .Fields("Party2Name").Value = Me.Party2Name
-        '.Fields("Company").Value = Me.Company
         .Fields("InvoiceNo").Value = Me.InvoiceNo
-        '.Fields("Email").Value = Me.Email
-        '.Fields("Description").Value = Me.Description
         .Fields("Subtotal").Value = Me.Subtotal
         .Fields("InvoiceDate").Value = Me.InvoiceDate
-        '.Fields("InvoiceTime").Value = Me.InvoiceTime
-        '.Fields("PaymentTerms").Value = Me.PaymentTerms
-        '.Fields("Note").Value = Me.Note
-        '.Fields("Terms").Value = Me.Terms
-        '.Fields("MinimumAmount").Value = Me.MinimumAmount
-        '.Fields("Memo").Value = Me.Memo
-        '.Fields("URL").Value = Me.URL
-        '.Fields("TemplateID").Value = Me.TemplateID
-        '.Fields("Line").Value = Me.Line1
-        '.Fields("City").Value = Me.City
-        '.Fields("State").Value = Me.State
-        '.Fields("ZIP").Value = Me.ZIP
         .Fields("Quantity").Value = Me.Quantity
-        '.Fields("Value").Value = Me.Value
         .Fields("InventoryRateCode").Value = Me.InventoryRateCode
-        '.Fields("IRC").Value = Me.IRC
-        .Fields("CaseNumber1").Value = Me.CaseNumber1
-        .Fields("CaseNumber2").Value = Me.CaseNumber2
         .Fields("ActualQuantity").Value = Me.ActualQuantity
-        .Fields("Jurisdiction").Value = Me.Jurisdiction
         .Fields("TurnaroundTimesCD").Value = Me.TurnaroundTime
-        .Fields("OrderingID").Value = Me.OrderingID
         .Fields("AudioLength").Value = Me.AudioLength
         .Fields("EstimatedPageCount").Value = Me.EstimatedPageCount
         .Fields("StatusesID").Value = Me.StatusesID
@@ -702,32 +348,14 @@ Public Sub Update()
         .Fields("ExpectedAdvanceDate").Value = Me.ExpectedAdvanceDate
         .Fields("ExpectedRebateDate").Value = Me.ExpectedRebateDate
         .Fields("PaymentSum").Value = Me.PaymentSum
-        '.Fields("FactoringApproved").Value = Me.FactoringApproved
         .Fields("BrandingTheme").Value = Me.BrandingTheme
         .Fields("FinalPrice").Value = Me.FinalPrice
-        '.Fields("ClientTranscriptName").Value = Me.ClientTranscriptName
-        '.Fields("CurrentTranscriptName").Value = Me.CurrentTranscriptName
-        '.Fields("BalanceDue").Value = Me.BalanceDue
-        '.Fields("FactoringCost").Value = Me.FactoringCost
-        '.Fields("URL1").Value = Me.URL1
-        '.Fields("LinkToCSV").Value = Me.LinkToCSV
-        '.Fields("FirstName").Value = Me.FirstName
-        '.Fields("LastName").Value = Me.LastName
         .Fields("HearingDate").Value = Me.HearingDate
-        '.Fields("MrMs").Value = Me.MrMs
-        '.Fields("Name").Value = Me.Name
-        '.Fields("Address1").Value = Me.Address1
-        '.Fields("Address2").Value = Me.Address2
-        '.Fields("Notes").Value = Me.Notes
-        '.Fields("Time").Value = Me.Time
-        '.Fields("Time1").Value = Me.Time1
         .Fields("CasesID").Value = Me.CaseID
-        '.Fields("CasesID1").Value = Me.CasesID1
-        '.Fields("Status").Value = Me.Status
         .Fields("UnitPrice").Value = Me.UnitPrice
-        '.Fields("HearingLocation").Value = Me.HearingLocation
         .Fields("HearingStartTime").Value = Me.HearingStartTime
         .Fields("HearingEndTime").Value = Me.HearingEndTime
+        .Fields("HearingDate").Value = Me.HearingDate
         .Update
     End With
     mbooLoaded = True

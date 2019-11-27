@@ -15,7 +15,7 @@ Private mCompany As String, mMrMs As String, mLastName As String
 Private mFirstName As String, mEmailAddress As String, mJobTitle As String
 Private mBusinessPhone As String, mAddress As String, mCity As String
 Private mState As String
-Private mZIP As String, mNotes As String, mFactoringApproved As CheckBox
+Private mZIP As String, mNotes As String, mFactoringApproved As Boolean
 Public sApp4 As Long
 
 Private mrstRecordset4 As Recordset
@@ -105,6 +105,13 @@ Public Property Let State(rData As String)
     mState = rData
 End Property
 
+Public Property Get FactoringApproved() As Boolean
+    FactoringApproved = mFactoringApproved
+End Property
+Public Property Let FactoringApproved(rData As Boolean)
+    mFactoringApproved = rData
+End Property
+
 Public Property Get ID() As Long
     ID = sApp4
 End Property
@@ -117,30 +124,6 @@ End Property
 Private Property Set RecordsetA4(rData As Recordset)
     Set mrstRecordset4 = rData
 End Property
-
-Public Sub SetAppValues(ByVal sApp4 As String)
-', ByVal sCompany As String, ByVal sMrMs As String, ByVal sLastName As String, _
-ByVal sFirstName As String, ByVal sEmailAddress As String, ByVal sJobTitle As String, _
-ByVal sBusinessPhone As String, ByVal sAddress As String, ByVal sCity As String, _
-sZIP As String, ByVal sNotes As String, sState As String
-'ByVal sFactoringApproved As CheckBox,
-        'mMrMs = sMrMs
-        'mLastName = sLastName
-        'mFirstName = sFirstName
-        'mFirstName = sEmailAddress
-        'mJobTitle = sJobTitle
-        'mBusinessPhone = sJobTitle
-        'mAddress = sAddress
-        'mCity = sCity
-        'mZIP = sCity
-        'mNotes = sNotes
-        'mFactoringApproved = sFactoringApproved
-        'mState = sState
-        'm_max = max_value
-        mAppID4 = sApp4
-        FindFirst "ID=" & sApp4
-    mbooLoaded = True
-End Sub
 
 
 Private Sub Load()
@@ -158,7 +141,7 @@ Private Sub Load()
         Me.State = Nz(.Fields("State").Value)
         Me.ZIP = Nz(.Fields("ZIP").Value)
         Me.Notes = Nz(.Fields("Notes").Value)
-       'Me.FactoringApproved = Nz(.Fields("FactoringApproved").Value)
+       Me.FactoringApproved = Nz(.Fields("FactoringApproved").Value)
     End With
     mbooLoaded = True
 End Sub
@@ -183,7 +166,7 @@ Public Sub Update()
         .Fields("State").Value = Me.State
         .Fields("ZIP").Value = Me.ZIP
         .Fields("Notes").Value = Me.Notes
-        '.Fields("FactoringApproved").Value = Me.FactoringApproved
+        .Fields("FactoringApproved").Value = Me.FactoringApproved
         .Update
     End With
     mbooLoaded = True
