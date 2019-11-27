@@ -14,9 +14,10 @@ Option Explicit
 Private sCourtDatesID As Long, dHearingStartTime As Date, dHearingEndTime As Date
 Private mApp0 As App0, mApp1 As App1, mApp2 As App2, mApp3 As App3
 Private mApp4 As App4, mApp5 As App5, mApp6 As App6
-Private mCaseInfo As CaseInfo
+Private mCaseInfo As CaseInfo, mStatus As Status
 Public sApp0 As Long, sApp1 As Long, sApp2 As Long, sApp3 As Long
 Public sApp4 As Long, sApp5 As Long, sApp6 As Long, sCaseID As Long
+Public sStatusID As Long, sStatusCID As Long
 
 Public lngNumOfHrs As Long, lngNumOfMins As Long, lngNumOfSecsRem As Long, lngNumOfSecs As Long
 Public lngNumOfHrs1 As Long, lngNumOfMins1 As Long, lngNumOfSecsRem1 As Long, lngNumOfSecs1 As Long
@@ -212,6 +213,16 @@ Public Property Get ID() As Long
     ID = sCourtDatesID
 End Property
 
+Public Property Get StatusID() As Long
+    StatusID = sStatusID
+End Property
+
+Public Property Get Status() As Status
+    'Private mApp1 As App1
+    If (mStatus Is Nothing) Then Set Status = New Status
+    Set Status = mStatus
+End Property
+
 Public Property Get CaseInfo() As CaseInfo
     'Private mApp1 As App1
     If (mCaseInfo Is Nothing) Then Set CaseInfo = New CaseInfo
@@ -281,6 +292,10 @@ Private Sub Load()
         sApp4 = Nz(.Fields("App4").Value)
         sApp5 = Nz(.Fields("App5").Value)
         sApp6 = Nz(.Fields("App6").Value)
+        sStatusID = Nz(.Fields("StatusesID").Value)
+        sStatusCID = Nz(.Fields("ID").Value)
+        sCourtDatesID = .Fields("ID").Value
+        sCaseID = .Fields("CasesID").Value
         Me.InvoiceNo = .Fields("InvoiceNo").Value
         Me.Subtotal = Nz(.Fields("Subtotal").Value)
         Me.InvoiceDate = Nz(.Fields("InvoiceDate").Value)
@@ -303,8 +318,6 @@ Private Sub Load()
         Me.HearingEndTime = .Fields("HearingEndTime").Value
         Me.CaseID = Nz(.Fields("CasesID").Value)
         Me.UnitPrice = Nz(.Fields("UnitPrice").Value)
-        sCourtDatesID = .Fields("ID").Value
-        sCaseID = .Fields("CasesID").Value
     End With
     mbooLoaded = True
     mApp0.FindFirst "ID=" & sApp0
@@ -315,6 +328,7 @@ Private Sub Load()
     mApp5.FindFirst "ID=" & sApp5
     mApp6.FindFirst "ID=" & sApp6
     mCaseInfo.FindFirst "ID=" & sCaseID
+    mStatus.FindFirst "ID=" & sStatusID
     'mApp1.SetAppValues (sApp1)
 End Sub
 
@@ -334,6 +348,8 @@ Public Sub Update()
         sApp5 = Nz(.Fields("App5").Value)
         sApp6 = Nz(.Fields("App6").Value)
         sCaseID = Nz(.Fields("CasesID").Value)
+        sStatusID = Nz(.Fields("StatusesID").Value)
+        sStatusCID = Nz(.Fields("ID").Value)
         .Fields("InvoiceNo").Value = Me.InvoiceNo
         .Fields("Subtotal").Value = Me.Subtotal
         .Fields("InvoiceDate").Value = Me.InvoiceDate
@@ -386,6 +402,7 @@ Private Sub Class_Initialize()
     Set mApp5 = New App5
     Set mApp6 = New App6
     Set mCaseInfo = New CaseInfo
+    Set mStatus = New Status
 End Sub
 
 Private Sub Class_Terminate()
