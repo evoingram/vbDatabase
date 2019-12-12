@@ -1,0 +1,8 @@
+﻿'@Folder("Database.Production.Forms")
+Option Compare Database
+Option Explicit
+
+Private Sub CourtDatesID_AfterUpdate()
+Me.Filter = "CourtDatesID= " & Me.CourtDatesID
+Me.FilterOn = True
+End Sub

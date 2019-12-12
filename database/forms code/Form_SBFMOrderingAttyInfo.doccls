@@ -1,0 +1,11 @@
+﻿'@Folder("Database.NotApplicable.Forms")
+Option Explicit
+Private Sub Form_Load()
+'Call GetOrderingAttorneyInfo
+'If sFactoringApproved = True Then
+ '   Me.Text27.ControlSource = "=""Factored"""
+'Else
+'    Me.Text27.ControlSource = "=""Prepaid"""
+'End If
+'OIFID
+End Sub

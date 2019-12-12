@@ -1,0 +1,22 @@
+﻿'@Folder("Database.Production.Forms")
+Option Compare Database
+Option Explicit
+
+Private Sub btnBrowse_Click()
+
+Dim sFilePath As String
+Dim fdSelectedFile As FileDialog
+
+Set fdSelectedFile = Application.FileDialog(msoFileDialogFilePicker)
+fdSelectedFile.AllowMultiSelect = False
+
+If fdSelectedFile.Show Then
+    Me.txtFileLocation = fdSelectedFile.SelectedItems.item(1)
+    sFilePath = Me.txtFileLocation
+    Me.WebBrowser4.Navigate_self sFilePath, 0
+    Me.WebBrowser4.Requery
+End If
+
+
+End Sub
+

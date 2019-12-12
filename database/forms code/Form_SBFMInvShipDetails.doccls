@@ -1,0 +1,26 @@
+﻿'@Folder("Database.Production.Forms")
+Option Compare Database
+Option Explicit
+
+Sub Form_Current()
+
+Dim sParentName As String
+
+On Error Resume Next
+sParentName = Me.Parent.Name
+
+If Err <> 0 Then
+    GoTo eHandlerX
+Else
+    On Error GoTo eHandler
+    Me.Parent![INVInvTemplate].Requery
+End If
+
+eHandlerX:
+Exit Sub
+
+eHandler:
+Resume eHandlerX
+
+End Sub
+
