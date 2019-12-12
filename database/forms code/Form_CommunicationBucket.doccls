@@ -1,0 +1,9 @@
+﻿'@Folder("Database.Production.Forms")
+Option Compare Database
+Option Explicit
+
+'@Ignore ProcedureNotUsed
+Private Sub Command1_Click()
+
+pfCommHistoryExportSub
+End Sub

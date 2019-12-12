@@ -1,0 +1,24 @@
+﻿'@Folder("Database.Admin.Forms")
+Option Compare Database
+Option Explicit
+
+Private Sub Combo57_AfterUpdate()
+Me.Requery
+End Sub
+
+Private Sub ContactsEntered_AfterUpdate()
+Me.Requery
+End Sub
+
+Private Sub CourtDatesID_AfterUpdate()
+
+
+End Sub
+
+Private Sub CoverPage_AfterUpdate()
+Me.Requery
+End Sub
+
+Private Sub Form_AfterUpdate()
+Me.Requery
+End Sub

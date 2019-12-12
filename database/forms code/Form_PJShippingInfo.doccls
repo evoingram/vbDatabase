@@ -1,0 +1,39 @@
+﻿'@Folder("Database.Production.Forms")
+Option Compare Database
+Option Explicit
+
+    '1. Authenticate a User . This involves accepting the userfs username and password and verifying
+'it with Stamps.com servers. This is usually done once at the beginning when the application is
+'launched. You can either use a login screen that is shown at the time of launch or you can save
+'the settings and log in the user in when they launch the application. The latter usually offers
+'lower security, so the former is the recommended behavior.
+    '2. Get Userfs Account Information . This provides a lot of information about the status of a
+'Stamps.com user account including postage balance and user access restrictions. It can help you
+'anticipate a userfs needs and capabilities and build a great user experience. However, when
+'using it, you should exercise caution as it reaches out to a number of our servers and can really
+'slow your application down.
+    '3. Purchase Postage . As described in the prior section, users will have to purchase and maintain a
+'postage balance. Most Stamps.com subscriptions usually come with a small amount of free
+'postage for the user (usually $5) but to continue printing postage the user will have to purchase
+'postage from time to time.
+    '4. Generate a Shipping Label . To print postage you have to go through a 3]step process.
+        ''a. Verify Address . This step helps ensure that a valid and properly formatted recipient
+'address is being used. This step allows the USPS to process packages quickly and easily.
+        ''b. Get Rates . In this step you request the various USPS services available to the user. In
+'SWS/IM this will require a minimum of an origin and destination zip codes. You then
+'show the user the options they have to ship with the USPS, the cost involved and the
+'time it can take to ship a package from origin to destination.
+
+        ''c. Request a Label . Once the user has selected a USPS service you provide the userfs
+'selection to an SWS/IM web method along with the verified address to receive a
+'shipping label.
+
+
+'check all stages completed
+'needs address selector
+'select mail type
+'weight
+'mailnig history (date shipped, received, tracking number)
+'add labels to document history
+'ship button
+'cancel
