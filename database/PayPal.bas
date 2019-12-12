@@ -1,5 +1,6 @@
 Attribute VB_Name = "PayPal"
-
+'@Folder("Database.Admin.Modules")
+Option Explicit
 
 '============================================================================
 'class module cmPayPal
@@ -62,7 +63,7 @@ Private x As String
 Private sTemp As String
 
 
-Function fSendPPEmailFactored()
+Sub fSendPPEmailFactored()
 'generates factored invoice email for pp
 Dim sFile1 As String, sInvoicePathPDF As String, sLine1 As String
 Dim sInvoiceNumber As String, sName As String, vPPInvoiceNo As String
@@ -376,13 +377,13 @@ End With
 End If
 Call pfCommunicationHistoryAdd("PP Invoice Sent")
 Call pfClearGlobals
-End Function
+End Sub
 
 
 
 
 
-Function fPPDraft()
+Sub fPPDraft()
 '============================================================================
 ' Name        : fPPDraft
 ' Author      : Erica L Ingram
@@ -417,24 +418,25 @@ rstRates.Close
 
 Debug.Print sCourtDatesID & " " & sInvoiceNumber
 
-sFile1 = "C:\other\1.txt"
-sFile2 = "C:\other\2.txt"
+'Note: fPPDraft can delete following lines when known safe come back
+'sFile1 = "C:\other\1.txt"
+'sFile2 = "C:\other\2.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
+'sUserName = sLine1
+'sPassword = sLine2
 
 sURL = "https://api.paypal.com/v1/oauth2/token/"
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
-    sAuth = TextBase64Encode(sUserName & ":" & sPassword, "us-ascii") 'mycn.GetConnection
+    sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "POST", sURL, False
@@ -569,10 +571,10 @@ CurrentDb.Execute sUpdatePPStatus
 sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
 CurrentDb.Execute sUpdatePPID
 Call pfClearGlobals
-End Function
+End Sub
 
 
-Function fPayPalUpdateCheck()
+Sub fPayPalUpdateCheck()
 '============================================================================
 ' Name        : fPayPalUpdateCheck
 ' Author      : Erica L Ingram
@@ -630,24 +632,26 @@ If Not (rstQuery1.EOF And rstQuery1.BOF) Then
         Else
             vInvoiceID = Right(vInvoiceID, 20)
             vInvoiceID = Replace(Replace(vInvoiceID, " ", ""), "-", "")
-            sFile1 = "C:\other\1.txt"
-            sFile2 = "C:\other\2.txt"
             
-            Open sFile1 For Input As #1
-            Line Input #1, sLine1
-            Close #1
+            'note: fPayPalUpdateCheck can delete following lines when known safe come back
+            'sFile1 = "C:\other\1.txt"
+            'sFile2 = "C:\other\2.txt"
             
-            Open sFile2 For Input As #2
-            Line Input #2, sLine2
-            Close #2
+            'Open sFile1 For Input As #1
+            'Line Input #1, sLine1
+            'Close #1
+            
+            'Open sFile2 For Input As #2
+            'Line Input #2, sLine2
+            'Close #2
+            'sUserName = sLine1
+            'sPassword = sLine2
             
             sURL = "https://api.paypal.com/v1/oauth2/token/"
             sEmail = "inquiries@aquoco.co"
-            sUserName = sLine1
-            sPassword = sLine2
                 '  https://api.paypal.com/v1/oauth2/token \
                 'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
-                sAuth = TextBase64Encode(sUserName & ":" & sPassword, "us-ascii") 'mycn.GetConnection
+                sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
                 With CreateObject("WinHttp.WinHttpRequest.5.1")
                     '.Visible = True
                     .Open "POST", sURL, False
@@ -723,12 +727,10 @@ rstQuery1.Close
 Set rstQuery1 = Nothing
 
 Call pfClearGlobals
-End Function
+End Sub
 
 
-
-
-Function fSendPPEmailBalanceDue()
+Sub fSendPPEmailBalanceDue()
 '============================================================================
 ' Name        : fPayPalUpdateCheck
 ' Author      : Erica L Ingram
@@ -1190,9 +1192,9 @@ End With
 End If
 Call pfCommunicationHistoryAdd("PP Invoice Sent")
 
-End Function
+End Sub
 
-Function fSendPPEmailDeposit()
+Sub fSendPPEmailDeposit()
 '============================================================================
 ' Name        : fPayPalUpdateCheck
 ' Author      : Erica L Ingram
@@ -1525,12 +1527,12 @@ Set oWordDoc = Nothing
 
 Call pfCommunicationHistoryAdd("PP Invoice Sent") 'record entry in comm history table for logs
 Call pfClearGlobals
-End Function
+End Sub
 
 
 
 
-Function fPPGetInvoiceInfo()
+Sub fPPGetInvoiceInfo()
 '============================================================================
 ' Name        : fPPGetInvoiceInfo
 ' Author      : Erica L Ingram
@@ -1559,24 +1561,25 @@ Dim sFile1 As String, sFile2 As String, sText As String, sLine1 As String, sLine
 
 Call fPPGenerateJSONInfo
 
-sFile1 = "C:\other\1.txt"
-sFile2 = "C:\other\2.txt"
+'note: fPPGetInvoiceInfo can delete following lines when known safe come back
+'sFile1 = "C:\other\1.txt"
+'sFile2 = "C:\other\2.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
+'sUserName = sLine1
+'sPassword = sLine2
 
 sURL = "https://api.paypal.com/v1/oauth2/token/"
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
-    sAuth = TextBase64Encode(sUserName & ":" & sPassword, "us-ascii") 'mycn.GetConnection
+    sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "POST", sURL, False
@@ -1647,12 +1650,12 @@ Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
 Debug.Print "--------------------------------------------"
 
 
-End Function
+End Sub
 
 
 
 
-Function fPPRefund()
+Sub fPPRefund()
 '============================================================================
 ' Name        : fPPRefund
 ' Author      : Erica L Ingram
@@ -1737,29 +1740,30 @@ If sAnswer = vbNo Then 'Code for No
 Else 'Code for yes
 End If
 
-sFile1 = "C:\other\1.txt"
-sFile2 = "C:\other\2.txt"
+'note: fPPRefund can delete following lines when known safe come back
+'sFile1 = "C:\other\1.txt"
+'sFile2 = "C:\other\2.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
+'sUserName = sLine1
+'sPassword = sLine2
+'sLine1 = ""
+'sLine2 = ""
 
 sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
 sInvoiceTime = (Format(Now(), "hh:mm:ss"))
 sURL = "https://api.paypal.com/v1/oauth2/token/"
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
-sLine1 = ""
-sLine2 = ""
 '  https://api.paypal.com/v1/oauth2/token \
 'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
 
-sAuth = TextBase64Encode(sUserName & ":" & sPassword, "us-ascii") 'mycn.GetConnection
+sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
 sPassword = ""
 sUserName = ""
 With CreateObject("WinHttp.WinHttpRequest.5.1")
@@ -1853,7 +1857,7 @@ Else
 End If
         
 Exitif:
-End Function
+End Sub
 
 
 
@@ -1887,7 +1891,7 @@ Function TextBase64Encode(sText, sCharset)
 End Function
 
 
-Function fPPUpdate()
+Sub fPPUpdate()
 '============================================================================
 ' Name        : fPPUpdate
 ' Author      : Erica L Ingram
@@ -1918,29 +1922,31 @@ sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 Call fPPGenerateJSONInfo
 Call pfGetOrderingAttorneyInfo
 
-sFile1 = "C:\other\1.txt"
-sFile2 = "C:\other\2.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'note: fPPUpdate can delete following lines when known safe come back
+'sFile1 = "C:\other\1.txt"
+'sFile2 = "C:\other\2.txt"
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
+
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
 
 sURL = "https://api.paypal.com/v1/oauth2/token/"
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
+'sUserName = sLine1
+'sPassword = sLine2
+'sLine1 = ""
+'sLine2 = ""
+'sPassword = ""
+'sUserName = ""
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     
-    sAuth = TextBase64Encode(sUserName & ":" & sPassword, "us-ascii") 'mycn.GetConnection
-    sLine1 = ""
-    sLine2 = ""
-    sPassword = ""
-    sUserName = ""
+    sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
     
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
@@ -2065,10 +2071,10 @@ CurrentDb.Execute sUpdatePPID
 
 
 
-End Function
+End Sub
 
 
-Function fManualPPPayment()
+Sub fManualPPPayment()
 '============================================================================
 ' Name        : fManualPPPayment
 ' Author      : Erica L Ingram
@@ -2119,29 +2125,30 @@ Set rstQInfoInvNo = qdf.OpenRecordset
 sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
 sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
 
-sFile1 = "C:\other\1.txt"
-sFile2 = "C:\other\2.txt"
+'note: fManualPPPayment can delete following lines when known safe come back
+'sFile1 = "C:\other\1.txt"
+'sFile2 = "C:\other\2.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
 
 sURL = "https://api.paypal.com/v1/oauth2/token/"
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
+'sUserName = sLine1
+'sPassword = sLine2
+'sLine1 = ""
+'sLine2 = ""
+'sPassword = ""
+'sUserName = ""
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     
-    sAuth = TextBase64Encode(sUserName & ":" & sPassword, "us-ascii") 'mycn.GetConnection
-    sLine1 = ""
-    sLine2 = ""
-    sPassword = ""
-    sUserName = ""
+    sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
     
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
@@ -2226,7 +2233,7 @@ sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) &
 CurrentDb.Execute sUpdatePPID
 
 
-End Function
+End Sub
 
 
 

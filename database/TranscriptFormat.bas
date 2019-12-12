@@ -1,5 +1,7 @@
 Attribute VB_Name = "TranscriptFormat"
+'@Folder("Database.Production.Modules")
 Option Compare Database
+Option Explicit
  
 '============================================================================
 'class module cmTranscriptFormat
@@ -57,7 +59,7 @@ Private sQueryName As String
 Private db As Database
 Public sBookmarkName As String
 
-Function test1()
+Sub test1()
 '============================================================================
 ' Name        : pfTCEntryReplacement
 ' Author      : Erica L Ingram
@@ -109,9 +111,9 @@ Set oCourtCoverWD = Nothing
 Set oWordApp = Nothing
             
             
-End Function
+End Sub
 
-Public Function pfReplaceBMKWwithBookmark()
+Public Sub pfReplaceBMKWwithBookmark()
 '============================================================================
 ' Name        : pfReplaceBMKWwithBookmark
 ' Author      : Erica L Ingram
@@ -178,10 +180,10 @@ With ActiveDocument 'insert topline at TopLine bookmark
 
 End With
 
-End Function
+End Sub
 
 
-Public Function pfCreateBookmarks()
+Public Sub pfCreateBookmarks()
 '============================================================================
 ' Name        : pfCreateBookmarks
 ' Author      : Erica L Ingram
@@ -190,7 +192,7 @@ Public Function pfCreateBookmarks()
 ' Description : replaces #TOC_# notations in transcript with bookmarks and then places index at bookmarks
 '============================================================================
 
-Dim sFileName As String, sBookmarkName As String
+Dim sFileName As String, sBookmarkName As String, vBookmarkName As String
 sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 
 'oWordDoc.Activate
@@ -716,9 +718,9 @@ oWordDoc.Close (wdSaveChanges)
 
 
 
-End Function
+End Sub
 
-Public Function pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacementText As String)
+Public Sub pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacementText As String)
 '============================================================================
 ' Name        : pfApplyStyle
 ' Author      : Erica L Ingram
@@ -760,11 +762,11 @@ oWordDoc.Application.Selection.Find.Execute Replace:=wdReplaceAll
 
 oWordDoc.SaveAs2 FileName:=sFileName
 
-End Function
+End Sub
 
 
 
-Public Function pfCreateIndexesTOAs()
+Public Sub pfCreateIndexesTOAs()
 '============================================================================
 ' Name        : pfCreateIndexesTOAs
 ' Author      : Erica L Ingram
@@ -953,10 +955,10 @@ With oWordDoc
         
         
 End With
-End Function
+End Sub
 
 
-Public Function pfReplaceFDA()
+Public Sub pfReplaceFDA()
 '============================================================================
 ' Name        : pfReplaceFDA
 ' Author      : Erica L Ingram
@@ -1046,9 +1048,9 @@ oWordDoc.Close
     Set rs1 = Nothing 'Clean up
     Set oWordApp = Nothing
 Call pfClearGlobals
-End Function
+End Sub
 
-Public Function pfDynamicSpeakersFindReplace()
+Public Sub pfDynamicSpeakersFindReplace()
 '============================================================================
 ' Name        : pfDynamicSpeakersFindReplace
 ' Author      : Erica L Ingram
@@ -1265,9 +1267,9 @@ With oWordDoc
 
 End With
     
-End Function
+End Sub
 
-Public Function pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
+Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
     Optional bWrap As String = "wdFindContinue", Optional bFormat As Boolean = False, Optional bMatchCase As Boolean = True, _
     Optional bMatchWholeWord As Boolean = False, Optional bMatchWildcards As Boolean = False, _
     Optional bMatchSoundsLike As Boolean = False, Optional bMatchAllWordForms As Boolean = False)
@@ -1335,9 +1337,9 @@ oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
         End With
         oWordDoc.Save
 'Debug.Print "no"
-End Function
+End Sub
 
-Public Function pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
+Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
     Optional bWrap As String = "wdFindContinue", Optional bFormat As Boolean = False, Optional bMatchCase As Boolean = True, _
     Optional bMatchWholeWord As Boolean = False, Optional bMatchWildcards As Boolean = False, _
     Optional bMatchSoundsLike As Boolean = False, Optional bMatchAllWordForms As Boolean = False)
@@ -1405,10 +1407,10 @@ With oWordDoc.Application
 End With
         oWordDoc.Save
 
-End Function
+End Sub
 
 
-Public Function pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As String, sFieldText As String)
+Public Sub pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As String, sFieldText As String)
 '============================================================================
 ' Name        : pfFieldTCReplaceAll
 ' Author      : Erica L Ingram
@@ -1482,9 +1484,9 @@ End With
 
         oWordDoc.Save
 
-End Function
+End Sub
 
-Public Function pfWordIndexer()
+Public Sub pfWordIndexer()
 '============================================================================
 ' Name        : pfWordIndexer
 ' Author      : Erica L Ingram
@@ -1496,7 +1498,7 @@ Public Function pfWordIndexer()
 Dim sInput As String, sFileName As String
 Dim sCurrentIndexEntry As String, sCurrentEntryOriginal As String, sExclusions As String
 Dim sCurrentEntry1 As String, sCurrentEntry2 As String, sCurrentEntry3 As String
-Dim sCurrentEntry4 As String, sCurrentEntry5 As String
+Dim sCurrentEntry4 As String, sCurrentEntry5 As String, vBookmarkName As String
 Dim oWordApp As New Word.Application, oWordDoc As New Word.Document, oWordApp1 As New Word.Application, oWordDoc1 As New Word.Document
 Dim w As Long, x As Long, y As Long, z As Long
 Dim Rng
@@ -1634,7 +1636,7 @@ With oWordDoc
         .Tables(1).Sort Excludeheader:=False, FieldNumber:=1, _
         SortFieldType:=wdSortFieldAlphanumeric, _
         SortOrder:=wdSortOrderAscending, CaseSensitive:=False
-        .Tables.item(1).Columns(2).Delete
+        .Tables.item(1).Columns(2).delete
         '.Tables.item(1).Columns(1).Width = InchesToPoints(1.1)
         '.Tables.item(1).Columns(2).Width = InchesToPoints(0.8)
     End With
@@ -1693,7 +1695,7 @@ With oWordDoc
     End If
     
     .Application.Selection.MoveDown Unit:=wdLine, Count:=4
-    .Application.Selection.Delete Count:=3
+    .Application.Selection.delete Count:=3
     
     If .ActiveWindow.View.SplitSpecial = wdPaneNone Then
         .ActiveWindow.ActivePane.View.Type = wdPrintView
@@ -1716,11 +1718,11 @@ End With
 
 oWordApp.Quit
 
-End Function
+End Sub
 
 
 
-Function FPJurors()
+Sub FPJurors()
 '============================================================================
 ' Name        : FPJurors
 ' Author      : Erica L Ingram
@@ -1884,10 +1886,10 @@ oCourtCoverWD.Save
 oCourtCoverWD.Close
 oWordApp.Quit
 Call pfClearGlobals
-End Function
+End Sub
 
 
-Function pfTCEntryReplacement()
+Sub pfTCEntryReplacement()
 '============================================================================
 ' Name        : pfTCEntryReplacement
 ' Author      : Erica L Ingram
@@ -2055,13 +2057,13 @@ oCourtCoverWD.Close
 oWordApp.Quit
 Set oCourtCoverWD = Nothing
 Set oWordApp = Nothing
-End Function
+End Sub
 
 
 
 
 
-Function pfFindRepCitationLinks()
+Sub pfFindRepCitationLinks()
 '============================================================================
 ' Name        : pfFindRepCitationLinks
 ' Author      : Erica L Ingram
@@ -2105,7 +2107,8 @@ Function pfFindRepCitationLinks()
     Dim sAbsoluteURL As String, sURL As String, apiWaxLRS As String
     Dim sCaseName As String, sInputState As String, sToken As String
     Dim sInput1 As String, sInput2 As String, sInputCourt As String
-    Dim sCourt As String
+    Dim sCourt As String, sFile1 As String, qReplaceHyperlink As String
+    Dim sQLongCitation As String, sQCHCategory As String, sQWebAddress As String
     
     Dim rep, resp, sCitation, oEntry
     
@@ -2120,14 +2123,16 @@ Function pfFindRepCitationLinks()
     Dim sCurrentLinkSQL As String, sCurrentLinkFC As String, sCurrentLinkRH As String
     Dim sCurrentLinkLC As String, sCurrentLinkCHC As String, sCurrentLinkWeb As String
     Dim sBeginCHT As String, sEndCHT As String, sCurrentSearch As String
-    Dim sCurrentTerm As String, sCLChoiceList As String
+    Dim sCurrentTerm As String, sCLChoiceList As String, sQFindCitation As String
     Dim x As Long, y As Long, z As Long, j As Long
-    Dim iLongCitationLength As Integer
+    Dim iLongCitationLength As Integer, iStartPos As Integer, iStopPos As Integer
     Dim letter, sSearchTermArray()
     Dim rCurrentSearch As Range
     Dim oWordApp As Word.Application, oWordDoc As Word.Document
     Dim sInitialSearchSQL As String, sOriginalSearchTerm As String
-    Dim i As Long
+    Dim rstCurrentHyperlink As DAO.Recordset
+    
+    Dim i As Long, vBookmarkName As String
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
     x = 1
@@ -2323,20 +2328,22 @@ ExitLoop:
                     'Get token; sign up at https://www.courtlistener.com/api/
                     
                     'get token into variable
-                    sFile1 = "C:\other\10.txt"
+                    'note: pfFindRepCitationLinks can delete following lines when known safe come back
+                    'sFile1 = "C:\other\10.txt"
                     
-                    Open sFile1 For Input As #1
-                    Line Input #1, sLine1
-                    Close #1
+                    'Open sFile1 For Input As #1
+                    'Line Input #1, sLine1
+                    'Close #1
+                    'sToken = ""
                     
                     With CreateObject("WinHttp.WinHttpRequest.5.1")
                         .Open "GET", sURL, False 'options or head
                         .setRequestHeader "Accept", "application/json"
                         .setRequestHeader "content-type", "application/x-www-form-urlencoded"
-                        .setRequestHeader "Authorization", "Bearer " & sToken
+                        'make sure this is token and that it works; wasn't assigned correctly prior to change
+                        .setRequestHeader "Authorization", "Bearer " & Environ("apiCourtListener")
                         .send
                         apiWaxLRS = .responseText
-                        sToken = ""
                         .abort
                         'Debug.Print apiWaxLRS
                         'Debug.Print "--------------------------------------------"
@@ -2769,20 +2776,23 @@ Done:
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
     
-End Function
+End Sub
 
-Function pfTopOfTranscriptBookmark()
+Sub pfTopOfTranscriptBookmark()
 
 Dim AcroApp As Acrobat.CAcroApp
 Dim PDoc As Acrobat.CAcroPDDoc
 Dim PDocCover As Acrobat.CAcroPDDoc
 Dim ADoc As AcroAVDoc
+Dim PDocAll As Acrobat.CAcroPDDoc
+
 Dim PDBookmark As AcroPDBookmark
 Dim PDFPageView As AcroAVPageView
 Dim bTitle, n, sTranscriptsFolderFinalPDF As String
 Dim sTranscriptVolumesALLPath As String, sVolumesCoverPath  As String
 Dim oPDFBookmarks As Object, parentBookmark As AcroPDBookmark
 Dim jso As Object, BookMarkRoot As Object
+Dim numpages
 
 Set AcroApp = CreateObject("AcroExch.App")
 Set PDoc = CreateObject("AcroExch.PDDoc")
@@ -2812,7 +2822,7 @@ bTitle = PDBookmark.SetTitle("Table of Contents")
 n = PDocCover.Save(PDSaveFull, sVolumesCoverPath)
 
 ' Insert the pages of Part2 after the end of Part1
-    numPages = PDocCover.GetNumPages()
+    numpages = PDocCover.GetNumPages()
     
 PDoc.Open (sTranscriptsFolderFinalPDF)
 
@@ -2886,7 +2896,7 @@ n = PDoc.Save(PDSaveFull, sTranscriptsFolderFinalPDF)
 
 'for each -Transcript-FINAL.pdf in \Transcripts\ do the following
 
-    If PDocCover.InsertPages(numPages - 1, PDoc, 0, PDoc.GetNumPages(), True) = False Then
+    If PDocCover.InsertPages(numpages - 1, PDoc, 0, PDoc.GetNumPages(), True) = False Then
         MsgBox "Cannot insert pages"
     End If
 
@@ -2904,4 +2914,4 @@ Set AcroApp = Nothing
 Set PDoc = Nothing
 Set ADoc = Nothing
 
-End Function
+End Sub

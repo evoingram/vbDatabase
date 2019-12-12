@@ -1,5 +1,7 @@
 Attribute VB_Name = "Stage3"
+'@Folder("Database.Production.Modules")
 Option Compare Database
+Option Explicit
 
 '============================================================================
 'class module cmStage3
@@ -21,7 +23,7 @@ Option Compare Database
 '============================================================================
 
 
-Public Function pfStage3Ppwk()
+Public Sub pfStage3Ppwk()
 '============================================================================
 ' Name        : pfStage3Ppwk
 ' Author      : Erica L Ingram
@@ -178,9 +180,9 @@ End If
 
     MsgBox "Stage 3 complete."
     Call pfClearGlobals
-End Function
+End Sub
 
-Public Function pfBurnCD()
+Public Sub pfBurnCD()
 '============================================================================
 ' Name        : pfBurnCD
 ' Author      : Erica L Ingram
@@ -227,9 +229,9 @@ Else 'Code for yes
     
 End If
     
-End Function
+End Sub
 
-Public Function pfCreateRegularPDF()
+Public Sub pfCreateRegularPDF()
 '============================================================================
 ' Name        : pfCreateRegularPDF
 ' Author      : Erica L Ingram
@@ -274,7 +276,7 @@ Else 'Code for yes
 
     
     With oWordDoc
-        If .ProtectionType <> wdNoProtection Then .Unprotect password:="12345"
+        If .ProtectionType <> wdNoProtection Then .Unprotect password:="wrts0419"
         .Activate
         .Application.Selection.HomeKey Unit:=wdStory
         For Each rngStory In .StoryRanges
@@ -332,7 +334,7 @@ Else 'Code for yes
 End If
 
 'lock document in whole and save as final
-oWordDoc.Protect Type:=wdAllowOnlyReading, noReset:=True, password:="12345"
+oWordDoc.Protect Type:=wdAllowOnlyReading, noReset:=True, password:="wrts0419"
 oWordDoc.SaveAs FileName:=sFinalTranscriptWD 'sFinalTranscriptNoExt
 oWordDoc.ExportAsFixedFormat outputFileName:=sFinalTranscriptNoExt, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
 oWordDoc.Close SaveChanges:=False
@@ -348,11 +350,11 @@ MsgBox "Created Regular PDF Copy!"
 FileCopy sFinalTranscriptWD, "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-FINAL.docx"
 FileCopy sFinalTranscriptNoExt & ".pdf", "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-FINAL.pdf"
 
-End Function
+End Sub
 
 
 
-Function fDynamicHeaders()
+Sub fDynamicHeaders()
 '============================================================================
 ' Name        : fDynamicHeaders
 ' Author      : Erica L Ingram
@@ -378,6 +380,7 @@ Dim oWordField As Field, oWordSection As Section
 Dim x As Integer, y As Integer, z As Integer
 Dim sFileName As String, sBookmarkName As String, sHeading As String
 Dim sHeadings() As String
+Dim oRange As Range
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 'Call pfCurrentCaseInfo
 
@@ -494,7 +497,7 @@ Next
 
 x = 1
 For Each oWordSection In oWordDoc.Sections
-    oRange = oWordSection
+    Set oRange = oWordSection
     oWordDoc.Sections(x).Headers(wdHeaderFooterPrimary).Application.Selection.ParagraphFormat.Alignment = wdAlignParagraphCenter
     oWordDoc.Sections(x).Headers(wdHeaderFooterPrimary).Application.Selection.ParagraphFormat.LineSpacing = LinesToPoints(32888)
     oWordDoc.Sections(x).Headers(wdHeaderFooterPrimary).Application.Selection.Font.Underline = wdUnderlineNone
@@ -512,10 +515,10 @@ Set oWordDoc = Nothing
 Set oWordApp = Nothing
             
     
-End Function
+End Sub
 
 
-Function pfHeaders()
+Sub pfHeaders()
 '============================================================================
 ' Name        : pfHeaders
 ' Author      : Erica L Ingram
@@ -682,7 +685,7 @@ With oWordDoc.Application
     
             For Each sec In oWordDoc.Sections
             
-                iSectionIndex = sec.index
+                iSectionIndex = sec.Index
                 iHeadingsNumber = iSectionIndex - 1
                 iSectionNumber = iSectionIndex
                         
@@ -707,7 +710,7 @@ With oWordDoc.Application
                     
                     sStyleName = "Heading " & intLevel
                                         
-                    iSectionIndex = sec.index
+                    iSectionIndex = sec.Index
                     Debug.Print ("Section Number:  " & iSectionIndex & "   |   " & "Headings Number:  " & iHeadingsNumber)
                     If iSectionNumber = 1 Then GoTo SkipFrontPage
                                                                  
@@ -772,12 +775,13 @@ Set oWordDoc = Nothing
 Set rCurrentSection = Nothing
 
     
-End Function
+End Sub
 
-Function pfTopOfTranscriptBookmark()
+Sub pfTopOfTranscriptBookmark()
 
 Dim AcroApp As Acrobat.CAcroApp
 Dim PDoc As Acrobat.CAcroPDDoc
+Dim PDocAll As Acrobat.CAcroPDDoc
 Dim PDocCover As Acrobat.CAcroPDDoc
 Dim ADoc As AcroAVDoc
 Dim PDBookmark As AcroPDBookmark
@@ -786,7 +790,7 @@ Dim bTitle, n, sTranscriptsFolderFinalPDF As String
 Dim sTranscriptVolumesALLPath As String, sVolumesCoverPath  As String
 Dim oPDFBookmarks As Object, parentBookmark As AcroPDBookmark
 Dim jso As Object, BookMarkRoot As Object
-
+Dim numpages
 
 
 Set AcroApp = CreateObject("AcroExch.App")
@@ -819,7 +823,7 @@ bTitle = PDBookmark.SetTitle("Table of Contents")
 n = PDocCover.Save(PDSaveFull, sVolumesCoverPath)
 
 ' Insert the pages of Part2 after the end of Part1
-    numPages = PDocCover.GetNumPages()
+    numpages = PDocCover.GetNumPages()
     
 PDoc.Open (sTranscriptsFolderFinalPDF)
 
@@ -893,7 +897,7 @@ n = PDoc.Save(PDSaveFull, sTranscriptsFolderFinalPDF)
 
 'for each -Transcript-FINAL.pdf in \Transcripts\ do the following
 
-    If PDocCover.InsertPages(numPages - 1, PDoc, 0, PDoc.GetNumPages(), True) = False Then
+    If PDocCover.InsertPages(numpages - 1, PDoc, 0, PDoc.GetNumPages(), True) = False Then
         MsgBox "Cannot insert pages"
     End If
 
@@ -911,4 +915,88 @@ Set AcroApp = Nothing
 Set PDoc = Nothing
 Set ADoc = Nothing
 
-End Function
+End Sub
+
+                
+Sub fPDFBookmarks()
+
+On Error GoTo eHandler
+'============================================================================
+' Name        : fPrint2upPDF
+' Author      : Erica L Ingram
+' Copyright   : 2019, A Quo Co.
+' Call command: Call fPrint2upPDF
+' Description : prints 2-up transcript PDF
+'============================================================================
+
+
+Dim sTranscriptsFolderFinalPDF As String
+
+Dim sTranscriptsFolder2upPDF As String
+
+Dim sTranscript2upPSPath As String
+Dim sJavascriptPrint As String
+Dim jobsettings As String
+Dim sLogFilePath As String
+
+Dim aaAcroApp As Acrobat.AcroApp
+Dim aaAcroAVDoc As Acrobat.AcroAVDoc
+Dim aaAcroPDDoc As Acrobat.AcroPDDoc
+Dim bret
+Dim pp As Object
+
+Dim pdTranscriptFinalDistiller As PdfDistiller
+Dim aaAFormApp As AFORMAUTLib.AFormApp
+
+sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+sTranscriptsFolderFinalPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
+
+Set aaAcroApp = New AcroApp
+Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
+
+If aaAcroAVDoc.Open(sTranscriptsFolderFinalPDF, "") Then
+    aaAcroAVDoc.Maximize (1)
+    
+    Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
+    Set aaAFormApp = CreateObject("AFormAut.App")
+    
+      sJavascriptPrint = "function MakeBkMks(oBkMkParent, aBkMks) {" & _
+            "var aBkMkNames = [ " & Chr(34) & "General" & Chr(34) & ", " & Chr(34) & "Witnesses" & Chr(34) & _
+            ", " & Chr(34) & "Exhibits" & Chr(34) & ", " & Chr(34) & "Authorities" & Chr(34) & _
+            ", [" & Chr(34) & "Case Law" & Chr(34) & "," & _
+            Chr(34) & "Rules, Regulation, Code, Statutes" & Chr(34) & "," & _
+            Chr(34) & "Other Authority" & Chr(34) & "] ];" & _
+            "for(var index=0;index<aBkMks.length;index++) {" & _
+            "if(typeof(aBkMks[index]) == " & Chr(34) & "string" & Chr(34) & ") oBkMkParent.createChild({cName:aBkMks[i], nIndex:index });" & _
+            "else {" & _
+            "// Assume this is a sub Array" & _
+            "oBkMkParent.createChild({cName:aBkMks[index][0], nIndex:index});" & _
+            "MakeBkMks(oBkMkParent.children[index], aBkMks[index].slice(1) );}}}}" & _
+            "MakeBkMks(this.bookmarkRoot, aBkMkNames);"
+
+    aaAFormApp.Fields.ExecuteThisJavascript sJavascriptPrint
+    
+    aaAcroPDDoc.Save PDSaveFull, sTranscriptsFolderFinalPDF
+    'aaAcroPDDoc.Close
+    'aaAcroApp.CloseAllDocs
+    
+End If
+
+eHandlerX:
+Set aaAcroPDDoc = Nothing
+Set aaAcroAVDoc = Nothing
+Set aaAcroApp = Nothing
+MsgBox "PDF Bookmarks Created"
+Exit Sub
+
+eHandler:
+MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
+GoTo eHandlerX
+Resume
+
+End Sub
+
+
+
+
+

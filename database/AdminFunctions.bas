@@ -1,5 +1,5 @@
 Attribute VB_Name = "AdminFunctions"
-
+'@Folder("Database.Admin.Modules")
 Option Compare Database
 Option Explicit
 '============================================================================
@@ -93,7 +93,7 @@ Option Explicit
         '                            Arguments:    NONE
 '============================================================================
 
-Public Function pfUpdateCheckboxStatus(sStatusesField As String)
+Public Sub pfUpdateCheckboxStatus(sStatusesField As String)
 '============================================================================
 ' Name        : pfUpdateCheckboxStatus
 ' Author      : Erica L Ingram
@@ -111,9 +111,9 @@ sUpdateStatusesSQL = "update [Statuses] set " & sStatusesField & " =(Yes)"
 
 db.Execute sUpdateStatusesSQL
 
-End Function
+End Sub
 
-Public Function pfDebugSQLStatement()
+Public Sub pfDebugSQLStatement()
 '============================================================================
 ' Name        : pfDebugSQLStatement
 ' Author      : Erica L Ingram
@@ -134,8 +134,8 @@ Debug.Print oWordApp.Application.ActiveDocument.MailMerge.DataSource.QueryString
 oWordApp.Quit
 Set oWordApp = Nothing
 
-End Function
-Public Function pfDownloadfromFTP()
+End Sub
+Public Sub pfDownloadfromFTP()
 On Error Resume Next
 '============================================================================
 ' Name        : pfDownloadfromFTP
@@ -158,9 +158,9 @@ seCurrent.Dispose ' Disconnect, clean up
 
 On Error GoTo 0 ' Restore default error handling
 
-End Function
+End Sub
 
-Public Function pfDownloadFTPsite(ByRef mySession As Session)
+Public Sub pfDownloadFTPsite(ByRef mySession As Session)
 '============================================================================
 ' Name        : pfDownloadFTPsite
 ' Author      : Erica L Ingram
@@ -168,18 +168,18 @@ Public Function pfDownloadFTPsite(ByRef mySession As Session)
 ' Call command: Call pfDownloadFTPsite(mySession)
 ' Description : downloads files modified today (a.k.a. new files on FTP)
 '============================================================================
-
+'come back to add ssl ftp
 Dim seopFTPSettings As New SessionOptions
 Dim sInProgressPath As String
 Dim tropFTPSettings As New TransferOptions
 
+
 With seopFTPSettings ' Setup session options
     .Protocol = Protocol_Ftp
-    .HostName = ""
-    .Username = ""
-    .password = ""
+    .HostName = "ftp.aquoco.co"
+    .Username = Environ("ftpUserName")
+    .password = Environ("ftpPassword")
 End With
-
 mySession.Open seopFTPSettings ' Connect
 tropFTPSettings.TransferMode = TransferMode_Binary ' Upload files
 tropFTPSettings.FileMask = "*>=1D"
@@ -192,10 +192,10 @@ transferResult.Check ' Throw on any error
 
 MsgBox "You may now find any files downloaded today in T:\Production\1ToBeEntered\."
 
-End Function
+End Sub
 
 
-Public Function pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
+Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
 '============================================================================
 ' Name        : pfProcessFolder
 ' Author      : Erica L Ingram
@@ -256,7 +256,7 @@ Set adocOutlookExport = Nothing
 Set oOutlookNamespace = Nothing
 Set oOutlookPickedFolder = Nothing
  
-End Function
+End Sub
 Public Function pfFileExists(ByVal path_ As String) As Boolean
 '============================================================================
 ' Name        : pfFileExists
@@ -270,7 +270,7 @@ FileExists = (Len(Dir(path_)) > 0)
 
 End Function
 
-Public Function pfAcrobatGetNumPages(sCourtDatesID)
+Public Sub pfAcrobatGetNumPages(sCourtDatesID)
 '============================================================================
 ' Name        : pfAcrobatGetNumPages
 ' Author      : Erica L Ingram
@@ -353,9 +353,9 @@ Set qdf = Nothing
 DoCmd.OpenQuery "FinalUnitPriceQuery"  'PRE-QUERY FOR FINAL SUBTOTAL
 dbAQC.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
 dbAQC.Close
-End Function
+End Sub
 
-Public Function pfReadXML()
+Public Sub pfReadXML()
 '============================================================================
 ' Name        : pfReadXML
 ' Author      : Erica L Ingram
@@ -415,9 +415,9 @@ Do While Len(sOutputPath) > 0
        
 Loop
 
-End Function
+End Sub
 
-Public Function pfFileRenamePrompt()
+Public Sub pfFileRenamePrompt()
 '============================================================================
 ' Name        : pfFileRenamePrompt
 ' Author      : Erica L Ingram
@@ -437,7 +437,7 @@ sCoverPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCove
 sUserInput = InputBox("Enter the desired document name without the extension" & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Rename your document." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Enter the new name for the transcript here, without the extension." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date")
 
 If sUserInput = "Enter the new name for the transcript here, without the extension." Or sUserInput = "" Then
-    Exit Function
+    Exit Sub
 End If
 
 sClientTranscriptName = "I:\" & sCourtDatesID & "\Transcripts\" & sUserInput & ".docx"
@@ -456,10 +456,10 @@ CurrentDb.Execute sChkBxFiledNotFiled
 
 MsgBox "Transcript has been delivered.  Next, let's do some admin stuff."
 
-End Function
+End Sub
 
 
-Public Function pfWaitSeconds(iSeconds As Integer)
+Public Sub pfWaitSeconds(iSeconds As Integer)
 On Error GoTo lERR
 
 '============================================================================
@@ -480,15 +480,15 @@ Do 'yield to other programs
 Loop Until Now >= dCurrentTime
 
 lEXIT:
-Exit Function
+Exit Sub
 
 lERR:
 MsgBox "Error: " & Err.Number & ". " & Err.Description, , "modDateTime.WaitSeconds"
 Resume lEXIT
 
-End Function
+End Sub
 
-Public Function pfAvailabilitySchedule()
+Public Sub pfAvailabilitySchedule()
 '============================================================================
 ' Name        : pfAvailabilitySchedule
 ' Author      : Erica L Ingram
@@ -498,9 +498,9 @@ Public Function pfAvailabilitySchedule()
 '============================================================================
 
 DoCmd.OpenForm (Forms![SBFM-Availability])
-End Function
+End Sub
 
-Public Function pfCheckFolderExistence()
+Public Sub pfCheckFolderExistence()
 '============================================================================
 ' Name        : pfCheckFolderExistence
 ' Author      : Erica L Ingram
@@ -592,9 +592,9 @@ Else
     
 End If
 Call pfClearGlobals
-End Function
+End Sub
 
-Public Function pfCommunicationHistoryAdd(sCHTopic As String)
+Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
 '============================================================================
 ' Name        : pfCommunicationHistoryAdd
 ' Author      : Erica L Ingram
@@ -622,9 +622,9 @@ rstCHAdd.Update
 
 rstCHAdd.Close
 
-End Function
+End Sub
  
-Public Function pfStripIllegalChar(sInput As String)
+Public Sub pfStripIllegalChar(sInput As String)
 '============================================================================
 ' Name        : pfStripIllegalChar
 ' Author      : Erica L Ingram
@@ -646,10 +646,10 @@ ExitFunction:
 Set oRegex = Nothing
      
  
-End Function
+End Sub
  
  
-Public Function pfGetFolder(Folders As Collection, EntryID As Collection, StoreID As Collection, fld As MAPIFolder)
+Public Sub pfGetFolder(Folders As Collection, EntryID As Collection, StoreID As Collection, fld As MAPIFolder)
 '============================================================================
 ' Name        : pfGetFolder
 ' Author      : Erica L Ingram
@@ -671,7 +671,7 @@ Next SubFolder
 ExitSub:
 Set SubFolder = Nothing
 
-End Function
+End Sub
  
 Public Function pfBrowseForFolder(sSavePath As String, Optional OpenAt As String) As String
 '============================================================================
@@ -704,7 +704,7 @@ End Function
  
 
 
-Public Function pfSingleBAScrapeSpecificBarNo(sWebSiteBarNo As String)
+Public Sub pfSingleBAScrapeSpecificBarNo(sWebSiteBarNo As String)
 '============================================================================
 ' Name        : pfSingleBAScrapeSpecificBarNo
 ' Author      : Erica L Ingram
@@ -753,8 +753,8 @@ Set oPracticeArea = oInternetE.Document.getElementById("dnn_ctr2977_DNNWebContro
 sPracticeArea = oPracticeArea.innerText
 
 'print newly acquired info to debug window
-Debug.Print sBarName & Chr(13) & sBarNumber & Chr(13) & sEligibility & Chr(13) & sActiveL & Chr(13) & sAdmitDate & Chr(13) & _
-sCompanyName & Chr(13) & sAddress & Chr(13) & sEmail & Chr(13) & sPhone & Chr(13) & sFax & Chr(13) & sPracticeArea
+Debug.Print sBarName & Chr(13) & sBarNumber & Chr(13) & sEligibility & Chr(13) & sActiveL & Chr(13) & " " & Chr(13) & _
+sCompanyName & Chr(13) & sAddress & Chr(13) & " " & Chr(13) & sPhone & Chr(13) & " " & Chr(13) & sPracticeArea
 
 '**********************************************************************
 
@@ -778,9 +778,9 @@ rstBarAddresses.Update
 rstBarAddresses.Close
 Set rstBarAddresses = Nothing
 
-End Function
+End Sub
 
-Public Function pfScrapingBALoop(sWebSiteBarNo As String, sWebSiteBarNoGoal As String)
+Public Sub pfScrapingBALoop(sWebSiteBarNo As String, sWebSiteBarNoGoal As String)
 On Error Resume Next
 '============================================================================
 ' Name        : pfScrapingBALoop
@@ -833,8 +833,8 @@ Do While sWebSiteBarNo < sWebSiteBarNoGoal
     sPracticeArea = oPracticeArea.innerText
     
     'print newly acquired info to debug window
-    Debug.Print sBarName & Chr(13) & sBarNumber & Chr(13) & sEligibility & Chr(13) & sActiveL & Chr(13) & sAdmitDate & Chr(13) & _
-    sCompanyName & Chr(13) & sAddress & Chr(13) & sEmail & Chr(13) & sPhone & Chr(13) & sFax & Chr(13) & sPracticeArea
+    Debug.Print sBarName & Chr(13) & sBarNumber & Chr(13) & sEligibility & Chr(13) & sActiveL & Chr(13) & " " & Chr(13) & _
+    sCompanyName & Chr(13) & sAddress & Chr(13) & " " & Chr(13) & sPhone & Chr(13) & " " & Chr(13) & sPracticeArea
     
     '**********************************************************************
     
@@ -863,10 +863,10 @@ Do While sWebSiteBarNo < sWebSiteBarNoGoal
     pfDelay 22
         
 Loop
-End Function
+End Sub
 
 
-Public Function pfReformatTable()
+Public Sub pfReformatTable()
 '============================================================================
 ' Name        : pfReformatTable
 ' Author      : Erica L Ingram
@@ -955,10 +955,10 @@ Set rs = Nothing
 db.Close
 Set db = Nothing
 
-End Function
+End Sub
 
 
-Public Function pfDelay(lSeconds As Long)
+Public Sub pfDelay(lSeconds As Long)
 '============================================================================
 ' Name        : pfDelay
 ' Author      : Erica L Ingram
@@ -973,10 +973,10 @@ dEndTime = DateAdd("s", lSeconds, Now())
 Do While Now() < dEndTime
 DoEvents
 Loop
-End Function
+End Sub
 
 
-Public Function pfPriorityPointsAlgorithm()
+Public Sub pfPriorityPointsAlgorithm()
 '============================================================================
 ' Name        : pfPriorityPointsAlgorithm
 ' Author      : Erica L Ingram
@@ -1003,6 +1003,7 @@ If Not (rstTasks.EOF And rstTasks.BOF) Then
                 bCompleted = rstTasks.Fields("Completed").Value
                 sCategory = rstTasks.Fields("Category").Value
                 iTimeLength = rstTasks.Fields("TimeLength").Value
+                sPriority = rstTasks.Fields("Priority").Value
                 iPriorityPoints = 0
                 
                 If ((DateDiff("d", Now, dDue)) < 1) Then
@@ -1065,8 +1066,8 @@ End If
     
 MsgBox "Done assigning priority points to tasks."
 
-End Function
-Public Function pfGenerateJobTasks()
+End Sub
+Public Sub pfGenerateJobTasks()
 '============================================================================
 ' Name        : pfGenerateJobTasks
 ' Author      : Erica L Ingram
@@ -1367,8 +1368,8 @@ rstTasks.Update
 rstTasks.Close
 Set rstTasks = Nothing
 Call pfClearGlobals
-End Function
-Public Function pfDailyTaskAddFunction()
+End Sub
+Public Sub pfDailyTaskAddFunction()
 '============================================================================
 ' Name        : pfDailyTaskAddFunction
 ' Author      : Erica L Ingram
@@ -1482,10 +1483,10 @@ rstTasks.Update
 rstTasks.Close
 Set rstTasks = Nothing
 
-End Function
+End Sub
 
 
-Public Function pfWeeklyTaskAddFunction()
+Public Sub pfWeeklyTaskAddFunction()
 '============================================================================
 ' Name        : pfWeeklyTaskAddFunction
 ' Author      : Erica L Ingram
@@ -1706,9 +1707,9 @@ rstTasks.Update
 rstTasks.Close
 Set rstTasks = Nothing
 
-End Function
+End Sub
 
-Public Function pfMonthlyTaskAddFunction()
+Public Sub pfMonthlyTaskAddFunction()
 '============================================================================
 ' Name        : pfMonthlyTaskAddFunction
 ' Author      : Erica L Ingram
@@ -1796,12 +1797,12 @@ rstTasks.Update
 
 rstTasks.Close
 Set rstTasks = Nothing
-End Function
+End Sub
 
 
 
 
-Public Function pfCommHistoryExportSub()
+Public Sub pfCommHistoryExportSub()
 On Error Resume Next
 '============================================================================
 ' Name        : pfCommHistoryExportSub
@@ -1865,7 +1866,7 @@ Set rs = Nothing
 Set nsOutlookNmSpc = Nothing
 Set oOutlookAccessTestFolder = Nothing
 
-Exit Function
+Exit Sub
 
 eHandler:
 
@@ -1873,8 +1874,8 @@ eHandler:
 'MsgBox Err.Description & " (" & Err.Number & ")"
 
 Resume Next
-End Function
-Public Function pfEmailsExport1()
+End Sub
+Public Sub pfEmailsExport1()
 '============================================================================
 ' Name        : pfEmailsExport1
 ' Author      : Erica L Ingram
@@ -1922,10 +1923,10 @@ Set rstEmails = Nothing
 Set nsOutlookNmSpc = Nothing
 Set oOutLookMAPIFolder = Nothing
 
-End Function
+End Sub
 
 
-Public Function pfMoveSelectedMessages()
+Public Sub pfMoveSelectedMessages()
 '============================================================================
 ' Name        : pfMoveSelectedMessages
 ' Author      : Erica L Ingram
@@ -1997,10 +1998,10 @@ Set oSelection = Nothing
 Set oOutlookApp = Nothing
 Set nsOutlookNmSpc = Nothing
 Set oSourceFolder = Nothing
-End Function
+End Sub
 
 
-Public Function pfAskforAudio()
+Public Sub pfAskforAudio()
 '============================================================================
 ' Name        : pfAskforAudio
 ' Author      : Erica L Ingram
@@ -2045,11 +2046,11 @@ If iFileChosen = -1 Then
     
 End If
 
-End Function
+End Sub
         
 
 
-Public Function pfAskforNotes()
+Public Sub pfAskforNotes()
 '============================================================================
 ' Name        : pfAskforNotes
 ' Author      : Erica L Ingram
@@ -2147,9 +2148,9 @@ If iFileChosen = -1 Then
         End If
     Next i
 End If
-End Function
+End Sub
 
-Public Function pfRCWRuleScraper()
+Public Sub pfRCWRuleScraper()
 On Error Resume Next
 '============================================================================
 ' Name        : pfRCWRuleScraper
@@ -2179,12 +2180,12 @@ For x = 1 To 91 '(RCW first portion x.###.###) '1-91
     For y = 1 To 999 '(RCW second portion ###.y.###) '1-999
     
         
-        If y < 10 Then y = Str("0" & y)
+        If y < 10 Then y = str("0" & y)
                 
     
         For z = 10 To 990 Step 10 '(RCW third portion ###.###.z) '10 to 990 by 10s
         
-            If z < 100 Then z = Str("0" & z)
+            If z < 100 Then z = str("0" & z)
             
             'generate variables
             sCurrentRule = x & "." & y & "." & z
@@ -2241,7 +2242,7 @@ For w = 1 To UBound(vLettersArray1) '(RCW first portion w.###.###)
     
     For x = 1 To 999 '(RCW second portion ###.x.###)
     
-        If x < 10 Then x = Str("0" & x)
+        If x < 10 Then x = str("0" & x)
     
         '1-999 plus A, B, C
     
@@ -2251,11 +2252,11 @@ For w = 1 To UBound(vLettersArray1) '(RCW first portion w.###.###)
             
             sTitle2 = x & vLettersArray2(y)
         
-            If y < 10 Then sTitle2 = Str("0" & sTitle2)
+            If y < 10 Then sTitle2 = str("0" & sTitle2)
     
             For z = 10 To 990 Step 10 '(RCW third portion ###.###.z)
             
-                If z < 100 Then y = Str("0" & z)
+                If z < 100 Then y = str("0" & z)
                 
                 'generate variables
                 sCurrentRule = sTitle1 & "." & "." & sTitle2 & "." & z
@@ -2308,11 +2309,11 @@ Next
 
 
 
-End Function
+End Sub
 
 
 
-Public Function pfUSCRuleScraper()
+Public Sub pfUSCRuleScraper()
 On Error Resume Next
 '============================================================================
 ' Name        : pfRuleScraper
@@ -2495,7 +2496,7 @@ For i = 1 To 54
 Debug.Print ("Title " & i & " completed.  Next, Title " & i + 1)
 Next
 
-End Function
+End Sub
 
 Function GetLevel(strItem As String) As Integer
     ' Return the heading level of a header from the
@@ -2522,7 +2523,7 @@ Function GetLevel(strItem As String) As Integer
     GetLevel = (intDiff / 2) + 1
 End Function
 
-Function fWLGenerateJSONInfo()
+Sub fWLGenerateJSONInfo()
 '============================================================================
 ' Name        : fWLGenerateJSONInfo
 ' Author      : Erica L Ingram
@@ -2558,8 +2559,8 @@ bCompleted = "false"
 bStarred = "false"
 
 
-End Function
-Function fWunderlistAdd(sTitle As String, sDueDate As String)
+End Sub
+Sub fWunderlistAdd(sTitle As String, sDueDate As String)
 '============================================================================
 ' Name        : fWunderlistAdd
 ' Author      : Erica L Ingram
@@ -2592,29 +2593,31 @@ Dim sLocal As String, sResponseText As String
 
 Call fWLGenerateJSONInfo
 
-Dim sFile3 As String
-sFile1 = "C:\other\3.txt"
-sFile2 = "C:\other\4.txt"
-sFile3 = "C:\other\5.txt"
+'note: fWunderlistAdd can delete following comment lines when known safe come back
+'Dim sFile3 As String
+'sFile1 = "C:\other\3.txt"
+'sFile2 = "C:\other\4.txt"
+'sFile3 = "C:\other\5.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
 
-Dim sLine3 As String
-Open sFile3 For Input As #3
-Line Input #3, sLine3
-Close #3
+'Dim sLine3 As String
+'Open sFile3 For Input As #3
+'Line Input #3, sLine3
+'Close #3
 
 
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
-sToken = sLine3
+'sUserName = sLine1
+'sPassword = sLine2
+'sToken = sLine3
+'sToken = ""
 
 '{
 '  "list_id": 12345,
@@ -2643,12 +2646,11 @@ Debug.Print "RESPONSETEXT--------------------------------------------"
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "POST", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send json1
         apiWaxLRS = .responseText
-        sToken = ""
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
         Debug.Print "Status:  " & .Status
@@ -2672,11 +2674,11 @@ Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & sDueDate
 Debug.Print "--------------------------------------------"
 'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
-End Function
+End Sub
 
 
 
-Function fWunderlistGetTasksOnList()
+Sub fWunderlistGetTasksOnList()
 '============================================================================
 ' Name        : fWunderlistGetTasksOnList
 ' Author      : Erica L Ingram
@@ -2709,28 +2711,30 @@ Dim sLocal As String, sResponseText As String
 
 Call fWLGenerateJSONInfo
 
-Dim sFile3 As String
-sFile1 = "C:\other\3.txt"
-sFile2 = "C:\other\4.txt"
-sFile3 = "C:\other\5.txt"
+'note: fWunderlistGetTasksOnList can delete following comment lines when known safe come back
+'Dim sFile3 As String
+'sFile1 = "C:\other\3.txt"
+'sFile2 = "C:\other\4.txt"
+'sFile3 = "C:\other\5.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
 
-Dim sLine3 As String
-Open sFile3 For Input As #3
-Line Input #3, sLine3
-Close #3
+'Dim sLine3 As String
+'Open sFile3 For Input As #3
+'Line Input #3, sLine3
+'Close #3
+'sToken = ""
 
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
-sToken = sLine3
+'sUserName = sLine1
+'sPassword = sLine2
+'sToken = sLine3
 '{
 '  "list_id": 12345
 '}
@@ -2745,12 +2749,11 @@ Debug.Print "RESPONSETEXT--------------------------------------------"
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "GET", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send json1
         apiWaxLRS = .responseText
-        sToken = ""
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
         Debug.Print .Status
@@ -2782,16 +2785,16 @@ For Each rep In vDetails ' third level objects
     'Debug.Print "Error Details:  " & vErrorDetails
     Debug.Print "--------------------------------------------"
 Next
-Debug.Print "Task Title:  " & sTitle & "   |   List ID:  " & sWLListID & " " & lAssigneeID
-Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & sDueDate
+Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLListID & " " & lAssigneeID
+Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & " "
 Debug.Print "--------------------------------------------"
 'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
-End Function
+End Sub
 
 
 
-Function fWunderlistGetLists()
+Sub fWunderlistGetLists()
 '============================================================================
 ' Name        : fWunderlistGetLists
 ' Author      : Erica L Ingram
@@ -2824,18 +2827,19 @@ Dim sLocal As String, sResponseText As String
 
 Call fWLGenerateJSONInfo
 
-Dim sFile3 As String
-sFile1 = "C:\other\3.txt"
-sFile2 = "C:\other\4.txt"
-sFile3 = "C:\other\5.txt"
+'note: fWunderlistGetLists can delete following comment lines when known safe come back
+'Dim sFile3 As String
+'sFile1 = "C:\other\3.txt"
+'sFile2 = "C:\other\4.txt"
+'sFile3 = "C:\other\5.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
 
 Dim sLine3 As String
 Open sFile3 For Input As #3
@@ -2846,9 +2850,10 @@ Close #3
 sLocal = "'urn:ietf:wg:oauth:2.0:oob','oob'" '"https://localhost/"
 
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
-sToken = sLine3
+'sUserName = sLine1
+'sPassword = sLine2
+'sToken = sLine3
+'sToken = ""
 
 sURL2 = "https://a.wunderlist.com/api/v1/user"
 '{
@@ -2875,13 +2880,12 @@ Debug.Print "RESPONSETEXT--------------------------------------------"
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "GET", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         json5 = json1
         .send json5
         apiWaxLRS = .responseText
-        sToken = ""
         .abort
         Debug.Print apiWaxLRS
 Debug.Print "--------------------------------------------"
@@ -2901,15 +2905,15 @@ Debug.Print "Error Name:  " & vErrorName
 Debug.Print "Error Message:  " & vErrorMessage
 Debug.Print "Error Info Link:  " & vErrorILink
 Debug.Print "--------------------------------------------"
-Debug.Print "Task Title:  " & sTitle & "   |   List ID:  " & sWLListID & " " & lAssigneeID
-Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & sDueDate
+Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLListID & " " & lAssigneeID
+Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & " "
 Debug.Print "--------------------------------------------"
 'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
-End Function
+End Sub
 
 
-Function fWunderlistGetFolders()
+Sub fWunderlistGetFolders()
 '============================================================================
 ' Name        : fWunderlistGetFolders
 ' Author      : Erica L Ingram
@@ -2929,26 +2933,28 @@ Dim sText As String, sLine1 As String, sLine2 As String, sLine3 As String
 
 Call fWLGenerateJSONInfo
 
-sFile1 = "C:\other\3.txt"
-sFile2 = "C:\other\4.txt"
-sFile3 = "C:\other\5.txt"
+'note: fWunderlistGetFolders can delete following comment lines when known safe come back
+'sFile1 = "C:\other\3.txt"
+'sFile2 = "C:\other\4.txt"
+'sFile3 = "C:\other\5.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
 
-Open sFile3 For Input As #3
-Line Input #3, sLine3
-Close #3
+'Open sFile3 For Input As #3
+'Line Input #3, sLine3
+'Close #3
 
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
-sToken = sLine3
+'sUserName = sLine1
+'sPassword = sLine2
+'sToken = sLine3
+'sToken = ""
 
 'gets list of folders or folder revisions
 
@@ -2976,12 +2982,11 @@ Debug.Print "RESPONSETEXT--------------------------------------------"
 sURL = "https://a.wunderlist.com/api/v1/folder_revisions"
 With CreateObject("WinHttp.WinHttpRequest.5.1")
     .Open "GET", sURL, False
-    .setRequestHeader "X-Access-Token", sToken
-    .setRequestHeader "X-Client-ID", sUserName
+    .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+    .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
     .setRequestHeader "Content-Type", "application/json"
     .send
     apiWaxLRS = .responseText
-    sToken = ""
     .abort
     Debug.Print apiWaxLRS
     Debug.Print "--------------------------------------------"
@@ -2999,10 +3004,10 @@ Debug.Print "Folder ID:  " & vErrorName & "   |   " & "Folder Title:  " & vError
 Debug.Print "List IDs in Folder:  " & vErrorILink & "   |   " & "Revision No.:  " & vErrorIssue
 Debug.Print "--------------------------------------------"
 
-End Function
+End Sub
 
 
-Public Function pfUSCRuleScraper1()
+Sub pfUSCRuleScraper1()
 On Error Resume Next
 
 '============================================================================
@@ -3072,8 +3077,6 @@ For x = 1 To 54
         rstCitationHyperlinks.Fields("WebAddress").Value = sWebAddress
         rstCitationHyperlinks.Fields("CHCategory").Value = sCHCategory
         rstCitationHyperlinks.Update
-        
-        
         
     End If
 
@@ -3366,11 +3369,11 @@ Next
 
 
 
-End Function
+End Sub
 
 
 
-Public Function pfRCWRuleScraper1()
+Public Sub pfRCWRuleScraper1()
 On Error Resume Next
 '============================================================================
 ' Name        : pfRCWRuleScraper
@@ -3483,13 +3486,13 @@ NextNumber3:
                 
                 sTitle2 = n & vLettersArray2(o)
                 
-                If n < 10 Then sTitle2 = Str("0" & sTitle2)
+                If n < 10 Then sTitle2 = str("0" & sTitle2)
         
                 For p = 10 To 990 Step 10 '(RCW third portion ###.###.p)
                     
                     sTitle3 = p
                     
-                    If p < 100 Then sTitle3 = Str("0" & sTitle3)
+                    If p < 100 Then sTitle3 = str("0" & sTitle3)
                     
                     'generate variables
                     sCurrentRule = sTitle1 & "." & sTitle2 & "." & sTitle3
@@ -3551,15 +3554,10 @@ Next
 
 
 
-End Function
+End Sub
 
 
-
-
-
-
-    
-Public Function pfMARuleScraper()
+Public Sub pfMARuleScraper()
     
 On Error Resume Next
 Dim sFindCitation As String, sLongCitation As String, sRuleNumber As String
@@ -3590,7 +3588,7 @@ Dim w As Long, x As Long, y As Long, z As Long
     'Part III Title I through VI    Chapter 211 through 262 A through Z Section 1 through 100 A through Z
     'Part IV  Title I, II           Chapter 263 through 280 A through Z Section 1 through 100 A through Z
     'Part V   Title I               Chapter 281 and 282 A through Z     Section 1 through 100 A through Z
-                                                                    'ï¿½
+                                                                    '§
 vRomanArray = Array("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV")
 vLetterArray = Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")
 
@@ -3606,8 +3604,8 @@ For x = 1 To 5 'part I through V
         
         For j = 1 To 282 'Chapter 1 through 282
         
-            'Basic form:  Mass. Gen. Laws Chapter, ï¿½ Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
-            'Examples:    Mass. Gen. Laws ch. 71, ï¿½ 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
+            'Basic form:  Mass. Gen. Laws Chapter, § Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
+            'Examples:    Mass. Gen. Laws ch. 71, § 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
             
             sCurrentChapter = j
             
@@ -3652,8 +3650,8 @@ For x = 1 To 5 'part I through V
             
             For k = 0 To UBound(vLetterArray) ' A through Z
             
-                'Basic form:  Mass. Gen. Laws Chapter, ï¿½ Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
-                'Examples:    Mass. Gen. Laws ch. 71, ï¿½ 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
+                'Basic form:  Mass. Gen. Laws Chapter, § Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
+                'Examples:    Mass. Gen. Laws ch. 71, § 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
                 
                 sCurrentChapter = j & vLetterArray(k)
                 
@@ -3694,15 +3692,15 @@ For x = 1 To 5 'part I through V
                     
                 For l = 1 To 100 'Section 1 through 100
                 
-                    'Basic form:  Mass. Gen. Laws Chapter, ï¿½ Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
-                    'Examples:    Mass. Gen. Laws ch. 71, ï¿½ 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
+                    'Basic form:  Mass. Gen. Laws Chapter, § Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
+                    'Examples:    Mass. Gen. Laws ch. 71, § 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
                         
                     sCurrentSection = l
                     
                     'also without letters
                     
-                    sFindCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "ï¿½ " & sCurrentSection & " (####)"
-                    sLongCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "ï¿½ " & sCurrentSection & " (####)"
+                    sFindCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "§ " & sCurrentSection & " (####)"
+                    sLongCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "§ " & sCurrentSection & " (####)"
                     sCHCategory = 2
                     sWebAddress = "https://malegislature.gov/Laws/GeneralLaws/Part" & sCurrentPart & "/Title" & sCurrentTitle & "/Chapter" & sCurrentChapter & "/Section" & sCurrentSection
                     sReplaceHyperlink = sFindCitation & "#" & sWebAddress & "#" '"test#http://www.cnn.com#"
@@ -3738,13 +3736,13 @@ For x = 1 To 5 'part I through V
                     
                     For m = 0 To UBound(vLetterArray) ' A through Z
                     
-                        'Basic form:  Mass. Gen. Laws Chapter, ï¿½ Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
-                        'Examples:    Mass. Gen. Laws ch. 71, ï¿½ 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
+                        'Basic form:  Mass. Gen. Laws Chapter, § Section (Date).   |   Name of Act. Volume Mass. Acts Page Date.
+                        'Examples:    Mass. Gen. Laws ch. 71, § 1A (1966).   |  An Act Designating Certain Bridges in the Town of Middleborough. 1967 Mass. Acts 116. 8 October 1997.
                             
                         sCurrentSection = l & vLetterArray(m)
                         
-                        sFindCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "ï¿½ " & sCurrentSection & " (####)"
-                        sLongCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "ï¿½ " & sCurrentSection & " (####)"
+                        sFindCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "§ " & sCurrentSection & " (####)"
+                        sLongCitation = "Mass. Gen. Laws ch. " & sCurrentChapter & "§ " & sCurrentSection & " (####)"
                         sCHCategory = 2
                         sWebAddress = "https://malegislature.gov/Laws/GeneralLaws/Part" & sCurrentPart & "/Title" & sCurrentTitle & "/Chapter" & sCurrentChapter & "/Section" & sCurrentSection
                         sReplaceHyperlink = sFindCitation & "#" & sWebAddress & "#" '"test#http://www.cnn.com#"
@@ -3796,13 +3794,13 @@ NextNumber1:
 Next
     
 
-End Function
+End Sub
 
 
 
 
 
-Function fUnCompleteTimeMgmtTasks()
+Sub fUnCompleteTimeMgmtTasks()
 '============================================================================
 ' Name        : fUnCompleteTimeMgmtTasks
 ' Author      : Erica L Ingram
@@ -3877,7 +3875,7 @@ sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 End If
 
 
-End Function
+End Sub
 
 
 
@@ -3886,7 +3884,7 @@ End Function
 
 
 
-Function fCompleteTimeMgmtTasks()
+Sub fCompleteTimeMgmtTasks()
 '============================================================================
 ' Name        : fCompleteTimeMgmtTasks
 ' Author      : Erica L Ingram
@@ -3937,11 +3935,11 @@ sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 End If
 
 
-End Function
+End Sub
 
 
 
-Function fCompleteStatusBoxes()
+Sub fCompleteStatusBoxes()
 '============================================================================
 ' Name        : fCompleteStatusBoxes
 ' Author      : Erica L Ingram
@@ -3997,10 +3995,10 @@ End If
 rstCommHistory.Close
 Set rstCommHistory = Nothing
 
-End Function
+End Sub
 
 
-Function fCompleteStage1Tasks()
+Sub fCompleteStage1Tasks()
 '============================================================================
 ' Name        : fCompleteStage1Tasks
 ' Author      : Erica L Ingram
@@ -4081,9 +4079,9 @@ Else 'Code for yes
 
 End If
 
-End Function
+End Sub
 
-Function fCompleteStage2Tasks()
+Sub fCompleteStage2Tasks()
 '============================================================================
 ' Name        : fCompleteStage2Tasks
 ' Author      : Erica L Ingram
@@ -4164,10 +4162,10 @@ sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 End If
 
 
-End Function
+End Sub
 
 
-Function fCompleteStage3Tasks()
+Sub fCompleteStage3Tasks()
 '============================================================================
 ' Name        : fCompleteStage3Tasks
 ' Author      : Erica L Ingram
@@ -4248,9 +4246,9 @@ End If
 rstCommHistory.Close
 Set rstCommHistory = Nothing
 
-End Function
+End Sub
 
-Function fCompleteStage4Tasks()
+Sub fCompleteStage4Tasks()
 '============================================================================
 ' Name        : fCompleteStage4Tasks
 ' Author      : Erica L Ingram
@@ -4333,14 +4331,14 @@ End If
 rstCommHistory.Close
 Set rstCommHistory = Nothing
 
-End Function
+End Sub
 
 
 
 
 
 
-Function fFixBarAddressField()
+Sub fFixBarAddressField()
 '============================================================================
 ' Name        : fFixBarAddressField
 ' Author      : Erica L Ingram
@@ -4455,5 +4453,5 @@ Dim sAddress1 As String, sAddress2 As String
     rstBarAddresses.MoveNext
     Loop
 
-End Function
+End Sub
 

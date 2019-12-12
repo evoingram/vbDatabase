@@ -1,6 +1,7 @@
 Attribute VB_Name = "DocGen"
-
+'@Folder("Database.Production.Modules")
 Option Compare Database
+Option Explicit
 
 '============================================================================
 'class module cmDocGen
@@ -34,7 +35,7 @@ Option Compare Database
         
 '============================================================================
 
-Public Function pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
+Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
 '============================================================================
 ' Name        : pfGenericExportandMailMerge
 ' Author      : Erica L Ingram
@@ -44,7 +45,8 @@ Public Function pfGenericExportandMailMerge(sMerge As String, sExportTopic As St
 '============================================================================
 
 Dim sExportedTemplatePath As String, sTemplatePath As String, sOutputPDF As String
-Dim sExportInfoCSVPath As String
+Dim sExportInfoCSVPath As String, sQueryName As String
+Dim iCount As Integer
 Dim oWordAppDoc As Object
 Dim qdf As QueryDef
 Dim rstQuery As DAO.Recordset
@@ -127,9 +129,9 @@ oWordAppDoc.Application.ActiveDocument.SaveAs FileName:=sExportedTemplatePath
 oWordAppDoc.Application.ActiveDocument.Close
 Set oWordAppDoc = Nothing
 
-End Function
+End Sub
 
-Public Function pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
+Public Sub pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
         Optional sAttachment1 As String, Optional sAttachment2 As String, _
         Optional sAttachment3 As String, Optional sAttachment4 As String)
 On Error Resume Next
@@ -180,9 +182,9 @@ LoopExit:
 Set oWordApp = Nothing
 oWordDoc.Close
 oWordApp.Quit
-End Function
+End Sub
 
-Public Function pfCreateCDLabel()
+Public Sub pfCreateCDLabel()
 '============================================================================
 ' Name        : pfCreateCDLabel
 ' Author      : Erica L Ingram
@@ -195,6 +197,8 @@ Dim sPubDocName As String, sCommHistoryHyperlink As String, sCDLExcelExport As S
 Dim sPubDocPDFName As String, sAnswer As String, sQuestion As String
 Dim oPubDoc As Publisher.Document
 Dim oPubApp As Publisher.Application
+Dim dbVideoCollection As DAO.Database, rstVideos As DAO.Recordset
+
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 
@@ -269,10 +273,10 @@ Call fPrintKCIEnvelope
 
 
 Call pfClearGlobals
-End Function
+End Sub
 
 
-Public Function pfSelectCoverTemplate()
+Public Sub pfSelectCoverTemplate()
 '============================================================================
 ' Name        : pfSelectCoverTemplate
 ' Author      : Erica L Ingram
@@ -312,9 +316,9 @@ End If
 
 Call pfCommunicationHistoryAdd("CourtCover")
 Call pfClearGlobals
-End Function
+End Sub
 
-Public Function pfCreateCover(sTemplatePath As String)
+Public Sub pfCreateCover(sTemplatePath As String)
 '============================================================================
 ' Name        : pfCreateCover
 ' Author      : Erica L Ingram
@@ -328,8 +332,9 @@ Dim sExportInfoCSVPath As String, sFullTemplatePath As String
 Dim oExcelApp As New Excel.Application, oExcelWB As New Excel.Workbook
 Dim oWordApp As New Word.Application, oWordDoc As New Word.Document
 Dim xlRange As Excel.Range
-Dim oDocuments As Object, sSource As String
-Dim x As Integer
+Dim oDocuments As Object, sSource As String, sQueryName As String
+Dim x As Integer, iCount As Integer
+Dim rstCommHistory As DAO.Recordset
 Call pfCurrentCaseInfo  'refresh transcript info
 
 sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
@@ -441,9 +446,6 @@ For x = oDocuments.Count To 1 Step -1
     
 Next x
 
-
-
-
 'ActiveDocument.Close
 Set oExcelWB = Nothing
 Set oWordApp = Nothing
@@ -467,10 +469,10 @@ rstCommHistory.Update
 rstCommHistory.Close
 Set rstCommHistory = Nothing
 Call pfClearGlobals
-End Function
+End Sub
 
 
-Function fCreatePELLetter()
+Sub fCreatePELLetter()
 '============================================================================
 ' Name        : fCreatePELLetter
 ' Author      : Erica L Ingram
@@ -501,8 +503,8 @@ End If
 
 Call pfCommunicationHistoryAdd("PackageEnclosedLetter")
 Call pfClearGlobals
-End Function
-Function fFactorInvoicEmailF()
+End Sub
+Sub fFactorInvoicEmailF()
 '============================================================================
 ' Name        : fFactorInvoicEmailF
 ' Author      : Erica L Ingram
@@ -533,34 +535,32 @@ Call pfCommunicationHistoryAdd("FactorInvoiceEmail")
 
 sFactoringXLS = "T:\Database\Templates\Stage4s\Client_Basic_Schedule.xls" 'make factoring csv
 sGeneratedFactoringXLS = "I:\" & sCourtDatesID & "\WorkingFiles\" & "Client_Basic_Schedule.xls"
-sUnitPriceSQL = "SELECT UnitPrice from CourtDates where ID = " & sCourtDatesID & ";" 'get unitprice id
 
-Set db = CurrentDb
-Set rstUPCourtDates = CurrentDb.OpenRecordset(sUnitPriceSQL)
-sUnitPrice = rstUPCourtDates.Fields("UnitPrice").Value
-rstUPCourtDates.Close
-Set rstUPCourtDates = Nothing
+'note: fFactorInvoicEmailF can delete following lines when known safe come back
+'sUnitPriceSQL = "SELECT UnitPrice from CourtDates where ID = " & sCourtDatesID & ";" 'get unitprice id
+'Set db = CurrentDb
+'Set rstUPCourtDates = CurrentDb.OpenRecordset(sUnitPriceSQL)
+'sUnitPrice = rstUPCourtDates.Fields("UnitPrice").Value
+'rstUPCourtDates.Close
+'Set rstUPCourtDates = Nothing
 
 sUnitPriceSQL = "SELECT Rate from UnitPrice where ID = " & sUnitPrice & ";" 'get proper rate
-
 Set rstUnitPrice = CurrentDb.OpenRecordset(sUnitPriceSQL)
 sUnitPrice = rstUnitPrice.Fields("Rate").Value
 rstUnitPrice.Close
 Set rstUnitPrice = Nothing
 
 sGenerateXeroCSVSQL = "SELECT XeroInvoiceCSV.ContactName, XeroInvoiceCSV.InvoiceNumber, XeroInvoiceCSV.Reference, XeroInvoiceCSV.InvoiceDate, 28 From XeroInvoiceCSV WHERE XeroInvoiceCSV.Reference= " & sCourtDatesID & ";"
-
 Set db = CurrentDb
 Set qdf = CurrentDb.QueryDefs("FactoringCSVQuery")
 qdf.Parameters(0) = sActualQuantity
 qdf.Parameters(1) = sCourtDatesID
 Set rstFactoringCSV = qdf.OpenRecordset
 rstFactoringCSV.MoveFirst
-
 sInvoiceAmount = (sActualQuantity * sUnitPrice)
 iNetTerm = 28
 sContactName = rstFactoringCSV.Fields("ContactName").Value
-sInvoiceNumber = rstFactoringCSV.Fields("InvoiceNumber").Value
+'sInvoiceNumber = rstFactoringCSV.Fields("InvoiceNumber").Value
 sPONumber = rstFactoringCSV.Fields("PO Number").Value
 dInvoiceDate = rstFactoringCSV.Fields("Invoice Date").Value
 sFactoringXLS = "T:\Database\Templates\Stage4s\Client_Basic_Schedule.xls"
@@ -608,8 +608,8 @@ Call pfUpdateCheckboxStatus("InvoicetoFactorEmail")
 qdf.Close
 db.Close
 Call pfClearGlobals
-End Function
-Function fInfoNeededEmailF()
+End Sub
+Sub fInfoNeededEmailF()
 '============================================================================
 ' Name        : fInfoNeededEmailF
 ' Author      : Erica L Ingram
@@ -617,16 +617,14 @@ Function fInfoNeededEmailF()
 ' Call command: Call fInfoNeededEmailF
 ' Description : creates info needed e-mail
 '============================================================================
-
-
-
+'note: fInfoNeededEmailF not used anymore come back
 Call pfCheckFolderExistence 'checks for job folder and creates it if not exists
 Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
 Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
 
-End Function
+End Sub
 
-Public Function pfInvoicesCSV()
+Public Sub pfInvoicesCSV()
 '============================================================================
 ' Name        : pfInvoicesCSV
 ' Author      : Erica L Ingram
@@ -665,9 +663,9 @@ Application.FollowHyperlink (sXeroImportURL)
 
 Call pfUpdateCheckboxStatus("InvoiceCompleted")
 Call pfClearGlobals
-End Function
+End Sub
 
-Function fCreateWorkingCopy()
+Sub fCreateWorkingCopy()
 '============================================================================
 ' Name        : fCreateWorkingCopy
 ' Author      : Erica L Ingram
@@ -721,7 +719,7 @@ SendKeys "+{Home}"
         'add continuous section break at top
         .Paragraphs(1).Range.InsertBreak Type:=wdSectionBreakContinuous
         
-        If .ProtectionType <> wdNoProtection Then .Unprotect password:="12345"
+        If .ProtectionType <> wdNoProtection Then .Unprotect password:="wrts0419"
         'removes doc info and macro code within document
         .RemoveDocumentInformation (wdRDIAll)
         For Each vbComp In .VBProject.VBComponents
@@ -738,9 +736,9 @@ SendKeys "+{Home}"
         'delete cert section
         Set wsSections = .Sections
         Set oRng = .Range(Start:=.bookmarks("CertBMK").Range.End, End:=.bookmarks("ToABMK").Range.Start)
-        oRng.Delete
+        oRng.delete
         
-        For x = wsSections.Last.index To 1 Step -1
+        For x = wsSections.Last.Index To 1 Step -1
             Set wsSection = wsSections.item(x)
             If x = 1 Then
                 wsSection.ProtectedForForms = True
@@ -751,7 +749,7 @@ SendKeys "+{Home}"
         Next x
         
         'lock up header, leave all other sections unlocked
-        .Protect Type:=wdAllowOnlyFormFields, noReset:=True, password:="12345"
+        .Protect Type:=wdAllowOnlyFormFields, noReset:=True, password:="wrts0419"
         .SaveAs FileName:=sWCTranscriptsPath, FileFormat:=wdFormatXMLDocument 'save as file
         
     End With
@@ -764,9 +762,9 @@ Set oWordApp = Nothing
 
 FileCopy sWCTranscriptsPath, sWCMainPath
 
-End Function
+End Sub
 
-Function fSendShippingTrackingEmail()
+Sub fSendShippingTrackingEmail()
 '============================================================================
 ' Name        : fSendShippingTrackingEmail
 ' Author      : Erica L Ingram
@@ -774,15 +772,15 @@ Function fSendShippingTrackingEmail()
 ' Call command: Call fSendShippingTrackingEmail
 ' Description : creates shipping confirmation e-mail sent to client
 '============================================================================
-
+'Note: fSendShippingTrackingEmail not used come back
 Call pfGenericExportandMailMerge(qnTRCourtUnionAppAddrQ, "Stage4s\Shipped")
 Call pfSendWordDocAsEmail("Shipped", "Shipping Confirmation") 'shipped email
 Call pfCommunicationHistoryAdd("Shipped")
 
-End Function
+End Sub
 
 
-Function pfPrepareCover()
+Sub pfPrepareCover()
 '============================================================================
 ' Name        : pfPrepareCover
 ' Author      : Erica L Ingram
@@ -790,7 +788,8 @@ Function pfPrepareCover()
 ' Call command: Call pfPrepareCover
 ' Description : prepares volume cover for transcript compendium
 '============================================================================
-Dim rstCasesID As DAO.Recordset
+Dim cJob As New Job
+
 Dim rstJobsByCase As DAO.Recordset
 Dim sCasesID As String, sCurrentJobID As String, sVolumesCoverPath As String
 Dim dHearingDate As Date
@@ -800,9 +799,11 @@ Dim sVolumeText As String, sBookmarkName As String, sVolumesCoverPDFPath As Stri
 Dim oWordApp As Word.Application, oWordDoc As Word.Document
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-Set rstCasesID = CurrentDb.OpenRecordset("SELECT * FROM Courtdates WHERE ID = " & sCourtDatesID & ";")
-sCasesID = rstCasesID.Fields("CasesID").Value
-rstCasesID.Close
+'note:  pfPrepareCover can delete following lines when known safe
+'Dim rstCasesID As DAO.Recordset
+'Set rstCasesID = CurrentDb.OpenRecordset("SELECT * FROM Courtdates WHERE ID = " & sCourtDatesID & ";")
+'sCasesID = rstCasesID.Fields("CasesID").Value
+'rstCasesID.Close
 
 'query for all dates & job numbers for a case
 Set rstJobsByCase = CurrentDb.OpenRecordset("SELECT * FROM Courtdates WHERE CasesID = " & sCasesID & ";")
@@ -828,7 +829,7 @@ Do While rstJobsByCase.EOF = False
     sVolumeText = "Volume " & y & ":  " & Format(dHearingDate, "dddd, mmmm d, yyyy")
     Debug.Print sVolumeText
     On Error Resume Next
-    'Set oWordApp = GetObject(, "Word.Application")
+    Set oWordApp = GetObject(, "Word.Application")
     
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
@@ -839,7 +840,6 @@ Do While rstJobsByCase.EOF = False
     
     Set oWordDoc = oWordApp.Documents.Open(sVolumesCoverPath)
     On Error GoTo 0
-    
     
     oWordDoc.Application.Visible = True
     oWordDoc.Application.DisplayAlerts = False
@@ -865,4 +865,4 @@ oWordDoc.Close
 'oWordApp.Quit
 rstJobsByCase.Close
     
-End Function
+End Sub

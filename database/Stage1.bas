@@ -1,6 +1,7 @@
 Attribute VB_Name = "Stage1"
-
+'@Folder("Database.Production.Modules")
 Option Compare Database
+Option Explicit
 '============================================================================
 'class module cmStage1:
 'variables:
@@ -46,7 +47,7 @@ Option Compare Database
         
 '============================================================================
 
-Function fAssignPS()
+Sub fAssignPS()
 '============================================================================
 ' Name        : fAssignPS
 ' Author      : Erica L Ingram
@@ -69,9 +70,9 @@ Else 'Code for yes, opens PS in chrome
     Shell (sBrowserPath & " -url https://www.aquoco.co/ProjectSend/index.php")
 End If
 
-End Function
+End Sub
 
-Public Function pfEnterNewJob()
+Public Sub pfEnterNewJob()
 '============================================================================
 ' Name        : pfEnterNewJob
 ' Author      : Erica L Ingram
@@ -88,18 +89,21 @@ Dim oExcelApp As Object
 Dim rstTempJob As DAO.Recordset, rstCurrentJob As DAO.Recordset, rstCurrentCasesID As DAO.Recordset
 Dim rstTempCourtDates As DAO.Recordset, rstTempCases As DAO.Recordset, rstTempCustomers As DAO.Recordset
 Dim rstCurrentStatusesEntry As DAO.Recordset
-Dim rstMaxCasesID As DAO.Recordset
+Dim rstMaxCasesID As DAO.Recordset, rstCourtDatesID As DAO.Recordset
+
 
 Dim sExtensionXLSM As String, sExtensionXLS As String, sFullPathXLS As String, sFullPathXLSM As String
 Dim sPartialPath As String, sTurnaroundTimesCD As String, sInvoiceNumber As String
 Dim sNewCourtDatesRowSQL As String, sOrderingID As String, sCurrentJobSQL As String
 Dim sTempJobSQL As String, sStatusesEntrySQL As String, sCasesID As String
-Dim sCurrentTempApp As String
-Dim sAnswer As String, sQuestion As String
+Dim sCurrentTempApp As String, sTurnaround As String
+Dim sAnswer As String, sQuestion As String, sAppNumber As String
 Dim sTempCustomersSQL As String
 
 Dim sFactoring As String, sFiled As String, sBrandingTheme As String
-Dim sUnitPrice As String, sIRC As String
+Dim sUnitPrice As String, sIRC As String, sAccountCode As String
+
+Dim dInvoiceDate As Date
 
 sPartialPath = "T:\Database\Scripts\InProgressExcels\JotformCustomers"
 sExtensionXLS = ".xlsx"
@@ -225,7 +229,7 @@ Select Case sFiled
     Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", "Y", "y", _
     "yep", "Yep", "YEP", "YA", "Ya", "ya" 'filed
                 
-        Select Case sFactored
+        Select Case sFactoring
             Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
             "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
                 sFactoring = True
@@ -238,7 +242,7 @@ Select Case sFiled
         
     Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "NOPE", "Nope", "N", "n" 'not filed
         
-         Select Case sFactored
+         Select Case sFactoring
                 Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
                 "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
                     sFactoring = True
@@ -469,7 +473,7 @@ Do Until rstTempJob.EOF
     If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
         Select Case sAppNumber
             Case "App1", "App2", "App3", "App4", "App5", "App6"
-                db.Execute "UPDATE " & sTableName & " SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             Case Else
                 Exit Do
         End Select
@@ -554,11 +558,11 @@ sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 MsgBox "Thanks, job entered!  Job number is " & sCourtDatesID & " if you want to process it!"
 
 Call pfClearGlobals
-End Function
+End Sub
 
 
 
-Function fCheckTempCustomersCustomers()
+Sub fCheckTempCustomersCustomers()
 '============================================================================
 ' Name        : fCheckTempCustomersCustomers
 ' Author      : Erica L Ingram
@@ -571,6 +575,8 @@ Dim rstTempCustomers As DAO.Recordset, rstCheckTCuvCu As DAO.Recordset, rstCusto
 Dim sCheckTCuAgainstCuSQL As String, tcFirstName As String, tcLastName As String, tcCompany As String
 Dim tcMrMs As String, tcJobTitle As String, tcBusinessPhone As String, tcAddress As String
 Dim tcCity As String, tcZIP As String, tcState As String, tcNotes As String, tcFactoringApproved As String
+Dim rstCustomers As DAO.Recordset
+Dim tcCID As String
 
 Set rstTempCustomers = CurrentDb.OpenRecordset("TempCustomers")
 
@@ -634,7 +640,7 @@ NextPart:
         If rstCheckTCuvCu.EOF Then 'if they are new customers do the following
         
             'Set rstCustomers = CurrentDb.OpenRecordset("SELECT * From Customers;")
-            db.Execute "INSERT INTO Customers (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, ZIP, FactoringApproved, Notes) VALUES (" & _
+            CurrentDb.Execute "INSERT INTO Customers (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, ZIP, FactoringApproved, Notes) VALUES (" & _
             tcLastName & ", " & tcFirstName & ", " & tcCompany & ", " & tcMrMs & ", " & tcJobTitle & ", " & tcBusinessPhone & ", " & tcAddress & ", " & tcCity & ", " & tcState & _
             ", " & tcZIP & ", " & tcFactoringApproved & ", " & "notes" & ");"
 
@@ -653,9 +659,9 @@ NextPart:
             
             'rstCustomers.Fields("FactoringApproved").Value = tcFactoringApproved
             'rstCustomers.Fields("Notes").Value = "notes"
-            tcCID = rstCustomers.Fields("ID").Value
+            tcCID = rstCheckTCuvCu.Fields("AppID").Value
             'rstCustomers.Update
-            rstCustomers.Close
+            'rstCustomers.Close
         
         Else 'if they are previous customers, do the following
         
@@ -670,7 +676,7 @@ NextPart:
         
         End If
             'do for everyone
-            db.Execute "UPDATE TempCustomers SET AppID = " & tcCID & ", " & "Company = " & tcCompany & ", " & "MrMs = " & tcMrMs _
+            CurrentDb.Execute "UPDATE TempCustomers SET AppID = " & tcCID & ", " & "Company = " & tcCompany & ", " & "MrMs = " & tcMrMs _
              & ", " & "LastName= " & tcLastName & ", " & "FirstName = " & tcFirstName & ", " & "JobTitle = " & tcJobTitle & ", " & "BusinessPhone = " & _
              tcBusinessPhone & ", " & "Address = " & tcAddress & ", " & "City = " & tcCity & ", " & "State = " & tcState & ", " & "ZIP = " & tcZIP _
               & ", " & "Notes= " & tcNotes & ", " & "FactoringApproved = " & tcFactoringApproved & " WHERE [CourtDates].[ID] = " & sCourtDatesID & " AND AppID = '';"
@@ -705,8 +711,8 @@ Set rstCheckTCuvCu = Nothing
 rstTempCustomers.Close
 Set rstTempCustomers = Nothing
 
-End Function
-Function fCheckTempCasesCases()
+End Sub
+Sub fCheckTempCasesCases()
 '============================================================================
 ' Name        : fCheckTempCasesCases
 ' Author      : Erica L Ingram
@@ -719,6 +725,7 @@ Dim rstTempCases As DAO.Recordset, rstCheckTCavCa As DAO.Recordset, rstMaxCasesI
 Dim sCheckTCaAgainstCaSQL As String, sNewCasesIDSQL As String, tcsCourtDatesID As String, sCasesID As String
 Dim tcHearingTitle As String, tcParty1 As String, tcParty1Name As String, tcParty2 As String, tcParty2Name As String
 Dim tcCaseNumber1 As String, tcCaseNumber2 As String, tcJurisdiction As String, tcJudge As String, tcJudgeTitle As String
+Dim db
 
 Set db = CurrentDb
 Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
@@ -807,10 +814,10 @@ Set rstTempCases = Nothing
 
 MsgBox "Checked for previous case info."
     
-End Function
+End Sub
         
 
-Function fInsertCalculatedFieldintoTempCourtDates()
+Sub fInsertCalculatedFieldintoTempCourtDates()
 '============================================================================
 ' Name        : fInsertCalculatedFieldintoTempCourtDates
 ' Author      : Erica L Ingram
@@ -825,6 +832,7 @@ Dim iUnitPriceID As Integer
 Dim dInvoiceDate As Date, dExpectedBalanceDate As Date, dExpectedAdvanceDate As Date, dExpectedRebateDate As Date
 Dim cUnitPrice As Currency
 Dim sJurisdiction As String, sUnitPriceRateSrchSQL As String, InsertCustomersTempCourtDatesSQLstring As String
+Dim rs2 As DAO.Recordset
 
 'calculate fields
 Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
@@ -1051,7 +1059,7 @@ End If
 
 'insert calculated fields into tempcourtdates
 
-            db.Execute "UPDATE TempCourtDates SET InvoiceDate = " & dInvoiceDate & ", " & "UnitPrice = " & iUnitPriceID & ", " & "ExpectedRebateDate = " & dExpectedRebateDate _
+            CurrentDb.Execute "UPDATE TempCourtDates SET InvoiceDate = " & dInvoiceDate & ", " & "UnitPrice = " & iUnitPriceID & ", " & "ExpectedRebateDate = " & dExpectedRebateDate _
              & ", " & "ExpectedAdvanceDate = " & dExpectedAdvanceDate & ", " & "EstimatedPageCount = " & iEstimatedPageCount & ", " & "Subtotal = " & _
              sSubtotal & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
         'rstTempCustomers.Edit
@@ -1077,9 +1085,9 @@ MsgBox "Transcript Income Info:  " & Chr(13) & "Turnaround:  " & iTurnaroundTime
   & Chr(13) & "Expected Rebate Payment Date:  " & dExpectedRebateDate _
   & Chr(13) & "Expected Price Estimate:  $" & sSubtotal
 
-End Function
+End Sub
 
-Function fAudioPlayPromptTyping()
+Sub fAudioPlayPromptTyping()
 '============================================================================
 ' Name        : fAudioPlayPromptTyping
 ' Author      : Erica L Ingram
@@ -1100,9 +1108,9 @@ Else 'Code for yes
     Call fPlayAudioParent
 End If
 
-End Function
+End Sub
 
-Function fProcessAudioParent()
+Sub fProcessAudioParent()
 '============================================================================
 ' Name        : fProcessAudioParent
 ' Author      : Erica L Ingram
@@ -1114,9 +1122,9 @@ Function fProcessAudioParent()
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 Call fProcessAudioFolder("I:\" & sCourtDatesID & "\Audio")
 
-End Function
+End Sub
 
-Function fPlayAudioParent()
+Sub fPlayAudioParent()
 '============================================================================
 ' Name        : pfPlayAudioParent
 ' Author      : Erica L Ingram
@@ -1129,10 +1137,10 @@ sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 Call fPlayAudioFolder("I:\" & sCourtDatesID & "\Audio")
 
 
-End Function
+End Sub
 
 
-Function fPlayAudioFolder(ByVal sHostFolder As String)
+Sub fPlayAudioFolder(ByVal sHostFolder As String)
 '============================================================================
 ' Name        : pfPlayAudioFolder
 ' Author      : Erica L Ingram
@@ -1212,11 +1220,11 @@ Else 'Code for yes
 Line2:
 End If
      Call pfClearGlobals
-End Function
+End Sub
 
 
 
-Function fProcessAudioFolder(ByVal HostFolder As String)
+Sub fProcessAudioFolder(ByVal HostFolder As String)
 '============================================================================
 ' Name        : pfProcessAudioFolder
 ' Author      : Erica L Ingram
@@ -1282,9 +1290,9 @@ Else 'Code for yes
 Line2:
           End If
    End If
-End Function
+End Sub
 
-Public Function pfPriceQuoteEmail()
+Public Sub pfPriceQuoteEmail()
 '============================================================================
 ' Name        : pfPriceQuoteEmail
 ' Author      : Erica L Ingram
@@ -1308,6 +1316,7 @@ Dim sPageRate As String, sPageRate9 As String, sPriceQuoteDocPath As String
 Dim outputfilestring As String, yourVariable As String
 Dim oWordAppDoc As New Word.Application, oOutlookApp As New Outlook.Application, oOutlookMail As Object
 Dim oWordDoc As New Word.Document, oWordEditor As Word.editor, oWordApp As New Word.Application
+Dim sSubtotal5 As String, sSubtotal6 As String, sPageRate10 As String
 
 dDeadline = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtDeadline]
 iAudioLength = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtAudioLength]
@@ -1443,9 +1452,9 @@ LoopExit:
 oWordDoc.Close
 oWordApp.Quit
 Set oWordApp = Nothing
-End Function
+End Sub
 
-Public Function pfStage1Ppwk()
+Public Sub pfStage1Ppwk()
 'On Error GoTo eHandler
 '============================================================================
 ' Name        : pfStage1Ppwk
@@ -1461,7 +1470,9 @@ Dim sCourtRulesPath6 As String, sCourtRulesPath7 As String, sCourtRulesPath8 As 
 
 Dim sCourtRulesPath1a As String, sCourtRulesPath2a As String, sCourtRulesPath3a As String, sCourtRulesPath4a As String, sCourtRulesPath5a As String
 Dim sCourtRulesPath6a As String, sCourtRulesPath7a As String, sCourtRulesPath8a As String, sCourtRulesPath9a As String
-Dim sXeroCSVPath As String, sURL As String
+Dim sXeroCSVPath As String, sURL As String, sQuestion As String
+Dim sCourtRulesPath10a As String, sCourtRulesPath10 As String
+Dim sAnswer As String
 
 Call pfCurrentCaseInfo  'refresh transcript info
 Call pfCheckFolderExistence 'checks for job folder and creates it if not exists
@@ -1617,12 +1628,12 @@ End If
 MsgBox "Stage 1 complete."
 Call pfTypeRoughDraftF 'type rough draft prompt
 Call pfClearGlobals
-End Function
+End Sub
 
 
 
 
-Function fWunderlistAddNewJob()
+Sub fWunderlistAddNewJob()
 '============================================================================
 ' Name        : fWunderlistAddNewJob
 ' Author      : Erica L Ingram
@@ -1661,27 +1672,30 @@ bStarred = "false"
 lFolderID = 13249242 'id for "Production" folder
 
 
-sFile1 = "C:\other\3.txt"
-sFile2 = "C:\other\4.txt"
-sFile3 = "C:\other\5.txt"
+'note: fWunderlistAddNewJob can delete following comment lines when known safe come back
+'sFile1 = "C:\other\3.txt"
+'sFile2 = "C:\other\4.txt"
+'sFile3 = "C:\other\5.txt"
 
-Open sFile1 For Input As #1
-Line Input #1, sLine1
-Close #1
+'Open sFile1 For Input As #1
+'Line Input #1, sLine1
+'Close #1
 
-Open sFile2 For Input As #2
-Line Input #2, sLine2
-Close #2
+'Open sFile2 For Input As #2
+'Line Input #2, sLine2
+'Close #2
 
-Open sFile3 For Input As #3
-Line Input #3, sLine3
-Close #3
+'Open sFile3 For Input As #3
+'Line Input #3, sLine3
+'Close #3
 
 sEmail = "inquiries@aquoco.co"
-sUserName = sLine1
-sPassword = sLine2
-sToken = sLine3
+'sUserName = sLine1
+'sPassword = sLine2
+'sToken = sLine3
 sTitle = sCourtDatesID
+'sToken = ""
+'sUserName = ""
 
 'create a list JSON
     sJSON = "{" & Chr(34) & "title" & Chr(34) & ": " & Chr(34) & sTitle & Chr(34) & "}"
@@ -1695,8 +1709,8 @@ sTitle = sCourtDatesID
     With CreateObject("WinHttp.WinHttpRequest.5.1")
                 
         .Open "POST", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON 'send JSON to create empty list
         apiWaxLRS = .responseText
@@ -1714,8 +1728,8 @@ sTitle = sCourtDatesID
     sURL = "https://a.wunderlist.com/api/v1/folders"
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         .Open "GET", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send
         apiWaxLRS = .responseText
@@ -1764,8 +1778,8 @@ sTitle = sCourtDatesID
     sURL = "https://a.wunderlist.com/api/v1/folders/" & vErrorName
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         .Open "PATCH", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON
         apiWaxLRS = .responseText
@@ -1810,8 +1824,8 @@ sTitle = sCourtDatesID
     With CreateObject("WinHttp.WinHttpRequest.5.1")
                         
         .Open "POST", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON 'send JSON to create empty list
         apiWaxLRS = .responseText
@@ -1850,8 +1864,8 @@ sTitle = sCourtDatesID
                 
                 
         .Open "POST", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON
         apiWaxLRS = .responseText
@@ -1885,8 +1899,8 @@ sTitle = sCourtDatesID
     With CreateObject("WinHttp.WinHttpRequest.5.1")
     
         .Open "POST", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON
         apiWaxLRS = .responseText
@@ -1920,14 +1934,12 @@ sTitle = sCourtDatesID
     With CreateObject("WinHttp.WinHttpRequest.5.1")
     
         .Open "POST", sURL, False
-        .setRequestHeader "X-Access-Token", sToken
-        .setRequestHeader "X-Client-ID", sUserName
+        .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
+        .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON 'send JSON to create empty list
         
         apiWaxLRS = .responseText
-        sToken = ""
-        sUserName = ""
         .abort
     End With
     Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
@@ -1937,11 +1949,11 @@ sTitle = sCourtDatesID
 
 
 
-End Function
+End Sub
 
 
 
-Function autointake()
+Sub autointake()
 'autoread email form into access db
 Dim rstOLP As DAO.Recordset, rstTempCourtDates As DAO.Recordset
 Dim rstTempCases As DAO.Recordset, rstTempCustomers As DAO.Recordset
@@ -1978,8 +1990,8 @@ Dim sExtensionXLSM As String, sExtensionXLS As String, sFullPathXLS As String, s
 Dim sPartialPath As String, sTurnaroundTimesCD As String, sInvoiceNumber As String
 Dim sNewCourtDatesRowSQL As String, sOrderingID As String, sCurrentJobSQL As String
 Dim sTempJobSQL As String, sStatusesEntrySQL As String, sCasesID As String
-Dim sCurrentTempApp As String
-Dim sAnswer As String, sQuestion As String
+Dim sCurrentTempApp As String, sAddress3A As String, sLastA As String
+Dim sAnswer As String, sQuestion As String, sFirstA As String
 Dim sTempCustomersSQL As String
 
 
@@ -2162,7 +2174,7 @@ Select Case sFiled
     Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", "Y", "y", _
     "yep", "Yep", "YEP", "YA", "Ya", "ya" 'filed
                 
-        Select Case sFactored
+        Select Case sFactoring
             Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
             "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
                 sFactoring = True
@@ -2175,7 +2187,7 @@ Select Case sFiled
         
     Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "NOPE", "Nope", "N", "n" 'not filed
         
-         Select Case sFactored
+         Select Case sFactoring
                 Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
                 "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
                     sFactoring = True
@@ -2386,7 +2398,7 @@ sIRC & ", " & sBrandingTheme & ");"
                 
                 db.Execute "INSERT INTO TempCourtDates (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, " & _
                 "ZIP, Notes, FactoringApproved) VALUES (" & _
-                sLastName & ", " & sFirstName & ", " & sLastName & ", " & sCompany & ", " & sMrMs & ", " & sJobTitle & ", " & sBusinessPhone & ", " & sAddress1 & " " & sAddress2 & ", " & _
+                sLastName & ", " & sFirstName & ", " & sLastName & ", " & sCompany & ", " & sMrMs & ", " & "" & ", " & "" & ", " & sAddress1 & " " & sAddress2 & ", " & _
                 sCity & ", " & sState & ", " & sZIP & ", " & sEmail & ", " & sFactoring & ");"
             'move to next appearance
             Next
@@ -2762,9 +2774,9 @@ Else 'Code for yes
     Call pfSendWordDocAsEmail("OrderConfirmation", "Transcript Order Confirmation") 'Order Confrmation Email
     
 End If
-End Function
+End Sub
 
-Public Function NewOLEntry()
+Public Sub NewOLEntry()
 'when new entry in OLPayPalPayments, run autointake function
 Dim sCount As DAO.Recordset
 
@@ -2776,7 +2788,7 @@ If sCount.RecordCount > 0 Then
 Else
 End If
 
-End Function
+End Sub
 
 
 Private Sub ResetDisplay()
@@ -2794,7 +2806,8 @@ Private Sub ResetDisplay()
 End Sub
 
 Private Sub ScrollingMarquee()
-
+Dim strText As String
+Dim n As Integer
     ResetDisplay
 
     MinimizeNavigationPane
@@ -2826,7 +2839,7 @@ Private Sub ScrollingMarquee()
 End Sub
 
 
-Public Function MinimizeNavigationPane()
+Public Sub MinimizeNavigationPane()
 
 On Error GoTo ErrHandler
 
@@ -2834,12 +2847,12 @@ On Error GoTo ErrHandler
     DoCmd.Minimize
         
 Exit_ErrHandler:
-    Exit Function
+    Exit Sub
     
 ErrHandler:
     MsgBox "Error " & Err.Number & " in HideNavigationPane routine : " & Err.Description, vbOKOnly + vbCritical
     Resume Exit_ErrHandler
 
-End Function
+End Sub
 
 
