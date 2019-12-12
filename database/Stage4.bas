@@ -1541,8 +1541,8 @@ With mySessionOptions 'set up session options
 
     .Protocol = Protocol_Ftp
     .HostName = "ftp.aquoco.co"
-    .Username = "elingram@aquoco.co"
-    .password = "Reality!123"
+    .Username = Environ("ftpUserName")
+    .password = Environ("ftpPassword")
     
 End With
 
