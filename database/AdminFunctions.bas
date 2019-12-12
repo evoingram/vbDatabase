@@ -210,7 +210,9 @@ Dim adorstOutlookExport As ADODB.Recordset
 Dim oOutLookMAPIFolder As Outlook.MAPIFolder
 Dim oOutlookMail As Outlook.MailItem
 Dim dReceived As Date
-Dim sReceivedTime As String, sEmailHyperlink As String, sTableHyperilnk As String
+Dim sReceivedTime As String
+Dim sEmailHyperlink As String
+Dim sTableHyperilnk As String
 
 Set oOutlookNamespace = GetNamespace("MAPI")
 Set oOutlookPickedFolder = oOutlookNamespace.PickFolder
@@ -285,8 +287,12 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID)
 Dim dbAQC As Database
 Dim qdf As QueryDef
 Dim oAcrobatDoc As Object
-Dim sTranscriptPDFPath As String, sActualQuantity1 As String, sActualQuantity As String
-Dim sQuestion As String, sAnswer As String, sSQL As String
+Dim sTranscriptPDFPath As String
+Dim sActualQuantity1 As String
+Dim sActualQuantity As String
+Dim sQuestion As String
+Dim sAnswer As String
+Dim sSQL As String
 
 Set oAcrobatDoc = New AcroPDDoc
 
@@ -365,9 +371,12 @@ Public Sub pfReadXML()
 '============================================================================
 
 
-Dim sFullOutputDonePath As String, sTrackingNumber As String
-Dim sOutputPath As String, sFullOutputPath As String
-Dim dShipDate As Date, dShipDateFormatted As Date
+Dim sFullOutputDonePath As String
+Dim sTrackingNumber As String
+Dim sOutputPath As String
+Dim sFullOutputPath As String
+Dim dShipDate As Date
+Dim dShipDateFormatted As Date
 Dim rstCurrentJob As DAO.Recordset
 Dim formDOM As DOMDocument60    'Currently opened xml file
 Dim ixmlRoot As IXMLDOMElement
@@ -428,8 +437,10 @@ Public Sub pfFileRenamePrompt()
 
 Dim db As Database
 
-Dim sUserInput As String, sFinalTranscriptPath As String
-Dim sChkBxFiledNotFiled As String, sCoverPath As String
+Dim sUserInput As String
+Dim sFinalTranscriptPath As String
+Dim sChkBxFiledNotFiled As String
+Dim sCoverPath As String
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 sFinalTranscriptPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.docx"
@@ -508,7 +519,8 @@ Public Sub pfCheckFolderExistence()
 ' Call command: Call pfCheckFolderExistence
 ' Description : checks for Audio, Transcripts, FTP, WorkingFiles, Notes subfolders and RoughDraft and creates if not exists
 '============================================================================
-Dim sIPJobPath As String, sTemplatePath As String
+Dim sIPJobPath As String
+Dim sTemplatePath As String
 
 
 Call pfCurrentCaseInfo  'refresh transcript info
@@ -605,7 +617,8 @@ Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
 
 Dim db As DAO.Database
 Dim rstCHAdd As DAO.Recordset
-Dim sCHHyperlink As String, sCurrentDocPath As String
+Dim sCHHyperlink As String
+Dim sCurrentDocPath As String
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 sCurrentDocPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & sCHTopic & ".docx"
@@ -715,13 +728,31 @@ Public Sub pfSingleBAScrapeSpecificBarNo(sWebSiteBarNo As String)
 
 Dim rstBarAddresses As DAO.Recordset
 
-Dim oCompanyName As Object, oBarName As Object, oBarNumber As Object, oEligibility As Object
-Dim oActiveL As Object, oAdmitDate As Object, oAddress As Object, oEmail As Object
-Dim oPhone As Object, oFax As Object, oPracticeArea As Object, oInternetE As Object
+Dim oCompanyName As Object
+Dim oBarName As Object
+Dim oBarNumber As Object
+Dim oEligibility As Object
+Dim oActiveL As Object
+Dim oAdmitDate As Object
+Dim oAddress As Object
+Dim oEmail As Object
+Dim oPhone As Object
+Dim oFax As Object
+Dim oPracticeArea As Object
+Dim oInternetE As Object
 
 Dim sWebsiteLink As String
-Dim sCompanyName As String, sBarName As String, sBarNumber As String, sEligibility As String, sActiveL As String
-Dim sAdmitDate As String, sAddress As String, sEmail As String, sPhone As String, sFax As String, sPracticeArea As String
+Dim sCompanyName As String
+Dim sBarName As String
+Dim sBarNumber As String
+Dim sEligibility As String
+Dim sActiveL As String
+Dim sAdmitDate As String
+Dim sAddress As String
+Dim sEmail As String
+Dim sPhone As String
+Dim sFax As String
+Dim sPracticeArea As String
 
 sWebsiteLink = "https://www.mywsba.org/PersonifyEbusiness/LegalDirectory/LegalProfile.aspx?Usr_ID=0000000" & sWebSiteBarNo
 
@@ -792,12 +823,30 @@ On Error Resume Next
 
 Dim rstBarAddresses As DAO.Recordset
 
-Dim oCompanyName As Object, oBarName As Object, oBarNumber As Object, oEligibility As Object
-Dim oActiveL As Object, oAdmitDate As Object, oAddress As Object, oEmail As Object
-Dim oPhone As Object, oFax As Object, oPracticeArea As Object, oInternetE As Object
+Dim oCompanyName As Object
+Dim oBarName As Object
+Dim oBarNumber As Object
+Dim oEligibility As Object
+Dim oActiveL As Object
+Dim oAdmitDate As Object
+Dim oAddress As Object
+Dim oEmail As Object
+Dim oPhone As Object
+Dim oFax As Object
+Dim oPracticeArea As Object
+Dim oInternetE As Object
 Dim sWebsiteLink As String
-Dim sCompanyName As String, sBarName As String, sBarNumber As String, sEligibility As String, sActiveL As String
-Dim sAdmitDate As String, sAddress As String, sEmail As String, sPhone As String, sFax As String, sPracticeArea As String
+Dim sCompanyName As String
+Dim sBarName As String
+Dim sBarNumber As String
+Dim sEligibility As String
+Dim sActiveL As String
+Dim sAdmitDate As String
+Dim sAddress As String
+Dim sEmail As String
+Dim sPhone As String
+Dim sFax As String
+Dim sPracticeArea As String
 
 
 
@@ -874,7 +923,7 @@ Public Sub pfReformatTable()
 ' Call command: Call pfReformatTable
 ' Description : reformats scraped Bar addresses to useable format for table
 '============================================================================
-
+'note: pfReformatTable come back and check what's going on here to finish it if necessary
 'change all commas to semicolons
 'export to xls
 'delete columns ID, Eligibility, ActiveL, practice area
@@ -986,8 +1035,11 @@ Public Sub pfPriorityPointsAlgorithm()
 '               priority scale 1 to 100
 '============================================================================
 
-Dim iPriorityPoints As Integer, iTimeLength As Integer
-Dim sPriority As String, sCategory As String, bCompleted As Boolean
+Dim iPriorityPoints As Integer
+Dim iTimeLength As Integer
+Dim sPriority As String
+Dim sCategory As String
+Dim bCompleted As Boolean
 Dim rstTasks As DAO.Recordset
 Dim dDue As Date
 
@@ -1075,10 +1127,17 @@ Public Sub pfGenerateJobTasks()
 ' Call command: Call pfGenerateJobTasks
 ' Description : generates job tasks in the Tasks table
 '============================================================================
-
-Dim sTaskTitle As String, sTaskCategory As String, sPriority As String, sTaskDescription As String, sIPJobPath As String
-Dim iTypingTime As Integer, iAudioProofTime As Integer, iTaskMinuteLength As Integer
-Dim dStart As Date, dDue As Date
+'note: pfGenerateJobTasks can probably break this into separate functions come back
+Dim sTaskTitle As String
+Dim sTaskCategory As String
+Dim sPriority As String
+Dim sTaskDescription As String
+Dim sIPJobPath As String
+Dim iTypingTime As Integer
+Dim iAudioProofTime As Integer
+Dim iTaskMinuteLength As Integer
+Dim dStart As Date
+Dim dDue As Date
 Dim qdf As QueryDef
 Dim rstTasks As DAO.Recordset
 
@@ -1377,8 +1436,11 @@ Public Sub pfDailyTaskAddFunction()
 ' Call command: Call pfDailyTaskAddFunction
 ' Description : adds static daily tasks to Tasks table
 '============================================================================
-
-Dim sTaskTitle As String, sTaskCategory As String, sPriority As String, sTaskDescription As String
+'note: pfDailyTaskAddFunction can probably break this into separate functions come back
+Dim sTaskTitle As String
+Dim sTaskCategory As String
+Dim sPriority As String
+Dim sTaskDescription As String
 Dim dDue As Date
 Dim rstTasks As DAO.Recordset
 Dim iTaskMinuteLength As Integer
@@ -1494,9 +1556,13 @@ Public Sub pfWeeklyTaskAddFunction()
 ' Call command: Call pfWeeklyTaskAddFunction
 ' Description : adds static weekly tasks to Tasks table
 '============================================================================
-
-Dim sTaskTitle As String, sTaskCategory As String, sPriority As String, sTaskDescription As String
-Dim vStartDate As Date, dDue As Date
+'note: pfWeeklyTaskAddFunction can probably break this into separate functions come back
+Dim sTaskTitle As String
+Dim sTaskCategory As String
+Dim sPriority As String
+Dim sTaskDescription As String
+Dim vStartDate As Date
+Dim dDue As Date
 Dim rstTasks As DAO.Recordset
 Dim iTaskMinuteLength As Integer
 
@@ -1717,8 +1783,11 @@ Public Sub pfMonthlyTaskAddFunction()
 ' Call command: Call pfMonthlyTaskAddFunction
 ' Description : adds static monthly tasks to Tasks table
 '============================================================================
-
-Dim sTaskTitle As String, sTaskCategory As String, sPriority As String, sTaskDescription As String
+'note: pfMonthlyTaskAddFunction can probably break this into separate functions come back
+Dim sTaskTitle As String
+Dim sTaskCategory As String
+Dim sPriority As String
+Dim sTaskDescription As String
 Dim iTaskMinuteLength As Integer
 Dim dDue As Date
 Dim rstTasks As DAO.Recordset
@@ -1818,7 +1887,10 @@ Dim oOutlookAccessTestFolder As Object
 Dim oOutLookMAPIFolder As Outlook.MAPIFolder
 Dim oOutlookMail As Outlook.MailItem
 Dim dEmailReceived As Date
-Dim sEmailReceivedTime As String, sDriveHyperlink As String, sSenderName As String, sCommHistoryHyperlink As String
+Dim sEmailReceivedTime As String
+Dim sDriveHyperlink As String
+Dim sSenderName As String
+Dim sCommHistoryHyperlink As String
 Dim rs As DAO.Recordset
 Dim FNme As String
 
@@ -2012,7 +2084,9 @@ Public Sub pfAskforAudio()
 
 Dim fd As FileDialog
 Dim iFileChosen As Integer
-Dim sFileName As String, sAudioFolder As String, sNewAudioPath As String
+Dim sFileName As String
+Dim sAudioFolder As String
+Dim sNewAudioPath As String
 Dim i As Integer
 Dim fs As Object
 
@@ -2064,14 +2138,24 @@ Public Sub pfAskforNotes()
 
 Dim fd As FileDialog
 Dim iFileChosen As Integer
-Dim sFileName As String, sAudioFolder As String, sNewAudioPath As String
-Dim sNewNotesName As String, sOriginalNotesPath As String, sNotesPath As String
+Dim sFileName As String
+Dim sAudioFolder As String
+Dim sNewAudioPath As String
+Dim sNewNotesName As String
+Dim sOriginalNotesPath As String
+Dim sNotesPath As String
 Dim i As Integer
 Dim fs As Object
-Dim sWorkingCopyPath As String, sTranscriptWD As String, sFinalTranscriptWD As String
-Dim sFinalTranscriptNoExt As String, sCourtCoverPath As String
-Dim sAnswerPDFPrompt As String, sMakePDFPrompt As String
-Dim oWordApp As Word.Application, oWordDoc As Word.Document, oVBComponent As Object
+Dim sWorkingCopyPath As String
+Dim sTranscriptWD As String
+Dim sFinalTranscriptWD As String
+Dim sFinalTranscriptNoExt As String
+Dim sCourtCoverPath As String
+Dim sAnswerPDFPrompt As String
+Dim sMakePDFPrompt As String
+Dim oWordApp As Word.Application
+Dim oWordDoc As Word.Document
+Dim oVBComponent As Object
 Dim rngStory As Range
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -2160,19 +2244,36 @@ On Error Resume Next
 ' Description:  scrapes all RCWs from WA site
 '============================================================================
 
-Dim sFindCitation As String, sLongCitation As String, sRuleNumber As String
-Dim sWebAddress As String, sReplaceHyperlink As String, sCurrentRule As String
-Dim sChapterNumber As String, sSubchapterNumber As String, sSubtitleNumber As String
+Dim sFindCitation As String
+Dim sLongCitation As String
+Dim sRuleNumber As String
+Dim sWebAddress As String
+Dim sReplaceHyperlink As String
+Dim sCurrentRule As String
+Dim sChapterNumber As String
+Dim sSubchapterNumber As String
+Dim sSubtitleNumber As String
 Dim sSectionNumber As String
-Dim Title As String, sTitle2 As String, sTitle1 As String
+Dim Title As String
+Dim sTitle2 As String
+Dim sTitle1 As String
 
 Dim objHttp As Object
-Dim vLettersArray1(), vLettersArray2() As Variant
+Dim vLettersArray1() As Variant
+Dim vLettersArray2() As Variant
 Dim rstCitationHyperlinks As DAO.Recordset
-Dim iErrorNum As Integer, sCHCategory As Integer
+Dim iErrorNum As Integer
+Dim sCHCategory As Integer
 
-Dim i As Long, j As Long, k As Long, l As Long, m As Long
-Dim w As Long, x As Long, y As Long, z As Long
+Dim i As Long
+Dim j As Long
+Dim k As Long
+Dim l As Long
+Dim m As Long
+Dim w As Long
+Dim x As Long
+Dim y As Long
+Dim z As Long
 
 For x = 1 To 91 '(RCW first portion x.###.###) '1-91
 
@@ -2324,12 +2425,25 @@ On Error Resume Next
 '============================================================================
 
 Dim rstCitationHyperlinks As DAO.Recordset
-Dim iErrorNum As Integer, sCHCategory As Integer
-Dim sFindCitation As String, sLongCitation As String, sRuleNumber As String
-Dim sWebAddress As String, sReplaceHyperlink As String, sCurrentRule As String
-Dim vRuleNumbers() As Variant, vRules() As Variant
-Dim i As Long, j As Long, k As Long, l As Long, m As Long
-Dim w As Long, x As Long, y As Long, z As Long
+Dim iErrorNum As Integer
+Dim sCHCategory As Integer
+Dim sFindCitation As String
+Dim sLongCitation As String
+Dim sRuleNumber As String
+Dim sWebAddress As String
+Dim sReplaceHyperlink As String
+Dim sCurrentRule As String
+Dim vRuleNumbers() As Variant
+Dim vRules() As Variant
+Dim i As Long
+Dim j As Long
+Dim k As Long
+Dim l As Long
+Dim m As Long
+Dim w As Long
+Dim x As Long
+Dim y As Long
+Dim z As Long
 
 vRules = Array("CR ", "CrR ", "RAP ", "Rule ", "RCW ", "ER ")
 vRuleNumbers = Array("", "", "")
@@ -2499,28 +2613,28 @@ Next
 End Sub
 
 Function GetLevel(strItem As String) As Integer
-    ' Return the heading level of a header from the
-    ' array returned by Word.
+' Return the heading level of a header from the
+' array returned by Word.
 
-    ' The number of leading spaces indicates the
-    ' outline level (2 spaces per level: H1 has
-    ' 0 spaces, H2 has 2 spaces, H3 has 4 spaces.
+' The number of leading spaces indicates the
+' outline level (2 spaces per level: H1 has
+' 0 spaces, H2 has 2 spaces, H3 has 4 spaces.
 
-    Dim strTemp As String
-    Dim strOriginal As String
-    Dim intDiff As Integer
+Dim strTemp As String
+Dim strOriginal As String
+Dim intDiff As Integer
 
-    ' Get rid of all trailing spaces.
-    strOriginal = RTrim$(strItem)
+' Get rid of all trailing spaces.
+strOriginal = RTrim$(strItem)
 
-    ' Trim leading spaces, and then compare with
-    ' the original.
-    strTemp = LTrim$(strOriginal)
+' Trim leading spaces, and then compare with
+' the original.
+strTemp = LTrim$(strOriginal)
 
-    ' Subtract to find the number of
-    ' leading spaces in the original string.
-    intDiff = Len(strOriginal) - Len(strTemp)
-    GetLevel = (intDiff / 2) + 1
+' Subtract to find the number of
+' leading spaces in the original string.
+intDiff = Len(strOriginal) - Len(strTemp)
+GetLevel = (intDiff / 2) + 1
 End Function
 
 Sub fWLGenerateJSONInfo()
@@ -2569,19 +2683,47 @@ Sub fWunderlistAdd(sTitle As String, sDueDate As String)
 ' Description : adds task to Wunderlist
 '============================================================================
 
-Dim sURL As String, sUserName As String, sPassword As String, sAuth As String, stringJSON As String, sEmail As String
-Dim vInvoiceID As String, apiWaxLRS As String, vErrorIssue As String, sInvoiceTime As String
-Dim oRequest As Object, Json As Object, oWebBrowser As Object
-Dim vStatus As String, vTotal As String, sURL1 As String
+Dim sURL As String
+Dim sUserName As String
+Dim sPassword As String
+Dim sAuth As String
+Dim stringJSON As String
+Dim sEmail As String
+Dim vInvoiceID As String
+Dim apiWaxLRS As String
+Dim vErrorIssue As String
+Dim sInvoiceTime As String
+Dim oRequest As Object
+Dim Json As Object
+Dim oWebBrowser As Object
+Dim vStatus As String
+Dim vTotal As String
+Dim sURL1 As String
 Dim sURL2 As String
 Dim rstRates As DAO.Recordset
 
-Dim resp, response, rep, vDetails As Object
-Dim sToken As String, json1 As String, json2 As String, json3 As String, json4 As String, json5 As String
+Dim resp As Object
+Dim response As Object
+Dim rep As Object
+Dim vDetails As Object
+Dim sToken As String
+Dim json1 As String
+Dim json2 As String
+Dim json3 As String
+Dim json4 As String
+Dim json5 As String
 Dim Parsed As Dictionary
-Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
-Dim sFile1 As String, sFile2 As String, sText As String, sLine1 As String, sLine2 As String
-Dim sLocal As String, sResponseText As String
+Dim vErrorName As String
+Dim vErrorMessage As String
+Dim vErrorILink As String
+Dim vErrorDetails As String
+Dim sFile1 As String
+Dim sFile2 As String
+Dim sText As String
+Dim sLine1 As String
+Dim sLine2 As String
+Dim sLocal As String
+Dim sResponseText As String
 '{
 '  "list_id": 12345,
 '  "title": "Hallo",
@@ -2687,19 +2829,47 @@ Sub fWunderlistGetTasksOnList()
 ' Description : gets tasks on Wunderlist list
 '============================================================================
 
-Dim sURL As String, sUserName As String, sPassword As String, sAuth As String, stringJSON As String, sEmail As String
-Dim vInvoiceID As String, apiWaxLRS As String, vErrorIssue As String, sInvoiceTime As String
-Dim oRequest As Object, Json As Object, oWebBrowser As Object
-Dim vStatus As String, vTotal As String, sURL1 As String
+Dim sURL As String
+Dim sUserName As String
+Dim sPassword As String
+Dim sAuth As String
+Dim stringJSON As String
+Dim sEmail As String
+Dim vInvoiceID As String
+Dim apiWaxLRS As String
+Dim vErrorIssue As String
+Dim sInvoiceTime As String
+Dim oRequest As Object
+Dim Json As Object
+Dim oWebBrowser As Object
+Dim vStatus As String
+Dim vTotal As String
+Dim sURL1 As String
 Dim sURL2 As String
 Dim rstRates As DAO.Recordset
 
-Dim resp, response, rep, vDetails As Object
-Dim sToken As String, json1 As String, json2 As String, json3 As String, json4 As String, json5 As String
+Dim resp As Object
+Dim response As Object
+Dim rep As Object
+Dim vDetails As Object
+Dim sToken As String
+Dim json1 As String
+Dim json2 As String
+Dim json3 As String
+Dim json4 As String
+Dim json5 As String
 Dim Parsed As Dictionary
-Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
-Dim sFile1 As String, sFile2 As String, sText As String, sLine1 As String, sLine2 As String
-Dim sLocal As String, sResponseText As String
+Dim vErrorName As String
+Dim vErrorMessage As String
+Dim vErrorILink As String
+Dim vErrorDetails As String
+Dim sFile1 As String
+Dim sFile2 As String
+Dim sText As String
+Dim sLine1 As String
+Dim sLine2 As String
+Dim sLocal As String
+Dim sResponseText As String
 '{
 '  "list_id": 12345,
 '  "title": "Hallo",
@@ -2803,19 +2973,47 @@ Sub fWunderlistGetLists()
 ' Description : gets all Wunderlist lists
 '============================================================================
 
-Dim sURL As String, sUserName As String, sPassword As String, sAuth As String, stringJSON As String, sEmail As String
-Dim vInvoiceID As String, apiWaxLRS As String, vErrorIssue As String, sInvoiceTime As String
-Dim oRequest As Object, Json As Object, oWebBrowser As Object
-Dim vStatus As String, vTotal As String, sURL1 As String
+Dim sURL As String
+Dim sUserName As String
+Dim sPassword As String
+Dim sAuth As String
+Dim stringJSON As String
+Dim sEmail As String
+Dim vInvoiceID As String
+Dim apiWaxLRS As String
+Dim vErrorIssue As String
+Dim sInvoiceTime As String
+Dim oRequest As Object
+Dim Json As Object
+Dim oWebBrowser As Object
+Dim vStatus As String
+Dim vTotal As String
+Dim sURL1 As String
 Dim sURL2 As String
 Dim rstRates As DAO.Recordset
 
-Dim resp, response, rep, vDetails As Object
-Dim sToken As String, json1 As String, json2 As String, json3 As String, json4 As String, json5 As String
+Dim resp As Object
+Dim response As Object
+Dim rep As Object
+Dim vDetails As Object
+Dim sToken As String
+Dim json1 As String
+Dim json2 As String
+Dim json3 As String
+Dim json4 As String
+Dim json5 As String
 Dim Parsed As Dictionary
-Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
-Dim sFile1 As String, sFile2 As String, sText As String, sLine1 As String, sLine2 As String
-Dim sLocal As String, sResponseText As String
+Dim vErrorName As String
+Dim vErrorMessage As String
+Dim vErrorILink As String
+Dim vErrorDetails As String
+Dim sFile1 As String
+Dim sFile2 As String
+Dim sText As String
+Dim sLine1 As String
+Dim sLine2 As String
+Dim sLocal As String
+Dim sResponseText As String
 '{
 '  "list_id": 12345,
 '  "title": "Hallo",
@@ -2922,13 +3120,27 @@ Sub fWunderlistGetFolders()
 ' Description : gets list of Wunderlist folders or folder revisions
 '============================================================================
 
-Dim sURL As String, sUserName As String, sResponseText As String, json1 As String
+Dim sURL As String
+Dim sUserName As String
+Dim sResponseText As String
+Dim json1 As String
 Dim sPassword As String
-Dim apiWaxLRS As String, vErrorIssue As String, sEmail As String, sToken As String
+Dim apiWaxLRS As String
+Dim vErrorIssue As String
+Dim sEmail As String
+Dim sToken As String
 Dim Parsed As Dictionary
-Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
-Dim sFile1 As String, sFile2 As String, sFile3 As String
-Dim sText As String, sLine1 As String, sLine2 As String, sLine3 As String
+Dim vErrorName As String
+Dim vErrorMessage As String
+Dim vErrorILink As String
+Dim vErrorDetails As String
+Dim sFile1 As String
+Dim sFile2 As String
+Dim sFile3 As String
+Dim sText As String
+Dim sLine1 As String
+Dim sLine2 As String
+Dim sLine3 As String
 
 
 Call fWLGenerateJSONInfo
@@ -3018,17 +3230,31 @@ On Error Resume Next
 ' Description:  validates and builds links for all us code, no front matter, no appendices
 '============================================================================
 Dim rstCitationHyperlinks As DAO.Recordset
-Dim iErrorNum As Integer, sCHCategory As Integer
-Dim sFindCitation As String, sLongCitation As String, sRuleNumber As String
-Dim sWebAddress As String, sReplaceHyperlink As String, sCurrentRule As String
-Dim sChapterNumber As String, sSubchapterNumber As String, sSubtitleNumber As String
+Dim iErrorNum As Integer
+Dim sCHCategory As Integer
+Dim sFindCitation As String
+Dim sLongCitation As String
+Dim sRuleNumber As String
+Dim sWebAddress As String
+Dim sReplaceHyperlink As String
+Dim sCurrentRule As String
+Dim sChapterNumber As String
+Dim sSubchapterNumber As String
+Dim sSubtitleNumber As String
 Dim sSectionNumber As String
 Dim Title As String
 Dim objHttp As Object
 
 Dim vRuleNumbers() As Variant, vRules() As Variant
-Dim i As Long, j As Long, k As Long, l As Long, m As Long
-Dim w As Long, x As Long, y As Long, z As Long
+Dim i As Long
+Dim j As Long
+Dim k As Long
+Dim l As Long
+Dim m As Long
+Dim w As Long
+Dim x As Long
+Dim y As Long
+Dim z As Long
 'vRules = Array("CR ", "CrR ", "RAP ", "Rule ", "RCW ", "ER ")
 'vRuleNumbers = Array("", "", "")
 
@@ -3382,17 +3608,37 @@ On Error Resume Next
 ' Call command: Call pfRCWRuleScraper()
 ' Description:  builds all RCWs and their links, checks for validation, and puts into CitationHyperlinks table
 '============================================================================
-Dim sFindCitation As String, sLongCitation As String, sRuleNumber As String
-Dim sWebAddress As String, sReplaceHyperlink As String, sCurrentRule As String
-Dim Title As String, sTitle2 As String, sTitle1 As String, sTitle As String
-Dim sTitle3 As String, sCheck As String, sTitle4 As String
+Dim sFindCitation As String
+Dim sLongCitation As String
+Dim sRuleNumber As String
+Dim sWebAddress As String
+Dim sReplaceHyperlink As String
+Dim sCurrentRule As String
+Dim Title As String
+Dim sTitle2 As String
+Dim sTitle1 As String
+Dim sTitle As String
+Dim sTitle3 As String
+Dim sCheck As String
+Dim sTitle4 As String
 Dim oHTTPText As Object
-Dim vLettersArray1(), vLettersArray2() As Variant
+Dim vLettersArray1() As Variant
+Dim vLettersArray2() As Variant
 Dim rstCitationHyperlinks As DAO.Recordset
-Dim iErrorNum As Integer, sCHCategory As Integer
-Dim m As Long, n As Long, o As Long, p As Long
-Dim i As Long, j As Long, k As Long, l As Long
-Dim w As Long, x As Long, y As Long, z As Long
+Dim iErrorNum As Integer
+Dim sCHCategory As Integer
+Dim m As Long
+Dim n As Long
+Dim o As Long
+Dim p As Long
+Dim i As Long
+Dim j As Long
+Dim k As Long
+Dim l As Long
+Dim w As Long
+Dim x As Long
+Dim y As Long
+Dim z As Long
 
 'i build a delay in mine by calling a separate function so it requests only once every 22 seconds
 'y = 01 to 385 ; exception 28B, 43, 81
@@ -3560,17 +3806,32 @@ End Sub
 Public Sub pfMARuleScraper()
     
 On Error Resume Next
-Dim sFindCitation As String, sLongCitation As String, sRuleNumber As String
-Dim sWebAddress As String, sReplaceHyperlink As String, sCurrentRule As String
-Dim sCurrentPart As String, sCurrentTitle As String, sCurrentChapter As String
+Dim sFindCitation As String
+Dim sLongCitation As String
+Dim sRuleNumber As String
+Dim sWebAddress As String
+Dim sReplaceHyperlink As String
+Dim sCurrentRule As String
+Dim sCurrentPart As String
+Dim sCurrentTitle As String
+Dim sCurrentChapter As String
 Dim sCurrentSection As String
 Dim objHttp As Object
-Dim vLetterArray(), vRomanArray() As Variant
+Dim vLetterArray() As Variant
+Dim vRomanArray() As Variant
 Dim rstCitationHyperlinks As DAO.Recordset
-Dim iErrorNum As Integer, sCHCategory As Integer
+Dim iErrorNum As Integer
+Dim sCHCategory As Integer
 
-Dim i As Long, j As Long, k As Long, l As Long, m As Long
-Dim w As Long, x As Long, y As Long, z As Long
+Dim i As Long
+Dim j As Long
+Dim k As Long
+Dim l As Long
+Dim m As Long
+Dim w As Long
+Dim x As Long
+Dim y As Long
+Dim z As Long
 
 '============================================================================
 ' Name        : pfMARuleScraper
@@ -3811,7 +4072,9 @@ Sub fUnCompleteTimeMgmtTasks()
 
 
 
-Dim rstCommHistory As DAO.Recordset, sQuestion As String, sAnswer As String
+Dim rstCommHistory As DAO.Recordset
+Dim sQuestion As String
+Dim sAnswer As String
 Dim x As Integer
 
 sCourtDatesID = InputBox("Job Number?")
@@ -3895,7 +4158,9 @@ Sub fCompleteTimeMgmtTasks()
 'Call fWunderlistGetTasksOnList 'insert function name here
 
 
-Dim rstCommHistory As DAO.Recordset, sQuestion As String, sAnswer As String
+Dim rstCommHistory As DAO.Recordset
+Dim sQuestion As String
+Dim sAnswer As String
 
 sCourtDatesID = InputBox("Job Number?")
 
@@ -3950,7 +4215,9 @@ Sub fCompleteStatusBoxes()
 'Call fWunderlistGetTasksOnList 'insert function name here
 
 
-Dim rstCommHistory As DAO.Recordset, sQuestion As String, sAnswer As String
+Dim rstCommHistory As DAO.Recordset
+Dim sQuestion As String
+Dim sAnswer As String
 Dim x As Integer
 
 sCourtDatesID = InputBox("Job Number to complete statuses of?")
@@ -4009,7 +4276,9 @@ Sub fCompleteStage1Tasks()
 'Call fWunderlistGetTasksOnList 'insert function name here
 
 
-Dim rstCommHistory As DAO.Recordset, sQuestion As String, sAnswer As String
+Dim rstCommHistory As DAO.Recordset
+Dim sQuestion As String
+Dim sAnswer As String
 Dim x As Integer
 
 sCourtDatesID = InputBox("Job Number to complete Stage 1 of?")
@@ -4092,7 +4361,9 @@ Sub fCompleteStage2Tasks()
 'Call fWunderlistGetTasksOnList 'insert function name here
 
 
-Dim rstCommHistory As DAO.Recordset, sQuestion As String, sAnswer As String
+Dim rstCommHistory As DAO.Recordset
+Dim sQuestion As String
+Dim sAnswer As String
 Dim x As Integer
 
 sCourtDatesID = InputBox("Job Number to complete Stage 2 of?")
@@ -4176,7 +4447,9 @@ Sub fCompleteStage3Tasks()
 'Call fWunderlistGetTasksOnList 'insert function name here
 
 
-Dim rstCommHistory As DAO.Recordset, sQuestion As String, sAnswer As String
+Dim rstCommHistory As DAO.Recordset
+Dim sQuestion As String
+Dim sAnswer As String
 Dim x As Integer
 
 sCourtDatesID = InputBox("Job Number to complete Stage 3 of?")
@@ -4259,7 +4532,9 @@ Sub fCompleteStage4Tasks()
 'Call fWunderlistGetTasksOnList 'insert function name here
 
 
-Dim rstCommHistory As DAO.Recordset, sQuestion As String, sAnswer As String
+Dim rstCommHistory As DAO.Recordset
+Dim sQuestion As String
+Dim sAnswer As String
 Dim x As Integer
 
 sCourtDatesID = InputBox("Job Number to complete Stage 4 of?")
@@ -4346,13 +4621,23 @@ Sub fFixBarAddressField()
 ' Call command: Call fFixBarAddressField()
 ' Description:  fixes address field in baraddresses table
 '============================================================================
-Dim rstBarAddresses As DAO.Recordset, rstCustomers As DAO.Recordset
-Dim sBarNameArray() As String, sAddressArray() As String, sCityArray() As String
+Dim rstBarAddresses As DAO.Recordset
+Dim rstCustomers As DAO.Recordset
+Dim sBarNameArray() As String
+Dim sAddressArray() As String
+Dim sCityArray() As String
 Dim sCityArray1() As String
-Dim sLastName As String, sFirstName As String, sBarName As String
-Dim sCompany As String, sAddress As String, sPhone As String
-Dim sCity As String, sState As String, sZIP As String
-Dim sAddress1 As String, sAddress2 As String
+Dim sLastName As String
+Dim sFirstName As String
+Dim sBarName As String
+Dim sCompany As String
+Dim sAddress As String
+Dim sPhone As String
+Dim sCity As String
+Dim sState As String
+Dim sZIP As String
+Dim sAddress1 As String
+Dim sAddress2 As String
 
 'Customer fields: id, Company, MrMs, LastName, FirstName, EmailAddress, JobTitle, BusinessPhone
     'MobilePhone, FaxNumber, Address, City, State, ZIP, Web Page, Notes, FactoringApproved
