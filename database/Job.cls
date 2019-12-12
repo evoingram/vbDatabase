@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Folder("Database.Production.Classes")
 Option Compare Database
 Option Explicit
 
@@ -85,6 +86,14 @@ End Property
 
 Public Property Let TurnaroundTime(rData As String)
     sTurnaroundTime = rData
+End Property
+
+Public Property Get Location() As String
+    Location = sLocation
+End Property
+
+Public Property Let Location(rData As String)
+    sLocation = rData
 End Property
 
 
@@ -209,6 +218,14 @@ Public Property Let CaseID(rData As String)
     sCaseID = rData
 End Property
 
+Public Property Get PPID() As String
+    PPID = sPPID
+End Property
+
+Public Property Let PPID(rData As String)
+    sPPID = rData
+End Property
+
 Public Property Get ID() As Long
     ID = sCourtDatesID
 End Property
@@ -318,6 +335,8 @@ Private Sub Load()
         Me.HearingEndTime = .Fields("HearingEndTime").Value
         Me.CaseID = Nz(.Fields("CasesID").Value)
         Me.UnitPrice = Nz(.Fields("UnitPrice").Value)
+        Me.Location = Nz(.Fields("Location").Value)
+        Me.PPID = Nz(.Fields("PPID").Value)
     End With
     mbooLoaded = True
     mApp0.FindFirst "ID=" & sApp0

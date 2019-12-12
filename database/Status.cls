@@ -7,7 +7,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Folder("Database.Production.Classes")
 Option Compare Database
+Option Explicit
 
 Private mFactoringApproved As Boolean, mContactsEntered As Boolean, mJobEntered As Boolean
 Private mFixAppears As Boolean, mCorrectCDEntries As Boolean, mCoverPage As Boolean

@@ -1,5 +1,5 @@
 Attribute VB_Name = "Invoicing"
-
+'@Folder("Database.Admin.Modules")
 Option Compare Database
 Option Explicit
 
@@ -47,7 +47,7 @@ Option Explicit
 '============================================================================
 
 
-Function fApplyShipDateTrackingNumber()
+Sub fApplyShipDateTrackingNumber()
 
 '============================================================================
 ' Name        : fApplyShipDateTrackingNumber
@@ -122,8 +122,8 @@ Set rstOLPayPalPmt = Nothing
 rstCourtDates.Close 'Close the recordset
 Set rstCourtDates = Nothing 'Clean up
 
-End Function
-Function fApplyPayPalPayment()
+End Sub
+Sub fApplyPayPalPayment()
 
 '============================================================================
 ' Name        : fApplyPayPalPayment
@@ -162,11 +162,11 @@ If Not (rstCourtDates.EOF And rstCourtDates.BOF) Then 'For each CourtDates.ID
                     Call pfCommunicationHistoryAdd("PayPalPayment") 'comms history entry for paypal email
                     
                     Call fPaymentAdd(sInvoiceNumber, vAmount) 'apply payment to sCourtDatesID
-                    rstOLPayPalPmt.Delete 'delete in OLPayPalPayments
+                    rstOLPayPalPmt.delete 'delete in OLPayPalPayments
                 Else
                     
                     Call pfCommunicationHistoryAdd("PayPalInvoiceSent") 'comms history entry for paypal email
-                    rstOLPayPalPmt.Delete 'delete in OLPayPalPayments
+                    rstOLPayPalPmt.delete 'delete in OLPayPalPayments
                     
                 End If
        
@@ -196,9 +196,9 @@ Set rstOLPayPalPmt = Nothing
 rstCourtDates.Close 'Close the recordset
 Set rstCourtDates = Nothing 'Clean up
 
-End Function
+End Sub
 
-Function fGenerateInvoiceNumber()
+Sub fGenerateInvoiceNumber()
 '============================================================================
 ' Name        : fGenerateInvoiceNumber
 ' Author      : Erica L Ingram
@@ -244,11 +244,11 @@ rstCourtDates.Update
 rstCourtDates.Close
 rstMaxCourtDates.Close
 
-End Function
+End Sub
 
 
 
-Function fIsFactoringApproved()
+Sub fIsFactoringApproved()
 
 '============================================================================
 ' Name        : fIsFactoringApproved
@@ -305,10 +305,10 @@ Else 'if factoring not approved
 End If
 
 
-End Function
+End Sub
 
 
-Function fDepositPaymentReceived()
+Sub fDepositPaymentReceived()
 
 '============================================================================
 ' Name        : fDepositPaymentReceived
@@ -369,8 +369,8 @@ Else 'Code for Yes
 
 End If
 Exitif:
-End Function
-Public Function pfAutoCalculateFactorInterest()
+End Sub
+Public Sub pfAutoCalculateFactorInterest()
 
 '============================================================================
 ' Name        : pfAutoCalculateFactorInterest
@@ -450,8 +450,8 @@ Set rstCustomers = Nothing
 Else
 End If
 
-End Function
-Function fPaymentAdd(sInvoiceNumber As String, vAmount As String)
+End Sub
+Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
 
 '============================================================================
 ' Name        : fPaymentAdd
@@ -486,9 +486,9 @@ db.Close
 
 Call fManualPPPayment
 Call pfClearGlobals
-End Function
+End Sub
 
-Function fUpdateFactoringDates()
+Sub fUpdateFactoringDates()
 
 '============================================================================
 ' Name        : fUpdateFactoringDates
@@ -624,12 +624,12 @@ db.Execute sCDCalcUpdateSQL
 db.Close
 Call pfClearGlobals
 
-End Function
+End Sub
 
 
 
 
-Function fTranscriptExpensesBeginning()
+Sub fTranscriptExpensesBeginning()
 
 '============================================================================
 ' Name        : fTranscriptExpensesBeginning
@@ -836,8 +836,8 @@ rstExpensesAdd.Close
         
 MsgBox "Static Expenses Added!"
 Call pfClearGlobals
-End Function
-Function fTranscriptExpensesAfter()
+End Sub
+Sub fTranscriptExpensesAfter()
 
 '============================================================================
 ' Name        : fTranscriptExpensesAfter
@@ -888,12 +888,12 @@ rstExpensesAdd.Close
 
 MsgBox "Dynamic Expenses Added!"
 Call pfClearGlobals
-End Function
+End Sub
 
 
 
 
-Public Function fShippingExpenseEntry(sTrackingNumber As String)
+Public Sub fShippingExpenseEntry(sTrackingNumber As String)
 '============================================================================
 ' Name        : fShippingExpenseEntry
 ' Author      : Erica L Ingram
@@ -941,6 +941,6 @@ rstExpenses("iExpenseAmount").Value = iExpenseAmount
 rstExpenses("sExpenseMemo").Value = sExpenseMemo
 rstExpenses.Update
 Call pfClearGlobals
-End Function
+End Sub
 
 

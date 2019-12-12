@@ -1,4 +1,6 @@
 Attribute VB_Name = "~AScratchPad"
+'@Folder("Database.General.Modules")
+
 'fix PP/invoicing functions
     'invoice # Word doc doesn't save properly w/ PP button
 'fix stage 3 status checkmarks
@@ -539,42 +541,62 @@ Attribute VB_Name = "~AScratchPad"
 
 Option Explicit
 
-Private Declare PtrSafe Function CallNextHookEx Lib "user32" (ByVal hHook As Long, _
+'Private Declare PtrSafe Function CallNextHookEx Lib "user32" (ByVal hHook As Long, _
     ByVal ncode As Long, ByVal wParam As Long, lParam As Any) As Long
 
-Private Declare PtrSafe Function GetModuleHandle Lib "kernel32" Alias "GetModuleHandleA" (ByVal lpModuleName As String) As Long
+'Private Declare PtrSafe Function GetModuleHandle Lib "kernel32" Alias "GetModuleHandleA" (ByVal lpModuleName As String) As Long
 
-Private Declare PtrSafe Function SetWindowsHookEx Lib "user32" Alias "SetWindowsHookExA" _
+'Private Declare PtrSafe Function SetWindowsHookEx Lib "user32" Alias "SetWindowsHookExA" _
     (ByVal idHook As Long, ByVal lpfn As Long, ByVal hmod As Long, ByVal dwThreadId As Long) As Long
 
-Private Declare PtrSafe Function UnhookWindowsHookEx Lib "user32" (ByVal hHook As Long) As Long
+'Private Declare PtrSafe Function UnhookWindowsHookEx Lib "user32" (ByVal hHook As Long) As Long
 
-Private Declare PtrSafe Function SendDlgItemMessage Lib "user32" Alias "SendDlgItemMessageA" _
+'Private Declare PtrSafe Function SendDlgItemMessage Lib "user32" Alias "SendDlgItemMessageA" _
 (ByVal hDlg As Long, ByVal nIDDlgItem As Long, ByVal wMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
 
-Private Declare PtrSafe Function GetClassName Lib "user32" Alias "GetClassNameA" (ByVal hwnd As Long, _
+'Private Declare PtrSafe Function GetClassName Lib "user32" Alias "GetClassNameA" (ByVal hwnd As Long, _
 ByVal lpClassName As String, ByVal nMaxCount As Long) As Long
 
-Private Declare PtrSafe Function GetCurrentThreadId Lib "kernel32" () As Long
+'Private Declare PtrSafe Function GetCurrentThreadId Lib "kernel32" () As Long
+
+Sub test1()
+Dim cJob As Job
+Set cJob = New Job
+'On Error Resume Next
+sCourtDatesID = 1874
+cJob.FindFirst "ID=" & sCourtDatesID
+Debug.Print cJob.ID
+Debug.Print cJob.AudioLength
+Debug.Print cJob.TurnaroundTime
+Debug.Print Format(cJob.HearingStartTime, "h:mm AM/PM")
+Debug.Print Format(cJob.HearingEndTime, "h:mm AM/PM")
+Debug.Print Format(cJob.HearingDate, "mm-dd-yyyy")
+Debug.Print cJob.App1.ID
+Debug.Print cJob.App1.Company
+Debug.Print cJob.App0.ID
+Debug.Print cJob.App0.Company
+Debug.Print cJob.App0.FactoringApproved
+Debug.Print cJob.CaseInfo.Party1
+Debug.Print cJob.UnitPrice
+Debug.Print cJob.InventoryRateCode
+'On Error GoTo 0
+End Sub
 
 
-
-
-
-
-Function test2()
-
-
-Call pfSendWordDocAsEmail("PP-FactoredInvoiceEmail", "Transcript Delivery & Invoice", "T:\Production\2InProgress\1945\Generated\595617.pdf")
+Sub test2()
+Dim sUserName As String
+sUserName = Environ("ftpUserName")
+Debug.Print "ftp username is " & sUserName
+'Call pfSendWordDocAsEmail("PP-FactoredInvoiceEmail", "Transcript Delivery & Invoice", "T:\Production\2InProgress\1945\Generated\595617.pdf")
 'On Error Resume Next
 
-End Function
+End Sub
 
 
-Function RenameFiles1()
+Sub RenameFiles1()
 
 Dim RetVal As Variant
-Dim CurrDir As String
+
 ChDir "T:\Production\1ToBeEntered\Sunlark\KCRecorderOnline"         'Change folder to desired folder
 RetVal = Dir("*.*")       'Get first file in folder
 Do While Len(Nz(RetVal)) > 0   'Rename until no more files
@@ -582,82 +604,7 @@ Do While Len(Nz(RetVal)) > 0   'Rename until no more files
   RetVal = Dir()            'Get next file to rename
 Loop
 Debug.Print "Done!"
-End Function
+End Sub
 
-
-
-                
-Function fPDFBookmarks()
-
-On Error GoTo eHandler
-'============================================================================
-' Name        : fPrint2upPDF
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call fPrint2upPDF
-' Description : prints 2-up transcript PDF
-'============================================================================
-
-
-Dim sTranscriptsFolderFinalPDF As String, sTranscriptsFolder2upPDF As String
-Dim sTranscript2upPSPath As String, sJavascriptPrint As String, jobsettings As String
-Dim sLogFilePath As String
-
-Dim aaAcroApp As Acrobat.AcroApp
-Dim aaAcroAVDoc As Acrobat.AcroAVDoc
-Dim aaAcroPDDoc As Acrobat.AcroPDDoc
-Dim bret
-Dim pp As Object
-
-Dim pdTranscriptFinalDistiller As PdfDistiller
-Dim aaAFormApp As AFORMAUTLib.AFormApp
-
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-sTranscriptsFolderFinalPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
-
-Set aaAcroApp = New AcroApp
-Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
-
-If aaAcroAVDoc.Open(sTranscriptsFolderFinalPDF, "") Then
-    aaAcroAVDoc.Maximize (1)
-    
-    Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
-    Set aaAFormApp = CreateObject("AFormAut.App")
-    
-      sJavascriptPrint = "function MakeBkMks(oBkMkParent, aBkMks) {" & _
-            "var aBkMkNames = [ " & Chr(34) & "General" & Chr(34) & ", " & Chr(34) & "Witnesses" & Chr(34) & _
-            ", " & Chr(34) & "Exhibits" & Chr(34) & ", " & Chr(34) & "Authorities" & Chr(34) & _
-            ", [" & Chr(34) & "Case Law" & Chr(34) & "," & _
-            Chr(34) & "Rules, Regulation, Code, Statutes" & Chr(34) & "," & _
-            Chr(34) & "Other Authority" & Chr(34) & "] ];" & _
-            "for(var index=0;index<aBkMks.length;index++) {" & _
-            "if(typeof(aBkMks[index]) == " & Chr(34) & "string" & Chr(34) & ") oBkMkParent.createChild({cName:aBkMks[i], nIndex:index });" & _
-            "else {" & _
-            "// Assume this is a sub Array" & _
-            "oBkMkParent.createChild({cName:aBkMks[index][0], nIndex:index});" & _
-            "MakeBkMks(oBkMkParent.children[index], aBkMks[index].slice(1) );}}}}" & _
-            "MakeBkMks(this.bookmarkRoot, aBkMkNames);"
-
-    aaAFormApp.Fields.ExecuteThisJavascript sJavascriptPrint
-    
-    aaAcroPDDoc.Save PDSaveFull, sTranscriptsFolderFinalPDF
-    'aaAcroPDDoc.Close
-    'aaAcroApp.CloseAllDocs
-    
-End If
-
-eHandlerX:
-Set aaAcroPDDoc = Nothing
-Set aaAcroAVDoc = Nothing
-Set aaAcroApp = Nothing
-MsgBox "PDF Bookmarks Created"
-Exit Function
-
-eHandler:
-MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
-GoTo eHandlerX
-Resume
-
-End Function
 
 

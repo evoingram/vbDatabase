@@ -7,15 +7,24 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Folder("Database.Production.Classes")
 Option Compare Database
 Option Explicit
 
 Private mAppID4 As Long
-Private mCompany As String, mMrMs As String, mLastName As String
-Private mFirstName As String, mEmailAddress As String, mJobTitle As String
-Private mBusinessPhone As String, mAddress As String, mCity As String
+Private mCompany As String
+Private mMrMs As String
+Private mLastName As String
+Private mFirstName As String
+Private mEmailAddress As String
+Private mJobTitle As String
+Private mBusinessPhone As String
+Private mAddress As String
+Private mCity As String
 Private mState As String
-Private mZIP As String, mNotes As String, mFactoringApproved As Boolean
+Private mZIP As String
+Private mNotes As String
+Private mFactoringApproved As Boolean
 Public sApp4 As Long
 
 Private mrstRecordset4 As Recordset

@@ -1,5 +1,7 @@
 Attribute VB_Name = "AboutDB"
+'@Folder("Database.General.Modules")
 Option Compare Database
+Option Explicit
 
  
 'folder organization in 'T:\Production\2InProgress' or 'I:\'

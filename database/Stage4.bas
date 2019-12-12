@@ -1,5 +1,7 @@
 Attribute VB_Name = "Stage4"
+'@Folder("Database.Production.Modules")
 Option Compare Database
+Option Explicit
 
 '============================================================================
 'class module cmStage4
@@ -58,7 +60,7 @@ Option Compare Database
 
 
 
-Public Function pfStage4Ppwk()
+Public Sub pfStage4Ppwk()
 '============================================================================
 ' Name        : pfStage4Ppwk
 ' Author      : Erica L Ingram
@@ -73,7 +75,7 @@ Dim qdf1 As QueryDef, qdf As QueryDef
 Dim sAnswer As String, sQuestion As String
 Dim sIPCompletedFolderPath As String, sCompletedFolderPath As String
 Dim sFactoredChkBxSQL As String, sBillingURL As String
-
+Dim sPaymentDueDate As Date
 Call pfCurrentCaseInfo  'refresh transcript info
 
 Call pfGetOrderingAttorneyInfo
@@ -465,8 +467,8 @@ End If
 
 MsgBox "Stage 4 complete."
 Call pfClearGlobals
-End Function
-Public Function pfNewZip(sPath)
+End Sub
+Public Sub pfNewZip(sPath)
 '============================================================================
 ' Name        : pfNewZip
 ' Author      : Erica L Ingram
@@ -484,9 +486,9 @@ Open sPath For Output As #1
 Print #1, Chr$(80) & Chr$(75) & Chr$(5) & Chr$(6) & String(18, 0)
 Close #1
 
-End Function
+End Sub
 
-Function fTranscriptDeliveryF()
+Sub fTranscriptDeliveryF()
 '============================================================================
 ' Name        : fTranscriptDeliveryF
 ' Author      : Erica L Ingram
@@ -711,9 +713,9 @@ ContractorFile:
         MsgBox "Transcript has been marked filed."
     End If
 Call pfClearGlobals
-End Function
+End Sub
 
-Function fGenerateZIPsF()
+Sub fGenerateZIPsF()
 '============================================================================
 ' Name        : fGenerateZIPsF
 ' Author      : Erica L Ingram
@@ -726,6 +728,7 @@ Dim TranscriptWC As String, FindReplaceTranscriptD As String, FinalTranscriptPat
 Dim FindReplaceTranscriptF As String, naceTranscriptP As String, vInvoiceFilePathPPDF As String
 Dim sourceFile As String, destinationfile As String, sourcefile1 As String, destinationfile1 As String
 Dim filecopied As Object
+Dim MyNote As String, answer As String
 
 Call pfCurrentCaseInfo  'refresh transcript info
 
@@ -776,9 +779,9 @@ End If
 
 Call fAssignPS
 Call pfClearGlobals
-End Function
+End Sub
 
-Function fUploadtoFTP()
+Sub fUploadtoFTP()
 '============================================================================
 ' Name        : fUploadtoFTP
 ' Author      : Erica L Ingram
@@ -808,9 +811,9 @@ mySession.Dispose
 ' Restore default error handling
 On Error GoTo 0
 
-End Function
+End Sub
  
-Function fUploadZIPsPrompt()
+Sub fUploadZIPsPrompt()
 '============================================================================
 ' Name        : fUploadZIPsPrompt
 ' Author      : Erica L Ingram
@@ -834,9 +837,9 @@ Else 'Code for yes
 
 End If
 
-End Function
+End Sub
 
-Function fZIPAudio()
+Sub fZIPAudio()
 '============================================================================
 ' Name        : fZIPAudio
 ' Author      : Erica L Ingram
@@ -848,7 +851,8 @@ Function fZIPAudio()
 Dim sourceFile As String, destinationfile As String, sourcefile1 As String, destinationfile1 As String
 Dim filecopied As Object
 Dim FileNameZip1 As String, foldername1 As String, filenamezipFTPTRS As String, foldernameFTP As String
-
+Dim dbVideoCollection, rstCourtDates As DAO.Recordset, defpath As String, strDate As Date
+Dim oApp As Object
 Set dbVideoCollection = CurrentDb
 Set rstCourtDates = dbVideoCollection.OpenRecordset("CourtDates")
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -901,9 +905,9 @@ DoEvents
 ExitFunction:
     
 MsgBox "You find the ZIP file here: " & FileNameZip1
-End Function
+End Sub
 
-Function fZIPAudioTranscripts()
+Sub fZIPAudioTranscripts()
 '============================================================================
 ' Name        : fZIPAudioTranscripts
 ' Author      : Erica L Ingram
@@ -913,10 +917,10 @@ Function fZIPAudioTranscripts()
 '============================================================================
 
 Dim sourceFile As String, destinationfile As String, sourcefile1 As String, destinationfile1 As String
-Dim strDate As String, defpath As String
+Dim strDate As String, defpath As String, foldernameaudio As String, foldernameTranscripts As String
 Dim FileNameZip2 As String, FolderName2 As String, filenamezipFTP As String, foldernameFTP As String
-Dim filecopied As Object
-
+Dim filecopied As Object, oApp As Object
+Dim FileNameZipATRS As String, FileNameZipFTPATRS As String
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 defpath = CurrentProject.Path
@@ -975,9 +979,9 @@ On Error GoTo 0
 
 MsgBox "You find the zipfile here: " & FileNameZipATRS
 
-End Function
+End Sub
 
-Function fZIPTranscripts()
+Sub fZIPTranscripts()
 '============================================================================
 ' Name        : fZIPTranscripts
 ' Author      : Erica L Ingram
@@ -987,9 +991,12 @@ Function fZIPTranscripts()
 '============================================================================
 
 Dim sourceFile As String, destinationfile As String, sourcefile1 As String, destinationfile1 As String
-Dim filecopied As Object
+Dim filecopied As Object, oApp As Object
 Dim FileNameZip1 As String, foldername1 As String, filenamezipFTPTRS As String, foldernameFTP As String
-
+Dim dbVideoCollection
+Dim rstCourtDates As DAO.Recordset
+Dim defpath As String
+Dim strDate As Date
 Set dbVideoCollection = CurrentDb
 Set rstCourtDates = dbVideoCollection.OpenRecordset("CourtDates")
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1033,7 +1040,7 @@ On Error GoTo 0
 
 MsgBox "You find the ZIP file here: " & FileNameZip1
 
-End Function
+End Sub
 Function fRunXLSMacro(sFile As String, sMacroName As String) As String
 On Error GoTo eHandler
 '============================================================================
@@ -1076,7 +1083,7 @@ MsgBox "The following error has occured." & vbCrLf & vbCrLf & _
 Resume eHandlerX
 
 End Function
-Public Function pfSendTrackingEmail()
+Public Sub pfSendTrackingEmail()
 '============================================================================
 ' Name        : pfSendTrackingEmail
 ' Author      : Erica L Ingram
@@ -1108,8 +1115,8 @@ sAudioLength = rs.Fields("AudioLength").Value
 Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
 Call fWunderlistAdd(sCourtDatesID & ":  Package to Ship", Format(Now + 1, "yyyy-mm-dd"))
 Call pfClearGlobals
-End Function
-Function fEmailtoPrint(sFiletoEmailPath As String)
+End Sub
+Sub fEmailtoPrint(sFiletoEmailPath As String)
 '============================================================================
 ' Name        : fEmailtoPrint
 ' Author      : Erica L Ingram
@@ -1142,9 +1149,9 @@ On Error GoTo 0
 Set oOutlookMail = Nothing
 Set oOutlookApp = Nothing
 
-End Function
+End Sub
 
-Public Function fAudioDone()
+Public Sub fAudioDone()
 '============================================================================
 ' Name        : fAudioDone
 ' Author      : Erica L Ingram
@@ -1183,8 +1190,8 @@ sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
       
 'Line2:
   'Exit Do
-End Function
-Function fDistiller(sExportTopic As String)
+End Sub
+Sub fDistiller(sExportTopic As String)
 '============================================================================
 ' Name        : fDistiller
 ' Author      : Erica L Ingram
@@ -1199,7 +1206,7 @@ Dim aaAcroApp As Acrobat.AcroApp
 Dim aaAcroAVDoc As Acrobat.AcroAVDoc
 Dim aaAcroPDDoc As Acrobat.AcroPDDoc
 Dim pdTranscriptFinalDistiller As PdfDistiller
-Dim sDistillerSettings As String
+Dim sDistillerSettings As String, s2UpPSPath As String, sFinalPDFPath As String
 
 s2UpPSPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-" & sExportTopic & ".ps"
 sFinalPDFPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-" & sExportTopic & ".pdf"
@@ -1217,8 +1224,8 @@ Set aaAcroPDDoc = Nothing
 Set aaAcroAVDoc = Nothing
 Set aaAcroApp = Nothing
 
-End Function
-Function fPrint2upPDF()
+End Sub
+Sub fPrint2upPDF()
 On Error GoTo eHandler
 '============================================================================
 ' Name        : fPrint2upPDF
@@ -1309,16 +1316,16 @@ End If
 
 
 MsgBox "2-up condensed transcript saved at " & sTranscript2upPSPath
-Exit Function
+Exit Sub
 
 eHandler:
 MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
 GoTo eHandlerX
 Resume
-End Function
+End Sub
 
 
-Function fPrint4upPDF()
+Sub fPrint4upPDF()
 On Error GoTo eHandler
 '============================================================================
 ' Name        : fPrint4upPDF
@@ -1406,15 +1413,15 @@ End If
 
 
 MsgBox "4-up condensed transcript saved at " & sTranscript4upPDFPath
-Exit Function
+Exit Sub
 
 eHandler:
 MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
 GoTo eHandlerX
 Resume
-End Function
+End Sub
 
-Function fPrintKCIEnvelope()
+Sub fPrintKCIEnvelope()
 
 Dim sQuestion As String, sAnswer As String, sEnvelopePath As String
 sEnvelopePath = "T:\Database\Templates\Stage4s\Envelope-KCI.pdf"
@@ -1431,11 +1438,11 @@ Else 'Code for yes
     
 End If
 
-End Function
+End Sub
 
 
 
-Function fAcrobatKCIInvoice()
+Sub fAcrobatKCIInvoice()
 '============================================================================
 ' Name        : fAcrobatKCIInvoice
 ' Author      : Erica L Ingram
@@ -1498,7 +1505,7 @@ Set aaAcroAVDoc = Nothing
 Set aaAcroApp = Nothing
 
 MsgBox "Done processing"
-Exit Function
+Exit Sub
 
 
 
@@ -1510,10 +1517,10 @@ MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Details"
 GoTo eHandlerX
 Resume
 Call pfClearGlobals
-End Function
+End Sub
 
 
-Public Function pfUpload(ByRef mySession As Session)
+Public Sub pfUpload(ByRef mySession As Session)
 '============================================================================
 ' Name        : pfUpload
 ' Author      : Erica L Ingram
@@ -1533,9 +1540,9 @@ Call pfCurrentCaseInfo  'refresh transcript info
 With mySessionOptions 'set up session options
 
     .Protocol = Protocol_Ftp
-    .HostName = ""
-    .Username = ""
-    .password = ""
+    .HostName = "ftp.aquoco.co"
+    .Username = Environ("ftpUserName")
+    .password = Environ("ftpPassword")
     
 End With
 
@@ -1570,10 +1577,10 @@ For Each transfer In transferResult.Transfers
     MsgBox "Upload of " & transfer.FileName & " succeeded"
 Next
 Call pfClearGlobals
-End Function
+End Sub
 
 
-Function fPrivatePrint()
+Sub fPrivatePrint()
 '============================================================================
 ' Name        : fPrivatePrint
 ' Author      : Erica L Ingram
@@ -1636,7 +1643,7 @@ Else 'Code for yes
 End If
 
 
-End Function
+End Sub
 
 Public Sub fExportRecsToXML()
 On Error Resume Next
@@ -1650,11 +1657,12 @@ On Error Resume Next
 
 Dim qdf As DAO.QueryDef
 Dim sTrackingNumber As String, sSavedXMLFileName As String
-Dim prm As DAO.Parameter
+Dim prm As DAO.Parameter, rs As DAO.Recordset
+
 Dim rstCommHistory As DAO.Recordset, rstShippingOptions As DAO.Recordset
 Dim rstPkgType As DAO.Recordset, rstMailC As DAO.Recordset, rs1 As DAO.Recordset
-Dim sNewSQL As String
-
+Dim sNewSQL As String, SQLString As String, sMailClassNo As String
+Dim sPackageTypeNo As String, sPackageType As String, sMailClass As String
     SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
     Set rs1 = CurrentDb.OpenRecordset(SQLString)
     sMailClassNo = rs1.Fields("MailClass").Value
@@ -1732,7 +1740,7 @@ Set rstShippingOptions = Nothing
 End Sub
 
 
-Function fAppendXMLFiles()
+Sub fAppendXMLFiles()
 '============================================================================
 ' Name        : fAppendXMLFiles
 ' Author      : Erica L Ingram
@@ -1771,10 +1779,10 @@ Set file1 = Nothing
 Set file2 = Nothing
 Set FSO = Nothing
 
-End Function
+End Sub
 
 
-Function fCourtofAppealsIXML()
+Sub fCourtofAppealsIXML()
 On Error Resume Next
 '============================================================================
 ' Name        : fCourtofAppealsIXML
@@ -1793,7 +1801,11 @@ Dim rstMailC As DAO.Recordset, rstPkgType As DAO.Recordset
 Dim qdf As DAO.QueryDef, qdf1 As QueryDef
 Dim oExcelApp As New Excel.Application, oExcelWkbk As New Excel.Workbook
 Dim oExcelSheet As New Excel.Worksheet, oExcelWkbk2 As New Excel.Workbook
-
+Dim sQueryName As String, sTSQExcelFileName As String, SQLString As String
+Dim sMailClassNo As String, sPackageTypeNo As String, sMailClass As String
+Dim sPackageType As String, sMailClass As String, sNewSQL As String
+Dim rs1 As DAO.Recordset, rstShippingOptions As DAO.Recordset
+Dim sCHHyperlinkXML As String
 
 Call pfCurrentCaseInfo  'refresh transcript info
 
@@ -1897,6 +1909,6 @@ Call fTranscriptExpensesAfter
 
 MsgBox "Exported COA XML and added entry to CommHistory table."
 Call pfClearGlobals
-End Function
+End Sub
 
 

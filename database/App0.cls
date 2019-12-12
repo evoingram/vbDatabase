@@ -7,15 +7,25 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Folder("Database.Production.Classes")
 Option Compare Database
 Option Explicit
 
 Private mAppID0 As Long
-Private mCompany As String, mMrMs As String, mLastName As String
-Private mFirstName As String, mEmailAddress As String, mJobTitle As String
-Private mBusinessPhone As String, mAddress As String, mCity As String
+Private mCompany As String
+Private mMrMs As String
+Private mLastName As String
+
+Private mFirstName As String
+Private mEmailAddress As String
+Private mJobTitle As String
+Private mBusinessPhone As String
+Private mAddress As String
+Private mCity As String
 Private mState As String
-Private mZIP As String, mNotes As String, mFactoringApproved As Boolean
+Private mZIP As String
+Private mNotes As String
+Private mFactoringApproved As Boolean
 Public sApp0 As Long
 
 Private mrstRecordset0 As Recordset
@@ -126,13 +136,6 @@ End Property
 Private Property Set RecordsetA0(rData As Recordset)
     Set mrstRecordset0 = rData
 End Property
-
-Public Sub SetAppValues(ByVal sApp0 As String)
-        mAppID0 = sApp0
-        FindFirst "ID=" & sApp0
-    mbooLoaded = True
-End Sub
-
 
 Private Sub Load()
     With RecordsetA0

@@ -1,6 +1,7 @@
 Attribute VB_Name = "Stage2"
-
+'@Folder("Database.Production.Modules")
 Option Compare Database
+Option Explicit
 
 '============================================================================
 'module Stage2
@@ -42,7 +43,7 @@ Option Compare Database
 '============================================================================
 
 
-Public Function pfStage2Ppwk()
+Public Sub pfStage2Ppwk()
 '============================================================================
 ' Name        : pfStage2Ppwk
 ' Author      : Erica L Ingram
@@ -119,8 +120,11 @@ If sAnswer = vbNo Then 'Code for No
     GoTo EndIf1
     
 Else 'Code for yes
-
-    Call fInfoNeededEmailF
+    
+    Call pfCheckFolderExistence 'checks for job folder and creates it if not exists
+    Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
+    Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
+    'Call fInfoNeededEmailF
     Call pfUpdateCheckboxStatus("SpellingsEmail")
     
 EndIf1:
@@ -136,11 +140,11 @@ Call pfCurrentCaseInfo  'refresh transcript info
 sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & "CourtCover.docx"
 Application.FollowHyperlink sFileName
 Call pfClearGlobals
-End Function
+End Sub
 
 
 
-Public Function pfAutoCorrect()
+Public Sub pfAutoCorrect()
 '============================================================================
 ' Name        : pfAutoCorrect
 ' Author      : Erica L Ingram
@@ -212,9 +216,9 @@ rstAGShortcuts.Close
 Set flCurrentField = Nothing
 Set rstAGShortcuts = Nothing
 
-End Function
+End Sub
 
-Public Function pfRoughDraftToCoverF()
+Public Sub pfRoughDraftToCoverF()
 '============================================================================
 ' Name        : pfRoughDraftToCoverF
 ' Author      : Erica L Ingram
@@ -233,6 +237,8 @@ Dim x As Integer
 Dim drSpeakerName As DAO.Recordset
 Dim qdf As QueryDef
 Dim wsyWordStyle As String
+Dim bMatchCase As Boolean
+
 
 Call pfCurrentCaseInfo  'refresh transcript info
 
@@ -1643,9 +1649,9 @@ End If
 
 
 Call pfClearGlobals
-End Function
+End Sub
 
-Public Function pfStaticSpeakersFindReplace()
+Public Sub pfStaticSpeakersFindReplace()
 '============================================================================
 ' Name        : pfStaticSpeakersFindReplace
 ' Author      : Erica L Ingram
@@ -1959,9 +1965,9 @@ Set oWordDoc = Nothing
 Set oWordApp = Nothing
 
 DoCmd.Close ("ViewJobFormAppearancesQ")
-End Function
+End Sub
                                 
-Public Function pfReplaceColonUndercasewithColonUppercase()
+Public Sub pfReplaceColonUndercasewithColonUppercase()
 '============================================================================
 ' Name        : pfReplaceColonUndercasewithColonUppercase
 ' Author      : Erica L Ingram
@@ -1971,6 +1977,8 @@ Public Function pfReplaceColonUndercasewithColonUppercase()
 '============================================================================
 Dim sFileName As String
 Dim oWordApp As New Word.Application, oWordDoc As New Word.Document
+Dim sTextToFind As String, sReplacementText As String
+Dim wsyWordStyle As Word.Style
 
 DoCmd.OpenQuery "ViewJobFormAppearancesQ", acViewNormal, acReadOnly
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -2208,10 +2216,10 @@ Set oWordDoc = Nothing
 Set oWordApp = Nothing
 
 DoCmd.Close ("ViewJobFormAppearancesQ")
-End Function
+End Sub
 
 
-Public Function pfTypeRoughDraftF()
+Public Sub pfTypeRoughDraftF()
 '============================================================================
 ' Name        : pfTypeRoughDraftF
 ' Author      : Erica L Ingram
@@ -2306,26 +2314,26 @@ DoCmd.OpenForm FormName:="PJType" 'open window with AGShortcuts, SpeakerList, an
 
 Shell "winword ""I:\" & sCourtDatesID & "\" & "RoughDraft.docx""" 'open file
 Call pfClearGlobals
-End Function
+End Sub
 
 
-Public Function wwReplaceWeberOR()
+Public Sub wwReplaceWeberOR()
 Call pfTCEntryReplacement
 Call FPJurors
 
 'Call pfTCEntryReplacement
 Call pfRoughDraftToCoverF
 'Call pfCreateIndexWeberOR
-End Function
-Public Function wwReplaceWeberNV()
+End Sub
+Public Sub wwReplaceWeberNV()
 'Call .pfRoughDraftParensXEWeberNV
 Call FPJurors
 'Call pfTCEntryReplacement
 Call pfRoughDraftToCoverF
 'Call pfCreateIndexWeberNV
     
-End Function
-Public Function wwReplaceWeberBR()
+End Sub
+Public Sub wwReplaceWeberBR()
 
 'Call pfRoughDraftParensXEWABkp
 Call FPJurors
@@ -2334,16 +2342,16 @@ Call pfTCEntryReplacement
 Call pfCreateIndexesTOAs
 'Call pfCreateIndexWeberBR
 
-End Function
-Public Function pfReplaceAVT()
+End Sub
+Public Sub pfReplaceAVT()
 
 Call pfRoughDraftToCoverF
 Call FPJurors
 Call pfTCEntryReplacement
     
-End Function
+End Sub
 
-Public Function pfReplaceAQC()
+Public Sub pfReplaceAQC()
 
 Call pfRoughDraftToCoverF
 Call FPJurors
@@ -2351,16 +2359,16 @@ Call FPJurors
 'come back
 Call pfFindRepCitationLinks
 
-End Function
+End Sub
 
-Public Function pfReplaceMass()
+Public Sub pfReplaceMass()
 Call pfRoughDraftCFMass
 Call FPJurors
 Call pfTCEntryReplacement
     
-End Function
+End Sub
 
-Public Function pfRoughDraftCFMass()
+Public Sub pfRoughDraftCFMass()
 '============================================================================
 ' Name        : pfRoughDraftToCoverF
 ' Author      : Erica L Ingram
@@ -3651,6 +3659,6 @@ End If
 
 
 Call pfClearGlobals
-End Function
+End Sub
 
 
