@@ -107,6 +107,7 @@ Set rstViewJFAppQ = Nothing
 oCourtCoverWD.SaveAs2 FileName:=sFileName
 oCourtCoverWD.Close
 oWordApp.Quit
+On Error GoTo 0
 Set oCourtCoverWD = Nothing
 Set oWordApp = Nothing
             
@@ -985,7 +986,7 @@ If sJurisdiction = "Food and Drug Administration" Then
     QueryName = "Q-Doctors"
                 
     Set qdf = CurrentDb.QueryDefs(QueryName)
-    qdf.Parameters(0) = sCourtDatesID
+    Set qdf.Parameters(0) = sCourtDatesID
     Set rs1 = qdf.OpenRecordset
     'open Word document
     'run another query to pull up FDA finds
@@ -1073,7 +1074,7 @@ sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
 
 Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ) 'open query
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rs = qdf.OpenRecordset
 
 Set oWordApp = CreateObject("Word.Application")
@@ -1353,14 +1354,6 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
 
 sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
 
-
-
-
-
-
-
-
-
 On Error Resume Next
 
 Set oWordApp = GetObject(, "Word.Application")
@@ -1501,7 +1494,7 @@ Dim sCurrentEntry1 As String, sCurrentEntry2 As String, sCurrentEntry3 As String
 Dim sCurrentEntry4 As String, sCurrentEntry5 As String, vBookmarkName As String
 Dim oWordApp As New Word.Application, oWordDoc As New Word.Document, oWordApp1 As New Word.Application, oWordDoc1 As New Word.Document
 Dim w As Long, x As Long, y As Long, z As Long
-Dim Rng
+Dim Rng As Variant
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
@@ -1884,6 +1877,7 @@ With oCourtCoverWD
 End With
 oCourtCoverWD.Save
 oCourtCoverWD.Close
+On Error GoTo 0
 oWordApp.Quit
 Call pfClearGlobals
 End Sub
@@ -1913,7 +1907,7 @@ oWordApp.Visible = False
     
 Set oCourtCoverWD = oWordApp.Documents.Open(sFileName)
 Set qdf = CurrentDb.QueryDefs(qnTRCourtQ) 'open query
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rstTRCourtQ = qdf.OpenRecordset
 sJurisdiction = rstTRCourtQ!Jurisdiction
 sParty1Name = rstTRCourtQ!Party1Name
@@ -1923,7 +1917,7 @@ qdf.Close
 rstTRCourtQ.Close
 
 Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ) 'open query
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rstViewJFAppQ = qdf.OpenRecordset
 
 rstViewJFAppQ.MoveFirst
@@ -2110,7 +2104,10 @@ Sub pfFindRepCitationLinks()
     Dim sCourt As String, sFile1 As String, qReplaceHyperlink As String
     Dim sQLongCitation As String, sQCHCategory As String, sQWebAddress As String
     
-    Dim rep, resp, sCitation, oEntry
+    Dim rep As Variant
+    Dim resp As Variant
+    Dim sCitation As Variant
+    Dim oEntry As Variant
     
     Dim sID As Object, oCitations As Object
     Dim oRequest As Object, vDetails As Object
@@ -2126,7 +2123,8 @@ Sub pfFindRepCitationLinks()
     Dim sCurrentTerm As String, sCLChoiceList As String, sQFindCitation As String
     Dim x As Long, y As Long, z As Long, j As Long
     Dim iLongCitationLength As Integer, iStartPos As Integer, iStopPos As Integer
-    Dim letter, sSearchTermArray()
+    Dim letter As Variant
+    Dim sSearchTermArray() As Variant
     Dim rCurrentSearch As Range
     Dim oWordApp As Word.Application, oWordDoc As Word.Document
     Dim sInitialSearchSQL As String, sOriginalSearchTerm As String
@@ -2657,9 +2655,6 @@ NextSearchTerm:
                  
                                 
                 End If
-NextWord:
-
-
             sQFindCitation = ""
             qReplaceHyperlink = ""
             sQLongCitation = ""
@@ -2788,11 +2783,11 @@ Dim PDocAll As Acrobat.CAcroPDDoc
 
 Dim PDBookmark As AcroPDBookmark
 Dim PDFPageView As AcroAVPageView
-Dim bTitle, n, sTranscriptsFolderFinalPDF As String
+Dim bTitle As String, n As String, sTranscriptsFolderFinalPDF As String
 Dim sTranscriptVolumesALLPath As String, sVolumesCoverPath  As String
 Dim oPDFBookmarks As Object, parentBookmark As AcroPDBookmark
 Dim jso As Object, BookMarkRoot As Object
-Dim numpages
+Dim numpages As Variant
 
 Set AcroApp = CreateObject("AcroExch.App")
 Set PDoc = CreateObject("AcroExch.PDDoc")

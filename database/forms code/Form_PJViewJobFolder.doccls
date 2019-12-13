@@ -5,11 +5,11 @@ Option Explicit
 Private Sub WBCViewJobFolder_OnUpdated()
 Dim sTranscriptDir As String
 Dim sJobNumberDirectory As String
-Dim sAppName As String
+'Dim sAppName As String
 
 sJobNumberDirectory = "\\hubcloud\evoingram\production\2inprogress\" & Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] & "\"
 sTranscriptDir = "file:///" & sJobNumberDirectory
-sAppName = "C:\Windows\explorer.exe " & sTranscriptDir 'used to be sJobNumberDirectory but probably wrong
+'sAppName = "C:\Windows\explorer.exe " & sTranscriptDir 'used to be sJobNumberDirectory but probably wrong
 
 Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
@@ -18,11 +18,11 @@ Private Sub Command5_Click()
 
 Dim sTranscriptDir As String
 Dim sJobNumberDirectory As String
-Dim sAppName As String
+'Dim sAppName As String
 
 sJobNumberDirectory = "\\hubcloud\evoingram\production\2inprogress\" & Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] & "\"
 sTranscriptDir = "file:///" & sJobNumberDirectory
-sAppName = "C:\Windows\explorer.exe " & sJobNumberDirectory 'used to be sJobNumberDirectory but probably wrong
+'sAppName = "C:\Windows\explorer.exe " & sJobNumberDirectory 'used to be sJobNumberDirectory but probably wrong
 
 Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 

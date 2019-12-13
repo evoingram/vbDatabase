@@ -81,6 +81,7 @@ Dim oWordApp As New Word.Application, oWordDoc As New Word.Document
 Dim qdf As QueryDef
 Dim rstQuery As DAO.Recordset
 Dim iFileNum As Integer
+Dim sToEmail As String
 
 
 Call fPPGenerateJSONInfo 'refreshes some necessary info
@@ -96,7 +97,7 @@ Call pfGetOrderingAttorneyInfo 'refreshes some necessary info
 Call pfCurrentCaseInfo 'refreshes some necessary info
 
 Set qdf = CurrentDb.QueryDefs(sQueryName)
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rstQuery = qdf.OpenRecordset
 
 sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
@@ -360,6 +361,7 @@ End With
     oWordDoc.Content.Copy
     
     With oOutlookMail 'email that will also include pp button
+        '@Ignore UnassignedVariableUsage
         .To = sToEmail
         .CC = sCompanyEmail
         .Subject = "Transcript Delivery & Invoice for " & sName & ", " & sParty1 & " v. " & sParty2
@@ -375,6 +377,7 @@ End With
     Set oWordApp = Nothing
     Set oWordDoc = Nothing
 End If
+On Error GoTo 0
 Call pfCommunicationHistoryAdd("PP Invoice Sent")
 Call pfClearGlobals
 End Sub
@@ -399,12 +402,15 @@ Dim vStatus As String, vTotal As String
 
 Dim rstRates As DAO.Recordset
 
-Dim resp, response, rep, vDetails As Object
+Dim resp As Variant
+Dim response As Variant
+Dim rep As Variant
+Dim vDetails As Object
 Dim sToken As String, json1 As String, json2 As String, json3 As String, json4 As String, json5 As String
 Dim Parsed As Dictionary
 Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
 Dim sFile1 As String, sFile2 As String, sText As String, sLine1 As String, sLine2 As String
-
+Dim vInventoryRateCode As String
 
 Call fPPGenerateJSONInfo
 
@@ -456,6 +462,7 @@ sEmail = sCompanyEmail
 Debug.Print "--------------------------------------------"
     End With
       
+    '@Ignore UnassignedVariableUsage
     json1 = "{" & Chr(34) & "merchant_info" & Chr(34) & ": {" & Chr(34) & _
     "email" & Chr(34) & ": " & Chr(34) & sCompanyEmail & Chr(34) & "," & Chr(34) & _
     "first_name" & Chr(34) & ": " & Chr(34) & sCompanyFirstName & Chr(34) & "," & Chr(34) & _
@@ -494,7 +501,8 @@ Debug.Print "--------------------------------------------"
     "name" & Chr(34) & ": " & Chr(34) & "Tax" & Chr(34) & "," & Chr(34) & _
     "percent" & Chr(34) & ": 0.00}}]," & Chr(34) & _
     "payment_term" & Chr(34) & ": {" & Chr(34) & "term_type" & Chr(34) & ": " & Chr(34) & "DUE_ON_DATE_SPECIFIED" & Chr(34) & "," & Chr(34) & _
-    "due_date" & Chr(34) & ": " & Chr(34) & sInvoiceDate & " " & sInvoiceTime & Chr(34) & "}," & Chr(34) & _
+    "due_date" & Chr(34) & ": " & Chr(34) & sInvoiceDate & " " _
+    & sInvoiceTime & Chr(34) & "}," & Chr(34) & _
     "reference" & Chr(34) & ": " & Chr(34) & sCourtDatesID & Chr(34) & ","
     '"invoice_date" & Chr(34) & ": {" & Chr(34) & sInvoiceDate & Chr(34) & "}," & Chr(34) & _
 
@@ -542,7 +550,7 @@ Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
 sInvoiceNumber = Parsed("number") 'third level array
 vInvoiceID = Parsed("id") 'third level array
 vStatus = Parsed("status") 'third level array
-'vTotal = Parsed("total_amount")("value") 'second level array
+vTotal = Parsed("total_amount")("value") 'second level array
 vErrorName = Parsed("name") '("value") 'second level array
 vErrorMessage = Parsed("message") '("value") 'second level array
 vErrorILink = Parsed("information_link") '("value") 'second level array
@@ -556,8 +564,8 @@ Debug.Print "--------------------------------------------"
 Debug.Print "Error Name:  " & vErrorName
 Debug.Print "Error Message:  " & vErrorMessage
 Debug.Print "Error Info Link:  " & vErrorILink
-Debug.Print "Error Field:  " & vErrorIssue
-Debug.Print "Error Details:  " & vErrorDetails
+'Debug.Print "Error Field:  " & vErrorIssue
+'Debug.Print "Error Details:  " & vErrorDetails
 Debug.Print "--------------------------------------------"
 'Next
 Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & vInvoiceID
@@ -602,6 +610,7 @@ Dim Parsed As Dictionary
 Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
 Dim vTermDays As String, vDetails As String
 Dim sFile1 As String, sFile2 As String, sText As String, sLine1 As String, sLine2 As String
+Dim vPPStatus As String
 
 Call fPPGetInvoiceInfo
 
@@ -770,7 +779,7 @@ Call pfGetOrderingAttorneyInfo
 Call pfCurrentCaseInfo
 
 Set qdf = CurrentDb.QueryDefs(sQueryName)
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rstQuery = qdf.OpenRecordset
 
 sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
@@ -1026,6 +1035,7 @@ End With
     oWordDoc.Content.Copy
     
     With oOutlookMail
+        '@Ignore UnassignedVariableUsage
         .To = sToEmail
         .CC = sCompanyEmail
         .Subject = "Balance Due for " & sName & ", " & sParty1 & " v. " & sParty2
@@ -1175,6 +1185,7 @@ End With
     oWordDoc.Content.Copy
     
     With oOutlookMail
+    '@Ignore UnassignedVariableUsage
         .To = sToEmail
         .CC = sCompanyEmail
         .Subject = "Balance Due for " & sName & ", " & sParty1 & " v. " & sParty2
@@ -1190,6 +1201,7 @@ End With
     Set oWordDoc = Nothing
     
 End If
+On Error GoTo 0
 Call pfCommunicationHistoryAdd("PP Invoice Sent")
 
 End Sub
@@ -1210,6 +1222,7 @@ Dim sExportInfoCSVPath As String, sQueryName As String, sHTMLPPB As String
 Dim sInvoicePathDocX As String, vPPLink As String, sFilePath As String
 Dim sFilePathHTML As String, sQuestion As String, sAnswer As String
 Dim sToEmail As String, sLine2 As String, sFileNameOut As String
+Dim sPPStatus As String
 
 Dim oOutlookApp As Outlook.Application, oOutlookMail As Outlook.MailItem, oWordEditor As Word.editor
 Dim oWordApp As New Word.Application, oWordDoc As New Word.Document, oWordDoc1 As New Word.Document
@@ -1217,7 +1230,6 @@ Dim oWordApp As New Word.Application, oWordDoc As New Word.Document, oWordDoc1 A
 Dim qdf As QueryDef
 Dim rstQuery As DAO.Recordset
 Dim iFileNumIn As Integer, iFileNumOut As Integer
-
 'your invoice docx template MUST contain the phrase "#PPB1#" AND "#PPB2#" without the quotes somewhere on it.
 'your e-mail docx template MUST contain the phrase "#PPB1#" without the quotes somewhere on it.
 
@@ -1242,7 +1254,7 @@ Call pfGetOrderingAttorneyInfo 'refreshes some info, not relevant for purposes o
 
 Set qdf = CurrentDb.QueryDefs(sQueryName)
 
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rstQuery = qdf.OpenRecordset
 sInvoiceNumber = rstQuery.Fields("TRInvoiceCasesQ.InvoiceNo").Value
 sParty1 = rstQuery.Fields("Party1").Value
@@ -1518,6 +1530,7 @@ oWordApp.Quit
 End If
     oWordDoc.Close
     oWordApp.Quit
+On Error GoTo 0
 
 Set oOutlookApp = Nothing
 Set oOutlookMail = Nothing
@@ -1599,7 +1612,7 @@ sEmail = sCompanyEmail
 'Debug.Print "--------------------------------------------"
     End With
     'get info for invoice, call separate function for it maybe 'come back
- vInvoiceID = rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
+ vInvoiceID = sPPID 'rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
   
 'Debug.Print "RESPONSETEXT--------------------------------------------"
     sURL = "https://api.paypal.com/v1/invoicing/invoices/" & vInvoiceID
@@ -1684,8 +1697,9 @@ Dim Parsed As Dictionary
 Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
 Dim vTermDays As String, vDetails As String
 Dim sFile2 As String, sText As String, sLine2 As String
-
-
+Dim vPPLink As String
+Dim sQuestion As String
+Dim sAnswer As String
 Call fPPGenerateJSONInfo
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1699,7 +1713,7 @@ Call pfGetOrderingAttorneyInfo
 Call pfCurrentCaseInfo
 
 Set qdf = CurrentDb.QueryDefs(sQueryName)
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rstQuery = qdf.OpenRecordset
 
 sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
@@ -1816,7 +1830,7 @@ Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
 sInvoiceNumber = Parsed("number") 'third level array
 vInvoiceID = Parsed("id") 'third level array
 vStatus = Parsed("status") 'third level array
-'vTotal = Parsed("total_amount")("value") 'second level array
+vTotal = Parsed("total_amount")("value") 'second level array
 vErrorName = Parsed("name") '("value") 'second level array
 vErrorMessage = Parsed("message") '("value") 'second level array
 vErrorILink = Parsed("information_link") '("value") 'second level array
@@ -1829,8 +1843,8 @@ Debug.Print "--------------------------------------------"
 Debug.Print "Error Name:  " & vErrorName
 Debug.Print "Error Message:  " & vErrorMessage
 Debug.Print "Error Info Link:  " & vErrorILink
-Debug.Print "Error Field:  " & vErrorIssue
-Debug.Print "Error Details:  " & vErrorDetails
+'Debug.Print "Error Field:  " & vErrorIssue
+'Debug.Print "Error Details:  " & vErrorDetails
 Debug.Print "--------------------------------------------"
 '"id":"INV2-FZTH-K3T4-TM6Y-WC4U"
 '"number":"0003"
@@ -1861,7 +1875,7 @@ End Sub
 
 
 
-Function TextBase64Encode(sText, sCharset)
+Function TextBase64Encode(sText As String, sCharset As Variant)
 '============================================================================
 ' Name        : TextBase64Encode
 ' Author      : Erica L Ingram
@@ -1870,7 +1884,7 @@ Function TextBase64Encode(sText, sCharset)
 ' Description : encodes to base64
 '============================================================================
 '
-    Dim aBinary
+    Dim aBinary As Variant
 
     With CreateObject("ADODB.Stream")
         .Type = 2 ' adTypeText
@@ -1913,7 +1927,7 @@ Dim resp As Variant, response As Variant, rep As Variant
 Dim sToken As String, json1 As String, json2 As String, json3 As String, json4 As String, json5 As String
 Dim Parsed As Dictionary
 Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
-Dim vTermDays As String, vDetails As String
+Dim vDetails As String
 Dim sFile1 As String, sFile2 As String, sText As String, sLine2 As String
 
 
@@ -1975,28 +1989,27 @@ Debug.Print "--------------------------------------------"
     "last_name" & Chr(34) & ": " & Chr(34) & sCompanyLastName & Chr(34) & "," & Chr(34) & _
     "business_name" & Chr(34) & ": " & Chr(34) & sCompanyName & Chr(34) & "," & Chr(34) & _
     "phone" & Chr(34) & ": {" & Chr(34) & _
-    "country_code" & Chr(34) & ": " & Chr(34) & vPCountryCode & Chr(34) & "," & Chr(34) & _
+    "country_code" & Chr(34) & ": " & Chr(34) & sPCountryCode & Chr(34) & "," & Chr(34) & _
     "national_number" & Chr(34) & ": " & Chr(34) & sCompanyNationalNumber & Chr(34) & "}," & Chr(34) & _
     "address" & Chr(34) & ": {" & Chr(34) & _
     "line1" & Chr(34) & ": " & Chr(34) & sCompanyAddress & Chr(34) & "," & Chr(34) & _
     "city" & Chr(34) & ": " & Chr(34) & sCompanyCity & Chr(34) & "," & Chr(34) & _
     "state" & Chr(34) & ": " & Chr(34) & sCompanyState & Chr(34) & "," & Chr(34) & _
     "postal_code" & Chr(34) & ": " & Chr(34) & sCompanyZIP & Chr(34) & "," & Chr(34) & _
-    "country_code" & Chr(34) & ": " & Chr(34) & vZCountryCode & Chr(34) & "}},"
+    "country_code" & Chr(34) & ": " & Chr(34) & sZCountryCode & Chr(34) & "}},"
     
     json2 = Chr(34) & "billing_info" & Chr(34) & ": [{" & Chr(34) & _
     "email" & Chr(34) & ": " & Chr(34) & sEmail & Chr(34) & "}],"
     
-    json3 = Chr(34) & "items" & Chr(34) & ": [" & _
-    "{" & Chr(34) & _
-    "name" & Chr(34) & ": " & Chr(34) & sDescription & Chr(34) & "," & Chr(34) & _
+    '@Ignore UnassignedVariableUsage
+    json3 = Chr(34) & "items" & Chr(34) & ": [" & "{" & Chr(34) & "name" & Chr(34) & ": " & Chr(34) & sDescription & Chr(34) & "," & Chr(34) & _
     "quantity" & Chr(34) & ": " & Chr(34) & sQuantity & Chr(34) & "," & Chr(34) & _
     "unit_price" & Chr(34) & ": {" & Chr(34) & _
     "currency" & Chr(34) & ": " & Chr(34) & "USD" & Chr(34) & "," & Chr(34) & _
     "value" & Chr(34) & ": " & Chr(34) & sUnitPrice & Chr(34) & "}}]," & Chr(34) & _
     "note" & Chr(34) & ": " & Chr(34) & sNote & Chr(34) & "," & Chr(34) & _
     "payment_term" & Chr(34) & ": {" & Chr(34) & _
-    "term_type" & Chr(34) & ": " & Chr(34) & "NET_" & vTermDays & Chr(34) & "}," & Chr(34) & _
+    "term_type" & Chr(34) & ": " & Chr(34) & "NET_" & sTermDays & Chr(34) & "}," & Chr(34) & _
     "shipping_info" & Chr(34) & ": {" & Chr(34) & _
     "first_name" & Chr(34) & ": " & Chr(34) & sFirstName & Chr(34) & "," & Chr(34) & _
     "last_name" & Chr(34) & ": " & Chr(34) & sLastName & Chr(34) & "," & Chr(34) & _
@@ -2049,8 +2062,8 @@ Debug.Print "--------------------------------------------"
 Debug.Print "Error Name:  " & vErrorName
 Debug.Print "Error Message:  " & vErrorMessage
 Debug.Print "Error Info Link:  " & vErrorILink
-Debug.Print "Error Field:  " & vErrorIssue
-Debug.Print "Error Details:  " & vErrorDetails
+'Debug.Print "Error Field:  " & vErrorIssue
+'Debug.Print "Error Details:  " & vErrorDetails
 Debug.Print "--------------------------------------------"
 Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & vInvoiceID
 Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
@@ -2110,6 +2123,11 @@ Dim Parsed As Dictionary
 Dim vErrorName As String, vErrorMessage As String, vErrorILink As String, vErrorDetails As String
 Dim vTermDays As String, vDetails As String
 Dim sFile1 As String, sFile2 As String, sText As String, sLine2 As String
+Dim vMethod As String
+Dim vAmount As String
+Dim db As Database
+Dim qdf As QueryDefs
+Dim rstQInfoInvNo As DAO.Recordset
 
 
 
@@ -2119,7 +2137,7 @@ Call pfGetOrderingAttorneyInfo
 
 Set db = CurrentDb
 Set qdf = db.QueryDefs("QInfobyInvoiceNumber")
-qdf.Parameters(0) = sCourtDatesID
+Set qdf.Parameters(0) = sCourtDatesID
 Set rstQInfoInvNo = qdf.OpenRecordset
 
 sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
@@ -2174,6 +2192,7 @@ Debug.Print "--------------------------------------------"
     sInvoiceTime = (Format(Now(), "hh:mm:ss"))
     vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & sFinalPrice & ".")
 
+    '@Ignore UnassignedVariableUsage
     json1 = "{" & _
     Chr(34) & "method" & Chr(34) & ": " & Chr(34) & vMethod & Chr(34) & "," & Chr(34) & _
     "date" & Chr(34) & ": " & Chr(34) & sInvoiceDate & " " & sInvoiceTime & Chr(34) & "," & Chr(34) & _
@@ -2193,6 +2212,7 @@ Debug.Print "RESPONSETEXT--------------------------------------------"
         '.setRequestHeader "content-type", "application/x-www-form-urlencoded"
         .setRequestHeader "content-type", "application/json"
         .setRequestHeader "Authorization", "Bearer " & sToken
+        '@Ignore UnassignedVariableUsage
         json5 = json1 & json2 & json3
         .send json5
         apiWaxLRS = .responseText
@@ -2218,8 +2238,8 @@ Debug.Print "--------------------------------------------"
 Debug.Print "Error Name:  " & vErrorName
 Debug.Print "Error Message:  " & vErrorMessage
 Debug.Print "Error Info Link:  " & vErrorILink
-Debug.Print "Error Field:  " & vErrorIssue
-Debug.Print "Error Details:  " & vErrorDetails
+'Debug.Print "Error Field:  " & vErrorIssue
+'Debug.Print "Error Details:  " & vErrorDetails
 Debug.Print "--------------------------------------------"
 Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & vInvoiceID
 Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
@@ -2227,13 +2247,17 @@ Debug.Print "--------------------------------------------"
 
 'update PPID & PPStatus
 Dim sUpdatePPStatus As String, sUpdatePPID As String
+'@Ignore UnassignedVariableUsage
 sUpdatePPStatus = "UPDATE CourtDates SET PPStatus = " & Chr(34) & vStatus & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
 CurrentDb.Execute sUpdatePPStatus
+'@Ignore UnassignedVariableUsage
 sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
 CurrentDb.Execute sUpdatePPID
 
 
 End Sub
+
+
 
 
 

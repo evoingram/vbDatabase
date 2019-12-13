@@ -114,6 +114,7 @@ Call fShippingExpenseEntry(sTrackingNumber)
 If ((sJurisdiction) Like ("*" & "SUPERIOR COURT" & "*")) Then
     Call fCourtofAppealsIXML
 End If
+On Error GoTo 0
 
 Call pfClearGlobals
 

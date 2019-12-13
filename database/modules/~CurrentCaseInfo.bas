@@ -106,9 +106,11 @@ Public Const sCompanyZIP As String = "98119"
 Public Const sZCountryCode As String = "US"
 
 'TODO: CurrentCaseInfo module, why isn't this used?  Come back
-'Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
-'Public Const sPPTemplateName As String = "Amount only"
-'Public Const sTermDays As String = "30"
+'@Ignore ConstantNotUsed
+Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
+'@Ignore ConstantNotUsed
+Public Const sPPTemplateName As String = "Amount only"
+Public Const sTermDays As String = "30"
 Public lAssigneeID As Long, sDueDate As String, bStarred As String, bCompleted As String, sTitle As String, sWLListID As String
 
 
@@ -926,3 +928,4 @@ If Not rstTRQPlusCases.EOF Then
     db.Close
   
 End Sub
+

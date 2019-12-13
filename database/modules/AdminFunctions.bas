@@ -268,11 +268,12 @@ Public Sub pfFileExists(ByVal path_ As String)
 ' Description : check if file exists
 '============================================================================
 Dim FileExists As Variant
+'@Ignore AssignmentNotUsed
 FileExists = (Len(Dir(path_)) > 0)
 
 End Sub
 
-Public Sub pfAcrobatGetNumPages(sCourtDatesID)
+Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
 '============================================================================
 ' Name        : pfAcrobatGetNumPages
 ' Author      : Erica L Ingram
@@ -647,7 +648,7 @@ Public Sub pfStripIllegalChar(sInput As String)
 '============================================================================
 
 Dim oRegex As Object
-Dim StripIllegalChar
+Dim StripIllegalChar As Variant
  
 Set oRegex = CreateObject("vbscript.regexp")
 oRegex.Pattern = "[\" & Chr(34) & "\!\@\#\$\%\^\&\*\(\)\=\+\|\[\]\{\}\`\'\;\:\<\>\?\/\,]"
@@ -655,7 +656,6 @@ oRegex.IgnoreCase = True
 oRegex.Global = True
 StripIllegalChar = oRegex.Replace(sInput, "")
 
-ExitFunction:
 Set oRegex = Nothing
      
  
@@ -681,7 +681,6 @@ For Each SubFolder In fld.Folders
     pfGetFolder Folders, EntryID, StoreID, SubFolder
 Next SubFolder
       
-ExitSub:
 Set SubFolder = Nothing
 
 End Sub
@@ -710,7 +709,6 @@ sSavePath = oBrowsedFolder.Self.Path
 On Error Resume Next
 On Error GoTo 0
      
-ExitFunction:
 Set oShell = Nothing
    
 End Sub
@@ -912,6 +910,7 @@ Do While sWebSiteBarNo < sWebSiteBarNoGoal
     pfDelay 22
         
 Loop
+On Error GoTo 0
 End Sub
 
 
@@ -2060,6 +2059,7 @@ For Each oSubSelection In oSelection
     Err.Clear
     
 Next
+On Error GoTo 0
 
 'Display the number of items that were moved.
 MsgBox "Moved " & lMovedItems & " messages(s)."
@@ -2408,6 +2408,7 @@ NextNumber2:
     Next
 Next
 
+On Error GoTo 0
 
 
 End Sub
@@ -2942,8 +2943,8 @@ For Each rep In vDetails ' third level objects
     vErrorIssue = rep("id")
     vErrorDetails = rep("due_date")
     Debug.Print "--------------------------------------------"
-    Debug.Print "Error Name:  " & vErrorName
-    Debug.Print "Error Message:  " & vErrorMessage
+    Debug.Print "Error ID:  " & vErrorIssue
+    Debug.Print "Error Details:  " & vErrorDetails
     'Debug.Print "Error Info Link:  " & vErrorILink
     'Debug.Print "Error Field:  " & vErrorIssue
     'Debug.Print "Error Details:  " & vErrorDetails
@@ -3587,6 +3588,7 @@ NextNumber5:
 Next
 
 
+On Error GoTo 0
 
 
 End Sub
@@ -3791,6 +3793,7 @@ Next
     
 
 Next
+On Error GoTo 0
 
 
 
@@ -4048,6 +4051,7 @@ NextNumber1:
     
 Next
     
+On Error GoTo 0
 
 End Sub
 
@@ -4731,8 +4735,10 @@ Dim sAddress2 As String
 
     rstBarAddresses.MoveNext
     Loop
+On Error GoTo 0
 
 End Sub
+
 
 
 

@@ -468,7 +468,7 @@ End If
 MsgBox "Stage 4 complete."
 Call pfClearGlobals
 End Sub
-Public Sub pfNewZip(sPath)
+Public Sub pfNewZip(sPath As String)
 '============================================================================
 ' Name        : pfNewZip
 ' Author      : Erica L Ingram
@@ -700,7 +700,6 @@ Else
         Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", sPDFFinalTranscript, sWordFinalTranscript, sWorkingCopyPath, sInvoicePDF)
         
     End If
-NoEmailSent:
 End If
 ContractorFile:
     If sAnswer = vbNo Then
@@ -851,8 +850,10 @@ Sub fZIPAudio()
 Dim sourceFile As String, destinationfile As String, sourcefile1 As String, destinationfile1 As String
 Dim filecopied As Object
 Dim FileNameZip1 As String, foldername1 As String, filenamezipFTPTRS As String, foldernameFTP As String
-Dim dbVideoCollection, rstCourtDates As DAO.Recordset, defpath As String, strDate As Date
+Dim dbVideoCollection As Database, rstCourtDates As DAO.Recordset, defpath As String, strDate As Date
 Dim oApp As Object
+'TODO: Universal Change dbVideoCollection database/other db names to proper name
+Dim dbVideoCollection As Database
 Set dbVideoCollection = CurrentDb
 Set rstCourtDates = dbVideoCollection.OpenRecordset("CourtDates")
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -897,12 +898,6 @@ DoEvents
     
     'come back
     
-    
-    
-
-
-
-ExitFunction:
     
 MsgBox "You find the ZIP file here: " & FileNameZip1
 End Sub
@@ -993,7 +988,7 @@ Sub fZIPTranscripts()
 Dim sourceFile As String, destinationfile As String, sourcefile1 As String, destinationfile1 As String
 Dim filecopied As Object, oApp As Object
 Dim FileNameZip1 As String, foldername1 As String, filenamezipFTPTRS As String, foldernameFTP As String
-Dim dbVideoCollection
+Dim dbVideoCollection As Database
 Dim rstCourtDates As DAO.Recordset
 Dim defpath As String
 Dim strDate As Date
@@ -1041,7 +1036,7 @@ On Error GoTo 0
 MsgBox "You find the ZIP file here: " & FileNameZip1
 
 End Sub
-Function fRunXLSMacro(sFile As String, sMacroName As String) As String
+Sub fRunXLSMacro(sFile As String, sMacroName As String)
 On Error GoTo eHandler
 '============================================================================
 ' Name        : fGenerateZIPsF
@@ -1068,6 +1063,7 @@ eHandlerX:
 On Error Resume Next
 oExcelWkbk.Close (True)
 oExcelApp.Quit
+On Error GoTo 0
 Set oExcelWkbk = Nothing
 Set oExcelApp = Nothing
 Exit Function
@@ -1082,7 +1078,7 @@ MsgBox "The following error has occured." & vbCrLf & vbCrLf & _
         
 Resume eHandlerX
 
-End Function
+End Sub
 Public Sub pfSendTrackingEmail()
 '============================================================================
 ' Name        : pfSendTrackingEmail
@@ -1219,7 +1215,6 @@ Set pdTranscriptFinalDistiller = Nothing
 aaAcroPDDoc.Close
 aaAcroApp.CloseAllDocs
 
-eHandler:
 Set aaAcroPDDoc = Nothing
 Set aaAcroAVDoc = Nothing
 Set aaAcroApp = Nothing
@@ -1243,7 +1238,7 @@ Dim sLogFilePath As String
 Dim aaAcroApp As Acrobat.AcroApp
 Dim aaAcroAVDoc As Acrobat.AcroAVDoc
 Dim aaAcroPDDoc As Acrobat.AcroPDDoc
-Dim bret
+Dim bret As Variant
 Dim pp As Object
 
 Dim pdTranscriptFinalDistiller As PdfDistiller
@@ -1735,6 +1730,7 @@ Do While rstShippingOptions.EOF = False
 Loop
 
 rstShippingOptions.Close
+On Error GoTo 0
 Set rstShippingOptions = Nothing
  
 End Sub
@@ -1892,6 +1888,7 @@ sCOAXML = "T:\Production\4ShippingXMLs\" & sCourtDatesID & "-CourtofAppealsDivI-
 sCOAXMLJF = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
 
 FileCopy sCOAXML, sCOAXMLJF
+On Error GoTo 0
 
 'add shipping xml entry to comm history table
 sCHHyperlinkXML = sCourtDatesID & "CoADiv1-ShippingXML" & "#" & sCOAXML & "#"
@@ -1910,5 +1907,6 @@ Call fTranscriptExpensesAfter
 MsgBox "Exported COA XML and added entry to CommHistory table."
 Call pfClearGlobals
 End Sub
+
 
 

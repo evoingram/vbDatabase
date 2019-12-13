@@ -38,11 +38,11 @@ End Sub
 
 
   Private Sub Form_Current()
-Dim sRoughDraftPath As String
-
-sRoughDraftPath = "I:\" & sCourtDatesID & "\" & sCourtDatesID & "RoughDraft.docx"
- ' Me.oleShowDoc.SourceDoc = sRoughDraftPath
-  'Me.oleShowDoc.Requery
+  
+'Dim sRoughDraftPath As String
+'sRoughDraftPath = "I:\" & sCourtDatesID & "\" & sCourtDatesID & "RoughDraft.docx"
+'Me.oleShowDoc.SourceDoc = sRoughDraftPath
+'Me.oleShowDoc.Requery
   
   End Sub
 Public Function DisplayDoc(ctlDocControl As Control, sRoughDraftPath As Variant) As String
@@ -103,7 +103,7 @@ Public Sub pfOpenWork()
 Dim sRoughDraftPath As String, sFTRFolder As String, sCourtSmartFolder As String
 Dim sCaseViewerFolder As String, sExpressScribeFolder As String
 Dim oFSO As Object, oFolder As Object, oFiles As Object
-Dim oSingleFile, sAudioFolder As String
+Dim oSingleFile As Variant, sAudioFolder As String
 'get courtdatesid
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 

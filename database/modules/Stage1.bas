@@ -498,7 +498,6 @@ Do Until rstTempJob.EOF
     End If
     x = x + 1
 Loop
-ExitLoop:
 db.Close:   Set db = Nothing
 Set db = CurrentDb
 'rstCurrentJob.Close
@@ -631,7 +630,6 @@ If Not (rstTempCustomers.EOF And rstTempCustomers.BOF) Then
             tcFactoringApproved = rstTempCustomers.Fields("FactoringApproved").Value
         End If
     
-NextPart:
         
         'query to check TempCustomers against Customers
         sCheckTCuAgainstCuSQL = "SELECT Customers.ID As AppID, Customers.LastName, Customers.FirstName, Customers.Company, Customers.Address, Customers.City, Customers.State, Customers.ZIP, Customers.MrMs, Customers.EmailAddress, Customers.JobTitle, Customers.BusinessPhone, Customers.MobilePhone, Customers.FaxNumber, Customers.Notes, Customers.FactoringApproved FROM Customers WHERE (((Customers.LastName) like " & Chr(34) & "*" & tcLastName & "*" & Chr(34) & ") AND ((Customers.FirstName) like " & Chr(34) & "*" & tcFirstName & "*" & Chr(34) & ") AND ((Customers.Company) like " & Chr(34) & "*" & tcCompany & "*" & Chr(34) & "));"
@@ -701,7 +699,6 @@ NextPart:
         
     Loop
     
-ExitLoop:
 Else
 End If
 
@@ -725,7 +722,7 @@ Dim rstTempCases As DAO.Recordset, rstCheckTCavCa As DAO.Recordset, rstMaxCasesI
 Dim sCheckTCaAgainstCaSQL As String, sNewCasesIDSQL As String, tcsCourtDatesID As String, sCasesID As String
 Dim tcHearingTitle As String, tcParty1 As String, tcParty1Name As String, tcParty2 As String, tcParty2Name As String
 Dim tcCaseNumber1 As String, tcCaseNumber2 As String, tcJurisdiction As String, tcJudge As String, tcJudgeTitle As String
-Dim db
+Dim db As Database
 
 Set db = CurrentDb
 Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
@@ -1442,10 +1439,10 @@ Set oOutlookMail = oOutlookApp.CreateItem(0)
     'Set oWordEditor = .GetInspector.WordEditor
     .GetInspector.WordEditor.Content.Paste
     .Display
-LoopExit:
     End With
 oWordDoc.Close
 oWordApp.Quit
+On Error GoTo 0
 Set oWordApp = Nothing
 End Sub
 
@@ -1744,7 +1741,7 @@ sTitle = sCourtDatesID
     vErrorILink = ""
     Dim x As Integer
     x = 1
-    Dim ID
+    Dim ID As Variant
     For Each ID In rep ' third level objects
         If x = 1 Then
             vErrorILink = rep(x)

@@ -2,6 +2,7 @@
 Option Compare Database
 Option Explicit
 
+'@Ignore UnderscoreInPublicClassModuleMember
 Public Sub cmdStage1Paperwork_Click()
 Call pfStage1Ppwk
 End Sub

@@ -25,6 +25,7 @@ Private mState As String
 Private mZIP As String
 Private mNotes As String
 Private mFactoringApproved As Boolean
+'@Ignore EncapsulatePublicField
 Public sApp6 As Long
 
 Private mrstRecordset6 As Recordset
@@ -186,6 +187,7 @@ Public Sub AddNew()
     mbooLoaded = False
 End Sub
 
+'@Ignore FunctionReturnValueNotUsed
 Public Function FindFirst(Optional Criteria As Variant) As Boolean
     If IsMissing(Criteria) Then
         RecordsetA6.MoveFirst

@@ -212,6 +212,7 @@ Else 'Code for yes
     sDrive = InputBox("Driveletter : ", "Driveletter", "D") & ":\" 'CD burner drive letter
     sSource = "I:\" & sCourtDatesID & "\FTP\" 'source directory
     sCDVolumeName = sCourtDatesID 'CD volume name (16-char max)
+    '@Ignore ConstantNotUsed
     Const MY_COMPUTER = &H11
     
     Set oWSHShell = CreateObject("WScript.Shell")
@@ -505,11 +506,11 @@ Next
     
     
     
-HeadersDone:
 'save & close
 oWordDoc.SaveAs2 FileName:=sFileName
 oWordDoc.Close
 oWordApp.Quit
+On Error GoTo 0
 Set oWordDoc = Nothing
 Set oWordApp = Nothing
             
@@ -769,6 +770,7 @@ End With
 
 oWordDoc.SaveAs2 FileName:=sFileName
 oWordDoc.Close
+On Error GoTo 0
 Set oWordApp = Nothing
 Set oWordDoc = Nothing
 Set rCurrentSection = Nothing
@@ -785,11 +787,11 @@ Dim PDocCover As Acrobat.CAcroPDDoc
 Dim ADoc As AcroAVDoc
 Dim PDBookmark As AcroPDBookmark
 Dim PDFPageView As AcroAVPageView
-Dim bTitle, n, sTranscriptsFolderFinalPDF As String
-Dim sTranscriptVolumesALLPath As String, sVolumesCoverPath  As String
+Dim bTitle As String, n As Variant, sTranscriptsFolderFinalPDF As String
+Dim sTranscriptVolumesALLPath As String, sVolumesCoverPath As String
 Dim oPDFBookmarks As Object, parentBookmark As AcroPDBookmark
 Dim jso As Object, BookMarkRoot As Object
-Dim numpages
+Dim numpages As Variant
 
 
 Set AcroApp = CreateObject("AcroExch.App")
@@ -941,7 +943,7 @@ Dim sLogFilePath As String
 Dim aaAcroApp As Acrobat.AcroApp
 Dim aaAcroAVDoc As Acrobat.AcroAVDoc
 Dim aaAcroPDDoc As Acrobat.AcroPDDoc
-Dim bret
+Dim bret As Variant
 Dim pp As Object
 
 Dim pdTranscriptFinalDistiller As PdfDistiller
@@ -994,6 +996,7 @@ GoTo eHandlerX
 Resume
 
 End Sub
+
 
 
 

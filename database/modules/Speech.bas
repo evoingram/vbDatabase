@@ -825,7 +825,7 @@ pfGetFile = StrConv(bFileContents, vbUnicode)
 End Function
 '******************* upload - end
 
-Public Sub pfDoFolder(Folder)
+Public Sub pfDoFolder(Folder As Variant)
 '============================================================================
 ' Name        : pfDoFolder
 ' Author      : Erica L Ingram
