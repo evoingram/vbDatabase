@@ -179,6 +179,8 @@ At1:
         .Attachments.Add (sAttachment1)
 LoopExit:
     End With
+    
+On Error GoTo 0
 Set oWordApp = Nothing
 oWordDoc.Close
 oWordApp.Quit
@@ -193,11 +195,16 @@ Public Sub pfCreateCDLabel()
 ' Description : makes CD label and prompts for print or no
 '============================================================================
 
-Dim sPubDocName As String, sCommHistoryHyperlink As String, sCDLExcelExport As String
-Dim sPubDocPDFName As String, sAnswer As String, sQuestion As String
+Dim sPubDocName As String
+Dim sCommHistoryHyperlink As String
+Dim sCDLExcelExport As String
+'Dim sPubDocPDFName As String
+Dim sAnswer As String
+Dim sQuestion As String
 Dim oPubDoc As Publisher.Document
 Dim oPubApp As Publisher.Application
-Dim dbVideoCollection As DAO.Database, rstVideos As DAO.Recordset
+Dim dbVideoCollection As DAO.Database
+Dim rstVideos As DAO.Recordset
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -218,7 +225,7 @@ Set oPubApp = New Publisher.Application
 Set oPubDoc = oPubApp.Open("T:\Database\Templates\Stage1s\CD-Label.pub")
 
 sPubDocName = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CD-Label" & ".pub" 'set name
-sPubDocPDFName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CD-Label" & ".pdf" 'set name
+'sPubDocPDFName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CD-Label" & ".pdf" 'set name
 sCommHistoryHyperlink = sCourtDatesID & "-CD-Label" & "#" & sPubDocName
 
 
@@ -328,7 +335,8 @@ Public Sub pfCreateCover(sTemplatePath As String)
 '============================================================================
 
 Dim sCourtCoverYesExt As String, sCourtCoverNoExt As String, sCommHistoryAddSQL As String
-Dim sExportInfoCSVPath As String, sFullTemplatePath As String
+'Dim sExportInfoCSVPath As String
+Dim sFullTemplatePath As String
 Dim oExcelApp As New Excel.Application, oExcelWB As New Excel.Workbook
 Dim oWordApp As New Word.Application, oWordDoc As New Word.Document
 Dim xlRange As Excel.Range
@@ -337,7 +345,7 @@ Dim x As Integer, iCount As Integer
 Dim rstCommHistory As DAO.Recordset
 Call pfCurrentCaseInfo  'refresh transcript info
 
-sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
+'sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
 sCourtCoverYesExt = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 sCourtCoverNoExt = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover"
 sFullTemplatePath = "T:\Database\Templates\" & sTemplatePath 'sTemplatePath is folder\subject
@@ -533,6 +541,7 @@ MsgBox "Factoring Invoice Email Created!"
 
 Call pfCommunicationHistoryAdd("FactorInvoiceEmail")
 
+'@Ignore AssignmentNotUsed
 sFactoringXLS = "T:\Database\Templates\Stage4s\Client_Basic_Schedule.xls" 'make factoring csv
 sGeneratedFactoringXLS = "I:\" & sCourtDatesID & "\WorkingFiles\" & "Client_Basic_Schedule.xls"
 
@@ -679,7 +688,7 @@ Dim sTranscriptsFPathDocX As String, sTranscriptsPathDocX As String, sTranscript
 Dim sAnswer As String, sQuestion As String, sCourtCoverPath As String
 Dim oWordApp As New Word.Application, oWordDoc As New Word.Document, vbComp As Object
 Dim wsSections As Word.Sections, wsSection As Word.Section
-Dim x
+Dim x As Variant
 Dim oRng As Range
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]

@@ -156,6 +156,7 @@ Private Type json_Options
     ' The solidus (/) is not required to be escaped, use this option to escape them as \/ in ConvertToJson
     EscapeSolidus As Boolean
 End Type
+'@Ignore EncapsulatePublicField
 Public JsonOptions As json_Options
 
 ' ============================================= '
@@ -349,6 +350,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
 
         json_BufferAppend json_Buffer, json_Indentation & "]", json_BufferPosition, json_BufferLength
 
+        '@Ignore UnassignedVariableUsage
         ConvertToJson = json_BufferToString(json_Buffer, json_BufferPosition)
 
     ' Dictionary or Collection
@@ -442,6 +444,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
             json_BufferAppend json_Buffer, json_Indentation & "]", json_BufferPosition, json_BufferLength
         End If
 
+        '@Ignore UnassignedVariableUsage
         ConvertToJson = json_BufferToString(json_Buffer, json_BufferPosition)
     Case VBA.vbInteger, VBA.vbLong, VBA.vbSingle, VBA.vbDouble, VBA.vbCurrency, VBA.vbDecimal
         ' Number (use decimals for numbers)
@@ -588,10 +591,12 @@ Private Function json_ParseString(json_String As String, ByRef json_Index As Lon
                 ' Unicode character escape (e.g. \u00a9 = Copyright)
                 json_Index = json_Index + 1
                 json_Code = VBA.Mid$(json_String, json_Index, 4)
+                '@Ignore UnassignedVariableUsage
                 json_BufferAppend json_Buffer, VBA.ChrW(VBA.Val("&h" + json_Code)), json_BufferPosition, json_BufferLength
                 json_Index = json_Index + 4
             End Select
         Case json_Quote
+        '@ignore UnassignedVariableUsage
             json_ParseString = json_BufferToString(json_Buffer, json_BufferPosition)
             json_Index = json_Index + 1
             Exit Function
@@ -731,9 +736,11 @@ Private Function json_Encode(ByVal json_Text As Variant) As String
             json_Char = "\u" & VBA.Right$("0000" & VBA.Hex$(json_AscCode), 4)
         End Select
 
+        '@Ignore UnassignedVariableUsage
         json_BufferAppend json_Buffer, json_Char, json_BufferPosition, json_BufferLength
     Next json_Index
 
+    '@Ignore UnassignedVariableUsage
     json_Encode = json_BufferToString(json_Buffer, json_BufferPosition)
 End Function
 
@@ -1122,5 +1129,6 @@ Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
 End Function
 
 #End If
+
 
 

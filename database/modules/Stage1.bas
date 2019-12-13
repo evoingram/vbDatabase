@@ -498,8 +498,8 @@ Do Until rstTempJob.EOF
     End If
     x = x + 1
 Loop
-ExitLoop:
 db.Close:   Set db = Nothing
+'@Ignore AssignmentNotUsed
 Set db = CurrentDb
 'rstCurrentJob.Close
 'rstTempJob.Close
@@ -631,7 +631,6 @@ If Not (rstTempCustomers.EOF And rstTempCustomers.BOF) Then
             tcFactoringApproved = rstTempCustomers.Fields("FactoringApproved").Value
         End If
     
-NextPart:
         
         'query to check TempCustomers against Customers
         sCheckTCuAgainstCuSQL = "SELECT Customers.ID As AppID, Customers.LastName, Customers.FirstName, Customers.Company, Customers.Address, Customers.City, Customers.State, Customers.ZIP, Customers.MrMs, Customers.EmailAddress, Customers.JobTitle, Customers.BusinessPhone, Customers.MobilePhone, Customers.FaxNumber, Customers.Notes, Customers.FactoringApproved FROM Customers WHERE (((Customers.LastName) like " & Chr(34) & "*" & tcLastName & "*" & Chr(34) & ") AND ((Customers.FirstName) like " & Chr(34) & "*" & tcFirstName & "*" & Chr(34) & ") AND ((Customers.Company) like " & Chr(34) & "*" & tcCompany & "*" & Chr(34) & "));"
@@ -701,7 +700,6 @@ NextPart:
         
     Loop
     
-ExitLoop:
 Else
 End If
 
@@ -725,7 +723,7 @@ Dim rstTempCases As DAO.Recordset, rstCheckTCavCa As DAO.Recordset, rstMaxCasesI
 Dim sCheckTCaAgainstCaSQL As String, sNewCasesIDSQL As String, tcsCourtDatesID As String, sCasesID As String
 Dim tcHearingTitle As String, tcParty1 As String, tcParty1Name As String, tcParty2 As String, tcParty2Name As String
 Dim tcCaseNumber1 As String, tcCaseNumber2 As String, tcJurisdiction As String, tcJudge As String, tcJudgeTitle As String
-Dim db
+Dim db As Database
 
 Set db = CurrentDb
 Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
@@ -1442,10 +1440,10 @@ Set oOutlookMail = oOutlookApp.CreateItem(0)
     'Set oWordEditor = .GetInspector.WordEditor
     .GetInspector.WordEditor.Content.Paste
     .Display
-LoopExit:
     End With
 oWordDoc.Close
 oWordApp.Quit
+On Error GoTo 0
 Set oWordApp = Nothing
 End Sub
 
@@ -1727,12 +1725,15 @@ sTitle = sCourtDatesID
         .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
         .abort
     End With
     
     
+    '@Ignore AssignmentNotUsed
     apiWaxLRS = Left(apiWaxLRS, Len(apiWaxLRS) - 1)
+    '@Ignore AssignmentNotUsed
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
     
     Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
@@ -1744,7 +1745,7 @@ sTitle = sCourtDatesID
     vErrorILink = ""
     Dim x As Integer
     x = 1
-    Dim ID
+    Dim ID As Variant
     For Each ID In rep ' third level objects
         If x = 1 Then
             vErrorILink = rep(x)
@@ -1777,8 +1778,11 @@ sTitle = sCourtDatesID
         .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = Left(apiWaxLRS, Len(apiWaxLRS) - 1)
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
         .abort
     End With
@@ -1898,6 +1902,7 @@ sTitle = sCourtDatesID
         .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
         .abort
     End With
@@ -1934,12 +1939,15 @@ sTitle = sCourtDatesID
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON 'send JSON to create empty list
         
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
         .abort
     End With
     Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
     
+    '@Ignore AssignmentNotUsed
     iListID = Parsed("list_id") 'get new list_id
+    '@Ignore AssignmentNotUsed
     sTitle = Parsed("title")
 
 
@@ -2810,6 +2818,7 @@ Dim n As Integer
     'Sets the timer in motion for case 10 - scrolling text
 
     n = 10
+    '@Ignore AssignmentNotUsed
     sCourtDatesID = DMax("[ID]", "CourtDates")
     
     'If Me.TimerInterval = 0 Then
@@ -2828,6 +2837,7 @@ Dim n As Integer
         'Me.cmd10.ForeColor = RGB(0, 32, 68)
         'Me.cmd10.FontWeight = 400
         'Me.cmd10.FontSize = 12
+        '@Ignore AssignmentNotUsed
         strText = ""
     'End If
     

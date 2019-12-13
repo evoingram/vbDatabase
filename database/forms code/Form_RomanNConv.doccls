@@ -4,8 +4,10 @@ Option Explicit
 
 Private Sub RNCButton_Click()
 Dim iX As Integer
-Dim vRomanFormat
+Dim vRomanFormat As Variant
+Dim Text6 As Variant
 
+'@Ignore UnassignedVariableUsage
 iX = Text6.Value
 If iX = 0 Then Exit Sub
 
@@ -30,7 +32,9 @@ Next
 
 sRoman = String(iZ, "M") & sRoman    ' thousands
 If iX < 0 Then sRoman = "-" & sRoman ' sign if negative
+'@Ignore AssignmentNotUsed
 vRomanFormat = sRoman
+Dim Text8 As Variant
 Text8 = sRoman
 
 End Sub

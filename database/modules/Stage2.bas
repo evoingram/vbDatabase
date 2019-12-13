@@ -293,12 +293,14 @@ oWordApp.Visible = True
 
     x = 18 '18 is number of first dynamic speaker
     
+    '@Ignore UnassignedVariableUsage
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
     
     
     'file name to do find replaces in
     sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     
+    '@Ignore UnassignedVariableUsage
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
     Set qdf.Parameters(0) = sCourtDatesID
     Set drSpeakerName = qdf.OpenRecordset
@@ -419,6 +421,7 @@ oWordApp.Visible = True
         Set drSpeakerName = Nothing 'Clean up
         
         
+        '@Ignore UnassignedVariableUsage
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
@@ -1329,11 +1332,13 @@ oWordApp.Visible = True
             
         x = 18 '18 is number of first dynamic speaker
         
+        '@Ignore UnassignedVariableUsage
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
         
+        '@Ignore UnassignedVariableUsage
         Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
         Set qdf.Parameters(0) = sCourtDatesID
         Set drSpeakerName = qdf.OpenRecordset
@@ -1646,6 +1651,7 @@ If sJurisdiction <> "FDA" And sJurisdiction <> "Food and Drug Administration" An
     Call fDynamicHeaders
 End If
 
+On Error GoTo 0
 
 Call pfClearGlobals
 End Sub
@@ -2430,12 +2436,14 @@ Set oWordDoc = GetObject(sCourtCover, "Word.Document")
 
     x = 18 '18 is number of first dynamic speaker
     
+    '@Ignore UnassignedVariableUsage
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
     
     
     'file name to do find replaces in
     sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     
+    '@Ignore UnassignedVariableUsage
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
     Set qdf.Parameters(0) = sCourtDatesID
     Set drSpeakerName = qdf.OpenRecordset
@@ -2556,6 +2564,7 @@ Set oWordDoc = GetObject(sCourtCover, "Word.Document")
         Set drSpeakerName = Nothing 'Clean up
         
         
+        '@Ignore UnassignedVariableUsage
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
@@ -3573,11 +3582,13 @@ Set oWordDoc = GetObject(sCourtCover, "Word.Document")
         
         x = 18 '18 is number of first dynamic speaker
         
+        '@Ignore UnassignedVariableUsage
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
         
+        '@Ignore UnassignedVariableUsage
         Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
         Set qdf.Parameters(0) = sCourtDatesID
         Set drSpeakerName = qdf.OpenRecordset

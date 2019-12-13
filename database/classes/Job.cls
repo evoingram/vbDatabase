@@ -402,6 +402,7 @@ Public Sub AddNew()
     mbooLoaded = False
 End Sub
 
+'@Ignore FunctionReturnValueNotUsed
 Public Function FindFirst(Optional Criteria As Variant) As Boolean
     If IsMissing(Criteria) Then
         Recordset.MoveFirst

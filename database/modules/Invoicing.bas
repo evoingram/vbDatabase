@@ -471,6 +471,7 @@ Call pfCurrentCaseInfo  'refresh transcript info
 Set db = CurrentDb
 
 sPaymentMadePath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PaymentMade.docx"
+'@Ignore AssignmentNotUsed
 sTableHyperlink = sCourtDatesID & "-PaymentMade" & "#" & sPaymentMadePath & "#"
 
 Set rstPaymentAdd = db.OpenRecordset("Payments")
@@ -654,7 +655,9 @@ Call pfCurrentCaseInfo  'refresh transcript info
 Set db = CurrentDb
 Set rstExpensesAdd = db.OpenRecordset("Expenses")
     
+'@Ignore AssignmentNotUsed
 vEPC = sEstimatedPageCount
+'@Ignore AssignmentNotUsed
 vEPC = Int(vEPC)
 
 If vEPC > 200 Then

@@ -268,11 +268,12 @@ Public Sub pfFileExists(ByVal path_ As String)
 ' Description : check if file exists
 '============================================================================
 Dim FileExists As Variant
+'@Ignore AssignmentNotUsed
 FileExists = (Len(Dir(path_)) > 0)
 
 End Sub
 
-Public Sub pfAcrobatGetNumPages(sCourtDatesID)
+Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
 '============================================================================
 ' Name        : pfAcrobatGetNumPages
 ' Author      : Erica L Ingram
@@ -351,6 +352,8 @@ Set dbAQC = CurrentDb
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 sSQL = "UPDATE [CourtDates] SET [CourtDates].[ActualQuantity] = " & sActualQuantity & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+
+'@Ignore AssignmentNotUsed
 Set qdf = dbAQC.CreateQueryDef("", sSQL)
 dbAQC.Execute sSQL
 
@@ -647,15 +650,17 @@ Public Sub pfStripIllegalChar(sInput As String)
 '============================================================================
 
 Dim oRegex As Object
-Dim StripIllegalChar
+Dim StripIllegalChar As Variant
  
 Set oRegex = CreateObject("vbscript.regexp")
 oRegex.Pattern = "[\" & Chr(34) & "\!\@\#\$\%\^\&\*\(\)\=\+\|\[\]\{\}\`\'\;\:\<\>\?\/\,]"
+'@Ignore AssignmentNotUsed
 oRegex.IgnoreCase = True
+'@Ignore AssignmentNotUsed
 oRegex.Global = True
+'@Ignore AssignmentNotUsed
 StripIllegalChar = oRegex.Replace(sInput, "")
 
-ExitFunction:
 Set oRegex = Nothing
      
  
@@ -681,7 +686,6 @@ For Each SubFolder In fld.Folders
     pfGetFolder Folders, EntryID, StoreID, SubFolder
 Next SubFolder
       
-ExitSub:
 Set SubFolder = Nothing
 
 End Sub
@@ -710,7 +714,6 @@ sSavePath = oBrowsedFolder.Self.Path
 On Error Resume Next
 On Error GoTo 0
      
-ExitFunction:
 Set oShell = Nothing
    
 End Sub
@@ -912,6 +915,7 @@ Do While sWebSiteBarNo < sWebSiteBarNoGoal
     pfDelay 22
         
 Loop
+On Error GoTo 0
 End Sub
 
 
@@ -2060,6 +2064,7 @@ For Each oSubSelection In oSelection
     Err.Clear
     
 Next
+On Error GoTo 0
 
 'Display the number of items that were moved.
 MsgBox "Moved " & lMovedItems & " messages(s)."
@@ -2408,6 +2413,7 @@ NextNumber2:
     Next
 Next
 
+On Error GoTo 0
 
 
 End Sub
@@ -2755,6 +2761,7 @@ Call fWLGenerateJSONInfo
 'Close #3
 
 
+'@Ignore AssignmentNotUsed
 sEmail = sCompanyEmail
 'sUserName = sLine1
 'sPassword = sLine2
@@ -2942,8 +2949,8 @@ For Each rep In vDetails ' third level objects
     vErrorIssue = rep("id")
     vErrorDetails = rep("due_date")
     Debug.Print "--------------------------------------------"
-    Debug.Print "Error Name:  " & vErrorName
-    Debug.Print "Error Message:  " & vErrorMessage
+    Debug.Print "Error ID:  " & vErrorIssue
+    Debug.Print "Error Details:  " & vErrorDetails
     'Debug.Print "Error Info Link:  " & vErrorILink
     'Debug.Print "Error Field:  " & vErrorIssue
     'Debug.Print "Error Details:  " & vErrorDetails
@@ -3039,8 +3046,10 @@ Call fWLGenerateJSONInfo
 'Close #3
 'https://www.wunderlist.com/oauth/authorize?client_id=ID&redirect_uri=URL&state=RANDOM
 
+'@Ignore AssignmentNotUsed
 sLocal = "'urn:ietf:wg:oauth:2.0:oob','oob'" '"https://localhost/"
 
+'@Ignore AssignmentNotUsed
 sEmail = sCompanyEmail
 'sUserName = sLine1
 'sPassword = sLine2
@@ -3156,6 +3165,7 @@ Call fWLGenerateJSONInfo
 'Line Input #3, sLine3
 'Close #3
 
+'@Ignore AssignmentNotUsed
 sEmail = sCompanyEmail
 'sUserName = sLine1
 'sPassword = sLine2
@@ -3587,6 +3597,7 @@ NextNumber5:
 Next
 
 
+On Error GoTo 0
 
 
 End Sub
@@ -3791,6 +3802,7 @@ Next
     
 
 Next
+On Error GoTo 0
 
 
 
@@ -4048,6 +4060,7 @@ NextNumber1:
     
 Next
     
+On Error GoTo 0
 
 End Sub
 
@@ -4731,8 +4744,10 @@ Dim sAddress2 As String
 
     rstBarAddresses.MoveNext
     Loop
+On Error GoTo 0
 
 End Sub
+
 
 
 
