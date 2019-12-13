@@ -387,6 +387,7 @@ Public Sub openRSet(sTableName As String)
     Dim db As Database
     Dim rstTableName As DAO.Recordset
     Set db = CurrentDb
+    '@Ignore AssignmentNotUsed
     Set rstTableName = db.OpenRecordset(sTableName)
     
 End Sub

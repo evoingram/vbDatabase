@@ -32,6 +32,7 @@ Next
 
 sRoman = String(iZ, "M") & sRoman    ' thousands
 If iX < 0 Then sRoman = "-" & sRoman ' sign if negative
+'@Ignore AssignmentNotUsed
 vRomanFormat = sRoman
 Dim Text8 As Variant
 Text8 = sRoman

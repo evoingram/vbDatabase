@@ -156,6 +156,7 @@ Private Type json_Options
     ' The solidus (/) is not required to be escaped, use this option to escape them as \/ in ConvertToJson
     EscapeSolidus As Boolean
 End Type
+'@Ignore EncapsulatePublicField
 Public JsonOptions As json_Options
 
 ' ============================================= '
@@ -1128,5 +1129,6 @@ Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
 End Function
 
 #End If
+
 
 

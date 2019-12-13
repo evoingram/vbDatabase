@@ -74,6 +74,7 @@ Dim qdf As QueryDef
 
 DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly 'open query
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
+'@Ignore AssignmentNotUsed
 sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
 Set oWordApp = CreateObject("Word.Application")
 
@@ -779,7 +780,8 @@ Public Sub pfCreateIndexesTOAs()
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 
-Dim oWordApp As New Word.Application, oWordDoc As New Word.Document
+Dim oWordApp As New Word.Application
+Dim oWordDoc As New Word.Document
 
 On Error Resume Next
 Set oWordApp = GetObject(, "Word.Application")
@@ -2198,6 +2200,7 @@ Sub pfFindRepCitationLinks()
         If x = 0 Then GoTo Done
         iStartPos = InStr(x, sCurrentSearch, sBeginCHT, vbTextCompare)
         If iStartPos = 0 Then GoTo ExitLoop
+        '@Ignore AssignmentNotUsed
         iStopPos = InStr(iStartPos, sCurrentSearch, sEndCHT, vbTextCompare)
         If iStopPos = 0 Then GoTo ExitLoop
         sCurrentTerm = Mid$(sCurrentSearch, iStartPos + Len(sBeginCHT), iStopPos - iStartPos - Len(sEndCHT))
@@ -2790,6 +2793,7 @@ Dim jso As Object, BookMarkRoot As Object
 Dim numpages As Variant
 
 Set AcroApp = CreateObject("AcroExch.App")
+'@Ignore AssignmentNotUsed
 Set PDoc = CreateObject("AcroExch.PDDoc")
 Set PDocAll = CreateObject("AcroExch.PDDoc")
 Set PDocCover = CreateObject("AcroExch.PDDoc")
@@ -2807,11 +2811,15 @@ Set ADoc = PDocCover.OpenAVDoc(sVolumesCoverPath)
 
 
 'Table of Contents Bookmark
+'@Ignore AssignmentNotUsed
 Set PDFPageView = ADoc.GetAVPageView()
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmarks make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDocCover, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("Table of Contents")
 
 n = PDocCover.Save(PDSaveFull, sVolumesCoverPath)
@@ -2831,56 +2839,80 @@ AppActivate "Adobe Acrobat Pro Extended"
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("TOP OF TRANSCRIPT")
 
 'Index Bookmark
 Call PDFPageView.Goto(1)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("TRANSCRIPT INDEXES")
 
 'General Index Bookmark
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("General")
 
 'Witnesses Index Bookmark
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("Witnesses")
 
 'Exhibits Index Bookmark
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("Exhibits")
 
 'Cases Bookmark
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("Cases")
 
 'Rules, Regulation, Code, Statutes Bookmark
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("Rules, Regulation, Code, Statutes")
 
 'Other Authorities Bookmark
 Call PDFPageView.Goto(0)
 AcroApp.MenuItemExecute ("NewBookmark")
 
+'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
+'@Ignore AssignmentNotUsed
 bTitle = PDBookmark.SetTitle("Other Authorities")
 
 MsgBox ("Hit okay after you've moved all bookmarks to their corresponding headings; General, Witnesses, or Exhibits; and also created the Authorities bookmark structure.")

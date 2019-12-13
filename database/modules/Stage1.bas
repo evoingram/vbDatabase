@@ -499,6 +499,7 @@ Do Until rstTempJob.EOF
     x = x + 1
 Loop
 db.Close:   Set db = Nothing
+'@Ignore AssignmentNotUsed
 Set db = CurrentDb
 'rstCurrentJob.Close
 'rstTempJob.Close
@@ -1724,12 +1725,15 @@ sTitle = sCourtDatesID
         .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
         .abort
     End With
     
     
+    '@Ignore AssignmentNotUsed
     apiWaxLRS = Left(apiWaxLRS, Len(apiWaxLRS) - 1)
+    '@Ignore AssignmentNotUsed
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
     
     Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
@@ -1774,8 +1778,11 @@ sTitle = sCourtDatesID
         .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = Left(apiWaxLRS, Len(apiWaxLRS) - 1)
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
         .abort
     End With
@@ -1895,6 +1902,7 @@ sTitle = sCourtDatesID
         .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
         .abort
     End With
@@ -1931,12 +1939,15 @@ sTitle = sCourtDatesID
         .setRequestHeader "Content-Type", "application/json"
         .send sJSON 'send JSON to create empty list
         
+        '@Ignore AssignmentNotUsed
         apiWaxLRS = .responseText
         .abort
     End With
     Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
     
+    '@Ignore AssignmentNotUsed
     iListID = Parsed("list_id") 'get new list_id
+    '@Ignore AssignmentNotUsed
     sTitle = Parsed("title")
 
 
@@ -2807,6 +2818,7 @@ Dim n As Integer
     'Sets the timer in motion for case 10 - scrolling text
 
     n = 10
+    '@Ignore AssignmentNotUsed
     sCourtDatesID = DMax("[ID]", "CourtDates")
     
     'If Me.TimerInterval = 0 Then
@@ -2825,6 +2837,7 @@ Dim n As Integer
         'Me.cmd10.ForeColor = RGB(0, 32, 68)
         'Me.cmd10.FontWeight = 400
         'Me.cmd10.FontSize = 12
+        '@Ignore AssignmentNotUsed
         strText = ""
     'End If
     

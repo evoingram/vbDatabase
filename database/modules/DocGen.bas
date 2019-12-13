@@ -541,6 +541,7 @@ MsgBox "Factoring Invoice Email Created!"
 
 Call pfCommunicationHistoryAdd("FactorInvoiceEmail")
 
+'@Ignore AssignmentNotUsed
 sFactoringXLS = "T:\Database\Templates\Stage4s\Client_Basic_Schedule.xls" 'make factoring csv
 sGeneratedFactoringXLS = "I:\" & sCourtDatesID & "\WorkingFiles\" & "Client_Basic_Schedule.xls"
 

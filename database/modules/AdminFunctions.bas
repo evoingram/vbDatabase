@@ -352,6 +352,8 @@ Set dbAQC = CurrentDb
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 sSQL = "UPDATE [CourtDates] SET [CourtDates].[ActualQuantity] = " & sActualQuantity & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+
+'@Ignore AssignmentNotUsed
 Set qdf = dbAQC.CreateQueryDef("", sSQL)
 dbAQC.Execute sSQL
 
@@ -652,8 +654,11 @@ Dim StripIllegalChar As Variant
  
 Set oRegex = CreateObject("vbscript.regexp")
 oRegex.Pattern = "[\" & Chr(34) & "\!\@\#\$\%\^\&\*\(\)\=\+\|\[\]\{\}\`\'\;\:\<\>\?\/\,]"
+'@Ignore AssignmentNotUsed
 oRegex.IgnoreCase = True
+'@Ignore AssignmentNotUsed
 oRegex.Global = True
+'@Ignore AssignmentNotUsed
 StripIllegalChar = oRegex.Replace(sInput, "")
 
 Set oRegex = Nothing
@@ -2756,6 +2761,7 @@ Call fWLGenerateJSONInfo
 'Close #3
 
 
+'@Ignore AssignmentNotUsed
 sEmail = sCompanyEmail
 'sUserName = sLine1
 'sPassword = sLine2
@@ -3040,8 +3046,10 @@ Call fWLGenerateJSONInfo
 'Close #3
 'https://www.wunderlist.com/oauth/authorize?client_id=ID&redirect_uri=URL&state=RANDOM
 
+'@Ignore AssignmentNotUsed
 sLocal = "'urn:ietf:wg:oauth:2.0:oob','oob'" '"https://localhost/"
 
+'@Ignore AssignmentNotUsed
 sEmail = sCompanyEmail
 'sUserName = sLine1
 'sPassword = sLine2
@@ -3157,6 +3165,7 @@ Call fWLGenerateJSONInfo
 'Line Input #3, sLine3
 'Close #3
 
+'@Ignore AssignmentNotUsed
 sEmail = sCompanyEmail
 'sUserName = sLine1
 'sPassword = sLine2

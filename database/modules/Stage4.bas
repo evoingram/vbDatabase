@@ -864,6 +864,7 @@ If Right(defpath, 1) <> "\" Then
 End If
 
 foldername1 = "I:\" & sCourtDatesID & "\Audio\"
+'@Ignore AssignmentNotUsed, AssignmentNotUsed
 foldernameFTP = "I:\" & sCourtDatesID & "\FTP"
 
 strDate = Format(Now, " dd-mmm-yy h-mm-ss")
@@ -1001,6 +1002,7 @@ If Right(defpath, 1) <> "\" Then
     defpath = defpath & "\"
 End If
 
+'@Ignore AssignmentNotUsed
 foldername1 = "I:\" & sCourtDatesID & "\Transcripts\"
 foldernameFTP = "I:\" & sCourtDatesID & "\FTP"
 
@@ -1098,9 +1100,8 @@ Call pfCurrentCaseInfo  'refresh transcript info
 
 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 deliverySQLstring = "SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";"
-
+'TODO: pfSendTrackingEmail get current values and delete following come back
 Set rs = CurrentDb.OpenRecordset(deliverySQLstring)
-
 vTrackingNumber = rs.Fields("TrackingNumber").Value
 sParty1 = rs.Fields("Party1").Value
 sParty2 = rs.Fields("Party2").Value
@@ -1813,7 +1814,9 @@ sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 Call pfCurrentCaseInfo  'refresh transcript info
         
+'@Ignore AssignmentNotUsed
 sQueryName = "TempShippingOptionsQ"
+'@Ignore AssignmentNotUsed
 sTSQExcelFileName = "T:\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
 
 SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
@@ -1849,10 +1852,13 @@ rstShippingOptions.Edit
 Set rstShippingOptions.Fields("Output") = sOutputXMLStringSQLFile
 rstShippingOptions.Update
 
+'@Ignore AssignmentNotUsed
 sTempShippingOQ1 = "TempShippingOptionsQ1"
+'@Ignore AssignmentNotUsed
 sTempShippingOQPath = "T:\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
 
 Set rstTempShippingOQ1 = CurrentDb.OpenRecordset(sNewSQL)
+'@Ignore AssignmentNotUsed
 sTSOCourtDatesID = rstTempShippingOQ1("ReferenceID").Value
 
 Set oExcelApp = CreateObject("Excel.Application")
@@ -1907,6 +1913,7 @@ Call fTranscriptExpensesAfter
 MsgBox "Exported COA XML and added entry to CommHistory table."
 Call pfClearGlobals
 End Sub
+
 
 
 
