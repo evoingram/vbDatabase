@@ -92,14 +92,14 @@ Public Sub pfStage4Ppwk()
     
         Set db = CurrentDb
         Set qdf1 = CurrentDb.QueryDefs("PaymentQueryInvoiceInfo")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sFinalPrice = rs1.Fields("FinalPrice").Value 'STORE FINAL PRICE IN VARIABLE
         sInvoiceNumber = rs1.Fields("InvoiceNo").Value 'STORE INVOICE NUMBER IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("TR-AppAddr-Q")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sFactoringApproved = rs1.Fields("FactoringApproved").Value 'STORE FACTORING APPROVED YES/NO IN VARIABLE
@@ -108,7 +108,7 @@ Public Sub pfStage4Ppwk()
         sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         qdf1.Execute
     
         MsgBox "Time to deliver.  Next we will do factoring."
@@ -141,14 +141,14 @@ Public Sub pfStage4Ppwk()
     
         Set db = CurrentDb
         Set qdf1 = CurrentDb.QueryDefs("PaymentQueryInvoiceInfo")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sFinalPrice = rs1.Fields("FinalPrice").Value 'STORE FINAL PRICE IN VARIABLE
         sInvoiceNumber = rs1.Fields("InvoiceNo").Value 'STORE INVOICE NUMBER IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("TR-AppAddr-Q")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sFactoringApproved = rs1.Fields("FactoringApproved").Value 'STORE FACTORING APPROVED YES/NO IN VARIABLE
@@ -157,7 +157,7 @@ Public Sub pfStage4Ppwk()
         sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         qdf1.Execute
     
         MsgBox "Time to deliver.  Next we will do factoring."
@@ -189,13 +189,13 @@ Public Sub pfStage4Ppwk()
     
         Set db = CurrentDb
         Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         qdf1.Execute
     
         MsgBox "Next we will do factoring and then deliver."
@@ -224,13 +224,13 @@ Public Sub pfStage4Ppwk()
     
         Set db = CurrentDb
         Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         qdf1.Execute
     
         MsgBox "Next we will do factoring and then deliver."
@@ -260,13 +260,13 @@ Public Sub pfStage4Ppwk()
     
         Set db = CurrentDb
         Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         qdf1.Execute
     
         MsgBox "Next we will do factoring and then deliver."
@@ -294,7 +294,7 @@ Public Sub pfStage4Ppwk()
     
         Set qdf1 = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
      
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
         sFinalPrice = rs1.Fields("FinalPrice").Value 'STORE FINAL PRICE IN VARIABLE
         sInvoiceNumber = rs1.Fields("InvoiceNo").Value 'STORE INVOICE NUMBER IN VARIABLE
@@ -302,13 +302,13 @@ Public Sub pfStage4Ppwk()
         Set qdf1 = CurrentDb.QueryDefs("TR-AppAddr-Q")
     
      
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sFactoringApproved = rs1.Fields("FactoringApproved").Value
         rs1.Close
         Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        Set qdf1.Parameters(0) = sCourtDatesID
+        qdf1.Parameters(0) = sCourtDatesID
         Set rs1 = qdf1.OpenRecordset
     
         sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0)
@@ -317,7 +317,7 @@ Public Sub pfStage4Ppwk()
         If sFactoringApproved = True Then        'IF FACTORING APPROVED, DO THE FOLLOWING
         
             Set qdf = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
-            Set qdf.Parameters(0) = sCourtDatesID
+            qdf.Parameters(0) = sCourtDatesID
             qdf.Execute
         
             MsgBox "Time to deliver.  Next we will do factoring."
@@ -365,7 +365,7 @@ Public Sub pfStage4Ppwk()
                 Call fTranscriptExpensesAfter    'LOGS DYNAMIC PER-TRANSCRIPT EXPENSES
             
                 Set qdf = CurrentDb.QueryDefs("UpdateInvoicePPaymentDueDateQuery") 'UPDATE PAYMENTDUEDATE & INVOICEDATE
-                Set qdf.Parameters(0) = sCourtDatesID
+                qdf.Parameters(0) = sCourtDatesID
                 qdf.Execute
             
                 MsgBox "They owe less than $10.  Time to deliver."
@@ -888,7 +888,6 @@ Public Sub fZIPAudio()
     Dim strDate As Date
     Dim oApp As Object
     'TODO: Universal Change dbVideoCollection database/other db names to proper name
-    Dim dbVideoCollection As Database
     Set dbVideoCollection = CurrentDb
     Set rstCourtDates = dbVideoCollection.OpenRecordset("CourtDates")
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1935,7 +1934,6 @@ Public Sub fCourtofAppealsIXML()
     Dim sPackageTypeNo As String
     Dim sMailClass As String
     Dim sPackageType As String
-    Dim sMailClass As String
     Dim sNewSQL As String
     Dim rs1 As DAO.Recordset
     Dim rstShippingOptions As DAO.Recordset
@@ -1987,7 +1985,7 @@ Public Sub fCourtofAppealsIXML()
     Set rstShippingOptions = CurrentDb.OpenRecordset("SELECT * FROM ShippingOptions WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";")
     
     rstShippingOptions.Edit
-    Set rstShippingOptions.Fields("Output") = sOutputXMLStringSQLFile
+    rstShippingOptions.Fields("Output") = sOutputXMLStringSQLFile
     rstShippingOptions.Update
 
     '@Ignore AssignmentNotUsed

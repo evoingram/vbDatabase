@@ -589,6 +589,13 @@ End Sub
 '@Ignore EmptyMethod
 '@Ignore ProcedureNotUsed
 Private Sub emptyFunction()
+
+    Dim cJob As New Job
+    
+    Debug.Print cJob.DocPath.CaseInfo
+    
+    Debug.Print "test"
+    
     'TODO: PATH
     'Call pfSendWordDocAsEmail("PP-FactoredInvoiceEmail", "Transcript Delivery & Invoice", "T:\Production\2InProgress\1945\Generated\595617.pdf")
     'On Error Resume Next

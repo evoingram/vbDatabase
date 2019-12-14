@@ -38,8 +38,6 @@ End Property
         
 Public Function addRSet(sTableName As String) As String
     'add
-    Dim rstTableName As DAO.Recordset
-    Dim rstTempCourtDates As DAO.Recordset
     Dim sCasesID As String
     Dim db As Database
     Dim sPartialPath As String
@@ -65,67 +63,55 @@ Public Function addRSet(sTableName As String) As String
     Dim rstTempJob As DAO.Recordset
     Dim rstCurrentJob As DAO.Recordset
     Dim rstTableName As DAO.Recordset
+    Dim rstTempCourtDates As DAO.Recordset
 
     Dim x As Long
 
     Dim dInvoiceDate As Date
 
-
-    Set db = CurrentDb                           'Re-link the CSV Table
-    On Error Resume Next:   On Error GoTo 0
-    db.TableDefs.Refresh
-
-
     Select Case sTableName
 
-    Case "TempCourtDates"
-        'add new case/transcript order to tempcourtdates
-    'TODO: PATH
-        sPartialPath = "T:\Database\Scripts\InProgressExcels\jotform"
-        sExtensionXLS = ".xlsx"
-        sExtensionXLSM = ".xlsm"
-        sFullPathXLS = sPartialPath & sExtensionXLS
-        sFullPathXLSM = sPartialPath & sExtensionXLSM
-        Set oExcelApp = CreateObject("Excel.Application")
-        
-        Set db = CurrentDb                       'Re-link the CSV Table
-        On Error Resume Next:   On Error GoTo 0
-        db.TableDefs.Refresh
-                
-        Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLSM, Local:=True)
-        oExcelMacroWB.Application.DisplayAlerts = False
-        oExcelMacroWB.Application.Visible = False
-        oExcelMacroWB.SaveAs Replace(sFullPathXLSM, sExtensionXLSM, sExtensionXLS), FileFormat:=xlWorkbookDefault
-        oExcelMacroWB.Close True
-        Set oExcelMacroWB = Nothing
-        
-        Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLS, Local:=True)
-        oExcelWB.Application.DisplayAlerts = False
-        oExcelWB.Application.Visible = False
-        oExcelWB.SaveAs Replace(sFullPathXLS, sExtensionXLS, ".csv"), FileFormat:=6
-        oExcelWB.Close True
-        Set oExcelWB = Nothing
-         
-        Set db = CurrentDb                       'Re-link the CSV Table
-        On Error Resume Next:   On Error GoTo 0
-        db.TableDefs.Refresh
-        
-    'TODO: PATH
-        DoCmd.TransferText TransferType:=acImportDelim, TableName:="TempCourtDates", _
-                           FileName:="T:\Database\Scripts\InProgressExcels\Jotform.csv", HasFieldNames:=True
-        db.TableDefs.Refresh
-        
-        'come back add if filing/factoring to xlsm
-        sFiled = InputBox("Are we filing this, yes or no?")
-        sFactoring = InputBox("Are we factoring this, yes or no?")
-        
-        'generate necessary info
-        Set rstTableName = CurrentDb.OpenRecordset("TempCourtDates")
-        sTurnaround = rstTableName.Fields("TurnaroundTimesCD").Value
-        dInvoiceDate = (Date + sTurnaround) - 2
-        dDueDate = (Date + sTurnaround) - 2
-        sAccountCode = 400
-        
+        Case "TempCourtDates"
+            'add new case/transcript order to tempcourtdates
+        'TODO: PATH
+            sPartialPath = "T:\Database\Scripts\InProgressExcels\jotform"
+            sExtensionXLS = ".xlsx"
+            sExtensionXLSM = ".xlsm"
+            sFullPathXLS = sPartialPath & sExtensionXLS
+            sFullPathXLSM = sPartialPath & sExtensionXLSM
+            Set oExcelApp = CreateObject("Excel.Application")
+            
+            Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLSM, Local:=True)
+            oExcelMacroWB.Application.DisplayAlerts = False
+            oExcelMacroWB.Application.Visible = False
+            oExcelMacroWB.SaveAs Replace(sFullPathXLSM, sExtensionXLSM, sExtensionXLS), FileFormat:=xlWorkbookDefault
+            oExcelMacroWB.Close True
+            Set oExcelMacroWB = Nothing
+            
+            Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLS, Local:=True)
+            oExcelWB.Application.DisplayAlerts = False
+            oExcelWB.Application.Visible = False
+            oExcelWB.SaveAs Replace(sFullPathXLS, sExtensionXLS, ".csv"), FileFormat:=6
+            oExcelWB.Close True
+            Set oExcelWB = Nothing
+             
+            
+        'TODO: PATH
+            DoCmd.TransferText TransferType:=acImportDelim, TableName:="TempCourtDates", _
+                               FileName:="T:\Database\Scripts\InProgressExcels\Jotform.csv", HasFieldNames:=True
+            CurrentDb.TableDefs.Refresh
+            
+            'come back add if filing/factoring to xlsm
+            sFiled = InputBox("Are we filing this, yes or no?")
+            sFactoring = InputBox("Are we factoring this, yes or no?")
+            
+            'generate necessary info
+            Set rstTableName = CurrentDb.OpenRecordset("TempCourtDates")
+            sTurnaround = rstTableName.Fields("TurnaroundTimesCD").Value
+            dInvoiceDate = (Date + sTurnaround) - 2
+            dDueDate = (Date + sTurnaround) - 2
+            sAccountCode = 400
+            
         Select Case sTurnaround
         Case "45"
             sUnitPrice = 64
@@ -227,13 +213,13 @@ Public Function addRSet(sTableName As String) As String
         rstTableName.Update
         
         'delete empty entries from table
-        db.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] IS NULL;"
+        CurrentDb.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] IS NULL;"
         
         'come back return anything???
         Exit Function
 
     Case "Cases"
-        Set rstTempCourtDates = db.OpenRecordset(sTableName)
+        Set rstTempCourtDates = CurrentDb.OpenRecordset(sTableName)
         'add new entry to cases from TempCourtDates
         rstTempCourtDates.MoveFirst
         rstTableName.AddNew
@@ -263,10 +249,9 @@ Public Function addRSet(sTableName As String) As String
                                "HearingDate, HearingStartTime, HearingEndTime, AudioLength, Location, " & _
                                "TurnaroundTimesCD, InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, " & _
                                "AccountCode, BrandingTheme FROM [TempCourtDates];"
-        db.Execute (sNewCourtDatesRowSQL)
+        CurrentDb.Execute (sNewCourtDatesRowSQL)
         
         ' store courtdatesID
-        Set db = CurrentDb
         Set rstCourtDatesID = CurrentDb.OpenRecordset("SELECT MAX(ID) as IDNo FROM " & sTableName)
         sCourtDatesID = rstCourtDatesID.Fields("IDNo").Value
         rstCourtDatesID.Close
@@ -302,9 +287,6 @@ Public Function addRSet(sTableName As String) As String
         oExcelWB.Close True
         Set oExcelWB = Nothing
                 
-        Set db = CurrentDb
-        On Error Resume Next:   On Error GoTo 0
-        db.TableDefs.Refresh
                 
         'get appearances into database
     'TODO: PATH
@@ -325,7 +307,7 @@ Public Function addRSet(sTableName As String) As String
         sOrderingID = rstTempJob.Fields("AppID").Value
         
         If IsNull(rstCurrentJob!OrderingID) Then
-            db.Execute "UPDATE CourtDates SET OrderingID = " & sOrderingID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE CourtDates SET OrderingID = " & sOrderingID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             rstCurrentJob.Close
         End If
         
@@ -336,7 +318,7 @@ Public Function addRSet(sTableName As String) As String
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         sCurrentJobSQL = "SELECT * FROM CourtDates WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
         
-        Set rstTempJob = db.OpenRecordset(sTempCustomersSQL)
+        Set rstTempJob = CurrentDb.OpenRecordset(sTempCustomersSQL)
         'Set rstCurrentJob = db.OpenRecordset(sCurrentJobSQL)
         
         x = 1
@@ -349,14 +331,14 @@ Public Function addRSet(sTableName As String) As String
             sAppNumber = "App" & x
             
             If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
-                'db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                'currentdb.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 
-                'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
+                'Set rstTempCDs = currentdb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
                 'rstCurrentJob.Edit
                 
                 Select Case sAppNumber
                 Case "App1", "App2", "App3", "App4", "App5", "App6"
-                    db.Execute "UPDATE " & sTableName & " SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                    CurrentDb.Execute "UPDATE " & sTableName & " SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 Case "App7"
                     Exit Do
                         
@@ -368,7 +350,6 @@ Public Function addRSet(sTableName As String) As String
             x = x + 1
         Loop
 
-        db.Close:   Set db = Nothing
         'rstCurrentJob.Close
         rstTempJob.Close
         Set rstTempJob = Nothing

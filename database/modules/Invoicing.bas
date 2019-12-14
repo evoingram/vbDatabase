@@ -236,7 +236,7 @@ Public Sub fGenerateInvoiceNumber()
     'insert calculated fields into tempFPtable
     Set rstTempCourtDates = CurrentDb.OpenRecordset("qSelect1TempCourtDates")
     rstTempCourtDates.Edit
-    Set rstTempCourtDates.Fields("InvoiceNo") = sInvoiceNumber
+    rstTempCourtDates.Fields("InvoiceNo") = sInvoiceNumber
     rstTempCourtDates.Update
     rstTempCourtDates.Close
 
@@ -244,7 +244,7 @@ Public Sub fGenerateInvoiceNumber()
 
     Set rstCourtDates = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID]=" & sCourtDatesID & ";")
     rstCourtDates.Edit
-    Set rstCourtDates.Fields("InvoiceNo") = sInvoiceNumber
+    rstCourtDates.Fields("InvoiceNo") = sInvoiceNumber
     rstCourtDates.Update
 
     rstCourtDates.Close
@@ -335,7 +335,7 @@ Public Sub fDepositPaymentReceived()
 
     Set db = CurrentDb
     Set qdf = db.QueryDefs("QInfobyInvoiceNumber")
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstQInfoInvNo = qdf.OpenRecordset
 
     sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
@@ -935,7 +935,7 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
 
 
     Set qdf1 = db.QueryDefs(qnTRCourtQ)
-    Set qdf1.Parameters(0) = sCourtDatesID
+    qdf1.Parameters(0) = sCourtDatesID
     Set rstShippingExpenseEntry = qdf1.OpenRecordset
 
 

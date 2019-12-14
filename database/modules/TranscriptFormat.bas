@@ -1007,7 +1007,7 @@ Public Sub pfReplaceFDA()
         QueryName = "Q-Doctors"
                 
         Set qdf = CurrentDb.QueryDefs(QueryName)
-        Set qdf.Parameters(0) = sCourtDatesID
+        qdf.Parameters(0) = sCourtDatesID
         Set rs1 = qdf.OpenRecordset
         'open Word document
         'run another query to pull up FDA finds
@@ -1100,7 +1100,7 @@ Public Sub pfDynamicSpeakersFindReplace()
     sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
 
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ) 'open query
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rs = qdf.OpenRecordset
 
     Set oWordApp = CreateObject("Word.Application")
@@ -1963,7 +1963,7 @@ Public Sub pfTCEntryReplacement()
     
     Set oCourtCoverWD = oWordApp.Documents.Open(sFileName)
     Set qdf = CurrentDb.QueryDefs(qnTRCourtQ)    'open query
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstTRCourtQ = qdf.OpenRecordset
     sJurisdiction = rstTRCourtQ!Jurisdiction
     sParty1Name = rstTRCourtQ!Party1Name
@@ -1973,7 +1973,7 @@ Public Sub pfTCEntryReplacement()
     rstTRCourtQ.Close
 
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ) 'open query
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstViewJFAppQ = qdf.OpenRecordset
 
     rstViewJFAppQ.MoveFirst

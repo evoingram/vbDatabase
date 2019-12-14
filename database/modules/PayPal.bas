@@ -99,7 +99,6 @@ Public Sub fSendPPEmailFactored()
     Dim qdf As QueryDef
     Dim rstQuery As DAO.Recordset
     Dim iFileNum As Long
-    Dim sToEmail As String
 
 
     Call fPPGenerateJSONInfo                     'refreshes some necessary info
@@ -116,7 +115,7 @@ Public Sub fSendPPEmailFactored()
     Call pfCurrentCaseInfo                       'refreshes some necessary info
 
     Set qdf = CurrentDb.QueryDefs(sQueryName)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
     sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
@@ -880,7 +879,7 @@ Public Sub fSendPPEmailBalanceDue()
     Call pfCurrentCaseInfo
 
     Set qdf = CurrentDb.QueryDefs(sQueryName)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
     sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
@@ -1377,7 +1376,7 @@ Public Sub fSendPPEmailDeposit()
 
     Set qdf = CurrentDb.QueryDefs(sQueryName)
 
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
     sInvoiceNumber = rstQuery.Fields("TRInvoiceCasesQ.InvoiceNo").Value
     sParty1 = rstQuery.Fields("Party1").Value
@@ -1917,7 +1916,7 @@ Public Sub fPPRefund()
     Call pfCurrentCaseInfo
 
     Set qdf = CurrentDb.QueryDefs(sQueryName)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
     sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
@@ -2405,7 +2404,7 @@ Public Sub fManualPPPayment()
     Dim vMethod As String
     Dim vAmount As String
     Dim db As Database
-    Dim qdf As QueryDefs
+    Dim qdf As QueryDef
     Dim rstQInfoInvNo As DAO.Recordset
 
 
@@ -2415,8 +2414,8 @@ Public Sub fManualPPPayment()
 
 
     Set db = CurrentDb
-    Set qdf = db.QueryDefs("QInfobyInvoiceNumber")
-    Set qdf.Parameters(0) = sCourtDatesID
+    Set qdf = CurrentDb.QueryDefs("QInfobyInvoiceNumber")
+    qdf.Parameters(0) = sCourtDatesID
     Set rstQInfoInvNo = qdf.OpenRecordset
 
     sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value

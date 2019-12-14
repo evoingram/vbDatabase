@@ -53,8 +53,7 @@ Public Sub pfStage2Ppwk()
 
     Dim sAnswer As String
     Dim sQuestion As String
-    Dim sFileName As String
-
+    Dim cJob As New Job
 
     'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
@@ -64,53 +63,50 @@ Public Sub pfStage2Ppwk()
     Call pfUpdateCheckboxStatus("Transcribe")
 
     Call pfCurrentCaseInfo
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & "CourtCover.docx"
 
     If sJurisdiction = "*AVT*" Then
 
         Call pfReplaceAVT
         MsgBox "Stage 2 complete."
-        Application.FollowHyperlink sFileName
+        Application.FollowHyperlink cJob.DocPath.CourtCover
     
     ElseIf sJurisdiction Like "FDA" Then
 
         Call pfReplaceFDA
-        Application.FollowHyperlink sFileName
+        Application.FollowHyperlink cJob.DocPath.CourtCover
         
     ElseIf sJurisdiction Like "Food and Drug Administration" Then
 
         Call pfReplaceFDA
-        Application.FollowHyperlink sFileName
+        Application.FollowHyperlink cJob.DocPath.CourtCover
 
     ElseIf sJurisdiction Like "Weber Oregon" Then
 
         Call wwReplaceWeberOR
         Call FPJurors
         MsgBox "Stage 2 complete."
-        Application.FollowHyperlink sFileName
+        Application.FollowHyperlink cJob.DocPath.RoughDraft
 
     ElseIf sJurisdiction Like "Weber Bankruptcy" Then
 
         Call wwReplaceWeberBR
-        Application.FollowHyperlink sFileName
+        Application.FollowHyperlink cJob.DocPath.RoughDraft
 
     ElseIf sJurisdiction Like "Weber Nevada" Then
 
         Call wwReplaceWeberNV
-        Application.FollowHyperlink sFileName
+        Application.FollowHyperlink cJob.DocPath.RoughDraft
  
     ElseIf sJurisdiction Like "Massachusetts" Then
 
         Call pfReplaceMass
-        Application.FollowHyperlink sFileName
+        Application.FollowHyperlink cJob.DocPath.RoughDraft
        
     Else
 
         Call pfReplaceAQC
     
     End If
-
 
     sQuestion = "Need to send an information-needed e-mail?" 'information needed email prompt
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -133,13 +129,7 @@ EndIf1:
     MsgBox "Stage 2 complete."
 
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & "CourtCover.docx"
-    Application.FollowHyperlink sFileName
+    Application.FollowHyperlink cJob.DocPath.CourtCover
     Call pfClearGlobals
 End Sub
 
@@ -158,17 +148,15 @@ Public Sub pfAutoCorrect()
     Dim sACShortcutsSQL As String
     Dim sFieldValue As String
     Dim rstAGShortcuts As DAO.Recordset
-    Dim sRoughDraft As String
     Dim oWordDoc As Word.Document
     Dim oWordApp As Word.Application
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     sACShortcutsSQL = "SELECT * FROM AGShortcuts WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-    'TODO: PATH
-    sRoughDraft = "I:\" & sCourtDatesID & "\RoughDraft.docx"
 
-    Set db = CurrentDb()
+    Set db = CurrentDb
     Set rstAGShortcuts = db.OpenRecordset(sACShortcutsSQL)
 
 
@@ -181,7 +169,7 @@ Public Sub pfAutoCorrect()
     End If
     On Error GoTo 0
     'oWordApp.Visible = True
-    Set oWordDoc = GetObject(sRoughDraft, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.RoughDraft, "Word.Document")
 
     With oWordDoc                                'insert rough draft at RoughBKMK bookmark
 
@@ -233,13 +221,7 @@ Public Sub pfRoughDraftToCoverF()
     '                   all dynamic speakers, Q&A, : a-z, various AQC & AVT headings
     '============================================================================
 
-    Dim sRoughDraft As String
-    Dim sFileName As String
     Dim sSpeakerName As String
-    Dim sLinkToCSV As String
-    Dim sCourtCover As String
-    'TODO: duplicate? come back
-    Dim qnViewJobFormAppearancesQ As String
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
     Dim sTextToFind As String
@@ -249,15 +231,11 @@ Public Sub pfRoughDraftToCoverF()
     Dim qdf As QueryDef
     Dim wsyWordStyle As String
     Dim bMatchCase As Boolean
+    Dim cJob As New Job
 
 
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-    'TODO: PATH
-    sLinkToCSV = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
-    sRoughDraft = "I:\" & sCourtDatesID & "\" & "RoughDraft.docx"
-    sCourtCover = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-
+    
 
     On Error Resume Next
 
@@ -265,7 +243,7 @@ Public Sub pfRoughDraftToCoverF()
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
-    Set oWordDoc = GetObject(sCourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
 
     oWordApp.Visible = True
     On Error GoTo 0
@@ -277,19 +255,19 @@ Public Sub pfRoughDraftToCoverF()
         If .bookmarks.Exists("RoughBKMK") = True Then
     
             .bookmarks("RoughBKMK").Select
-            .Application.Selection.InsertFile FileName:=sRoughDraft
+            .Application.Selection.InsertFile FileName:=cJob.DocPath.RoughDraft
         
         Else
             MsgBox "Bookmark ""RoughBKMK"" does not exist!"
         End If
         .MailMerge.MainDocumentType = wdNotAMergeDocument
-        .SaveAs2 FileName:=sCourtCover
+        .SaveAs2 FileName:=cJob.DocPath.CourtCover
         .Close
     End With
 
     'Documents("RoughDraft.docx").Close wdDoNotSaveChanges
     
-    'Set oWordDoc = Documents.Open(sCourtCover)
+    'Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
     
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -300,7 +278,7 @@ Public Sub pfRoughDraftToCoverF()
 
     Set oWordApp = CreateObject("Word.Application")
 
-    Set oWordDoc = GetObject(sCourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
     oWordApp.Visible = True
 
     x = 18  '18 is number of first dynamic speaker
@@ -310,12 +288,10 @@ Public Sub pfRoughDraftToCoverF()
     
     
     'file name to do find replaces in
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     
     '@Ignore UnassignedVariableUsage
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set drSpeakerName = qdf.OpenRecordset
     
     If Not (drSpeakerName.EOF And drSpeakerName.BOF) Then
@@ -437,8 +413,6 @@ Public Sub pfRoughDraftToCoverF()
         '@Ignore UnassignedVariableUsage
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-        'TODO: PATH
-        sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
         
         
         sTextToFind = " --"
@@ -1350,12 +1324,10 @@ Public Sub pfRoughDraftToCoverF()
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-        'TODO: PATH
-        sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
         
         '@Ignore UnassignedVariableUsage
         Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
-        Set qdf.Parameters(0) = sCourtDatesID
+        qdf.Parameters(0) = sCourtDatesID
         Set drSpeakerName = qdf.OpenRecordset
         
         If Not (drSpeakerName.EOF And drSpeakerName.BOF) Then
@@ -1680,24 +1652,22 @@ Public Sub pfStaticSpeakersFindReplace()
     ' Description : finds and replaces static speakers in CourtCover after rough draft is inserted
     '============================================================================
 
-    Dim sFileName As String
     Dim sTextToFind As String
     Dim sReplacementText As String
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
+    Dim cJob As New Job
 
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-
+    
     Set oWordApp = GetObject(, "Word.Application")
     If oWordApp Is Nothing Then
         Set oWordApp = CreateObject("Word.Application")
     End If
     oWordApp.Visible = False
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     oWordDoc.Activate
 
     sTextToFind = " --"
@@ -1999,17 +1969,15 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     ' Call command: Call pfReplaceColonUndercasewithColonUppercase
     ' Description:  replaces : a-z with : A-Z, applies styles to fixed phrases in transcript
     '============================================================================
-    Dim sFileName As String
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
     Dim sTextToFind As String
     Dim sReplacementText As String
     Dim wsyWordStyle As Word.Style
+    Dim cJob As New Job
 
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 
     Set oWordApp = GetObject(, "Word.Application")
 
@@ -2017,7 +1985,7 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
         Set oWordApp = CreateObject("Word.Application")
     End If
     oWordApp.Visible = False
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     oWordDoc.Activate
 
     '********************************** :  A through Z
@@ -2255,6 +2223,7 @@ Public Sub pfTypeRoughDraftF()
     '============================================================================
 
     Dim oRoughDraft As Object
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence
@@ -2345,8 +2314,7 @@ Public Sub pfTypeRoughDraftF()
 
     DoCmd.OpenForm FormName:="PJType"            'open window with AGShortcuts, SpeakerList, and jurisdiction notes
 
-    'TODO: PATH
-    Shell "winword ""I:\" & sCourtDatesID & "\" & "RoughDraft.docx""" 'open file
+    Shell "winword " + cJob.DocPath.RoughDraft 'open file
     Call pfClearGlobals
 End Sub
 
@@ -2413,28 +2381,22 @@ Public Sub pfRoughDraftCFMass()
     ' Description : Adds rough draft to courtcover, does find/replacements of static speakers 1-17, all dynamic speakers, Q&A, : a-z, various AQC & AVT headings
     '============================================================================
 
-    Dim sRoughDraft As String
-    Dim sFileName As String
     Dim sSpeakerName As String
-    Dim sLinkToCSV As String
-    Dim sCourtCover As String
-    'TODO: duplicate
-    Dim qnViewJobFormAppearancesQ As String
-    Dim oWordDoc As New Word.Document
-    Dim oWordApp As New Word.Application
     Dim sTextToFind As String
     Dim sReplacementText As String
+    Dim wsyWordStyle As String
+    
+    'TODO: duplicate
+    Dim oWordDoc As New Word.Document
+    Dim oWordApp As New Word.Application
+    
     Dim x As Long
+    Dim cJob As New Job
+
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef
-    Dim wsyWordStyle As String
-
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-    'TODO: PATH
-    sLinkToCSV = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
-    sRoughDraft = "I:\" & sCourtDatesID & "\" & "RoughDraft.docx"
-    sCourtCover = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -2444,24 +2406,24 @@ Public Sub pfRoughDraftCFMass()
     On Error GoTo 0
     oWordApp.Visible = True
 
-    Set oWordDoc = GetObject(sCourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
     With oWordDoc                                'insert rough draft at RoughBKMK bookmark
 
         If .bookmarks.Exists("RoughBKMK") = True Then
     
             .bookmarks("RoughBKMK").Select
-            .Application.Selection.InsertFile FileName:=sRoughDraft
+            .Application.Selection.InsertFile FileName:=cJob.DocPath.RoughDraft
         
         Else
             MsgBox "Bookmark ""RoughBKMK"" does not exist!"
         End If
         .MailMerge.MainDocumentType = wdNotAMergeDocument
-        .SaveAs2 FileName:=sCourtCover
+        .SaveAs2 FileName:=cJob.DocPath.CourtCover
         .Close
     End With
     'Documents("RoughDraft.docx").Close wdDoNotSaveChanges
     
-    'Set oWordDoc = Documents.Open(sCourtCover)
+    'Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
     
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -2471,7 +2433,7 @@ Public Sub pfRoughDraftCFMass()
     On Error GoTo 0
     oWordApp.Visible = True
 
-    Set oWordDoc = GetObject(sCourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
 
     x = 18                                       '18 is number of first dynamic speaker
     
@@ -2480,12 +2442,11 @@ Public Sub pfRoughDraftCFMass()
     
     
     'file name to do find replaces in
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
+    
     
     '@Ignore UnassignedVariableUsage
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set drSpeakerName = qdf.OpenRecordset
     
     If Not (drSpeakerName.EOF And drSpeakerName.BOF) Then
@@ -2607,8 +2568,6 @@ Public Sub pfRoughDraftCFMass()
         '@Ignore UnassignedVariableUsage
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-        sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
         
         
         sTextToFind = " --"
@@ -3627,12 +3586,10 @@ Public Sub pfRoughDraftCFMass()
         DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-        'TODO: PATH
-        sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
         
         '@Ignore UnassignedVariableUsage
         Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
-        Set qdf.Parameters(0) = sCourtDatesID
+        qdf.Parameters(0) = sCourtDatesID
         Set drSpeakerName = qdf.OpenRecordset
         
         If Not (drSpeakerName.EOF And drSpeakerName.BOF) Then
@@ -3697,7 +3654,7 @@ Public Sub pfRoughDraftCFMass()
     Set drSpeakerName = Nothing                  'clean up
 
 
-    oWordDoc.SaveAs2 FileName:=sCourtCover
+    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
     oWordDoc.Close
     oWordApp.Quit
 

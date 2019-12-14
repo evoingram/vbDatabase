@@ -47,6 +47,7 @@ Public sEmail As String
 Public sDescription As String
 Public sSubtotal As String
 Public sInvoiceDate As String
+Public dInvoiceDate As Date
 Public sInvoiceTime As String
 Public sPaymentTerms As String
 Public sNote As String
@@ -129,6 +130,7 @@ Public Const qnShippingOptionsQ As String = "ShippingOptionsQ"
 Public Const qnViewJobFormAppearancesQ As String = "ViewJobFormAppearancesQ"
 Public Const qnTRCourtUnionAppAddrQ As String = "TR-Court-Union-AppAddr"
 Public Const qnOrderingAttorneyInfo As String = "OrderingAttorneyInfo"
+Public Const qnQInfobyInvNo As String = "QInfobyInvoiceNumber"
 
 Public Const sCompanyEmail As String = "inquiries@aquoco.co"
 Public Const sCompanyFirstName As String = "Erica"
@@ -525,7 +527,7 @@ Public Sub pfCurrentCaseInfo1()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstTRCourtUnionAA = qdf.OpenRecordset
             
     If Not rstTRCourtUnionAA.EOF Then
@@ -605,7 +607,7 @@ Public Sub pfGetOrderingAttorneyInfo1()
 
     Set db = CurrentDb
     Set qdf = db.QueryDefs(qnOrderingAttorneyInfo)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
 
     Set rstOrderingAttyInfo = qdf.OpenRecordset
 
@@ -677,7 +679,7 @@ Public Sub pfGetCaseInfoQDFRecordset()
 
     Set db = CurrentDb
     Set qdf = db.QueryDefs(qnTRCourtUnionAppAddrQ)
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rs1 = qdf.OpenRecordset
 
     If Not rs1.EOF Then
@@ -745,7 +747,7 @@ Public Sub fPPGenerateJSONInfo1()
 
     Set db = CurrentDb
     Set qdf = db.QueryDefs("TRInvoiQPlusCases")
-    Set qdf.Parameters(0) = sCourtDatesID
+    qdf.Parameters(0) = sCourtDatesID
     Set rstTRQPlusCases = qdf.OpenRecordset
 
     If Not rstTRQPlusCases.EOF Then

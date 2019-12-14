@@ -205,7 +205,7 @@ Private Sub Command68_Click()
             'paypal csv PayPalDepositInvoiceCSVQ & PayPalFactoringInvoiceCSVQ
         
             Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
-            Set qdf.Parameters(0) = sCourtDatesID
+            qdf.Parameters(0) = sCourtDatesID
             Set rstTRCUnionAA = qdf.OpenRecordset()
             sFactoringApproved = rstTRCUnionAA.Fields("FactoringApproved")
         

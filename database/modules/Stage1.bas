@@ -612,7 +612,6 @@ Public Sub fCheckTempCustomersCustomers()
     Dim tcState As String
     Dim tcNotes As String
     Dim tcFactoringApproved As String
-    Dim rstCustomers As DAO.Recordset
     Dim tcCID As String
 
     Set rstTempCustomers = CurrentDb.OpenRecordset("TempCustomers")
@@ -2095,7 +2094,7 @@ Public Sub autointake()
     Dim sSplitInfo() As String
     Dim sCSVInfo() As String
     Dim sInfoFields() As String
-    Dim sAddress3() As String
+    Dim sAddress3A() As String
     Dim sYourNameA() As String
     Dim sAttorneyName() As String
     Dim sHearingDate As String
@@ -2171,7 +2170,7 @@ Public Sub autointake()
     Dim sStatusesEntrySQL As String
     Dim sCasesID As String
     Dim sCurrentTempApp As String
-    Dim sAddress3A As String
+    Dim sAddress3 As String
     Dim sLastA As String
     Dim sAnswer As String
     Dim sQuestion As String

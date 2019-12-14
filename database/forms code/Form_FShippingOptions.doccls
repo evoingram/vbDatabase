@@ -79,7 +79,7 @@ Private Sub Command78_Click()
     sOutputXMLSQL = "\\HUBCLOUD\evoingram\Production\4ShippingXMLs\Output\" & sCourtDatesID & "-Output.xml"
     Set rstOutputFieldXML = CurrentDb.OpenRecordset("SELECT * FROM ShippingOptions WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";")
     rstOutputFieldXML.Edit
-    Set rstOutputFieldXML.Fields("Output") = sOutputXMLSQL
+    rstOutputFieldXML.Fields("Output") = sOutputXMLSQL
     rstOutputFieldXML.Update
 
     Set oExcelApp = CreateObject("Excel.Application")

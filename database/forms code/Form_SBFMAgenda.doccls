@@ -73,8 +73,8 @@ Private Sub List66_AfterUpdate()
         Do Until rstGroupTasksICPQ.EOF = True
     
             rstGroupTasksICPQ.Edit
-            Set rstGroupTasksICPQ!VendorYN = True
-            Set rstGroupTasksICPQ("VendorYN") = True
+            rstGroupTasksICPQ!VendorYN = True
+            rstGroupTasksICPQ("VendorYN") = True
             rstGroupTasksICPQ.Update
 
             sContactName = rstGroupTasksICPQ!FirstName & " " & rstGroupTasksICPQ!LastName

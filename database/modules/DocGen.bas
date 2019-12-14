@@ -10,7 +10,6 @@ Option Explicit
 '   NONE
 
 'functions:
-    'TODO: PATH
 'pfGenericExportandMailMerge:  Description:  exports to specified template from T:\Database\Templates and saves in I:\####\
 '                          Arguments:    sQueryName, sExportTopic
 'pfSendWordDocAsEmail:         Description:  sends Word document as an e-mail body
@@ -42,7 +41,6 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call pfGenericExportandMailMerge(sQueryName, sExportTopic)
-    'TODO: PATH
     ' Description:  exports to specified template from T:\Database\Templates and saves in I:\####\
     '============================================================================
 
@@ -50,30 +48,36 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     Dim sTemplatePath As String
     Dim sOutputPDF As String
     Dim sExportInfoCSVPath As String
+    Dim sArray() As String
+    Dim sExportTopic1 As String
     Dim sQueryName As String
+    
     Dim iCount As Long
     Dim oWordAppDoc As Object
+    
     Dim qdf As QueryDef
     Dim rstQuery As DAO.Recordset
+    
     Dim xlRange As Excel.Range
     Dim oExcelWB As Excel.Workbook
     Dim oExcelApp As Excel.Application
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     If sMerge = "Case" Then
 
         sQueryName = qnTRCourtUnionAppAddrQ
-    'TODO: PATH
-        sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
+        sExportInfoCSVPath = cJob.DocPath.CaseInfo
     
     ElseIf sMerge = "Invoice" Then
 
-        sQueryName = "QInfobyInvoiceNumber"
-    'TODO: PATH
-        sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-InvoiceInfo.xls"
+        sQueryName = qnQInfobyInvNo
+        sExportInfoCSVPath = cJob.DocPath.InvoiceInfo
     
     End If
+    
     iCount = Len(Dir(sExportInfoCSVPath))
 
     If iCount = 0 Then
@@ -105,15 +109,12 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     
     End If
 
-    Dim sArray() As String
-    Dim sExportTopic1 As String
     sArray = Split(sExportTopic, "\")
+    
     sExportTopic1 = sArray(1)
-    'TODO: PATH
-    sExportedTemplatePath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & sExportTopic1 & ".docx"
-
-    'TODO: PATH
-    sTemplatePath = "T:\Database\Templates\" & sExportTopic & "-Template.docx" 'export topic is folder\subject
+    
+    sExportedTemplatePath = cJob.DocPath.JobDirectoryGN & sExportTopic1 & ".docx"
+    sTemplatePath = cJob.DocPath.TemplateFolder & sExportTopic & "-Template.docx" 'export topic is folder\subject
 
 
     Set oWordAppDoc = GetObject(sTemplatePath, "Word.Document")
@@ -134,8 +135,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     oWordAppDoc.MailMerge.Execute
 
     oWordAppDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
-    'TODO: PATH
-    sOutputPDF = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & sExportTopic1 & ".pdf"
+    sOutputPDF = cJob.DocPath.JobDirectoryGN & sExportTopic1 & ".pdf"
     oWordAppDoc.Application.ActiveDocument.ExportAsFixedFormat outputFileName:=sOutputPDF, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
     oWordAppDoc.Application.ActiveDocument.SaveAs FileName:=sExportedTemplatePath
 
@@ -163,11 +163,12 @@ Public Sub pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
     Dim oWordApp As New Word.Application
     Dim oWordEditor As Word.editor
     Dim oWordDoc As New Word.Document
-
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     'TODO: PATH
-    sTemplateAddress = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & vCHTopic & ".docx"
+    sTemplateAddress = cJob.DocPath.JobDirectoryGN & vCHTopic & ".docx"
     Set oOutlookApp = CreateObject("Outlook.Application")
     Set oOutlookMail = oOutlookApp.CreateItem(0)
     Set oWordApp = CreateObject("Word.Application")
@@ -213,61 +214,46 @@ Public Sub pfCreateCDLabel()
     ' Description : makes CD label and prompts for print or no
     '============================================================================
 
-    Dim sPubDocName As String
     Dim sCommHistoryHyperlink As String
-    Dim sCDLExcelExport As String
-    'Dim sPubDocPDFName As String
     Dim sAnswer As String
     Dim sQuestion As String
+    
     Dim oPubDoc As Publisher.Document
     Dim oPubApp As Publisher.Application
-    Dim dbVideoCollection As DAO.Database
-    Dim rstVideos As DAO.Recordset
+    
+    Dim rstCommHistory As DAO.Recordset
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-
     Call pfCheckFolderExistence                  'check for main folders and create if not exists
-
     Call pfCurrentCaseInfo                       'refresh transcript info
+    
+    'DoCmd.OutputTo ObjectType:=acOutputQuery, ObjectName:=qnTRCourtUnionAppAddrQ, OutputFormat:=acFormatXLS, Outputfile:=cJob.DocPath.CaseInfo, AutoStart:=False 'query info for label
 
-
-
-    'DoCmd.OutputTo ObjectType:=acOutputQuery, ObjectName:=qnTRCourtUnionAppAddrQ, OutputFormat:=acFormatXLS, Outputfile:=sCDLExcelExport, AutoStart:=False 'query info for label
-
-
-    'TODO: PATH
-    sCDLExcelExport = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
-    DoCmd.TransferSpreadsheet TransferType:=acExport, TableName:=qnTRCourtUnionAppAddrQ, FileName:=sCDLExcelExport
+    DoCmd.TransferSpreadsheet TransferType:=acExport, TableName:=qnTRCourtUnionAppAddrQ, FileName:=cJob.DocPath.CaseInfo
 
     Set oPubApp = New Publisher.Application
-    'TODO: PATH
-    Set oPubDoc = oPubApp.Open("T:\Database\Templates\Stage1s\CD-Label.pub")
+    Set oPubDoc = oPubApp.Open(cJob.DocPath.TemplateFolder & "Stage1s/CD-Label.pub")
 
-    'TODO: PATH
-    sPubDocName = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CD-Label" & ".pub" 'set name
-    'sPubDocPDFName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CD-Label" & ".pdf" 'set name
-    sCommHistoryHyperlink = sCourtDatesID & "-CD-Label" & "#" & sPubDocName
+    sCommHistoryHyperlink = sCourtDatesID & "-CD-Label" & "#" & cJob.DocPath.CDLabel
+    
 
-
-    oPubDoc.MailMerge.OpenDataSource bstrDataSource:=sCDLExcelExport, bstrTable:="", fOpenExclusive:=True, fneverprompt:=1 'performs mail merge
+    oPubDoc.MailMerge.OpenDataSource bstrDataSource:=cJob.DocPath.CaseInfo, bstrTable:="", fOpenExclusive:=True, fneverprompt:=1 'performs mail merge
     oPubDoc.MailMerge.Execute Pause:=True, Destination:=pbMergeToNewPublication
-    oPubDoc.SaveAs FileName:=sPubDocName         'saves file in job number folder in in progress
+    oPubDoc.SaveAs FileName:=cJob.DocPath.CDLabel         'saves file in job number folder in in progress
     oPubDoc.Close
     oPubApp.Quit
-    Set dbVideoCollection = CurrentDb
-    Set rstVideos = dbVideoCollection.OpenRecordset("CommunicationHistory")
+    Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
 
     'Adds record to CommHistoryTable and link to document on hard drive
-    rstVideos.AddNew
-    rstVideos("FileHyperlink").Value = sCommHistoryHyperlink
-    rstVideos("DateCreated").Value = Now
-    rstVideos("CourtDatesID").Value = sCourtDatesID
-    rstVideos("CustomersID").Value = sCustomerID
-    rstVideos.Update
-
-
-
+    rstCommHistory.AddNew
+        rstCommHistory("FileHyperlink").Value = sCommHistoryHyperlink
+        rstCommHistory("DateCreated").Value = Now
+        rstCommHistory("CourtDatesID").Value = sCourtDatesID
+        rstCommHistory("CustomersID").Value = sCustomerID
+    rstCommHistory.Update
 
     'sQuestion = "Want to burn the CD?"
     'sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -281,11 +267,9 @@ Public Sub pfCreateCDLabel()
     
     'End If
 
-
-
     'sQuestion = "Print CD Label? (MAKE SURE PAPER IS CORRECT IN PRINTER)"
     'sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???") '
-
+    
     'If sAnswer = vbNo Then 'Code for No
 
     '    MsgBox "CD label will not print."
@@ -298,9 +282,8 @@ Public Sub pfCreateCDLabel()
     'End If
 
     Call fPrintKCIEnvelope
-
-
     Call pfClearGlobals
+    
 End Sub
 
 Public Sub pfSelectCoverTemplate()
@@ -311,9 +294,8 @@ Public Sub pfSelectCoverTemplate()
     ' Call command: Call pfSelectCoverTemplate
     ' Description : parent function to create correct transcript cover/skeleton from template
     '============================================================================
-
+    
     Dim sFDAQuery As String
-
 
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
@@ -354,63 +336,47 @@ Public Sub pfCreateCover(sTemplatePath As String)
     ' Description : creates transcript cover/skeleton from template
     '============================================================================
 
-    Dim sCourtCoverYesExt As String
-    Dim sCourtCoverNoExt As String
     Dim sCommHistoryAddSQL As String
-    'Dim sExportInfoCSVPath As String
     Dim sFullTemplatePath As String
+    Dim sSource As String
+    
     Dim oExcelApp As New Excel.Application
     Dim oExcelWB As New Excel.Workbook
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
     Dim xlRange As Excel.Range
+    
     Dim oDocuments As Object
-    Dim sSource As String
-    Dim sQueryName As String
+    
     Dim x As Long
     Dim iCount As Long
+    
     Dim rstCommHistory As DAO.Recordset
-    Dim sExportInfoCSVPath As String
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
-    'TODO: PATH
-    'sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
-    sCourtCoverYesExt = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-    sCourtCoverNoExt = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover"
-    sFullTemplatePath = "T:\Database\Templates\" & sTemplatePath 'sTemplatePath is folder\subject
-
-
-    'If sMerge = "Case" Then
-
-    sQueryName = qnTRCourtUnionAppAddrQ
-    'TODO: PATH
-    sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-CaseInfo.xls"
     
-    'ElseIf sMerge = "Invoice" Then
-
-    '   sQueryName = "QInfobyInvoiceNumber"
-    '  sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-InvoiceInfo.xls"
+    Dim cJob As New Job
     
-    'End If
+    Call pfCurrentCaseInfo  'refresh transcript info
 
-    iCount = Len(Dir(sExportInfoCSVPath))
+    sFullTemplatePath = cJob.DocPath.TemplateFolder & sTemplatePath 'sTemplatePath is folder\subject
+
+    iCount = Len(Dir(cJob.DocPath.CaseInfo))
 
     If iCount = 0 Then
 
-        DoCmd.OutputTo acOutputQuery, sQueryName, acFormatXLS, sExportInfoCSVPath, False
+        DoCmd.OutputTo acOutputQuery, qnTRCourtUnionAppAddrQ, acFormatXLS, cJob.DocPath.CaseInfo, False
     
         Set oExcelApp = CreateObject("Excel.Application")
         oExcelApp.Application.Visible = False
         oExcelApp.Application.DisplayAlerts = False
     
-        Set oExcelWB = oExcelApp.Application.Workbooks.Open(sExportInfoCSVPath)
+        Set oExcelWB = oExcelApp.Application.Workbooks.Open(cJob.DocPath.CaseInfo)
         oExcelWB.Application.DisplayAlerts = False
         oExcelWB.Application.Visible = False
     
         With oExcelWB
             Set xlRange = .Worksheets(1).Range("A2").CurrentRegion
             .Names.Add Name:="AAAAADataRange", RefersTo:=xlRange
-            .SaveAs FileName:=sExportInfoCSVPath
+            .SaveAs FileName:=cJob.DocPath.CaseInfo
             .Saved = True
             .Close
         End With
@@ -441,17 +407,16 @@ Public Sub pfCreateCover(sTemplatePath As String)
 
     With oWordDoc
         .MailMerge.OpenDataSource _
-        Name:=sExportInfoCSVPath, ReadOnly:=False, _
+        Name:=cJob.DocPath.CaseInfo, ReadOnly:=False, _
         ConfirmConversions:=False, LinkToSource:=True, _
         AddToRecentFiles:=False, PasswordDocument:="", PasswordTemplate:="", _
         WritePasswordDocument:="", WritePasswordTemplate:="", Revert:=False, _
         Format:=wdOpenFormatAuto, Connection:= _
-        "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & sCourtCoverYesExt & ";Mode=Read;Extended Properties=" & Chr(34) & Chr(34) & "HDR=YES;IMEX=1;" _
+        "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & cJob.DocPath.CourtCover & ";Mode=Read;Extended Properties=" & Chr(34) & Chr(34) & "HDR=YES;IMEX=1;" _
                                                                                                                                    & Chr(34) & Chr(34) & ";Jet OLEDB:System database=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & ";Jet OLEDB:Registry Path=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & _
                                                                                                                                      ";Jet OLEDB:Engine Type=34;Jet OLEDB;" _
                                                                                                                                      , SQLStatement:="SELECT * FROM `AAAAADataRange`", SQLStatement1:="", _
                                                                                                                                      SubType:=wdMergeSubTypeAccess
-          
         .MailMerge.DataSource.FirstRecord = wdDefaultFirstRecord
         .MailMerge.DataSource.LastRecord = wdDefaultLastRecord
         .MailMerge.Execute
@@ -476,7 +441,7 @@ Public Sub pfCreateCover(sTemplatePath As String)
         Debug.Print sSource
         If sSource = "Form Letters1" Then
             Documents("Form Letters1").Activate
-            Documents("Form Letters1").SaveAs FileName:=sCourtCoverYesExt
+            Documents("Form Letters1").SaveAs FileName:=cJob.DocPath.CourtCover
         Else
             Documents(sSource).Activate
             Documents(sSource).Close SaveChanges:=wdDoNotSaveChanges
@@ -494,18 +459,20 @@ Public Sub pfCreateCover(sTemplatePath As String)
 
     Call pfCreateIndexesTOAs
 
-    'sCommHistoryAddSQL = "Update CommunicationHistory Set [CommunicationHistory].[Hyperlink]=" & Chr(34) & "[TR-Court-Union-AppAddr]![CourtDatesID]#" & sCourtCoverYesExt & Chr(34) & ";"
+    'sCommHistoryAddSQL = "Update CommunicationHistory Set [CommunicationHistory].[Hyperlink]=" & Chr(34) & "[TR-Court-Union-AppAddr]![CourtDatesID]#" & cJob.DocPath.CourtCover & Chr(34) & ";"
     'CurrentDb.Execute sCommHistoryAddSQL
 
 
     Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
     rstCommHistory.AddNew
-    rstCommHistory.Fields("FileHyperlink").Value = sCourtDatesID & "#" & sCourtCoverYesExt
-    rstCommHistory.Fields("CourtDatesID").Value = sCourtDatesID
-    rstCommHistory.Fields("DateCreated").Value = Now
+        rstCommHistory.Fields("FileHyperlink").Value = sCourtDatesID & "#" & cJob.DocPath.CourtCover
+        rstCommHistory.Fields("CourtDatesID").Value = sCourtDatesID
+        rstCommHistory.Fields("DateCreated").Value = Now
     rstCommHistory.Update
+    
     rstCommHistory.Close
     Set rstCommHistory = Nothing
+    
     Call pfClearGlobals
 End Sub
 
@@ -518,17 +485,12 @@ Public Sub fCreatePELLetter()
     ' Description : creates package enclosed letter
     '============================================================================
 
-    Dim sPELtrPDFPath As String
-    Dim sPELtrWordPath As String
     Dim sQuestion As String
     Dim sAnswer As String
-
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-    'TODO: PATH
-    sPELtrWordPath = "T:\Database\Templates\Stage1s\PackageEnclosedLetter.docx"
-    sPELtrPDFPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PackageEnclosedLetter" & ".pdf"
 
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
     Call pfGenericExportandMailMerge("Case", "Stage1s\PackageEnclosedLetter")
@@ -539,7 +501,7 @@ Public Sub fCreatePELLetter()
     If sAnswer = vbNo Then                       'Code for No
         MsgBox "Package-enclosed letter will not print."
     Else                                         'Code for yes
-        Call fEmailtoPrint(sPELtrPDFPath)
+        Call fEmailtoPrint(cJob.DocPath.PELP)
     End If
 
     Call pfCommunicationHistoryAdd("PackageEnclosedLetter")
@@ -561,22 +523,25 @@ Public Sub fFactorInvoicEmailF()
     Dim sUnitPrice As String
     Dim sGenerateXeroCSVSQL As String
     Dim sGeneratedFactoringXLS As String
-    Dim sInvoicePDFPath As String
     Dim sContactName As String
     Dim sPONumber As String
     Dim sFactoringURL As String
     Dim sUnitPriceSQL As String
     Dim sInvoiceAmount As String
     Dim sInvoiceNumber As String
+    
     Dim rstUPCourtDates As DAO.Recordset
     Dim rstUnitPrice As DAO.Recordset
     Dim rstFactoringCSV As DAO.Recordset
-    Dim dInvoiceDate As Date
+    
     Dim qdf As QueryDef
-    Dim db As DAO.Database
+    
     Dim oExcelApp As New Excel.Application
     Dim oExcelWB As New Excel.Workbook
+    
     Dim iNetTerm As Long
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence
@@ -588,9 +553,8 @@ Public Sub fFactorInvoicEmailF()
     Call pfCommunicationHistoryAdd("FactorInvoiceEmail")
 
     '@Ignore AssignmentNotUsed
-    'TODO: PATH
-    sFactoringXLS = "T:\Database\Templates\Stage4s\Client_Basic_Schedule.xls" 'make factoring csv
-    sGeneratedFactoringXLS = "I:\" & sCourtDatesID & "\WorkingFiles\" & "Client_Basic_Schedule.xls"
+    sFactoringXLS = cJob.DocPath.TemplateFolder4 & "Client_Basic_Schedule.xls" 'make factoring csv
+    sGeneratedFactoringXLS = cJob.DocPath.JobDirectoryW & "Client_Basic_Schedule.xls"
 
     'TODO: fFactorInvoicEmailF can delete following lines when known safe come back
     'sUnitPriceSQL = "SELECT UnitPrice from CourtDates where ID = " & sCourtDatesID & ";" 'get unitprice id
@@ -607,10 +571,9 @@ Public Sub fFactorInvoicEmailF()
     Set rstUnitPrice = Nothing
 
     sGenerateXeroCSVSQL = "SELECT XeroInvoiceCSV.ContactName, XeroInvoiceCSV.InvoiceNumber, XeroInvoiceCSV.Reference, XeroInvoiceCSV.InvoiceDate, 28 From XeroInvoiceCSV WHERE XeroInvoiceCSV.Reference= " & sCourtDatesID & ";"
-    Set db = CurrentDb
     Set qdf = CurrentDb.QueryDefs("FactoringCSVQuery")
-    Set qdf.Parameters(0) = sActualQuantity
-    Set qdf.Parameters(1) = sCourtDatesID
+    qdf.Parameters(0) = sActualQuantity
+    qdf.Parameters(1) = sCourtDatesID
     Set rstFactoringCSV = qdf.OpenRecordset
     rstFactoringCSV.MoveFirst
     sInvoiceAmount = (sActualQuantity * sUnitPrice)
@@ -619,8 +582,6 @@ Public Sub fFactorInvoicEmailF()
     sInvoiceNumber = rstFactoringCSV.Fields("InvoiceNumber").Value
     sPONumber = rstFactoringCSV.Fields("PO Number").Value
     dInvoiceDate = rstFactoringCSV.Fields("Invoice Date").Value
-    'TODO: PATH
-    sFactoringXLS = "T:\Database\Templates\Stage4s\Client_Basic_Schedule.xls"
 
     DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acReadOnly
 
@@ -646,25 +607,23 @@ Public Sub fFactorInvoicEmailF()
     Set oExcelApp = Nothing
     rstFactoringCSV.Close
 
-    'TODO: PATH
-    sInvoicePDFPath = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".PDF"
-    sQuestion = "Click yes after you have created your final invoice at " & sInvoicePDFPath
+    sQuestion = "Click yes after you have created your final invoice at " & cJob.DocPath.InvoiceP
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
     If sAnswer = vbNo Then                       'IF NO THEN THIS HAPPENS
         MsgBox "No invoice will be sent to factoring."
     Else                                         'if yes then this happens
-        Call pfSendWordDocAsEmail("FactorInvoiceEmail", "Invoice to Factor", sInvoicePDFPath) 'send email and add attachment yourself (from xero)
+        Call pfSendWordDocAsEmail("FactorInvoiceEmail", "Invoice to Factor", cJob.DocPath.InvoiceP) 'send email and add attachment yourself (from xero)
     End If
 
     sFactoringURL = "https://cirrus.factorfox.net/"
-
-
     Application.FollowHyperlink (sFactoringURL)
+    
     Call pfUpdateCheckboxStatus("InvoicetoFactorEmail")
 
     qdf.Close
-    db.Close
+    CurrentDb.Close
+    
     Call pfClearGlobals
 End Sub
 
@@ -692,38 +651,35 @@ Public Sub pfInvoicesCSV()
     ' Description : creates CSVs used for invoicing
     '============================================================================
 
-    Dim sCSVPath As String
     Dim sXeroImportURL As String
-
+    
+    Dim cJob As New Job
+    
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfGetOrderingAttorneyInfo
 
-    'TODO: PATH
-    sCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-" & "-XeroInvoiceCSV" & ".csv"
 
     DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
-    DoCmd.TransferText acExportDelim, , "SelectXero", sCSVPath, True
-
+    DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
 
     'real factoring csv plus invoice generated FactoringCSVQuery
 
     If sFactoringApproved = True Then
 
         DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acAdd
-        DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", sCSVPath, True
+        DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", cJob.DocPath.XeroCSV, True
     
     Else
-
-    
     End If
 
     sXeroImportURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
-
     Application.FollowHyperlink (sXeroImportURL)
+
 
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
     Call pfClearGlobals
+    
 End Sub
 
 Public Sub fCreateWorkingCopy()
@@ -735,29 +691,21 @@ Public Sub fCreateWorkingCopy()
     ' Description : creates "working copy" sent to client
     '============================================================================
 
-    Dim sWCTranscriptsPath As String
-    Dim sWCMainPath As String
-    Dim sTranscriptsFPathDocX As String
-    Dim sTranscriptsPathDocX As String
-    Dim sTranscriptsPathNoExt As String
     Dim sAnswer As String
     Dim sQuestion As String
-    Dim sCourtCoverPath As String
-    Dim oWordApp As New Word.Application
-    Dim oWordDoc As New Word.Document
+    
     Dim vbComp As Object
-    Dim wsSections As Word.Sections
-    Dim wsSection As Word.Section
     Dim x As Variant
     Dim oRng As Range
+    
+    Dim oWordApp As New Word.Application
+    Dim oWordDoc As New Word.Document
+    Dim wsSections As Word.Sections
+    Dim wsSection As Word.Section
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sWCTranscriptsPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
-    sTranscriptsFPathDocX = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript.docx"
-    sTranscriptsPathDocX = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.docx"
-    sTranscriptsPathNoExt = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
-    sWCMainPath = "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
 
     Call pfWordIndexer
 
@@ -768,8 +716,6 @@ Public Sub fCreateWorkingCopy()
         MsgBox "No working copy will be made."
     
     Else                                         'Code for yes
-    'TODO: PATH
-        sCourtCoverPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
         On Error Resume Next
         Set oWordApp = GetObject(, "Word.Application")
 
@@ -781,7 +727,7 @@ Public Sub fCreateWorkingCopy()
         oWordApp.Application.DisplayAlerts = False
         oWordApp.Application.Visible = False
 
-        Set oWordDoc = oWordApp.Documents.Open(sCourtCoverPath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
 
 
         SendKeys "+{Home}"
@@ -821,7 +767,7 @@ Public Sub fCreateWorkingCopy()
         
             'lock up header, leave all other sections unlocked
             .Protect Type:=wdAllowOnlyFormFields, noReset:=True, password:="wrts0419"
-            .SaveAs FileName:=sWCTranscriptsPath, FileFormat:=wdFormatXMLDocument 'save as file
+            .SaveAs FileName:=cJob.DocPath.TranscriptWC, FileFormat:=wdFormatXMLDocument 'save as file
         
         End With
     End If
@@ -831,7 +777,7 @@ Public Sub fCreateWorkingCopy()
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
 
-    FileCopy sWCTranscriptsPath, sWCMainPath
+    FileCopy cJob.DocPath.TranscriptWC, cJob.DocPath.TranscriptWCB
 
 End Sub
 
@@ -860,20 +806,23 @@ Public Sub pfPrepareCover()
     '============================================================================
     Dim cJob As New Job
 
-    Dim rstJobsByCase As DAO.Recordset
     Dim sCasesID As String
     Dim sCurrentJobID As String
     Dim sVolumesCoverPath As String
-    Dim dHearingDate As Date
-    Dim x As Long
-    Dim y As Long
     Dim sOriginalCurrentTranscriptPath As String
     Dim sNewCurrentTranscriptPath As String
     Dim sVolumeText As String
     Dim sBookmarkName As String
     Dim sVolumesCoverPDFPath As String
+    
+    Dim dHearingDate As Date
+    Dim x As Long
+    Dim y As Long
+    
     Dim oWordApp As Word.Application
     Dim oWordDoc As Word.Document
+    
+    Dim rstJobsByCase As DAO.Recordset
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     'TODO:  pfPrepareCover can delete following lines when known safe

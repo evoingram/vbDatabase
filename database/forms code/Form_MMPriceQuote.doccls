@@ -95,7 +95,7 @@ Private Sub btnCheckAvailability_Click()
     iWorkTimeAvail = 600 * dDateDifference
 
     Set qdf = CurrentDb.QueryDefs("TasksBeforeDeadlineQuery")
-    Set qdf.Parameters(0) = dDeadline
+    qdf.Parameters(0) = dDeadline
     Set rstTasksB4DdlnQ = qdf.OpenRecordset()
 
     If Not (rstTasksB4DdlnQ.EOF And rstTasksB4DdlnQ.BOF) Then 'For each CourtDates.ID

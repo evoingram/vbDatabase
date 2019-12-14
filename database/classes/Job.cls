@@ -24,6 +24,7 @@ Private mApp5 As App5
 Private mApp6 As App6
 Private mCaseInfo As CaseInfo
 Private mStatus As Status
+Private mDocPath As DocPath
 Public sApp0 As Long
 Public sApp1 As Long
 Public sApp2 As Long
@@ -31,6 +32,7 @@ Public sApp3 As Long
 Public sApp4 As Long
 Public sApp5 As Long
 Public sApp6 As Long
+Public sDocPath As Long
 Public sCaseID As Long
 Public sStatusID As Long
 Public sStatusCID As Long
@@ -312,6 +314,12 @@ Public Property Get App6() As App6
     Set App6 = mApp6
 End Property
 
+Public Property Get DocPath() As DocPath
+    'Private mApp1 As App1
+    If (mDocPath Is Nothing) Then Set DocPath = New DocPath
+    Set DocPath = mDocPath
+End Property
+
 Private Property Get Recordset() As Recordset
     Set Recordset = mrstRecordset
 End Property
@@ -368,6 +376,7 @@ Private Sub Load()
     mApp6.FindFirst "ID=" & sApp6
     mCaseInfo.FindFirst "ID=" & sCaseID
     mStatus.FindFirst "ID=" & sStatusID
+    mDocPath.Class_Initialize
     'mApp1.SetAppValues (sApp1)
 End Sub
 
@@ -413,6 +422,7 @@ Public Sub Update()
         .Fields("HearingDate").Value = Me.HearingDate
         .Update
     End With
+    mDocPath.Class_Initialize
     mbooLoaded = True
 End Sub
 
@@ -443,12 +453,22 @@ Private Sub Class_Initialize()
     Set mApp6 = New App6
     Set mCaseInfo = New CaseInfo
     Set mStatus = New Status
+    Set mDocPath = New DocPath
 End Sub
 
 Private Sub Class_Terminate()
     Recordset.Close
     Set Recordset = Nothing
+    Set mApp0 = Nothing
     Set mApp1 = Nothing
+    Set mApp2 = Nothing
+    Set mApp3 = Nothing
+    Set mApp4 = Nothing
+    Set mApp5 = Nothing
+    Set mApp6 = Nothing
+    Set mCaseInfo = Nothing
+    Set mStatus = Nothing
+    Set mDocPath = Nothing
 End Sub
 
 Private Function NullIfEmptyString(str As String) As Variant

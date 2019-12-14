@@ -246,8 +246,8 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
         sEmailHyperlink = "T:\Database\Emails\" & sReceivedTime & "-Email.msg"
         sTableHyperilnk = sReceivedTime & "-Email" & "#" & sEmailHyperlink & "#"
         adorstOutlookExport.AddNew
-        Set adorstOutlookExport("FileHyperlink") = sTableHyperilnk
-        Set adorstOutlookExport("DateCreated") = dReceived
+        adorstOutlookExport("FileHyperlink") = sTableHyperilnk
+        adorstOutlookExport("DateCreated") = dReceived
         adorstOutlookExport.Update
     Next
 
@@ -992,7 +992,7 @@ Public Sub pfReformatTable()
 
             ' Update First Record
             .Edit
-            Set !Field2 = Trim(varData(0))       ' remove spaces before writing new fields
+            !Field2 = Trim(varData(0))       ' remove spaces before writing new fields
             .Update
 
             ' Add records with same first field
@@ -1000,8 +1000,8 @@ Public Sub pfReformatTable()
             For i = 1 To UBound(varData)
                 With rsADD
                     .AddNew
-                    Set !Field1 = strField1
-                    Set !Field2 = Trim(varData(i)) ' remove spaces before writing new fields
+                    !Field1 = strField1
+                    !Field2 = Trim(varData(i)) ' remove spaces before writing new fields
                     .Update
                 End With
             Next
@@ -1927,11 +1927,11 @@ Public Sub pfCommHistoryExportSub()
         Set rs = CurrentDb.OpenRecordset("SELECT * FROM CommunicationHistory")
     
         rs.AddNew
-        Set rs("FileHyperlink") = sCommHistoryHyperlink
-        Set rs("FileHyperlink1") = sCommHistoryHyperlink
-        Set rs("DateCreated") = dEmailReceived
-        Set rs("CourtDatesID") = Null
-        Set rs("CustomersID") = Null
+        rs("FileHyperlink") = sCommHistoryHyperlink
+        rs("FileHyperlink1") = sCommHistoryHyperlink
+        rs("DateCreated") = dEmailReceived
+        rs("CourtDatesID") = Null
+        rs("CustomersID") = Null
         rs.Update
     
         On Error GoTo eHandler
@@ -1985,16 +1985,16 @@ Public Sub pfEmailsExport1()
     
             If .Class = olMail Then
                 rstEmails.AddNew
-                Set rstEmails("Subject") = .Subject
-                Set rstEmails("Body") = .Body
-                Set rstEmails("SenderName") = .SenderName
-                Set rstEmails("ToName") = .To
-                Set rstEmails("SenderEmailAddress") = .SenderEmailAddress
-                Set rstEmails("SenderEmailType") = .SenderEmailType
-                Set rstEmails("CCName") = .CC
-                Set rstEmails("BCCName") = .BCC
-                Set rstEmails("Importance") = .Importance
-                Set rstEmails("Sensitivity") = .Sensitivity
+                    rstEmails("Subject") = .Subject
+                    rstEmails("Body") = .Body
+                    rstEmails("SenderName") = .SenderName
+                    rstEmails("ToName") = .To
+                    rstEmails("SenderEmailAddress") = .SenderEmailAddress
+                    rstEmails("SenderEmailType") = .SenderEmailType
+                    rstEmails("CCName") = .CC
+                    rstEmails("BCCName") = .BCC
+                    rstEmails("Importance") = .Importance
+                    rstEmails("Sensitivity") = .Sensitivity
                 rstEmails.Update
             End If
         
