@@ -2,97 +2,96 @@
 Option Compare Database
 Option Explicit
 
-
 Private Sub List66_AfterUpdate()
 
-'    CurrentDb.Execute "DELETE FROM TempTasksDay", dbFailOnError
-'OrderGroupIncompleteTasks
-'Do while rSumTimeLength<=600
+    '    CurrentDb.Execute "DELETE FROM TempTasksDay", dbFailOnError
+    'OrderGroupIncompleteTasks
+    'Do while rSumTimeLength<=600
     'For each row in '=Int([TimeLength])
     '"GroupTasksIncompleteProduction Query"
 
-Dim rstGroupTasksICPQ As DAO.Recordset
-Dim sContactName As String
-Set rstGroupTasksICPQ = CurrentDb.OpenRecordset("SELECT * FROM GroupTasksIncompleteProduction Query")
+    Dim rstGroupTasksICPQ As DAO.Recordset
+    Dim sContactName As String
+    Set rstGroupTasksICPQ = CurrentDb.OpenRecordset("SELECT * FROM GroupTasksIncompleteProduction Query")
 
-If Me.List66.Value = "Today" Then
+    If Me.List66.Value = "Today" Then
 
-    Me.Text68.ControlSource = "=Now"
-    Me.RecordSource = "TempTasksDay1"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now"
+        Me.RecordSource = "TempTasksDay1"
+        Me.Requery
     
-ElseIf Me.List66.Value = "Tomorrow" Then
+    ElseIf Me.List66.Value = "Tomorrow" Then
 
-    Me.Text68.ControlSource = "=Now+1"
-    Me.RecordSource = "TempTasksDay2"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now+1"
+        Me.RecordSource = "TempTasksDay2"
+        Me.Requery
     
-ElseIf Me.List66.Value = "Day 3" Then
+    ElseIf Me.List66.Value = "Day 3" Then
 
-    Me.Text68.ControlSource = "=Now+2"
-    Me.RecordSource = "TempTasksDay3"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now+2"
+        Me.RecordSource = "TempTasksDay3"
+        Me.Requery
     
-ElseIf Me.List66.Value = "Day 4" Then
+    ElseIf Me.List66.Value = "Day 4" Then
 
-    Me.Text68.ControlSource = "=Now+3"
-    Me.RecordSource = "TempTasksDay4"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now+3"
+        Me.RecordSource = "TempTasksDay4"
+        Me.Requery
     
-ElseIf Me.List66.Value = "Day 5" Then
+    ElseIf Me.List66.Value = "Day 5" Then
 
-    Me.Text68.ControlSource = "=Now+4"
-    Me.RecordSource = "TempTasksDay5"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now+4"
+        Me.RecordSource = "TempTasksDay5"
+        Me.Requery
     
-ElseIf Me.List66.Value = "Day 6" Then
+    ElseIf Me.List66.Value = "Day 6" Then
 
-   Me.Text68.ControlSource = "=Now+5"
-    Me.RecordSource = "TempTasksDay6"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now+5"
+        Me.RecordSource = "TempTasksDay6"
+        Me.Requery
     
-ElseIf Me.List66.Value = "Day 7" Then
+    ElseIf Me.List66.Value = "Day 7" Then
 
-    Me.Text68.ControlSource = "=Now+6"
-    Me.RecordSource = "TempTasksDay7"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now+6"
+        Me.RecordSource = "TempTasksDay7"
+        Me.Requery
     
-ElseIf Me.List66.Value = "Day 8" Then
+    ElseIf Me.List66.Value = "Day 8" Then
 
-    Me.Text68.ControlSource = "=Now+7"
-    Me.RecordSource = "TempTasksDay8"
-    Me.Requery
+        Me.Text68.ControlSource = "=Now+7"
+        Me.RecordSource = "TempTasksDay8"
+        Me.Requery
 
-Else
+    Else
 
-End If
+    End If
 
-If Not (rstGroupTasksICPQ.EOF And rstGroupTasksICPQ.BOF) Then
+    If Not (rstGroupTasksICPQ.EOF And rstGroupTasksICPQ.BOF) Then
 
-    rstGroupTasksICPQ.MoveFirst
+        rstGroupTasksICPQ.MoveFirst
     
-    Do Until rstGroupTasksICPQ.EOF = True
+        Do Until rstGroupTasksICPQ.EOF = True
     
-        rstGroupTasksICPQ.Edit
-        Set rstGroupTasksICPQ!VendorYN = True
-        Set rstGroupTasksICPQ("VendorYN") = True
-        rstGroupTasksICPQ.Update
+            rstGroupTasksICPQ.Edit
+            Set rstGroupTasksICPQ!VendorYN = True
+            Set rstGroupTasksICPQ("VendorYN") = True
+            rstGroupTasksICPQ.Update
 
-        sContactName = rstGroupTasksICPQ!FirstName & " " & rstGroupTasksICPQ!LastName
+            sContactName = rstGroupTasksICPQ!FirstName & " " & rstGroupTasksICPQ!LastName
 
-        rstGroupTasksICPQ.MoveNext
+            rstGroupTasksICPQ.MoveNext
         
-    Loop
+        Loop
     
-Else
+    Else
 
-    MsgBox "There are no records in the recordset."
+        MsgBox "There are no records in the recordset."
     
-End If
+    End If
 
-MsgBox "Finished looping through records."
+    MsgBox "Finished looping through records."
 
-rstGroupTasksICPQ.Close
-Set rstGroupTasksICPQ = Nothing
+    rstGroupTasksICPQ.Close
+    Set rstGroupTasksICPQ = Nothing
 
 End Sub

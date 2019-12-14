@@ -4,26 +4,26 @@ Option Explicit
 
 Private Sub Command15_Click()
 
-If Me.Description.Height = 2200 Then
+    If Me.Description.Height = 2200 Then
 
-    Me.Description.Height = 1
-    Me.Section(acDetail).Height = 1600
-    Me.Description.Visible = False
+        Me.Description.Height = 1
+        Me.Section(acDetail).Height = 1600
+        Me.Description.Visible = False
     
-ElseIf Me.Description.Height = 1 Then
+    ElseIf Me.Description.Height = 1 Then
 
-    Me.Description.Height = 2200
-    Me.Section(acDetail).Height = 4000
-    Me.Description.Visible = True
+        Me.Description.Height = 2200
+        Me.Section(acDetail).Height = 4000
+        Me.Description.Visible = True
     
-Else
+    Else
 
-    Me.Description.Height = 2200
-    Me.Section(acDetail).Height = 4000
-    Me.Description.Visible = True
+        Me.Description.Height = 2200
+        Me.Section(acDetail).Height = 4000
+        Me.Description.Visible = True
     
-End If
+    End If
 
-Me.Requery
+    Me.Requery
 
 End Sub

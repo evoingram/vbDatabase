@@ -60,7 +60,6 @@ Public Property Let Party2Name(rData As String)
     mParty2Name = rData
 End Property
 
-
 Public Property Get CaseNumber2() As String
     CaseNumber2 = mCaseNumber2
 End Property
@@ -117,11 +116,9 @@ Public Property Let Notes(rData As String)
     mNotes = rData
 End Property
 
-
 Public Property Get ID() As Long
     ID = sCaseID
 End Property
-
 
 Private Property Get RecordsetA7() As Recordset
     Set RecordsetA7 = mrstRecordset7
@@ -130,7 +127,6 @@ End Property
 Private Property Set RecordsetA7(rData As Recordset)
     Set mrstRecordset7 = rData
 End Property
-
 
 Private Sub Load()
     With RecordsetA7
@@ -209,7 +205,4 @@ Private Function NullIfEmptyString(str As String) As Variant
         NullIfEmptyString = strTrimmed
     End If
 End Function
-
-
-
 

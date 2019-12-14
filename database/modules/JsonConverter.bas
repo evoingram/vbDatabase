@@ -49,58 +49,58 @@ Option Explicit
 ' === VBA-UTC Headers
 #If Mac Then
 
-#If VBA7 Then
+    #If VBA7 Then
 
-' 64-bit Mac (2016)
-Private Declare PtrSafe Function utc_popen Lib "libc.dylib" Alias "popen" _
-    (ByVal utc_Command As String, ByVal utc_Mode As String) As LongPtr
-Private Declare PtrSafe Function utc_pclose Lib "libc.dylib" Alias "pclose" _
-    (ByVal utc_File As LongPtr) As LongPtr
-Private Declare PtrSafe Function utc_fread Lib "libc.dylib" Alias "fread" _
-    (ByVal utc_Buffer As String, ByVal utc_Size As LongPtr, ByVal utc_Number As LongPtr, ByVal utc_File As LongPtr) As LongPtr
-Private Declare PtrSafe Function utc_feof Lib "libc.dylib" Alias "feof" _
-    (ByVal utc_File As LongPtr) As LongPtr
+        ' 64-bit Mac (2016)
+        Private Declare PtrSafe Function utc_popen Lib "libc.dylib" Alias "popen" _
+        (ByVal utc_Command As String, ByVal utc_Mode As String) As LongPtr
+        Private Declare PtrSafe Function utc_pclose Lib "libc.dylib" Alias "pclose" _
+        (ByVal utc_File As LongPtr) As LongPtr
+        Private Declare PtrSafe Function utc_fread Lib "libc.dylib" Alias "fread" _
+        (ByVal utc_Buffer As String, ByVal utc_Size As LongPtr, ByVal utc_Number As LongPtr, ByVal utc_File As LongPtr) As LongPtr
+        Private Declare PtrSafe Function utc_feof Lib "libc.dylib" Alias "feof" _
+        (ByVal utc_File As LongPtr) As LongPtr
 
-#Else
+    #Else
 
-' 32-bit Mac
-'Private Declare Function utc_popen Lib "libc.dylib" Alias "popen" _
-'    (ByVal utc_Command As String, ByVal utc_Mode As String) As Long
-'Private Declare Function utc_pclose Lib "libc.dylib" Alias "pclose" _
-'    (ByVal utc_File As Long) As Long
-'Private Declare Function utc_fread Lib "libc.dylib" Alias "fread" _
-'    (ByVal utc_Buffer As String, ByVal utc_Size As Long, ByVal utc_Number As Long, ByVal utc_File As Long) As Long
-'Private Declare Function utc_feof Lib "libc.dylib" Alias "feof" _
-'    (ByVal utc_File As Long) As Long
+        ' 32-bit Mac
+        'Private Declare Function utc_popen Lib "libc.dylib" Alias "popen" _
+        '    (ByVal utc_Command As String, ByVal utc_Mode As String) As Long
+        'Private Declare Function utc_pclose Lib "libc.dylib" Alias "pclose" _
+        '    (ByVal utc_File As Long) As Long
+        'Private Declare Function utc_fread Lib "libc.dylib" Alias "fread" _
+        '    (ByVal utc_Buffer As String, ByVal utc_Size As Long, ByVal utc_Number As Long, ByVal utc_File As Long) As Long
+        'Private Declare Function utc_feof Lib "libc.dylib" Alias "feof" _
+        '    (ByVal utc_File As Long) As Long
 
-#End If
+    #End If
 
 #ElseIf VBA7 Then
 
-' http://msdn.microsoft.com/en-us/library/windows/desktop/ms724421.aspx
-' http://msdn.microsoft.com/en-us/library/windows/desktop/ms724949.aspx
-' http://msdn.microsoft.com/en-us/library/windows/desktop/ms725485.aspx
-Private Declare PtrSafe Function utc_GetTimeZoneInformation Lib "kernel32" Alias "GetTimeZoneInformation" _
+    ' http://msdn.microsoft.com/en-us/library/windows/desktop/ms724421.aspx
+    ' http://msdn.microsoft.com/en-us/library/windows/desktop/ms724949.aspx
+    ' http://msdn.microsoft.com/en-us/library/windows/desktop/ms725485.aspx
+    Private Declare PtrSafe Function utc_GetTimeZoneInformation Lib "kernel32" Alias "GetTimeZoneInformation" _
     (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION) As Long
-Private Declare PtrSafe Function utc_SystemTimeToTzSpecificLocalTime Lib "kernel32" Alias "SystemTimeToTzSpecificLocalTime" _
+    Private Declare PtrSafe Function utc_SystemTimeToTzSpecificLocalTime Lib "kernel32" Alias "SystemTimeToTzSpecificLocalTime" _
     (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION, utc_lpUniversalTime As utc_SYSTEMTIME, utc_lpLocalTime As utc_SYSTEMTIME) As Long
-Private Declare PtrSafe Function utc_TzSpecificLocalTimeToSystemTime Lib "kernel32" Alias "TzSpecificLocalTimeToSystemTime" _
+    Private Declare PtrSafe Function utc_TzSpecificLocalTimeToSystemTime Lib "kernel32" Alias "TzSpecificLocalTimeToSystemTime" _
     (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION, utc_lpLocalTime As utc_SYSTEMTIME, utc_lpUniversalTime As utc_SYSTEMTIME) As Long
 
 #Else
 
-Private Declare Function utc_GetTimeZoneInformation Lib "kernel32" Alias "GetTimeZoneInformation" _
-    (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION) As Long
-Private Declare Function utc_SystemTimeToTzSpecificLocalTime Lib "kernel32" Alias "SystemTimeToTzSpecificLocalTime" _
-    (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION, utc_lpUniversalTime As utc_SYSTEMTIME, utc_lpLocalTime As utc_SYSTEMTIME) As Long
-Private Declare Function utc_TzSpecificLocalTimeToSystemTime Lib "kernel32" Alias "TzSpecificLocalTimeToSystemTime" _
-    (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION, utc_lpLocalTime As utc_SYSTEMTIME, utc_lpUniversalTime As utc_SYSTEMTIME) As Long
+    Private Declare Function utc_GetTimeZoneInformation Lib "kernel32" Alias "GetTimeZoneInformation" _
+                             (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION) As Long
+    Private Declare Function utc_SystemTimeToTzSpecificLocalTime Lib "kernel32" Alias "SystemTimeToTzSpecificLocalTime" _
+                             (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION, utc_lpUniversalTime As utc_SYSTEMTIME, utc_lpLocalTime As utc_SYSTEMTIME) As Long
+    Private Declare Function utc_TzSpecificLocalTimeToSystemTime Lib "kernel32" Alias "TzSpecificLocalTimeToSystemTime" _
+                             (utc_lpTimeZoneInformation As utc_TIME_ZONE_INFORMATION, utc_lpLocalTime As utc_SYSTEMTIME, utc_lpUniversalTime As utc_SYSTEMTIME) As Long
 
 #End If
 
 #If Mac Then
 
-#If VBA7 Then
+    #If VBA7 Then
 Private Type utc_ShellResult
     utc_Output As String
     utc_ExitCode As LongPtr
@@ -118,22 +118,22 @@ End Type
 #Else
 
 Private Type utc_SYSTEMTIME
-    utc_wYear As Integer
-    utc_wMonth As Integer
-    utc_wDayOfWeek As Integer
-    utc_wDay As Integer
-    utc_wHour As Integer
-    utc_wMinute As Integer
-    utc_wSecond As Integer
-    utc_wMilliseconds As Integer
+    utc_wYear As Long
+    utc_wMonth As Long
+    utc_wDayOfWeek As Long
+    utc_wDay As Long
+    utc_wHour As Long
+    utc_wMinute As Long
+    utc_wSecond As Long
+    utc_wMilliseconds As Long
 End Type
 
 Private Type utc_TIME_ZONE_INFORMATION
     utc_Bias As Long
-    utc_StandardName(0 To 31) As Integer
+    utc_StandardName(0 To 31) As Long
     utc_StandardDate As utc_SYSTEMTIME
     utc_StandardBias As Long
-    utc_DaylightName(0 To 31) As Integer
+    utc_DaylightName(0 To 31) As Long
     utc_DaylightDate As utc_SYSTEMTIME
     utc_DaylightBias As Long
 End Type
@@ -156,6 +156,7 @@ Private Type json_Options
     ' The solidus (/) is not required to be escaped, use this option to escape them as \/ in ConvertToJson
     EscapeSolidus As Boolean
 End Type
+
 '@Ignore EncapsulatePublicField
 Public JsonOptions As json_Options
 
@@ -171,6 +172,7 @@ Public JsonOptions As json_Options
 ' @return {Object} (Dictionary or Collection)
 ' @throws 10001 - JSON parse error
 ''
+'@Ignore AssignedByValParameter
 Public Function ParseJson(ByVal JsonString As String) As Object
     Dim json_Index As Long
     json_Index = 1
@@ -353,7 +355,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
         '@Ignore UnassignedVariableUsage
         ConvertToJson = json_BufferToString(json_Buffer, json_BufferPosition)
 
-    ' Dictionary or Collection
+        ' Dictionary or Collection
     Case VBA.vbObject
         If json_PrettyPrint Then
             If VBA.VarType(Whitespace) = VBA.vbString Then
@@ -404,7 +406,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
 
             json_BufferAppend json_Buffer, json_Indentation & "}", json_BufferPosition, json_BufferLength
 
-        ' Collection
+            ' Collection
         ElseIf VBA.TypeName(JsonValue) = "Collection" Then
             json_BufferAppend json_Buffer, "[", json_BufferPosition, json_BufferLength
             For Each json_Value In JsonValue
@@ -596,7 +598,7 @@ Private Function json_ParseString(json_String As String, ByRef json_Index As Lon
                 json_Index = json_Index + 4
             End Select
         Case json_Quote
-        '@ignore UnassignedVariableUsage
+            '@ignore UnassignedVariableUsage
             json_ParseString = json_BufferToString(json_Buffer, json_BufferPosition)
             json_Index = json_Index + 1
             Exit Function
@@ -774,7 +776,7 @@ Private Function json_StringIsLargeNumber(json_String As Variant) As Boolean
         For json_CharIndex = 1 To json_Length
             json_CharCode = VBA.Asc(VBA.Mid$(json_String, json_CharIndex, 1))
             Select Case json_CharCode
-            ' Look for .|0-9|E|e
+                ' Look for .|0-9|E|e
             Case 46, 48 To 57, 69, 101
                 ' Continue through characters
             Case Else
@@ -785,7 +787,7 @@ Private Function json_StringIsLargeNumber(json_String As Variant) As Boolean
     End If
 End Function
 
-Private Function json_ParseErrorMessage(json_String As String, ByRef json_Index As Long, ErrorMessage As String)
+Private Function json_ParseErrorMessage(json_String As String, ByRef json_Index As Long, ErrorMessage As String) As Variant
     ' Provide detailed parse error message, including details of where and what occurred
     '
     ' Example:
@@ -901,17 +903,17 @@ End Function
 Public Function ParseUtc(utc_UtcDate As Date) As Date
     On Error GoTo utc_ErrorHandling
 
-#If Mac Then
-    ParseUtc = utc_ConvertDate(utc_UtcDate)
-#Else
-    Dim utc_TimeZoneInfo As utc_TIME_ZONE_INFORMATION
-    Dim utc_LocalDate As utc_SYSTEMTIME
+    #If Mac Then
+        ParseUtc = utc_ConvertDate(utc_UtcDate)
+    #Else
+        Dim utc_TimeZoneInfo As utc_TIME_ZONE_INFORMATION
+        Dim utc_LocalDate As utc_SYSTEMTIME
 
-    utc_GetTimeZoneInformation utc_TimeZoneInfo
-    utc_SystemTimeToTzSpecificLocalTime utc_TimeZoneInfo, utc_DateToSystemTime(utc_UtcDate), utc_LocalDate
+        utc_GetTimeZoneInformation utc_TimeZoneInfo
+        utc_SystemTimeToTzSpecificLocalTime utc_TimeZoneInfo, utc_DateToSystemTime(utc_UtcDate), utc_LocalDate
 
-    ParseUtc = utc_SystemTimeToDate(utc_LocalDate)
-#End If
+        ParseUtc = utc_SystemTimeToDate(utc_LocalDate)
+    #End If
 
     Exit Function
 
@@ -930,17 +932,17 @@ End Function
 Public Function ConvertToUtc(utc_LocalDate As Date) As Date
     On Error GoTo utc_ErrorHandling
 
-#If Mac Then
-    ConvertToUtc = utc_ConvertDate(utc_LocalDate, utc_ConvertToUtc:=True)
-#Else
-    Dim utc_TimeZoneInfo As utc_TIME_ZONE_INFORMATION
-    Dim utc_UtcDate As utc_SYSTEMTIME
+    #If Mac Then
+        ConvertToUtc = utc_ConvertDate(utc_LocalDate, utc_ConvertToUtc:=True)
+    #Else
+        Dim utc_TimeZoneInfo As utc_TIME_ZONE_INFORMATION
+        Dim utc_UtcDate As utc_SYSTEMTIME
 
-    utc_GetTimeZoneInformation utc_TimeZoneInfo
-    utc_TzSpecificLocalTimeToSystemTime utc_TimeZoneInfo, utc_DateToSystemTime(utc_LocalDate), utc_UtcDate
+        utc_GetTimeZoneInformation utc_TimeZoneInfo
+        utc_TzSpecificLocalTimeToSystemTime utc_TimeZoneInfo, utc_DateToSystemTime(utc_LocalDate), utc_UtcDate
 
-    ConvertToUtc = utc_SystemTimeToDate(utc_UtcDate)
-#End If
+        ConvertToUtc = utc_SystemTimeToDate(utc_UtcDate)
+    #End If
 
     Exit Function
 
@@ -998,42 +1000,42 @@ Public Function ParseIso(utc_IsoString As String) As Date
                 End Select
 
                 If utc_NegativeOffset Then: utc_Offset = -utc_Offset
-            Else
-                utc_TimeParts = VBA.Split(utc_Parts(1), ":")
+                Else
+                    utc_TimeParts = VBA.Split(utc_Parts(1), ":")
+                End If
+            End If
+
+            Select Case UBound(utc_TimeParts)
+            Case 0
+                ParseIso = ParseIso + VBA.TimeSerial(VBA.CInt(utc_TimeParts(0)), 0, 0)
+            Case 1
+                ParseIso = ParseIso + VBA.TimeSerial(VBA.CInt(utc_TimeParts(0)), VBA.CInt(utc_TimeParts(1)), 0)
+            Case 2
+                ' VBA.Val does not use regional settings, use for seconds to avoid decimal/comma issues
+                ParseIso = ParseIso + VBA.TimeSerial(VBA.CInt(utc_TimeParts(0)), VBA.CInt(utc_TimeParts(1)), Int(VBA.Val(utc_TimeParts(2))))
+            End Select
+
+            ParseIso = ParseUtc(ParseIso)
+
+            If utc_HasOffset Then
+                ParseIso = ParseIso - utc_Offset
             End If
         End If
 
-        Select Case UBound(utc_TimeParts)
-        Case 0
-            ParseIso = ParseIso + VBA.TimeSerial(VBA.CInt(utc_TimeParts(0)), 0, 0)
-        Case 1
-            ParseIso = ParseIso + VBA.TimeSerial(VBA.CInt(utc_TimeParts(0)), VBA.CInt(utc_TimeParts(1)), 0)
-        Case 2
-            ' VBA.Val does not use regional settings, use for seconds to avoid decimal/comma issues
-            ParseIso = ParseIso + VBA.TimeSerial(VBA.CInt(utc_TimeParts(0)), VBA.CInt(utc_TimeParts(1)), Int(VBA.Val(utc_TimeParts(2))))
-        End Select
-
-        ParseIso = ParseUtc(ParseIso)
-
-        If utc_HasOffset Then
-            ParseIso = ParseIso - utc_Offset
-        End If
-    End If
-
-    Exit Function
+        Exit Function
 
 utc_ErrorHandling:
-    Err.Raise 10013, "UtcConverter.ParseIso", "ISO 8601 parsing error for " & utc_IsoString & ": " & Err.Number & " - " & Err.Description
-End Function
+        Err.Raise 10013, "UtcConverter.ParseIso", "ISO 8601 parsing error for " & utc_IsoString & ": " & Err.Number & " - " & Err.Description
+    End Function
 
-''
-' Convert local date to ISO 8601 string
-'
-' @method ConvertToIso
-' @param {Date} utc_LocalDate
-' @return {Date} ISO 8601 string
-' @throws 10014 - ISO 8601 conversion error
-''
+    ''
+    ' Convert local date to ISO 8601 string
+    '
+    ' @method ConvertToIso
+    ' @param {Date} utc_LocalDate
+    ' @return {Date} ISO 8601 string
+    ' @throws 10014 - ISO 8601 conversion error
+    ''
 Public Function ConvertToIso(utc_LocalDate As Date) As String
     On Error GoTo utc_ErrorHandling
 
@@ -1060,12 +1062,12 @@ Private Function utc_ConvertDate(utc_Value As Date, Optional utc_ConvertToUtc As
 
     If utc_ConvertToUtc Then
         utc_ShellCommand = "date -ur `date -jf '%Y-%m-%d %H:%M:%S' " & _
-            "'" & VBA.Format$(utc_Value, "yyyy-mm-dd HH:mm:ss") & "' " & _
-            " +'%s'` +'%Y-%m-%d %H:%M:%S'"
+                           "'" & VBA.Format$(utc_Value, "yyyy-mm-dd HH:mm:ss") & "' " & _
+                           " +'%s'` +'%Y-%m-%d %H:%M:%S'"
     Else
         utc_ShellCommand = "date -jf '%Y-%m-%d %H:%M:%S %z' " & _
-            "'" & VBA.Format$(utc_Value, "yyyy-mm-dd HH:mm:ss") & " +0000' " & _
-            "+'%Y-%m-%d %H:%M:%S'"
+                           "'" & VBA.Format$(utc_Value, "yyyy-mm-dd HH:mm:ss") & " +0000' " & _
+                           "+'%Y-%m-%d %H:%M:%S'"
     End If
 
     utc_Result = utc_ExecuteInShell(utc_ShellCommand)
@@ -1078,18 +1080,18 @@ Private Function utc_ConvertDate(utc_Value As Date, Optional utc_ConvertToUtc As
         utc_TimeParts = Split(utc_Parts(1), ":")
 
         utc_ConvertDate = DateSerial(utc_DateParts(0), utc_DateParts(1), utc_DateParts(2)) + _
-            TimeSerial(utc_TimeParts(0), utc_TimeParts(1), utc_TimeParts(2))
+                                                                                           TimeSerial(utc_TimeParts(0), utc_TimeParts(1), utc_TimeParts(2))
     End If
 End Function
 
 Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResult
-#If VBA7 Then
-    Dim utc_File As LongPtr
-    Dim utc_Read As LongPtr
-#Else
-    Dim utc_File As Long
-    Dim utc_Read As Long
-#End If
+    #If VBA7 Then
+        Dim utc_File As LongPtr
+        Dim utc_Read As LongPtr
+    #Else
+        Dim utc_File As Long
+        Dim utc_Read As Long
+    #End If
 
     Dim utc_Chunk As String
 
@@ -1098,18 +1100,18 @@ Private Function utc_ExecuteInShell(utc_ShellCommand As String) As utc_ShellResu
 
     If utc_File = 0 Then: Exit Function
 
-    Do While utc_feof(utc_File) = 0
-        utc_Chunk = VBA.Space$(50)
-        utc_Read = CLng(utc_fread(utc_Chunk, 1, Len(utc_Chunk) - 1, utc_File))
-        If utc_Read > 0 Then
-            utc_Chunk = VBA.Left$(utc_Chunk, CLng(utc_Read))
-            utc_ExecuteInShell.utc_Output = utc_ExecuteInShell.utc_Output & utc_Chunk
-        End If
-    Loop
+        Do While utc_feof(utc_File) = 0
+            utc_Chunk = VBA.Space$(50)
+            utc_Read = CLng(utc_fread(utc_Chunk, 1, Len(utc_Chunk) - 1, utc_File))
+            If utc_Read > 0 Then
+                utc_Chunk = VBA.Left$(utc_Chunk, CLng(utc_Read))
+                utc_ExecuteInShell.utc_Output = utc_ExecuteInShell.utc_Output & utc_Chunk
+            End If
+        Loop
 
 utc_ErrorHandling:
-    utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose(utc_File))
-End Function
+        utc_ExecuteInShell.utc_ExitCode = CLng(utc_pclose(utc_File))
+    End Function
 
 #Else
 
@@ -1125,10 +1127,12 @@ End Function
 
 Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
     utc_SystemTimeToDate = DateSerial(utc_Value.utc_wYear, utc_Value.utc_wMonth, utc_Value.utc_wDay) + _
-        TimeSerial(utc_Value.utc_wHour, utc_Value.utc_wMinute, utc_Value.utc_wSecond)
+                                                                                                     TimeSerial(utc_Value.utc_wHour, utc_Value.utc_wMinute, utc_Value.utc_wSecond)
 End Function
 
 #End If
+
+
 
 
 

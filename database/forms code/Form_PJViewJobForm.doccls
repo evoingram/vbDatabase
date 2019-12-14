@@ -3,21 +3,21 @@ Option Compare Database
 Option Explicit
 
 Private Sub ProcessJobSubform_Enter()
-Me.ViewJobFormSubform.SourceObject = "Form." & "SBFMAppearances"
-Me.ViewJobFormSubform.Requery
+    Me.ViewJobFormSubform.SourceObject = "Form." & "SBFMAppearances"
+    Me.ViewJobFormSubform.Requery
 End Sub
 
 Private Sub ProcessJobSubform_AfterUpdate()
-Me.ViewJobFormSubform.SourceObject = "Form." & "SBFMAppearances"
-[Forms]![PJViewJobForm].SourceObject = "Query." & qnViewJobFormAppearancesQ
+    Me.ViewJobFormSubform.SourceObject = "Form." & "SBFMAppearances"
+    [Forms]![PJViewJobForm].SourceObject = "Query." & qnViewJobFormAppearancesQ
 
-Me.Requery
+    Me.Requery
 End Sub
 
 Private Sub PJViewJobForm_OnLoad()
-[Forms]![SBFMAppearances].SourceObject = "Query." & qnViewJobFormAppearancesQ
-[Forms]![SBFMAppearances].Form.RecordSource = ("SELECT * FROM Cases INNER JOIN CourtDates ON Cases.ID = CourtDates.CasesID WHERE (CourtDates.ID=(Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField])) And CourtDates.CasesID Like Cases.ID;")
-[Forms]![SBFMCourtDates].Form.RecordSource = ("CourtDates")
-Me.RecordSource = ("SELECT * FROM Cases INNER JOIN CourtDates ON Cases.ID = CourtDates.CasesID WHERE (CourtDates.ID=Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]) And CourtDates.CasesID Like Cases.ID;")
-Me.Requery
+    [Forms]![SBFMAppearances].SourceObject = "Query." & qnViewJobFormAppearancesQ
+    [Forms]![SBFMAppearances].Form.RecordSource = ("SELECT * FROM Cases INNER JOIN CourtDates ON Cases.ID = CourtDates.CasesID WHERE (CourtDates.ID=(Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField])) And CourtDates.CasesID Like Cases.ID;")
+    [Forms]![SBFMCourtDates].Form.RecordSource = ("CourtDates")
+    Me.RecordSource = ("SELECT * FROM Cases INNER JOIN CourtDates ON Cases.ID = CourtDates.CasesID WHERE (CourtDates.ID=Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]) And CourtDates.CasesID Like Cases.ID;")
+    Me.Requery
 End Sub

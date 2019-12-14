@@ -2,25 +2,24 @@
 Option Compare Database
 Option Explicit
 
-Sub Form_Current()
+Public Sub Form_Current()
 
-Dim sParentName As String
+    Dim sParentName As String
 
-On Error Resume Next
-sParentName = Me.Parent.Name
+    On Error Resume Next
+    sParentName = Me.Parent.Name
 
-If Err <> 0 Then
-    GoTo eHandlerX
-Else
-    On Error GoTo eHandler
-    Me.Parent![INVInvTemplate].Requery
-End If
+    If Err <> 0 Then
+        GoTo eHandlerX
+    Else
+        On Error GoTo eHandler
+        Me.Parent![INVInvTemplate].Requery
+    End If
 
 eHandlerX:
-Exit Sub
+    Exit Sub
 
 eHandler:
-Resume eHandlerX
+    Resume eHandlerX
 
 End Sub
-
