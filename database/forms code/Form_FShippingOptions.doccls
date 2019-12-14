@@ -3,120 +3,127 @@ Option Compare Database
 Option Explicit
 
 Private Sub Command78_Click()
-On Error Resume Next
-'============================================================================
-' Name        : Command78_Click
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call Command78_Click
-' Description : exports to XML for standard shipping label and added entry to CommHistory table
-'============================================================================
+    On Error Resume Next
+    '============================================================================
+    ' Name        : Command78_Click
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call Command78_Click
+    ' Description : exports to XML for standard shipping label and added entry to CommHistory table
+    '============================================================================
 
-Dim sXMLLinkforCH As String, sSavedXMLFileName As String, sNewXMLFileName As String
-Dim sQueryName As String
-Dim sMacroName As String, sTSQExcelFileName As String, sTSO As String
-Dim sTSOCourtDatesID As String, sUpdateShipOpt As String, sOutputXMLSQL As String
-Dim rstCommHistory As DAO.Recordset, rstTempShippingOptionsQ As DAO.Recordset
-Dim qdf As DAO.QueryDef, qdf1 As QueryDef
-Dim oExcelApp As New Excel.Application, oExcelWorkbk As New Excel.Workbook, oExcelWksht As New Excel.Worksheet
-Dim oExcelWorkbk2 As New Excel.Workbook
-Dim rstOutputFieldXML As DAO.Recordset
-Dim SQLString As String, sMailClassNo As String, sPackageTypeNo As String
-Dim sMailClass As String, sPackageType As String, sTrackingNumber As String
-Dim sNewSQL As String
-Dim dbVideoCollection As DAO.Database, rstShippingOptions As DAO.Recordset
-Dim rs1 As DAO.Recordset, rstMailC As DAO.Recordset, rstPkgType As DAO.Recordset
-Dim prm As DAO.Parameter
+    Dim sXMLLinkforCH As String
+    Dim sMacroName As String
+    Dim sTSO As String
+    Dim sTSOCourtDatesID As String
+    Dim sUpdateShipOpt As String
+    Dim sOutputXMLSQL As String
+    Dim SQLString As String
+    Dim sMailClassNo As String
+    Dim sPackageTypeNo As String
+    Dim sMailClass As String
+    Dim sPackageType As String
+    Dim sTrackingNumber As String
+    Dim sNewSQL As String
+    
+    Dim qdf As DAO.QueryDef
+    Dim qdf1 As QueryDef
+    
+    Dim oExcelApp As New Excel.Application
+    Dim oExcelWorkbk As New Excel.Workbook
+    Dim oExcelWksht As New Excel.Worksheet
+    Dim oExcelWorkbk2 As New Excel.Workbook
+    
+    Dim rstOutputFieldXML As DAO.Recordset
+    Dim rstShippingOptions As DAO.Recordset
+    Dim rs1 As DAO.Recordset
+    Dim rstMailC As DAO.Recordset
+    Dim rstPkgType As DAO.Recordset
+    Dim rstCommHistory As DAO.Recordset
+    Dim rstTempShippingOptionsQ As DAO.Recordset
+    Dim prm As DAO.Parameter
+    
+    Dim cJob As New Job
 
-Call pfCurrentCaseInfo  'refresh transcript info
+    Call pfCurrentCaseInfo                       'refresh transcript info
         
-sQueryName = "TempShippingOptionsQ"
-sTSQExcelFileName = "T:\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
+    SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
+    Set rs1 = CurrentDb.OpenRecordset(SQLString)
+    sMailClassNo = rs1.Fields("MailClass").Value
+    sPackageTypeNo = rs1.Fields("PackageType").Value
+    rs1.Close
 
-SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
-Set rs1 = CurrentDb.OpenRecordset(SQLString)
-sMailClassNo = rs1.Fields("MailClass").Value
-sPackageTypeNo = rs1.Fields("PackageType").Value
-rs1.Close
+    '(SELECT MailClass FROM MailClass WHERE [ID] = " & sMailClassNo & ") as MailClass
+    Set rstMailC = CurrentDb.OpenRecordset("SELECT MailClass FROM MailClass WHERE [ID] = " & sMailClassNo)
+    sMailClass = rstMailC.Fields("MailClass").Value
+    rstMailC.Close
 
-'(SELECT MailClass FROM MailClass WHERE [ID] = " & sMailClassNo & ") as MailClass
-Set rstMailC = CurrentDb.OpenRecordset("SELECT MailClass FROM MailClass WHERE [ID] = " & sMailClassNo)
-sMailClass = rstMailC.Fields("MailClass").Value
-rstMailC.Close
+    '(SELECT PackageType FROM PackageType WHERE [ID] = " & sPackageTypeNo & ") as PackageType
+    Set rstPkgType = CurrentDb.OpenRecordset("SELECT PackageType FROM PackageType WHERE [ID] = " & sPackageTypeNo)
+    sPackageType = rstPkgType.Fields("PackageType").Value
+    rstPkgType.Close
 
-'(SELECT PackageType FROM PackageType WHERE [ID] = " & sPackageTypeNo & ") as PackageType
-Set rstPkgType = CurrentDb.OpenRecordset("SELECT PackageType FROM PackageType WHERE [ID] = " & sPackageTypeNo)
-sPackageType = rstPkgType.Fields("PackageType").Value
-rstPkgType.Close
-
-sNewSQL = "SELECT " & Chr(34) & sMailClass & Chr(34) & " as MailClass, " & Chr(34) & sPackageType & Chr(34) & " as PackageType, Width, Length, Depth, PriorityMailExpress1030, HolidayDelivery, SundayDelivery, SaturdayDelivery, SignatureRequired, Stealth, ReplyPostage, InsuredMail, COD, RestrictedDelivery, AdultSignatureRestricted, AdultSignatureRequired, ReturnReceipt, CertifiedMail, SignatureConfirmation, USPSTracking, CourtDatesIDLK as ReferenceID, ToName, ToAddress1, ToAddress2, ToCity, ToState, ToPostalCode, Value, Description, WeightOz, ActualWeight, ActualWeightText, ToEmail, ToPhone FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
-
-Debug.Print (sNewSQL)
+    sNewSQL = "SELECT " & Chr(34) & sMailClass & Chr(34) & " as MailClass, " & Chr(34) & sPackageType & Chr(34) & " as PackageType, Width, Length, Depth, PriorityMailExpress1030, HolidayDelivery, SundayDelivery, SaturdayDelivery, SignatureRequired, Stealth, ReplyPostage, InsuredMail, COD, RestrictedDelivery, AdultSignatureRestricted, AdultSignatureRequired, ReturnReceipt, CertifiedMail, SignatureConfirmation, USPSTracking, CourtDatesIDLK as ReferenceID, ToName, ToAddress1, ToAddress2, ToCity, ToState, ToPostalCode, Value, Description, WeightOz, ActualWeight, ActualWeightText, ToEmail, ToPhone FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
 
 
-Set rstTempShippingOptionsQ = CurrentDb.OpenRecordset(sNewSQL)
+    Set rstTempShippingOptionsQ = CurrentDb.OpenRecordset(sNewSQL)
 
+    sTSOCourtDatesID = rstTempShippingOptionsQ("CourtDatesID").Value
+    sOutputXMLSQL = "\\HUBCLOUD\evoingram\Production\4ShippingXMLs\Output\" & sCourtDatesID & "-Output.xml"
+    
+    Set rstOutputFieldXML = CurrentDb.OpenRecordset("SELECT * FROM ShippingOptions WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";")
+    rstOutputFieldXML.Edit
+        rstOutputFieldXML.Fields("Output") = sOutputXMLSQL
+    rstOutputFieldXML.Update
 
-sTSOCourtDatesID = rstTempShippingOptionsQ("CourtDatesID").Value
-sOutputXMLSQL = "\\HUBCLOUD\evoingram\Production\4ShippingXMLs\Output\" & sCourtDatesID & "-Output.xml"
-Set rstOutputFieldXML = CurrentDb.OpenRecordset("SELECT * FROM ShippingOptions WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";")
-rstOutputFieldXML.Edit
-Set rstOutputFieldXML.Fields("Output") = sOutputXMLSQL
-rstOutputFieldXML.Update
-
-Set oExcelApp = CreateObject("Excel.Application")
-Set oExcelWorkbk = oExcelApp.Workbooks.Open(sTSQExcelFileName)
-sTSO = "TempShippingOptionsQ"
-Set oExcelWksht = oExcelWorkbk.Sheets(sTSO)
-oExcelWksht.Cells(2, 1).Value = sOutputXMLSQL
-oExcelWksht.Range("S2").CopyFromRecordset rstTempShippingOptionsQ
+    Set oExcelApp = CreateObject("Excel.Application")
+    Set oExcelWorkbk = oExcelApp.Workbooks.Open(cJob.DocPath.TempShipOptionsQ1XLSM)
+    
+    sTSO = "TempShippingOptionsQ"
+    Set oExcelWksht = oExcelWorkbk.Sheets(sTSO)
+    oExcelWksht.Cells(2, 1).Value = sOutputXMLSQL
+    oExcelWksht.Range("S2").CopyFromRecordset rstTempShippingOptionsQ
        
-'For Each oExcelWorkbk2 In oExcelApp.Workbooks
-   
+    'For Each oExcelWorkbk2 In oExcelApp.Workbooks
+    
+    oExcelWorkbk.Save
+    oExcelWorkbk.Close SaveChanges:=True
+    
+    'Next oExcelWorkbk2
+
+    rstTempShippingOptionsQ.Close
+    Set rstTempShippingOptionsQ = Nothing
+    Set qdf1 = Nothing
+    sMacroName = "ExportXML"
+
+    Call fRunXLSMacro(cJob.DocPath.TempShipOptionsQ1XLSM, sMacroName)
+
+    FileCopy cJob.DocPath.ShippingXML4, cJob.DocPath.ShippingXML
+
+    'add shipping xml entry to comm history table
+    sXMLLinkforCH = sCourtDatesID & "-ShippingXML" & "#" & cJob.DocPath.ShippingXML4 & "#"
+    Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
+    rstCommHistory.AddNew
+    rstCommHistory("FileHyperlink").Value = sXMLLinkforCH
+    rstCommHistory("DateCreated").Value = Now
+    rstCommHistory("CourtDatesID").Value = sCourtDatesID
+    rstCommHistory.Update
+
+    Set rstShippingOptions = CurrentDb.OpenRecordset("SELECT * FROM ShippingOptions WHERE CourtDatesID = " & sCourtDatesID & ";")
+    rstShippingOptions.MoveFirst
+        sTrackingNumber = rstShippingOptions.Fields("TrackingNumber").Value
+    rstShippingOptions.Close
+
+    MsgBox "Finished Exporting to XML for standard shipping label and added entry to CommHistory table."
+
+    Call fShippingExpenseEntry(sTrackingNumber)
 
 
- oExcelWorkbk.Save
-     oExcelWorkbk.Close SaveChanges:=True
-'Next oExcelWorkbk2
+    If ((sJurisdiction) Like ("*" & "SUPERIOR COURT" & "*")) Then
+        Call fCourtofAppealsIXML
+    End If
+    On Error GoTo 0
 
-rstTempShippingOptionsQ.Close
-Set rstTempShippingOptionsQ = Nothing
-Set qdf1 = Nothing
- sMacroName = "ExportXML"
-
-Call fRunXLSMacro(sTSQExcelFileName, sMacroName)
-
-sSavedXMLFileName = "T:\Production\4ShippingXMLs\" & sCourtDatesID & "-shipping.xml"
-sNewXMLFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-shipping.xml"
-
-FileCopy sSavedXMLFileName, sNewXMLFileName
-
-'add shipping xml entry to comm history table
-Set dbVideoCollection = CurrentDb
-sXMLLinkforCH = sCourtDatesID & "-ShippingXML" & "#" & sSavedXMLFileName & "#"
-Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
-rstCommHistory.AddNew
-rstCommHistory("FileHyperlink").Value = sXMLLinkforCH
-rstCommHistory("DateCreated").Value = Now
-rstCommHistory("CourtDatesID").Value = sCourtDatesID
-rstCommHistory.Update
-
-Set rstShippingOptions = CurrentDb.OpenRecordset("SELECT * FROM ShippingOptions WHERE CourtDatesID = " & sCourtDatesID & ";")
-rstShippingOptions.MoveFirst
-sTrackingNumber = rstShippingOptions.Fields("TrackingNumber").Value
-rstShippingOptions.Close
-
-MsgBox "Finished Exporting to XML for standard shipping label and added entry to CommHistory table."
-
-Call fShippingExpenseEntry(sTrackingNumber)
-
-
-If ((sJurisdiction) Like ("*" & "SUPERIOR COURT" & "*")) Then
-    Call fCourtofAppealsIXML
-End If
-On Error GoTo 0
-
-Call pfClearGlobals
+    Call pfClearGlobals
 
 End Sub
-

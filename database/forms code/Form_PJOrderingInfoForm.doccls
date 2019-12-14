@@ -2,13 +2,12 @@
 Option Compare Database
 Option Explicit
 
-
-
 Private Sub HDTOrderingInfo_Click()
-Me.OrderingAttorneyInfoSBFM.SourceObject = "Query." & qnOrderingAttorneyInfo
-Me.OrderingAttorneyInfoSBFM.Requery
-Me.OrderingAttorneyInfoSBFM.Form.DefaultView = "Single Form"
+    Me.OrderingAttorneyInfoSBFM.SourceObject = "Query." & qnOrderingAttorneyInfo
+    Me.OrderingAttorneyInfoSBFM.Requery
+    Me.OrderingAttorneyInfoSBFM.Form.DefaultView = "Single Form"
 End Sub
+
 Private Sub OrderingAttorneyInfoSBFM_AfterUpdate()
-Me.OrderingAttorneyInfoSBFM.Form.DefaultView = "Single Form"
+    Me.OrderingAttorneyInfoSBFM.Form.DefaultView = "Single Form"
 End Sub

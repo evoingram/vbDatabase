@@ -3,6 +3,6 @@ Option Compare Database
 Option Explicit
 
 Private Sub CourtDatesID_AfterUpdate()
-Me.Filter = "CourtDatesID= " & Me.CourtDatesID
-Me.FilterOn = True
+    Me.Filter = "CourtDatesID= " & Me.CourtDatesID
+    Me.FilterOn = True
 End Sub

@@ -4,175 +4,192 @@ Option Explicit
 
 'JurisdictionRef
 Private Sub WBCViewJobFolder_OnUpdated()
-Dim sTranscriptDir As String
-Dim sJobNumberDirectory As String
-Dim sAppName As String
+    Dim sTranscriptDir As String
+    Dim sJobNumberDirectory As String
+    Dim sAppName As String
 
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-Call pfCurrentCaseInfo
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    Call pfCurrentCaseInfo
 
 
 
-If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then
+    If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then
 
-    'T:\Administration\Jurisdiction References\eScribers
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\eScribers\"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\eScribers
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\eScribers\"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
 
-ElseIf sJurisdiction = "Food and Drug Administration" Then
+    ElseIf sJurisdiction = "Food and Drug Administration" Then
     
-    'T:\Administration\Jurisdiction References\FDA
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\FDA
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
     
-ElseIf sJurisdiction = "*FDA*" Then
+    ElseIf sJurisdiction = "*FDA*" Then
      
-     'T:\Administration\Jurisdiction References\FDA
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\FDA
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
-ElseIf sJurisdiction = "*Weber*" Then
+    ElseIf sJurisdiction = "*Weber*" Then
     
-    'T:\Administration\Jurisdiction References\Weber
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\Weber"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\Weber
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\Weber"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
-ElseIf sJurisdiction = "*County*" Then
+    ElseIf sJurisdiction = "*County*" Then
     
+    'TODO: PATH
         'T:\Administration\Jurisdiction References\WACounties
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\WACounties"
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\WACounties"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
         
-ElseIf sJurisdiction = "*USBC*" Then
+    ElseIf sJurisdiction = "*USBC*" Then
     
+    'TODO: PATH
         'T:\Administration\Jurisdiction References\USBC
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\USBC"
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\USBC"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
  
-ElseIf sJurisdiction = "Massachusetts" Then
+    ElseIf sJurisdiction = "Massachusetts" Then
     
+    'TODO: PATH
         'T:\Administration\Jurisdiction References\USBC
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\Massachusetts"
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\Massachusetts"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
-Else
-    'T:\Administration\Jurisdiction References
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References"
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+    Else
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
-    Application.FollowHyperlink ("https://ac.courts.wa.gov/index.cfm?fa=efiling.home")
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Application.FollowHyperlink ("https://ac.courts.wa.gov/index.cfm?fa=efiling.home")
         
-End If
+    End If
     
 End Sub
+
 Private Sub Command5_Click()
 
-Dim sTranscriptDir As String
-Dim sJobNumberDirectory As String
-Dim sAppName As String
+    Dim sTranscriptDir As String
+    Dim sJobNumberDirectory As String
+    Dim sAppName As String
 
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-Call pfCurrentCaseInfo
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    Call pfCurrentCaseInfo
 
 
 
-If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then
+    If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then
 
-    'T:\Administration\Jurisdiction References\eScribers
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\eScribers\"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\eScribers
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\eScribers\"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
 
-ElseIf sJurisdiction = "Food and Drug Administration" Then
+    ElseIf sJurisdiction = "Food and Drug Administration" Then
     
-    'T:\Administration\Jurisdiction References\FDA
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\FDA
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
     
-ElseIf sJurisdiction = "*FDA*" Then
+    ElseIf sJurisdiction = "*FDA*" Then
      
-     'T:\Administration\Jurisdiction References\FDA
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\FDA
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\FDA"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
-ElseIf sJurisdiction = "*Weber*" Then
+    ElseIf sJurisdiction = "*Weber*" Then
     
-    'T:\Administration\Jurisdiction References\Weber
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\Weber"
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References\Weber
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\Weber"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
-ElseIf sJurisdiction = "*County*" Then
+    ElseIf sJurisdiction = "*County*" Then
     
+    'TODO: PATH
         'T:\Administration\Jurisdiction References\WACounties
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\WACounties"
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\WACounties"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
         
-ElseIf sJurisdiction = "*USBC*" Then
+    ElseIf sJurisdiction = "*USBC*" Then
     
+    'TODO: PATH
         'T:\Administration\Jurisdiction References\USBC
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\USBC"
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\USBC"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
 
-ElseIf sJurisdiction = "Massachusetts" Then
+    ElseIf sJurisdiction = "Massachusetts" Then
     
+    'TODO: PATH
         'T:\Administration\Jurisdiction References\USBC
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References\Massachusetts"
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References\Massachusetts"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
     
-Else
-    'T:\Administration\Jurisdiction References
-    sJobNumberDirectory = "T:\Administration\Jurisdiction References"
+    Else
+    'TODO: PATH
+        'T:\Administration\Jurisdiction References
+        sJobNumberDirectory = "T:\Administration\Jurisdiction References"
     
-    sTranscriptDir = "file:///" & sJobNumberDirectory
+        sTranscriptDir = "file:///" & sJobNumberDirectory
         
-    Me.WBCViewJobFolder.Navigate2 sTranscriptDir
-    Application.FollowHyperlink ("https://ac.courts.wa.gov/index.cfm?fa=efiling.home")
+        Me.WBCViewJobFolder.Navigate2 sTranscriptDir
+        Application.FollowHyperlink ("https://ac.courts.wa.gov/index.cfm?fa=efiling.home")
         
-End If
+    End If
     
 
 End Sub

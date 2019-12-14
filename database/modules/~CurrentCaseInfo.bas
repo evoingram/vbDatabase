@@ -36,18 +36,57 @@ Option Explicit
 '============================================================================
 
 Public sParty1 As String
-Public sCompany As String, sParty2 As String, sCourtDatesID As String, sInvoiceNumber As String
-Public sParty1Name As String, sParty2Name As String, sInvoiceNo As String, sEmail As String, sDescription As String
-Public sSubtotal As String, sInvoiceDate As String, sInvoiceTime As String, sPaymentTerms As String, sNote As String
-Public sTerms As String, sMinimumAmount As String, vmMemo As String, vlURL As String, sTemplateID As String
-Public sLine1 As String, sCity As String, sState As String, sZIP As String, sQuantity As String, sValue As String
-Public sInventoryRateCode As String, sIRC As String, sCaseNumber2 As String
-Public sActualQuantity As String, sJurisdiction As String, sTurnaroundTime As String, sCaseNumber1 As String
-Public sCustomerID As String, sAudioLength As String, sEstimatedPageCount As String, sStatusesID As String
-Public dDueDate As Date, dExpectedAdvanceDate As Date, dExpectedRebateDate As Date, sPaymentSum As String
-Public sFactoringApproved As String, sBrandingTheme As String, sFinalPrice As String
-Public sClientTranscriptName As String, sCurrentTranscriptName As String
-Public sBalanceDue As String, sFactoringCost As String, svURL As String, sLinkToCSV As String
+Public sCompany As String
+Public sParty2 As String
+Public sCourtDatesID As String
+Public sInvoiceNumber As String
+Public sParty1Name As String
+Public sParty2Name As String
+Public sInvoiceNo As String
+Public sEmail As String
+Public sDescription As String
+Public sSubtotal As String
+Public sInvoiceDate As String
+Public dInvoiceDate As Date
+Public sInvoiceTime As String
+Public sPaymentTerms As String
+Public sNote As String
+Public sTerms As String
+Public sMinimumAmount As String
+Public vmMemo As String
+Public vlURL As String
+Public sTemplateID As String
+Public sLine1 As String
+Public sCity As String
+Public sState As String
+Public sZIP As String
+Public sQuantity As String
+Public sValue As String
+Public sInventoryRateCode As String
+Public sIRC As String
+Public sCaseNumber2 As String
+Public sActualQuantity As String
+Public sJurisdiction As String
+Public sTurnaroundTime As String
+Public sCaseNumber1 As String
+Public sCustomerID As String
+Public sAudioLength As String
+Public sEstimatedPageCount As String
+Public sStatusesID As String
+Public dDueDate As Date
+Public dExpectedAdvanceDate As Date
+Public dExpectedRebateDate As Date
+Public dExpectedBalanceDate As Date
+Public sPaymentSum As String
+Public sFactoringApproved As String
+Public sBrandingTheme As String
+Public sFinalPrice As String
+Public sClientTranscriptName As String
+Public sCurrentTranscriptName As String
+Public sBalanceDue As String
+Public sFactoringCost As String
+Public svURL As String
+Public sLinkToCSV As String
 Public sFirstName As String
 Public sLastName As String
 Public dHearingDate As Date
@@ -71,7 +110,6 @@ Public HyperlinkString As String
 Public rtfStringBody As String
 Public sLocation As String
 Public sPPID As String
-
 Public lngNumOfHrs As Long
 Public lngNumOfMins As Long
 Public lngNumOfSecsRem As Long
@@ -85,13 +123,16 @@ Public i As Long
 'Public SharedRecognizer As SpSharedRecognizer
 'Public theRecognizers As ISpeechObjectTokens
 
-Public oWordApp As Word.Document, oWordDoc As Word.Application
+Public oWordApp As Word.Document
+Public oWordDoc As Word.Application
 
 Public Const qnTRCourtQ As String = "TR-Court-Q"
 Public Const qnShippingOptionsQ As String = "ShippingOptionsQ"
 Public Const qnViewJobFormAppearancesQ As String = "ViewJobFormAppearancesQ"
 Public Const qnTRCourtUnionAppAddrQ As String = "TR-Court-Union-AppAddr"
 Public Const qnOrderingAttorneyInfo As String = "OrderingAttorneyInfo"
+Public Const qnQInfobyInvNo As String = "QInfobyInvoiceNumber"
+Public Const qTempShippingOptions As String = "TempShippingOptionsQ"
 
 Public Const sCompanyEmail As String = "inquiries@aquoco.co"
 Public Const sCompanyFirstName As String = "Erica"
@@ -111,391 +152,388 @@ Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LO
 '@Ignore ConstantNotUsed
 Public Const sPPTemplateName As String = "Amount only"
 Public Const sTermDays As String = "30"
-Public lAssigneeID As Long, sDueDate As String, bStarred As String, bCompleted As String, sTitle As String, sWLListID As String
-
+Public lAssigneeID As Long
+Public sDueDate As String
+Public bStarred As String
+Public bCompleted As String
+Public sTitle As String
+Public sWLListID As String
 
 Public Sub pfCurrentCaseInfo()
     
-'============================================================================
-' Name        : pfCurrentCaseInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call pfCurrentCaseInfo
-' Description : refreshes global variables for current transcript
-'============================================================================
+    '============================================================================
+    ' Name        : pfCurrentCaseInfo
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfCurrentCaseInfo
+    ' Description : refreshes global variables for current transcript
+    '============================================================================
 
-Dim cJob As Job
-Set cJob = New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-cJob.FindFirst "ID=" & sCourtDatesID
-sTurnaroundTime = cJob.TurnaroundTime
-sCasesID = cJob.CaseID
-sEstimatedPageCount = cJob.EstimatedPageCount
-sHearingLocation = cJob.Location
-sStartTime = Format(cJob.HearingStartTime, "h:mm AM/PM")
-sEndTime = Format(cJob.HearingEndTime, "h:mm AM/PM")
-sAudioLength = cJob.AudioLength
-dHearingDate = Format(cJob.HearingDate, "mm-dd-yyyy")
-sInvoiceNumber = cJob.InvoiceNo
-sCaseNumber1 = cJob.CaseInfo.CaseNumber1
-sCaseNumber2 = cJob.CaseInfo.CaseNumber2
-sParty1 = cJob.CaseInfo.Party1
-sParty1Name = cJob.CaseInfo.Party1Name
-sCompany = cJob.App0.Company
-sJurisdiction = cJob.CaseInfo.Jurisdiction
-sParty2 = cJob.CaseInfo.Party2
-sParty2Name = cJob.CaseInfo.Party2Name
-sActualQuantity = cJob.ActualQuantity
-sFactoringApproved = cJob.App0.FactoringApproved
-dExpectedAdvanceDate = Format(cJob.ExpectedAdvanceDate, "mm-dd-yyyy")
-dExpectedRebateDate = Format(cJob.ExpectedRebateDate, "mm-dd-yyyy")
-dDueDate = Format(cJob.DueDate, "mm-dd-yyyy")
-sSubtotal = cJob.Subtotal
-sPaymentSum = Nz(cJob.PaymentSum, 0)
-sFinalPrice = cJob.FinalPrice
-sFactoringCost = cJob.FactoringCost
-sBrandingTheme = cJob.BrandingTheme
-sPPID = cJob.PPID
-sBalanceDue = sFinalPrice - sPaymentSum
-sInventoryRateCode = cJob.InventoryRateCode
-sIRC = cJob.InventoryRateCode
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    sTurnaroundTime = cJob.TurnaroundTime
+    sCasesID = cJob.CaseID
+    sEstimatedPageCount = cJob.EstimatedPageCount
+    sHearingLocation = cJob.Location
+    sStartTime = Format(cJob.HearingStartTime, "h:mm AM/PM")
+    sEndTime = Format(cJob.HearingEndTime, "h:mm AM/PM")
+    sAudioLength = cJob.AudioLength
+    dHearingDate = Format(cJob.HearingDate, "mm-dd-yyyy")
+    sInvoiceNumber = cJob.InvoiceNo
+    sCaseNumber1 = cJob.CaseInfo.CaseNumber1
+    sCaseNumber2 = cJob.CaseInfo.CaseNumber2
+    sParty1 = cJob.CaseInfo.Party1
+    sParty1Name = cJob.CaseInfo.Party1Name
+    sCompany = cJob.App0.Company
+    sJurisdiction = cJob.CaseInfo.Jurisdiction
+    sParty2 = cJob.CaseInfo.Party2
+    sParty2Name = cJob.CaseInfo.Party2Name
+    sActualQuantity = cJob.ActualQuantity
+    sFactoringApproved = cJob.App0.FactoringApproved
+    dExpectedAdvanceDate = Format(cJob.ExpectedAdvanceDate, "mm-dd-yyyy")
+    dExpectedRebateDate = Format(cJob.ExpectedRebateDate, "mm-dd-yyyy")
+    dDueDate = Format(cJob.DueDate, "mm-dd-yyyy")
+    sSubtotal = cJob.Subtotal
+    sPaymentSum = Nz(cJob.PaymentSum, 0)
+    sFinalPrice = cJob.FinalPrice
+    sFactoringCost = cJob.FactoringCost
+    sBrandingTheme = cJob.BrandingTheme
+    sPPID = cJob.PPID
+    sBalanceDue = sFinalPrice - sPaymentSum
+    sInventoryRateCode = cJob.InventoryRateCode
+    sIRC = cJob.InventoryRateCode
 
 End Sub
 
-
-    
 Public Sub pfGetOrderingAttorneyInfo()
     
-'============================================================================
-' Name        : GetOrderingAttorneyInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call pfGetOrderingAttorneyInfo
-' Description : refreshes ordering attorney info for transcript
-'============================================================================
+    '============================================================================
+    ' Name        : GetOrderingAttorneyInfo
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfGetOrderingAttorneyInfo
+    ' Description : refreshes ordering attorney info for transcript
+    '============================================================================
 
-Dim rstOrderingAttyInfo As DAO.Recordset
-Dim cJob As Job
-Set cJob = New Job
+    Dim rstOrderingAttyInfo As DAO.Recordset
+    Dim cJob As Job
+    Set cJob = New Job
         
-sCourtDatesID = 1874
-'Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-cJob.FindFirst "ID=" & sCourtDatesID
-sFactoringApproved = cJob.App0.FactoringApproved
-sFirstName = cJob.App0.FirstName
-sLastName = cJob.App0.LastName
-sName = sFirstName & " " & sLastName
-sAddress1 = cJob.App0.Company
-sAddress2 = cJob.App0.Address
-sLine1 = cJob.App0.Address
-sCity = cJob.App0.City
-sState = cJob.App0.State
-sZIP = cJob.App0.ZIP
-sQuantity = cJob.Quantity
-sSubtotal = cJob.Subtotal
-sUnitPrice = cJob.UnitPrice
-sEmail = cJob.App0.Notes
-sNotes = cJob.App0.Notes
-sInvoiceNumber = cJob.InvoiceNo
-sOrderingID = cJob.sApp0
-sCompany = cJob.App0.Company
-sMrMs = cJob.App0.MrMs
-Set rstOrderingAttyInfo = CurrentDb.OpenRecordset("SELECT Rate FROM UnitPrice WHERE ID=" & sUnitPrice & ";")
-sUnitPrice = rstOrderingAttyInfo("Rate").Value
-rstOrderingAttyInfo.Close
-Debug.Print sMrMs
-Debug.Print sCompany
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    sFactoringApproved = cJob.App0.FactoringApproved
+    sFirstName = cJob.App0.FirstName
+    sLastName = cJob.App0.LastName
+    sName = sFirstName & " " & sLastName
+    sAddress1 = cJob.App0.Company
+    sAddress2 = cJob.App0.Address
+    sLine1 = cJob.App0.Address
+    sCity = cJob.App0.City
+    sState = cJob.App0.State
+    sZIP = cJob.App0.ZIP
+    sQuantity = cJob.Quantity
+    sSubtotal = cJob.Subtotal
+    sUnitPrice = cJob.UnitPrice
+    sEmail = cJob.App0.Notes
+    sNotes = cJob.App0.Notes
+    sInvoiceNumber = cJob.InvoiceNo
+    sOrderingID = cJob.sApp0
+    sCompany = cJob.App0.Company
+    sMrMs = cJob.App0.MrMs
+    Set rstOrderingAttyInfo = CurrentDb.OpenRecordset("SELECT Rate FROM UnitPrice WHERE ID=" & sUnitPrice & ";")
+    sUnitPrice = rstOrderingAttyInfo("Rate").Value
+    rstOrderingAttyInfo.Close
+    Debug.Print sMrMs
+    Debug.Print sCompany
     
 End Sub
 
+Public Sub fPPGenerateJSONInfo()
+    '============================================================================
+    ' Name        : fPPGenerateJSONInfo
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call fPPGenerateJSONInfo
+    ' Description : get info for invoice
+    '============================================================================
 
-Sub fPPGenerateJSONInfo()
-'============================================================================
-' Name        : fPPGenerateJSONInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call fPPGenerateJSONInfo
-' Description : get info for invoice
-'============================================================================
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    Call pfCurrentCaseInfo
+    sInvoiceID = sPPID                           '"INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6 '
+    sSubtotal = sUnitPrice
+    sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
+    sInvoiceTime = (Format(Now(), "hh:mm:ss"))
+    sMinimumAmount = "1"                         'rstTRQPlusCases.Fields("").value
+    sValue = sUnitPrice
+    sDescription = "Job No.:  " & sCourtDatesID & "  |  " & _
+                   "Invoice No.:  " & sInvoiceNumber & "\n" & _
+                   sParty1 & " v " & sParty2 & "\n" & _
+                   "Case Nos.:  " & sCaseNumber1 & " " & sCaseNumber2 & "\n" & _
+                   "Hearing Date:  " & dHearingDate & "\n" & _
+                   "Approx. " & sAudioLength & " minutes" & "  |  " & _
+                   "Turnaround Time:  " & sTurnaroundTime & " calendar days"
 
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-Call pfCurrentCaseInfo
-sInvoiceID = sPPID '"INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6 '
-sSubtotal = sUnitPrice
-sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
-sInvoiceTime = (Format(Now(), "hh:mm:ss"))
-sMinimumAmount = "1" 'rstTRQPlusCases.Fields("").value
-sValue = sUnitPrice
-sDescription = "Job No.:  " & sCourtDatesID & "  |  " & _
-"Invoice No.:  " & sInvoiceNumber & "\n" & _
-sParty1 & " v " & sParty2 & "\n" & _
-"Case Nos.:  " & sCaseNumber1 & " " & sCaseNumber2 & "\n" & _
-"Hearing Date:  " & dHearingDate & "\n" & _
-"Approx. " & sAudioLength & " minutes" & "  |  " & _
-"Turnaround Time:  " & sTurnaroundTime & " calendar days"
+    If sBrandingTheme = "1" Then                 'WRTS NC Factoring
+        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
+    
+        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("").value
+    
+        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                 "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                 "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
 
-If sBrandingTheme = "1" Then 'WRTS NC Factoring
-    sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
+    ElseIf sBrandingTheme = "2" Then             'WRTS NC 100 Deposit
+        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                        "The turnaround as described above will begin once this invoice is paid.  Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+        'rstTRQPlusCases.Fields("")value
     
-    sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("").value
+        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+        'rstTRQPlusCases.Fields("")value
     
-    sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
-
-ElseIf sBrandingTheme = "2" Then  'WRTS NC 100 Deposit
-    sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-        "The turnaround as described above will begin once this invoice is paid.  Full terms of service listed at https://www.aquoco.co/ServiceA.html."
-    'rstTRQPlusCases.Fields("")value
-    
-    sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-    'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
     
 
-ElseIf sBrandingTheme = "3" Then  'WRTS C 50 Deposit Filed Non-BK
-    sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-        "The turnaround as described above will begin once this invoice is paid."
-    'rstTRQPlusCases.Fields("")value
+    ElseIf sBrandingTheme = "3" Then             'WRTS C 50 Deposit Filed Non-BK
+        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                        "The turnaround as described above will begin once this invoice is paid."
+        'rstTRQPlusCases.Fields("")value
     
-    sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-    'rstTRQPlusCases.Fields("")value
+        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+        'rstTRQPlusCases.Fields("")value
     
-    sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
     
+        vmMemo = sCourtDatesID & " " & sInvoiceNo
+
+    ElseIf sBrandingTheme = "4" Then             'WRTS C 50 Deposit Filed BK
+
+        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                        "The turnaround as described above will begin once this invoice is paid."
+        'rstTRQPlusCases.Fields("")value
+    
+        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+        'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+    
+
+    ElseIf sBrandingTheme = "5" Then             'WRTS C 50 Deposit Not Filed
+        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                        "The turnaround as described above will begin once this invoice is paid."
+        'rstTRQPlusCases.Fields("")value
+    
+        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+        'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+    
+
+    ElseIf sBrandingTheme = "6" Then             'WRTS C Factoring Filed
+        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+    
+        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                 "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                 "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        
+
+    ElseIf sBrandingTheme = "7" Then             'WRTS C Factoring Not Filed
+        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+    
+        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                 "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                 "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        
+
+    ElseIf sBrandingTheme = "8" Then             'WRTS C 100 Deposit Filed
+        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                        "The turnaround as described above will begin once this invoice is paid."
+        'rstTRQPlusCases.Fields("")value
+    
+        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+        'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+    
+    ElseIf sBrandingTheme = "9" Then             'WRTS C 100 Deposit Not Filed
+        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                        "The turnaround as described above will begin once this invoice is paid."
+        'rstTRQPlusCases.Fields("")value
+    
+        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+        'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+    
+
+    ElseIf sBrandingTheme = "10" Then            'WRTS JJ Factoring
+        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+    
+        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                 "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                 "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        
+
+    ElseIf sBrandingTheme = "11" Then            'WRTS Tabula Not Factored/Filed
+        sPaymentTerms = sCourtDatesID & " " & sInvoiceNo 'rstTRQPlusCases.Fields("")value
+        sNote = "Thank you for your business."   'rstTRQPlusCases.Fields("")value
+        sTerms = "Thank you for your business."  'rstTRQPlusCases.Fields("")value
+
+    ElseIf sBrandingTheme = "12" Then            'WRTS AMOR Factoring
+        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+    
+        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+    
+        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                 "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                 "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        
+    End If
     vmMemo = sCourtDatesID & " " & sInvoiceNo
 
-ElseIf sBrandingTheme = "4" Then  'WRTS C 50 Deposit Filed BK
-
-    sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-        "The turnaround as described above will begin once this invoice is paid."
-    'rstTRQPlusCases.Fields("")value
-    
-    sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-    'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
-    
-
-ElseIf sBrandingTheme = "5" Then  'WRTS C 50 Deposit Not Filed
-    sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-        "The turnaround as described above will begin once this invoice is paid."
-    'rstTRQPlusCases.Fields("")value
-    
-    sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-    'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
-    
-
-ElseIf sBrandingTheme = "6" Then  'WRTS C Factoring Filed
-    sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-    
-    sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-        
-
-ElseIf sBrandingTheme = "7" Then  'WRTS C Factoring Not Filed
-    sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-    
-    sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-        
-
-ElseIf sBrandingTheme = "8" Then  'WRTS C 100 Deposit Filed
-    sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-        "The turnaround as described above will begin once this invoice is paid."
-    'rstTRQPlusCases.Fields("")value
-    
-    sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-    'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
-    
-ElseIf sBrandingTheme = "9" Then  'WRTS C 100 Deposit Not Filed
-    sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-        "The turnaround as described above will begin once this invoice is paid."
-    'rstTRQPlusCases.Fields("")value
-    
-    sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-    'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
-    
-
-ElseIf sBrandingTheme = "10" Then  'WRTS JJ Factoring
-    sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-    
-    sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-        
-
-ElseIf sBrandingTheme = "11" Then  'WRTS Tabula Not Factored/Filed
-    sPaymentTerms = sCourtDatesID & " " & sInvoiceNo 'rstTRQPlusCases.Fields("")value
-    sNote = "Thank you for your business." 'rstTRQPlusCases.Fields("")value
-    sTerms = "Thank you for your business." 'rstTRQPlusCases.Fields("")value
-
-ElseIf sBrandingTheme = "12" Then  'WRTS AMOR Factoring
-    sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-    
-    sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
-    
-    sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-        "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-        "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
-        
-End If
-vmMemo = sCourtDatesID & " " & sInvoiceNo
-
 End Sub
 
-Sub pfClearGlobals()
+Public Sub pfClearGlobals()
 
-'============================================================================
-' Name        : pfClearGlobals
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call pfClearGlobals
-' Description : clears all global variables
-'============================================================================
-sParty1 = ""
-sCompany = ""
-sParty2 = ""
-sCourtDatesID = ""
-sInvoiceNumber = ""
-sParty1Name = ""
-sParty2Name = ""
-sInvoiceNo = ""
-sEmail = ""
-sDescription = ""
-sSubtotal = ""
-sInvoiceDate = ""
-sInvoiceTime = ""
-sPaymentTerms = ""
-sNote = ""
-sTerms = ""
-sMinimumAmount = ""
-vmMemo = ""
-vlURL = ""
-sTemplateID = ""
-sLine1 = ""
-sCity = ""
-sState = ""
-sZIP = ""
-sQuantity = ""
-sValue = ""
-sInventoryRateCode = ""
-sIRC = ""
-sActualQuantity = ""
-sJurisdiction = ""
-sTurnaroundTime = ""
-sCaseNumber1 = ""
-sCaseNumber2 = ""
-Set oWordApp = Nothing
-Set oWordDoc = Nothing
-sCustomerID = ""
-sAudioLength = ""
-sEstimatedPageCount = ""
-sStatusesID = ""
-sFinalPrice = ""
-sPaymentSum = ""
-sBalanceDue = ""
-sFactoringCost = ""
-svURL = ""
-sLinkToCSV = ""
-sFactoringApproved = ""
-sBrandingTheme = ""
-sFirstName = ""
-sLastName = ""
-sMrMs = ""
-sName = ""
-sAddress1 = ""
-sAddress2 = ""
-sNotes = ""
-HyperlinkString = ""
-rtfStringBody = ""
-sTime = ""
-sTime1 = ""
-sClientTranscriptName = ""
-sCurrentTranscriptName = ""
-sLocation = ""
-sStartTime = ""
-sEndTime = ""
+    '============================================================================
+    ' Name        : pfClearGlobals
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfClearGlobals
+    ' Description : clears all global variables
+    '============================================================================
+    sParty1 = ""
+    sCompany = ""
+    sParty2 = ""
+    sCourtDatesID = ""
+    sInvoiceNumber = ""
+    sParty1Name = ""
+    sParty2Name = ""
+    sInvoiceNo = ""
+    sEmail = ""
+    sDescription = ""
+    sSubtotal = ""
+    sInvoiceDate = ""
+    sInvoiceTime = ""
+    sPaymentTerms = ""
+    sNote = ""
+    sTerms = ""
+    sMinimumAmount = ""
+    vmMemo = ""
+    vlURL = ""
+    sTemplateID = ""
+    sLine1 = ""
+    sCity = ""
+    sState = ""
+    sZIP = ""
+    sQuantity = ""
+    sValue = ""
+    sInventoryRateCode = ""
+    sIRC = ""
+    sActualQuantity = ""
+    sJurisdiction = ""
+    sTurnaroundTime = ""
+    sCaseNumber1 = ""
+    sCaseNumber2 = ""
+    Set oWordApp = Nothing
+    Set oWordDoc = Nothing
+    sCustomerID = ""
+    sAudioLength = ""
+    sEstimatedPageCount = ""
+    sStatusesID = ""
+    sFinalPrice = ""
+    sPaymentSum = ""
+    sBalanceDue = ""
+    sFactoringCost = ""
+    svURL = ""
+    sLinkToCSV = ""
+    sFactoringApproved = ""
+    sBrandingTheme = ""
+    sFirstName = ""
+    sLastName = ""
+    sMrMs = ""
+    sName = ""
+    sAddress1 = ""
+    sAddress2 = ""
+    sNotes = ""
+    HyperlinkString = ""
+    rtfStringBody = ""
+    sTime = ""
+    sTime1 = ""
+    sClientTranscriptName = ""
+    sCurrentTranscriptName = ""
+    sLocation = ""
+    sStartTime = ""
+    sEndTime = ""
 
 End Sub
-
-
 
 Public Sub pfCurrentCaseInfo1()
-'everything from this sub down to bottom of module can be deleted after known safe
-'============================================================================
-' Name        : pfCurrentCaseInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call pfCurrentCaseInfo
-' Description : refreshes global variables for current transcript
-'============================================================================
+    'everything from this sub down to bottom of module can be deleted after known safe
+    '============================================================================
+    ' Name        : pfCurrentCaseInfo
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfCurrentCaseInfo
+    ' Description : refreshes global variables for current transcript
+    '============================================================================
 
-Dim rstTRCourtUnionAA As DAO.Recordset
-Dim db As Database
-Dim qdf As QueryDef
+    Dim rstTRCourtUnionAA As DAO.Recordset
+    Dim qdf As QueryDef
 
 
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-            Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
-            Set qdf.Parameters(0) = sCourtDatesID
-            Set rstTRCourtUnionAA = qdf.OpenRecordset
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
+    qdf.Parameters(0) = sCourtDatesID
+    Set rstTRCourtUnionAA = qdf.OpenRecordset
             
-            If Not rstTRCourtUnionAA.EOF Then
-            If Not rstTRCourtUnionAA.Fields("TR-AppAddrQ.ID").Value Like "" Then
+    If Not rstTRCourtUnionAA.EOF Then
+        If Not rstTRCourtUnionAA.Fields("TR-AppAddrQ.ID").Value Like "" Then
             sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
             
             sCustomerID = rstTRCourtUnionAA.Fields("TR-AppAddrQ.ID").Value
@@ -541,44 +579,43 @@ sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
             sBalanceDue = sFinalPrice - sPaymentSum
             
         
+        End If
+    
+        rstTRCourtUnionAA.Close
+        Set qdf = Nothing
+    
     End If
-    
-    rstTRCourtUnionAA.Close
-    Set qdf = Nothing
-    db.Close
-    
-End If
 
 End Sub
-    
+
 Public Sub pfGetOrderingAttorneyInfo1()
     
-'============================================================================
-' Name        : GetOrderingAttorneyInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call pfGetOrderingAttorneyInfo
-' Description : refreshes ordering attorney info for transcript
-'============================================================================
+    '============================================================================
+    ' Name        : GetOrderingAttorneyInfo
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfGetOrderingAttorneyInfo
+    ' Description : refreshes ordering attorney info for transcript
+    '============================================================================
 
-Dim rstOrderingAttyInfo As DAO.Recordset
-Dim db As Database
-Dim qdf As QueryDef
-'Const sCourtDatesID As String = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-'GetProperty(cCurrentCI, sCourtDatesID)
+    Dim rstOrderingAttyInfo As DAO.Recordset
+    Dim db As Database
+    Dim qdf As QueryDef
+    'Const sCourtDatesID As String = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    'GetProperty(cCurrentCI, sCourtDatesID)
 
         
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-Set db = CurrentDb
-Set qdf = db.QueryDefs(qnOrderingAttorneyInfo)
-Set qdf.Parameters(0) = sCourtDatesID
+    Set db = CurrentDb
+    Set qdf = db.QueryDefs(qnOrderingAttorneyInfo)
+    qdf.Parameters(0) = sCourtDatesID
 
-Set rstOrderingAttyInfo = qdf.OpenRecordset
+    Set rstOrderingAttyInfo = qdf.OpenRecordset
 
-If Not rstOrderingAttyInfo.EOF Then
+    If Not rstOrderingAttyInfo.EOF Then
 
-    If Not rstOrderingAttyInfo.Fields("CourtDatesID").Value Like "" Then
+        If Not rstOrderingAttyInfo.Fields("CourtDatesID").Value Like "" Then
                 
         
             sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -616,39 +653,38 @@ If Not rstOrderingAttyInfo.EOF Then
             sLastName = rstOrderingAttyInfo.Fields("LastName").Value
             sFirstName = rstOrderingAttyInfo.Fields("FirstName").Value
             
+        End If
+
+
+        rstOrderingAttyInfo.Close
+        Set qdf = Nothing
+
+        Set rstOrderingAttyInfo = CurrentDb.OpenRecordset("SELECT Rate FROM UnitPrice WHERE ID=" & sUnitPrice & ";")
+        sUnitPrice = rstOrderingAttyInfo("Rate").Value
+
+        rstOrderingAttyInfo.Close
+
+        db.Close
+
     End If
-
-
-rstOrderingAttyInfo.Close
-Set qdf = Nothing
-
-Set rstOrderingAttyInfo = CurrentDb.OpenRecordset("SELECT Rate FROM UnitPrice WHERE ID=" & sUnitPrice & ";")
-sUnitPrice = rstOrderingAttyInfo("Rate").Value
-
-rstOrderingAttyInfo.Close
-
-db.Close
-
-End If
     
 End Sub
-
 
 Public Sub pfGetCaseInfoQDFRecordset()
 
 
-Dim rs1 As DAO.Recordset
-Dim db As Database
-Dim qdf As QueryDef
+    Dim rs1 As DAO.Recordset
+    Dim db As Database
+    Dim qdf As QueryDef
 
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-Set db = CurrentDb
-Set qdf = db.QueryDefs(qnTRCourtUnionAppAddrQ)
-Set qdf.Parameters(0) = sCourtDatesID
-Set rs1 = qdf.OpenRecordset
+    Set db = CurrentDb
+    Set qdf = db.QueryDefs(qnTRCourtUnionAppAddrQ)
+    qdf.Parameters(0) = sCourtDatesID
+    Set rs1 = qdf.OpenRecordset
 
-If Not rs1.EOF Then
+    If Not rs1.EOF Then
         If Not rs1.Fields("TR-AppAddrQ.ID").Value Like "" Then
             sCustomerID = rs1.Fields("TR-AppAddrQ.ID").Value
         End If
@@ -686,246 +722,246 @@ If Not rs1.EOF Then
         sFactoringCost = rs1.Fields("FactoringCost").Value
         sBalanceDue = sFinalPrice - sPaymentSum
     
-End If
+    End If
 
-rs1.Close
-Set qdf = Nothing
-db.Close
+    rs1.Close
+    Set qdf = Nothing
+    db.Close
 
 End Sub
 
-
-Sub fPPGenerateJSONInfo1()
-'============================================================================
-' Name        : fPPGenerateJSONInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call fPPGenerateJSONInfo
-' Description : get info for invoice
-'============================================================================
+Public Sub fPPGenerateJSONInfo1()
+    '============================================================================
+    ' Name        : fPPGenerateJSONInfo
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call fPPGenerateJSONInfo
+    ' Description : get info for invoice
+    '============================================================================
         
-Dim rstTRQPlusCases As DAO.Recordset
-Dim db As Database
-Dim qdf As QueryDef
+    Dim rstTRQPlusCases As DAO.Recordset
+    Dim db As Database
+    Dim qdf As QueryDef
 
 
-sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-Call pfCurrentCaseInfo
-
-Set db = CurrentDb
-Set qdf = db.QueryDefs("TRInvoiQPlusCases")
-Set qdf.Parameters(0) = sCourtDatesID
-Set rstTRQPlusCases = qdf.OpenRecordset
-
-If Not rstTRQPlusCases.EOF Then
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    
-    sInvoiceNumber = rstTRQPlusCases.Fields("TRInv.GetInvoiceNoFromCDID.InvoiceNo").Value
-    sInvoiceID = rstTRQPlusCases.Fields("TRInv.PPID").Value '"INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6 '
-    'sInvoiceID = .sInvoiceID
-    sSubtotal = rstTRQPlusCases.Fields("TRInv.UnitPrice").Value
-    sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
-    sInvoiceTime = (Format(Now(), "hh:mm:ss"))
-    sMinimumAmount = "1" 'rstTRQPlusCases.Fields("").value
-    sQuantity = rstTRQPlusCases.Fields("TRInv.ActualQuantity").Value
-    sValue = rstTRQPlusCases.Fields("TRInv.UnitPrice").Value
-    sBrandingTheme = rstTRQPlusCases.Fields("BrandingTheme").Value
+    Call pfCurrentCaseInfo
 
-    dDueDate = Format(rstTRQPlusCases.Fields("TRInvoiceCasesQ.DueDate").Value, "Short Date")
-    sPaymentSum = Nz(rstTRQPlusCases.Fields("TRInv.PaymentSum").Value, 0)
-    sFinalPrice = rstTRQPlusCases.Fields("TRInv.FinalPrice").Value
-    sFactoringCost = rstTRQPlusCases.Fields("TRInv.FactoringCost").Value
-    sBalanceDue = sFinalPrice - sPaymentSum
-    sIRC = rstTRQPlusCases.Fields("TRInv.InventoryRateCode").Value
+    Set db = CurrentDb
+    Set qdf = db.QueryDefs("TRInvoiQPlusCases")
+    qdf.Parameters(0) = sCourtDatesID
+    Set rstTRQPlusCases = qdf.OpenRecordset
+
+    If Not rstTRQPlusCases.EOF Then
+        sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
-    sDescription = "Job No.:  " & sCourtDatesID & "  |  " & _
-    "Invoice No.:  " & sInvoiceNumber & "\n" & _
-    sParty1 & " v " & sParty2 & "\n" & _
-    "Case Nos.:  " & sCaseNumber1 & " " & sCaseNumber2 & "\n" & _
-    "Hearing Date:  " & dHearingDate & "\n" & _
-    "Approx. " & sAudioLength & " minutes" & "  |  " & _
-    "Turnaround Time:  " & sTurnaroundTime & " calendar days"
+        sInvoiceNumber = rstTRQPlusCases.Fields("TRInv.GetInvoiceNoFromCDID.InvoiceNo").Value
+        sInvoiceID = rstTRQPlusCases.Fields("TRInv.PPID").Value '"INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6 '
+        'sInvoiceID = .sInvoiceID
+        sSubtotal = rstTRQPlusCases.Fields("TRInv.UnitPrice").Value
+        sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
+        sInvoiceTime = (Format(Now(), "hh:mm:ss"))
+        sMinimumAmount = "1"                     'rstTRQPlusCases.Fields("").value
+        sQuantity = rstTRQPlusCases.Fields("TRInv.ActualQuantity").Value
+        sValue = rstTRQPlusCases.Fields("TRInv.UnitPrice").Value
+        sBrandingTheme = rstTRQPlusCases.Fields("BrandingTheme").Value
+
+        dDueDate = Format(rstTRQPlusCases.Fields("TRInvoiceCasesQ.DueDate").Value, "Short Date")
+        sPaymentSum = Nz(rstTRQPlusCases.Fields("TRInv.PaymentSum").Value, 0)
+        sFinalPrice = rstTRQPlusCases.Fields("TRInv.FinalPrice").Value
+        sFactoringCost = rstTRQPlusCases.Fields("TRInv.FactoringCost").Value
+        sBalanceDue = sFinalPrice - sPaymentSum
+        sIRC = rstTRQPlusCases.Fields("TRInv.InventoryRateCode").Value
     
-    If sBrandingTheme = "1" Then 'WRTS NC Factoring
-        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
+        sDescription = "Job No.:  " & sCourtDatesID & "  |  " & _
+                       "Invoice No.:  " & sInvoiceNumber & "\n" & _
+                       sParty1 & " v " & sParty2 & "\n" & _
+                       "Case Nos.:  " & sCaseNumber1 & " " & sCaseNumber2 & "\n" & _
+                       "Hearing Date:  " & dHearingDate & "\n" & _
+                       "Approx. " & sAudioLength & " minutes" & "  |  " & _
+                       "Turnaround Time:  " & sTurnaroundTime & " calendar days"
+    
+        If sBrandingTheme = "1" Then             'WRTS NC Factoring
+            sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
         
-        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-        "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("").value
+            sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("").value
         
-        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
+            sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                     "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                     "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                     "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
             
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "2" Then  'WRTS NC 100 Deposit
-        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-            "The turnaround as described above will begin once this invoice is paid.  Full terms of service listed at https://www.aquoco.co/ServiceA.html."
-        'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "2" Then         'WRTS NC 100 Deposit
+            sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                            "The turnaround as described above will begin once this invoice is paid.  Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+            'rstTRQPlusCases.Fields("")value
         
-        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-        "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-        "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-        'rstTRQPlusCases.Fields("")value
+            sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+            'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+            sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
         
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "3" Then  'WRTS C 50 Deposit Filed Non-BK
-        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-            "The turnaround as described above will begin once this invoice is paid."
-        'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "3" Then         'WRTS C 50 Deposit Filed Non-BK
+            sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                            "The turnaround as described above will begin once this invoice is paid."
+            'rstTRQPlusCases.Fields("")value
         
-        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-        "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-        "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-        'rstTRQPlusCases.Fields("")value
+            sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+            'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+            sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
         
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "4" Then  'WRTS C 50 Deposit Filed BK
+        ElseIf sBrandingTheme = "4" Then         'WRTS C 50 Deposit Filed BK
     
-        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-            "The turnaround as described above will begin once this invoice is paid."
-        'rstTRQPlusCases.Fields("")value
+            sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                            "The turnaround as described above will begin once this invoice is paid."
+            'rstTRQPlusCases.Fields("")value
         
-        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-        "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-        "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-        'rstTRQPlusCases.Fields("")value
+            sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+            'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+            sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
         
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "5" Then  'WRTS C 50 Deposit Not Filed
-        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-            "The turnaround as described above will begin once this invoice is paid."
-        'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "5" Then         'WRTS C 50 Deposit Not Filed
+            sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                            "The turnaround as described above will begin once this invoice is paid."
+            'rstTRQPlusCases.Fields("")value
         
-        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-        "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-        "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-        'rstTRQPlusCases.Fields("")value
+            sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+            'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+            sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
         
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "6" Then  'WRTS C Factoring Filed
-        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "6" Then         'WRTS C Factoring Filed
+            sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
         
-        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-        "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+            sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+            sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                     "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                     "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                     "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
             
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "7" Then  'WRTS C Factoring Not Filed
-        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "7" Then         'WRTS C Factoring Not Filed
+            sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
         
-        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-        "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+            sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+            sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                     "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                     "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                     "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
             
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "8" Then  'WRTS C 100 Deposit Filed
-        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-            "The turnaround as described above will begin once this invoice is paid."
-        'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "8" Then         'WRTS C 100 Deposit Filed
+            sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                            "The turnaround as described above will begin once this invoice is paid."
+            'rstTRQPlusCases.Fields("")value
         
-        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-        "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-        "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-        'rstTRQPlusCases.Fields("")value
+            sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+            'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+            sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
         
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "9" Then  'WRTS C 100 Deposit Not Filed
-        sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-            "The turnaround as described above will begin once this invoice is paid."
-        'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "9" Then         'WRTS C 100 Deposit Not Filed
+            sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
+                            "The turnaround as described above will begin once this invoice is paid."
+            'rstTRQPlusCases.Fields("")value
         
-        sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
-        "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
-        "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
-        'rstTRQPlusCases.Fields("")value
+            sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
+                    "And if you have any questions or if we can be of any more assistance, please do not hesitate to contact us (inquiries@aquoco.co).  " & _
+                    "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
+            'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+            sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
         
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "10" Then  'WRTS JJ Factoring
-        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "10" Then        'WRTS JJ Factoring
+            sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
         
-        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-        "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+            sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+            sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                     "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                     "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                     "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
             
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "11" Then  'WRTS Tabula Not Factored/Filed
-        sPaymentTerms = sCourtDatesID & " " & sInvoiceNo 'rstTRQPlusCases.Fields("")value
-        sNote = "Thank you for your business." 'rstTRQPlusCases.Fields("")value
-        sTerms = "Thank you for your business." 'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "11" Then        'WRTS Tabula Not Factored/Filed
+            sPaymentTerms = sCourtDatesID & " " & sInvoiceNo 'rstTRQPlusCases.Fields("")value
+            sNote = "Thank you for your business." 'rstTRQPlusCases.Fields("")value
+            sTerms = "Thank you for your business." 'rstTRQPlusCases.Fields("")value
         
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    ElseIf sBrandingTheme = "12" Then  'WRTS AMOR Factoring
-        sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+        ElseIf sBrandingTheme = "12" Then        'WRTS AMOR Factoring
+            sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
         
-        sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
-        "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
+            sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
+                    "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
         
-        sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
-            "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
-            "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-            "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+            sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
+                     "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
+                     "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
+                     "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
             
-        vmMemo = sCourtDatesID & " " & sInvoiceNo
+            vmMemo = sCourtDatesID & " " & sInvoiceNo
     
-    End If
+        End If
             
                 
     End If
     
     rstTRQPlusCases.Close
- Set qdf = Nothing
+    Set qdf = Nothing
     db.Close
   
 End Sub
+
 

@@ -12,22 +12,49 @@ Option Compare Database
 Option Explicit
 
 
-Private sCourtDatesID As Long, dHearingStartTime As Date, dHearingEndTime As Date
-Private mApp0 As App0, mApp1 As App1, mApp2 As App2, mApp3 As App3
-Private mApp4 As App4, mApp5 As App5, mApp6 As App6
-Private mCaseInfo As CaseInfo, mStatus As Status
-Public sApp0 As Long, sApp1 As Long, sApp2 As Long, sApp3 As Long
-Public sApp4 As Long, sApp5 As Long, sApp6 As Long
+Private sCourtDatesID As Long
+Private dHearingStartTime As Date
+Private dHearingEndTime As Date
+Private mApp0 As App0
+Private mApp1 As App1
+Private mApp2 As App2
+Private mApp3 As App3
+Private mApp4 As App4
+Private mApp5 As App5
+Private mApp6 As App6
+Private mCaseInfo As CaseInfo
+Private mStatus As Status
+Private mDocPath As DocPath
+Public sApp0 As Long
+Public sApp1 As Long
+Public sApp2 As Long
+Public sApp3 As Long
+Public sApp4 As Long
+Public sApp5 As Long
+Public sApp6 As Long
+Public sDocPath As Long
 Public sCaseID As Long
-Public sStatusID As Long, sStatusCID As Long
+Public sStatusID As Long
+Public sStatusCID As Long
 
-Public lngNumOfHrs As Long, lngNumOfMins As Long, lngNumOfSecsRem As Long, lngNumOfSecs As Long
-Public lngNumOfHrs1 As Long, lngNumOfMins1 As Long, lngNumOfSecsRem1 As Long, lngNumOfSecs1 As Long
+Public lngNumOfHrs As Long
+Public lngNumOfMins As Long
+Public lngNumOfSecsRem As Long
+Public lngNumOfSecs As Long
+Public lngNumOfHrs1 As Long
+Public lngNumOfMins1 As Long
+Public lngNumOfSecsRem1 As Long
+Public lngNumOfSecs1 As Long
 Public i As Long
 
-Public oWordApp As Word.Document, oWordDoc As Word.Application
-Public lAssigneeID As Long, sDueDate As String, bStarred As String, bCompleted As String
-Public sTitle As String, sWLListID As String
+Public oWordApp As Word.Document
+Public oWordDoc As Word.Application
+Public lAssigneeID As Long
+Public sDueDate As String
+Public bStarred As String
+Public bCompleted As String
+Public sTitle As String
+Public sWLListID As String
 Private sPPID As String
 
 Private mrstRecordset As Recordset
@@ -65,7 +92,6 @@ Public Property Let Quantity(rData As String)
     sQuantity = rData
 End Property
 
-        
 Public Property Get InventoryRateCode() As String
     InventoryRateCode = sInventoryRateCode
 End Property
@@ -97,7 +123,6 @@ End Property
 Public Property Let Location(rData As String)
     sLocation = rData
 End Property
-
 
 Public Property Get AudioLength() As String
     AudioLength = sAudioLength
@@ -195,7 +220,6 @@ Public Property Let HearingDate(rData As Date)
     dHearingDate = rData
 End Property
 
-
 Public Property Get HearingStartTime() As Date
     HearingStartTime = dHearingStartTime
 End Property
@@ -260,13 +284,11 @@ Public Property Get App1() As App1
     Set App1 = mApp1
 End Property
 
-
 Public Property Get App2() As App2
     'Private mApp1 As App1
     If (mApp2 Is Nothing) Then Set App2 = New App2
     Set App2 = mApp2
 End Property
-
 
 Public Property Get App3() As App3
     'Private mApp1 As App1
@@ -292,6 +314,11 @@ Public Property Get App6() As App6
     Set App6 = mApp6
 End Property
 
+Public Property Get DocPath() As DocPath
+    'Private mApp1 As App1
+    If (mDocPath Is Nothing) Then Set DocPath = New DocPath
+    Set DocPath = mDocPath
+End Property
 
 Private Property Get Recordset() As Recordset
     Set Recordset = mrstRecordset
@@ -300,7 +327,6 @@ End Property
 Private Property Set Recordset(rData As Recordset)
     Set mrstRecordset = rData
 End Property
-
 
 Private Sub Load()
     With Recordset
@@ -350,6 +376,7 @@ Private Sub Load()
     mApp6.FindFirst "ID=" & sApp6
     mCaseInfo.FindFirst "ID=" & sCaseID
     mStatus.FindFirst "ID=" & sStatusID
+    mDocPath.Class_Initialize
     'mApp1.SetAppValues (sApp1)
 End Sub
 
@@ -395,6 +422,7 @@ Public Sub Update()
         .Fields("HearingDate").Value = Me.HearingDate
         .Update
     End With
+    mDocPath.Class_Initialize
     mbooLoaded = True
 End Sub
 
@@ -425,12 +453,22 @@ Private Sub Class_Initialize()
     Set mApp6 = New App6
     Set mCaseInfo = New CaseInfo
     Set mStatus = New Status
+    Set mDocPath = New DocPath
 End Sub
 
 Private Sub Class_Terminate()
     Recordset.Close
     Set Recordset = Nothing
+    Set mApp0 = Nothing
     Set mApp1 = Nothing
+    Set mApp2 = Nothing
+    Set mApp3 = Nothing
+    Set mApp4 = Nothing
+    Set mApp5 = Nothing
+    Set mApp6 = Nothing
+    Set mCaseInfo = Nothing
+    Set mStatus = Nothing
+    Set mDocPath = Nothing
 End Sub
 
 Private Function NullIfEmptyString(str As String) As Variant
@@ -441,23 +479,4 @@ Private Function NullIfEmptyString(str As String) As Variant
         NullIfEmptyString = strTrimmed
     End If
 End Function
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

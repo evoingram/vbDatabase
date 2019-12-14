@@ -5,42 +5,42 @@ Option Explicit
 Private Sub btnUSPSTracking_Click()
 
 
-Call pfPrepareAudio
+    Call pfPrepareAudio
 End Sub
 
 Private Sub Command174_Click()
 
 
-Call pfCopyTranscriptFromCompletedToPrepared
-'Call RenameBaseFiles
+    Call pfCopyTranscriptFromCompletedToPrepared
+    'Call RenameBaseFiles
 End Sub
 
 Private Sub Command177_Click()
 
 
-Call pfSplitAudio
+    Call pfSplitAudio
 End Sub
 
 Private Sub Command183_Click()
 
 
-Call pfCorpusUpload
+    Call pfCorpusUpload
 End Sub
 
 Private Sub Command7_Click()
 
 
-Call pfPrepareTranscript
+    Call pfPrepareTranscript
 End Sub
 
 Private Sub Command8_Click()
 
 
-Call pfTrainAudio
+    Call pfTrainAudio
 End Sub
 
 Private Sub Command9_Click()
 
 
-Call pfSRTranscribe
+    Call pfSRTranscribe
 End Sub
