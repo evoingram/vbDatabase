@@ -470,31 +470,27 @@ Public Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
     ' Description : adds payment to Payments table
     '============================================================================
 
-    Dim db As DAO.Database
-    Dim rstPaymentAdd As DAO.Recordset
     Dim sTableHyperlink As String
-    Dim sPaymentMadePath As String
+    
+    Dim rstPaymentAdd As DAO.Recordset
 
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    Set db = CurrentDb
 
-    'TODO: PATH
-    sPaymentMadePath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PaymentMade.docx"
     '@Ignore AssignmentNotUsed
-    sTableHyperlink = sCourtDatesID & "-PaymentMade" & "#" & sPaymentMadePath & "#"
+    sTableHyperlink = sCourtDatesID & "-PaymentMade" & "#" & cJob.DocPath.PaymentMade & "#"
 
-    Set rstPaymentAdd = db.OpenRecordset("Payments")
+    Set rstPaymentAdd = CurrentDb.OpenRecordset("Payments")
 
     rstPaymentAdd.AddNew
-    rstPaymentAdd("InvoiceNo").Value = sInvoiceNumber
-    rstPaymentAdd("Amount").Value = vAmount
-    rstPaymentAdd("RemitDate").Value = Date
+        rstPaymentAdd("InvoiceNo").Value = sInvoiceNumber
+        rstPaymentAdd("Amount").Value = vAmount
+        rstPaymentAdd("RemitDate").Value = Date
     rstPaymentAdd.Update
 
     rstPaymentAdd.Close
-    db.Close
 
     Call fManualPPPayment
     Call pfClearGlobals
@@ -510,17 +506,19 @@ Public Sub fUpdateFactoringDates()
     ' Description : updates various factoring dates in CourtDates table
     '============================================================================
 
-    Dim rstUnitPriceRate As DAO.Recordset
-    Dim dInvoiceDate As Date
-    Dim db As Database
-    Dim iUnitPriceID As Long
     Dim sExpectedAdvanceAmount As String
     Dim sExpectedRebateAmount As String
-    Dim dExpectedBalanceDate As String
     Dim sUnitPrice As String
     Dim sUnitPriceRateSQL As String
     Dim sCDCalcUpdateSQL As String
+    
+    Dim dInvoiceDate As Date
+    Dim iUnitPriceID As Long
 
+    Dim rstUnitPriceRate As DAO.Recordset
+    
+    Dim cJob As New Job
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     sExpectedRebateAmount = (sFinalPrice * 0.18)
@@ -618,8 +616,7 @@ Public Sub fUpdateFactoringDates()
     'get proper rate
     sUnitPriceRateSQL = "SELECT Rate from UnitPrice where ID = " & iUnitPriceID & ";"
 
-    Set db = CurrentDb
-    Set rstUnitPriceRate = db.OpenRecordset(sUnitPriceRateSQL)
+    Set rstUnitPriceRate = CurrentDb.OpenRecordset(sUnitPriceRateSQL)
     sUnitPrice = rstUnitPriceRate.Fields("Rate").Value
     rstUnitPriceRate.Close
 
@@ -636,8 +633,9 @@ Public Sub fUpdateFactoringDates()
     'insert calculated fields into courtdates
     sCDCalcUpdateSQL = "UPDATE CourtDates SET [ExpectedRebateDate] = " & dExpectedRebateDate & ", [ExpectedAdvanceDate] = " & dExpectedAdvanceDate & ", [Subtotal] = " & sSubtotal & " WHERE ID = " & sCourtDatesID & ";"
 
-    db.Execute sCDCalcUpdateSQL
-    db.Close
+    CurrentDb.Execute sCDCalcUpdateSQL
+    CurrentDb.Close
+    
     Call pfClearGlobals
 
 End Sub
@@ -658,15 +656,15 @@ Public Sub fTranscriptExpensesBeginning()
     '               Vendor, ExpensesDate, Amount, Memo
     '============================================================================
         
-    Dim db As DAO.Database
+    Dim vEPC As String
+    
     Dim rstExpensesAdd As DAO.Recordset
     Dim rstCourtDatesSet As DAO.Recordset
-    Dim vEPC As String
+    
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    Set db = CurrentDb
-    Set rstExpensesAdd = db.OpenRecordset("Expenses")
+    Set rstExpensesAdd = CurrentDb.OpenRecordset("Expenses")
     
     '@Ignore AssignmentNotUsed
     vEPC = sEstimatedPageCount
@@ -676,181 +674,183 @@ Public Sub fTranscriptExpensesBeginning()
     If vEPC > 200 Then
  
         rstExpensesAdd.AddNew                    'back cover
-        rstExpensesAdd("Vendor").Value = "Got Print"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.6
-        rstExpensesAdd("Memo").Value = "Back Cover"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Got Print"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.6
+            rstExpensesAdd("Memo").Value = "Back Cover"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'back cover
-        rstExpensesAdd("Vendor").Value = "Got Print"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.6
-        rstExpensesAdd("Memo").Value = "Back Cover"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Got Print"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.6
+            rstExpensesAdd("Memo").Value = "Back Cover"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'front cover
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.22
-        rstExpensesAdd("Memo").Value = "front cover"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.22
+            rstExpensesAdd("Memo").Value = "front cover"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'front cover
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.22
-        rstExpensesAdd("Memo").Value = "front cover"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.22
+            rstExpensesAdd("Memo").Value = "front cover"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'CD
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.18
-        rstExpensesAdd("Memo").Value = "CD"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.18
+            rstExpensesAdd("Memo").Value = "CD"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'CD sleeve
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.09
-        rstExpensesAdd("Memo").Value = "CD Sleeve"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.09
+            rstExpensesAdd("Memo").Value = "CD Sleeve"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'shipping envelope
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.32
-        rstExpensesAdd("Memo").Value = "Shipping Envelope"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.32
+            rstExpensesAdd("Memo").Value = "Shipping Envelope"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'Velobind
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.72
-        rstExpensesAdd("Memo").Value = "Velobind"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.72
+            rstExpensesAdd("Memo").Value = "Velobind"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'Velobind
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.72
-        rstExpensesAdd("Memo").Value = "Velobind"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.72
+            rstExpensesAdd("Memo").Value = "Velobind"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'business card
-        rstExpensesAdd("Vendor").Value = "Got Print"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.05
-        rstExpensesAdd("Memo").Value = "Business Card"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("Vendor").Value = "Got Print"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.05
+            rstExpensesAdd("Memo").Value = "Business Card"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
         rstExpensesAdd.Update
  
         rstExpensesAdd.AddNew                    'shipping label
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.15
+            rstExpensesAdd("Memo").Value = "Shipping Label"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+    Else
+ 
+        rstExpensesAdd.AddNew                    'back cover
+            rstExpensesAdd("Vendor").Value = "Got Print"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.6
+            rstExpensesAdd("Memo").Value = "Back Cover"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+
+        rstExpensesAdd.AddNew                    'front cover
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.22
+            rstExpensesAdd("Memo").Value = "front cover"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+
+        rstExpensesAdd.AddNew                    'CD
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.18
+            rstExpensesAdd("Memo").Value = "CD"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+
+        rstExpensesAdd.AddNew                    'CD sleeve
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.09
+            rstExpensesAdd("Memo").Value = "CD Sleeve"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+
+        rstExpensesAdd.AddNew                    'shipping envelope
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.32
+            rstExpensesAdd("Memo").Value = "Shipping Envelope"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+
+        rstExpensesAdd.AddNew                    'Velobind
+            rstExpensesAdd("Vendor").Value = "Amazon"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.72
+            rstExpensesAdd("Memo").Value = "Velobind"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+
+        rstExpensesAdd.AddNew                    'business card
+            rstExpensesAdd("Vendor").Value = "Got Print"
+            rstExpensesAdd("ExpensesDate").Value = Now
+            rstExpensesAdd("Amount").Value = 0.05
+            rstExpensesAdd("Memo").Value = "Business Card"
+            rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd.Update
+    
+    End If
+
+    rstExpensesAdd.AddNew                        'shipping label
         rstExpensesAdd("Vendor").Value = "Amazon"
         rstExpensesAdd("ExpensesDate").Value = Now
         rstExpensesAdd("Amount").Value = 0.15
         rstExpensesAdd("Memo").Value = "Shipping Label"
         rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
         rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-    Else
- 
-        rstExpensesAdd.AddNew                    'back cover
-        rstExpensesAdd("Vendor").Value = "Got Print"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.6
-        rstExpensesAdd("Memo").Value = "Back Cover"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-
-        rstExpensesAdd.AddNew                    'front cover
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.22
-        rstExpensesAdd("Memo").Value = "front cover"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-
-        rstExpensesAdd.AddNew                    'CD
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.18
-        rstExpensesAdd("Memo").Value = "CD"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-
-        rstExpensesAdd.AddNew                    'CD sleeve
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.09
-        rstExpensesAdd("Memo").Value = "CD Sleeve"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-
-        rstExpensesAdd.AddNew                    'shipping envelope
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.32
-        rstExpensesAdd("Memo").Value = "Shipping Envelope"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-
-        rstExpensesAdd.AddNew                    'Velobind
-        rstExpensesAdd("Vendor").Value = "Amazon"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.72
-        rstExpensesAdd("Memo").Value = "Velobind"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-
-        rstExpensesAdd.AddNew                    'business card
-        rstExpensesAdd("Vendor").Value = "Got Print"
-        rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.05
-        rstExpensesAdd("Memo").Value = "Business Card"
-        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
-        rstExpensesAdd.Update
-    
-    End If
-
-    rstExpensesAdd.AddNew                        'shipping label
-    rstExpensesAdd("Vendor").Value = "Amazon"
-    rstExpensesAdd("ExpensesDate").Value = Now
-    rstExpensesAdd("Amount").Value = 0.15
-    rstExpensesAdd("Memo").Value = "Shipping Label"
-    rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-    rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
     rstExpensesAdd.Update
+    
     rstExpensesAdd.Close
         
     MsgBox "Static Expenses Added!"
+    
     Call pfClearGlobals
 End Sub
 
@@ -867,40 +867,39 @@ Public Sub fTranscriptExpensesAfter()
     '               Vendor, ExpensesDate, Amount, Memo
     '============================================================================
 
-    Dim db As DAO.Database
     Dim rstExpensesAdd As DAO.Recordset
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    Set db = CurrentDb
-    Set rstExpensesAdd = db.OpenRecordset("Expenses")
+    Set rstExpensesAdd = CurrentDb.OpenRecordset("Expenses")
 
     rstExpensesAdd.AddNew                        'static
-    rstExpensesAdd("Vendor").Value = "internet rent etc"
-    rstExpensesAdd("ExpensesDate").Value = Now
-    rstExpensesAdd("Amount").Value = 0.09 * sEstimatedPageCount
-    rstExpensesAdd("Memo").Value = "internet rent electricity website"
-    rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-    rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd("Vendor").Value = "internet rent etc"
+        rstExpensesAdd("ExpensesDate").Value = Now
+        rstExpensesAdd("Amount").Value = 0.09 * sEstimatedPageCount
+        rstExpensesAdd("Memo").Value = "internet rent electricity website"
+        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
     rstExpensesAdd.Update
 
     rstExpensesAdd.AddNew                        'paper
-    rstExpensesAdd("Vendor").Value = "OfficeSupply.com"
-    rstExpensesAdd("ExpensesDate").Value = Now
-    rstExpensesAdd("Amount").Value = 0.01 * sEstimatedPageCount
-    rstExpensesAdd("Memo").Value = "paper"
-    rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-    rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd("Vendor").Value = "OfficeSupply.com"
+        rstExpensesAdd("ExpensesDate").Value = Now
+        rstExpensesAdd("Amount").Value = 0.01 * sEstimatedPageCount
+        rstExpensesAdd("Memo").Value = "paper"
+        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
     rstExpensesAdd.Update
 
     rstExpensesAdd.AddNew                        'ink
-    rstExpensesAdd("Vendor").Value = "OfficeSupply.com"
-    rstExpensesAdd("ExpensesDate").Value = Now
-    rstExpensesAdd("Amount").Value = 0.008
-    rstExpensesAdd("Memo").Value = "ink"
-    rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-    rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd("Vendor").Value = "OfficeSupply.com"
+        rstExpensesAdd("ExpensesDate").Value = Now
+        rstExpensesAdd("Amount").Value = 0.008
+        rstExpensesAdd("Memo").Value = "ink"
+        rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
+        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
     rstExpensesAdd.Update
+    
     rstExpensesAdd.Close
 
     MsgBox "Dynamic Expenses Added!"
@@ -917,24 +916,22 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     'needs sVendorName, dExpenseIncurred, iExpenseAmount, sExpenseMemo
     '               generates shipping expenses and enters them into the expenses table
     '============================================================================
-    Dim db As DAO.Database
-    Dim rstExpenses As DAO.Recordset
-    Dim rstShippingExpenseEntry As DAO.Recordset
-    Dim dExpenseIncurred As Date
-    Dim iExpenseAmount As Long
+
     Dim sVendorName As String
     Dim sExpenseMemo As String
+    
+    Dim dExpenseIncurred As Date
+    Dim iExpenseAmount As Long
 
     Dim qdf1 As QueryDef
+    Dim rstExpenses As DAO.Recordset
+    Dim rstShippingExpenseEntry As DAO.Recordset
 
-    Set db = CurrentDb
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    'come back need query for shipping iExpenseAmount + info from CourtDates and Customers
-
-
-    Set qdf1 = db.QueryDefs(qnTRCourtQ)
+    'TODO: come back need query for shipping iExpenseAmount + info from CourtDates and Customers
+    Set qdf1 = CurrentDb.QueryDefs(qnTRCourtQ)
     qdf1.Parameters(0) = sCourtDatesID
     Set rstShippingExpenseEntry = qdf1.OpenRecordset
 
@@ -951,11 +948,14 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     Set rstExpenses = CurrentDb.OpenRecordset("Expenses")
 
     rstExpenses.AddNew
-    rstExpenses("sVendorName").Value = sVendorName
-    rstExpenses("dExpenseIncurred").Value = dExpenseIncurred
-    rstExpenses("iExpenseAmount").Value = iExpenseAmount
-    rstExpenses("sExpenseMemo").Value = sExpenseMemo
+        rstExpenses("sVendorName").Value = sVendorName
+        rstExpenses("dExpenseIncurred").Value = dExpenseIncurred
+        rstExpenses("iExpenseAmount").Value = iExpenseAmount
+        rstExpenses("sExpenseMemo").Value = sExpenseMemo
     rstExpenses.Update
+    
+    rstExpenses.Close
+    
     Call pfClearGlobals
 End Sub
 

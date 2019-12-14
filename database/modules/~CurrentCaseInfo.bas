@@ -76,6 +76,7 @@ Public sStatusesID As String
 Public dDueDate As Date
 Public dExpectedAdvanceDate As Date
 Public dExpectedRebateDate As Date
+Public dExpectedBalanceDate As Date
 Public sPaymentSum As String
 Public sFactoringApproved As String
 Public sBrandingTheme As String
@@ -131,6 +132,7 @@ Public Const qnViewJobFormAppearancesQ As String = "ViewJobFormAppearancesQ"
 Public Const qnTRCourtUnionAppAddrQ As String = "TR-Court-Union-AppAddr"
 Public Const qnOrderingAttorneyInfo As String = "OrderingAttorneyInfo"
 Public Const qnQInfobyInvNo As String = "QInfobyInvoiceNumber"
+Public Const qTempShippingOptions As String = "TempShippingOptionsQ"
 
 Public Const sCompanyEmail As String = "inquiries@aquoco.co"
 Public Const sCompanyFirstName As String = "Erica"

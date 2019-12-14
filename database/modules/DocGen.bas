@@ -158,16 +158,17 @@ Public Sub pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
     '============================================================================
     Dim sTemplateAddress As String
     Dim sCourtDatesID As String
+    
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
     Dim oWordApp As New Word.Application
     Dim oWordEditor As Word.editor
     Dim oWordDoc As New Word.Document
+    
     Dim cJob As New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    'TODO: PATH
     sTemplateAddress = cJob.DocPath.JobDirectoryGN & vCHTopic & ".docx"
     Set oOutlookApp = CreateObject("Outlook.Application")
     Set oOutlookMail = oOutlookApp.CreateItem(0)
@@ -804,18 +805,13 @@ Public Sub pfPrepareCover()
     ' Call command: Call pfPrepareCover
     ' Description : prepares volume cover for transcript compendium
     '============================================================================
-    Dim cJob As New Job
 
-    Dim sCasesID As String
-    Dim sCurrentJobID As String
-    Dim sVolumesCoverPath As String
     Dim sOriginalCurrentTranscriptPath As String
     Dim sNewCurrentTranscriptPath As String
     Dim sVolumeText As String
     Dim sBookmarkName As String
-    Dim sVolumesCoverPDFPath As String
+    Dim sCurrentJobID As String
     
-    Dim dHearingDate As Date
     Dim x As Long
     Dim y As Long
     
@@ -823,14 +819,11 @@ Public Sub pfPrepareCover()
     Dim oWordDoc As Word.Document
     
     Dim rstJobsByCase As DAO.Recordset
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO:  pfPrepareCover can delete following lines when known safe
-    'Dim rstCasesID As DAO.Recordset
-    'Set rstCasesID = CurrentDb.OpenRecordset("SELECT * FROM Courtdates WHERE ID = " & sCourtDatesID & ";")
-    'sCasesID = rstCasesID.Fields("CasesID").Value
-    'rstCasesID.Close
-
+    
     'query for all dates & job numbers for a case
     Set rstJobsByCase = CurrentDb.OpenRecordset("SELECT * FROM Courtdates WHERE CasesID = " & cJob.CaseInfo.ID & ";")
     x = rstJobsByCase.RecordCount
@@ -841,10 +834,8 @@ Public Sub pfPrepareCover()
     Do While rstJobsByCase.EOF = False
 
         sCurrentJobID = rstJobsByCase.Fields("ID").Value
-        dHearingDate = rstJobsByCase.Fields("HearingDate").Value
 
         'copy other transcript pdfs for same volume into \transcripts\ folder
-    'TODO: PATH
         sOriginalCurrentTranscriptPath = "I:\" & sCurrentJobID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
         sNewCurrentTranscriptPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
     
@@ -852,9 +843,7 @@ Public Sub pfPrepareCover()
             FileCopy sOriginalCurrentTranscriptPath, sNewCurrentTranscriptPath
         End If
         'list current date on volumes cover
-    'TODO: PATH
-        sVolumesCoverPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Cover.docx"
-        sVolumeText = "Volume " & y & ":  " & Format(dHearingDate, "dddd, mmmm d, yyyy")
+        sVolumeText = "Volume " & y & ":  " & Format(cJob.HearingDate, "dddd, mmmm d, yyyy")
         Debug.Print sVolumeText
         On Error Resume Next
         Set oWordApp = GetObject(, "Word.Application")
@@ -864,10 +853,10 @@ Public Sub pfPrepareCover()
         End If
     
         '@Ignore AssignmentNotUsed
-        Set oWordDoc = GetObject(sVolumesCoverPath, "Word.Document")
+        Set oWordDoc = GetObject(cJob.DocPath.WACoverD, "Word.Document")
     
     
-        Set oWordDoc = oWordApp.Documents.Open(sVolumesCoverPath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.WACoverD)
         On Error GoTo 0
     
         oWordDoc.Application.Visible = True
@@ -887,12 +876,10 @@ Public Sub pfPrepareCover()
     oWordDoc.Save
 
     'make volume cover pdf
-    'TODO: PATH
-    sVolumesCoverPDFPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Cover.pdf"
-    oWordDoc.ExportAsFixedFormat outputFileName:=sVolumesCoverPDFPath, ExportFormat:=wdExportFormatPDF
+    oWordDoc.ExportAsFixedFormat outputFileName:=cJob.DocPath.WACoverP, ExportFormat:=wdExportFormatPDF
 
     oWordDoc.Close
-    'oWordApp.Quit
+    oWordApp.Quit
     rstJobsByCase.Close
     
 End Sub

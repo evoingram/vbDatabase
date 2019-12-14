@@ -5,7 +5,6 @@ Option Compare Database
 Option Explicit
 
  
-    'TODO: PATH
 'folder organization in 'T:\Production\2InProgress' or 'I:\'
 '####
 'Audio:         Audio files
@@ -193,7 +192,6 @@ Option Explicit
 
 'functions:
 
-    'TODO: PATH
 'pfGenericExportandMailMerge:  Description:  exports to specified template from T:\Database\Templates\ and saves in I:\####\
 '                          Arguments:    sQueryName, sExportTopic
 'pfSendWordDocAsEmail:         Description:  sends Word document as an e-mail body
@@ -382,7 +380,7 @@ Option Explicit
 '                       Arguments:    sFile, sMacroName
 'pfSendTrackingEmail:   Description:  generates tracking number e-mail for customer
 '                       Arguments:    NONE
-    'TODO: PATH
+    
 'fZIPTranscripts:       Description:  zips transcripts folder in I:\####\
 '                       Arguments:    NONE
 'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in I:\####\

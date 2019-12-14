@@ -32,23 +32,21 @@ Private Sub Command68_Click()
     ' Description : generates document specified from combo box selection
     '============================================================================
 
-    'need other docs in list:
+    'TODO: need other docs in list:
     'paypal invoice
     'word index
     'pp-draft
     '
-
-    Dim sCourtCoverPath As String
+    
     Dim sAnswer As String
     Dim sQuestion As String
+    
     Dim qdf As QueryDef
     Dim rstTRCUnionAA As DAO.Recordset
 
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-    'TODO: PATH
-    sLinkToCSV = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-" & "-XeroInvoiceCSV" & ".csv"
 
     If Me.cmbListAllDocuments = "Stage 1:  Deposit Received paperwork" Then
     
@@ -89,7 +87,7 @@ Private Sub Command68_Click()
         'export xero csv
         DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
     
-        DoCmd.TransferText acExportDelim, , "SelectXero", sLinkToCSV, True
+        DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
         'DoCmd.Close ("XeroCSVQuery")
     
         'open xero website
@@ -114,9 +112,7 @@ Private Sub Command68_Click()
     
     ElseIf Me.cmbListAllDocuments = "Stage 3:  Audio proof" Then
 
-    'TODO: PATH
-        sCourtCoverPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-        Application.FollowHyperlink sCourtCoverPath
+        Application.FollowHyperlink cJob.DocPath.CourtCover
 
     ElseIf Me.cmbListAllDocuments = "Stage 3:  Volumes Cover" Then
     
@@ -132,8 +128,8 @@ Private Sub Command68_Click()
 
         'export xero csv
         DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
-        'DoCmd.TransferText acExportDelim, , "XeroInvoiceQuery1Select", sLinkToCSV, True
-        DoCmd.TransferText acExportDelim, , "SelectXero", sLinkToCSV, True
+        'DoCmd.TransferText acExportDelim, , "XeroInvoiceQuery1Select", cJob.DocPath.XeroCSV, True
+        DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
 
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
@@ -142,8 +138,6 @@ Private Sub Command68_Click()
     
     ElseIf Me.cmbListAllDocuments = "Stage 4:  PayPal invoice CSV" Then
 
-    'TODO: PATH
-        sLinkToCSV = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-PayPalInvoiceCSV" & ".csv"
     
         'real factoring csv plus invoice generated FactoringCSVQuery
         'paypal csv PayPalDepositInvoiceCSVQ & PayPalFactoringInvoiceCSVQ
@@ -154,16 +148,16 @@ Private Sub Command68_Click()
         If sFactoringApproved = True Then
     
             DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acAdd
-            DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", sLinkToCSV, True
+            DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", cJob.DocPath.PPCSV, True
             DoCmd.Close ("FactoringCSVQuery")
             DoCmd.OpenQuery "PayPalFactoringInvoiceCSVQ", acViewNormal, acAdd
-            DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", sLinkToCSV, True
+            DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", cJob.DocPath.PPCSV, True
             DoCmd.Close ("PayPalFactoringInvoiceCSVQ")
         
         Else
     
             DoCmd.OpenQuery "PayPalDepositInvoiceCSVQ", acViewNormal, acAdd
-            DoCmd.TransferText acExportDelim, , "PayPalDepositInvoiceCSVQ", sLinkToCSV, True
+            DoCmd.TransferText acExportDelim, , "PayPalDepositInvoiceCSVQ", cJob.DocPath.PPCSV, True
             DoCmd.Close ("PayPalDepositInvoiceCSVQ")
         
         End If
@@ -194,10 +188,9 @@ Private Sub Command68_Click()
             Call pfUpdateCheckboxStatus("InvoicetoFactorEmail")
         
             sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-            sLinkToCSV = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-" & "-XeroInvoiceCSV" & ".csv"
+            
             DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
-            DoCmd.TransferText acExportDelim, , "SelectXero", sLinkToCSV, True
+            DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
             DoCmd.Close ("XeroCSVQuery")
         
             'TR-Court-Union-AppAddr
@@ -212,16 +205,16 @@ Private Sub Command68_Click()
             If sFactoringApproved = True Then
         
                 DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acAdd
-                DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", sLinkToCSV, True
+                DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", cJob.DocPath.PPCSV, True
                 DoCmd.Close ("FactoringCSVQuery")
                 DoCmd.OpenQuery "PayPalFactoringInvoiceCSVQ", acViewNormal, acAdd
-                DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", sLinkToCSV, True
+                DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", cJob.DocPath.PPCSV, True
                 DoCmd.Close ("PayPalFactoringInvoiceCSVQ")
             
             Else
         
                 DoCmd.OpenQuery "PayPalDepositInvoiceCSVQ", acViewNormal, acAdd
-                DoCmd.TransferText acExportDelim, , "PayPalDepositInvoiceCSVQ", sLinkToCSV, True
+                DoCmd.TransferText acExportDelim, , "PayPalDepositInvoiceCSVQ", cJob.DocPath.PPCSV, True
                 DoCmd.Close ("PayPalDepositInvoiceCSVQ")
             
             End If
@@ -245,9 +238,7 @@ Private Sub Command68_Click()
         'export xero csv
         DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
         
-    'TODO: PATH
-        sLinkToCSV = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-" & "-XeroInvoiceCSV" & ".csv"
-        DoCmd.TransferText acExportDelim, , "SelectXero", sLinkToCSV, True
+        DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
         'DoCmd.Close ("XeroCSVQuery")
     
         'open xero website

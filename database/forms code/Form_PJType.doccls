@@ -8,40 +8,37 @@ End Sub
 
 Private Sub Form_Load()
 
-    Dim sNotesPath As String
     Dim wbViewNotes As String
-    Dim sRoughDraftPath As String
+    
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sNotesPath = "I:\" & sCourtDatesID & "\Notes\" & sCourtDatesID & "-Notes.pdf"
+    
     wbViewNotes = "Me.Parent.wbNotes"
-    Debug.Print Len(Dir(sNotesPath))
-    If Len(Dir(sNotesPath)) = 0 Then
+    
+    If Len(Dir(cJob.DocPath.Notes)) = 0 Then
 
-        MsgBox "Job number " & sCourtDatesID & " doesn't have notes to open." & Chr(13) & "Notes were supposed to be found at " & sNotesPath
+        MsgBox "Job number " & sCourtDatesID & " doesn't have notes to open." & Chr(13) & "Notes were supposed to be found at " & cJob.DocPath.Notes
         Me.wbNotes.Visible = True
     
     Else
 
         Me.wbNotes.Visible = True
-        Me.wbNotes.Navigate2 sNotesPath
+        Me.wbNotes.Navigate2 cJob.DocPath.Notes
         Me.wbNotes.Requery
     
     End If
-
-    'TODO: PATH
-    'sRoughDraftPath = "I:\" & sCourtDatesID & "\" & sCourtDatesID & "RoughDraft.docx"
-    '  Me.oleShowDoc.SourceDoc = sRoughDraftPath
-    'Call DisplayDoc(Me.oleShowDoc, sRoughDraftPath)
-
+    
+    '  Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
+    'Call DisplayDoc(Me.oleShowDoc, cJob.DocPath.RoughDraft)
 
 End Sub
 
 Private Sub Form_Current()
   
-    'Dim sRoughDraftPath As String
-    'sRoughDraftPath = "I:\" & sCourtDatesID & "\" & sCourtDatesID & "RoughDraft.docx"
-    'Me.oleShowDoc.SourceDoc = sRoughDraftPath
+    'Dim cJob As New Job
+    
+    'Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
     'Me.oleShowDoc.Requery
   
 End Sub
@@ -97,32 +94,20 @@ Err_DisplayDoc:
 End Function
 
 Public Sub pfOpenWork()
-
-
-    Dim sRoughDraftPath As String
-    Dim sFTRFolder As String
-    Dim sCourtSmartFolder As String
-    Dim sCaseViewerFolder As String
-    Dim sExpressScribeFolder As String
+    
     Dim oFSO As Object
     Dim oFolder As Object
     Dim oFiles As Object
+    
     Dim oSingleFile As Variant
-    Dim sAudioFolder As String
+    
+    Dim cJob As New Job
+    
     'get courtdatesid
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    'TODO: PATH
-    sFTRFolder = "C:\Program Files (x86)\FTR\ForTheRecord\TheRecordPlayer.exe"
-    sAudioFolder = "T:\Production\2InProgress\" & sCourtDatesID & "\Audio\"
-    sCourtSmartFolder = "T:\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
-    sCaseViewerFolder = "C:\Program Files (x86)\JAVS\CaseViewer\CaseViewer3.exe"
-    sExpressScribeFolder = "C:\Program Files (x86)\NCH Software\Scribe\scribe.exe"
-    sRoughDraftPath = "I:\" & sCourtDatesID & "\" & sCourtDatesID & "RoughDraft.docx"
-
-
     Set oFSO = CreateObject("Scripting.FileSystemObject")
-    Set oFolder = oFSO.GetFolder(sAudioFolder)
+    Set oFolder = oFSO.GetFolder(cJob.DocPath.AudioFolder)
     Set oFiles = oFolder.Files
 
 
@@ -131,20 +116,20 @@ Public Sub pfOpenWork()
 
         If oSingleFile.Name Like "*.trm" Then
             Debug.Print "FTR"
-            Shell sFTRFolder, vbNormalFocus
+            Shell cJob.DocPath.APFTR, vbNormalFocus
             GoTo NextStep
         ElseIf oSingleFile.Name Like "*.csx" Then
             Debug.Print "CourtSmart"
-            Shell sCourtSmartFolder, vbNormalFocus
+            Shell cJob.DocPath.APCS, vbNormalFocus
             GoTo NextStep
         ElseIf oSingleFile.Name Like "*.trs" Then
             Debug.Print "FTR"
-            Shell sFTRFolder, vbNormalFocus
+            Shell cJob.DocPath.APFTR, vbNormalFocus
             GoTo NextStep
         Else
             Debug.Print "CaseViewer/ExpressScribe"
-            Shell sCaseViewerFolder, vbNormalFocus
-            Shell sExpressScribeFolder, vbNormalFocus
+            Shell cJob.DocPath.APCV, vbNormalFocus
+            Shell cJob.DocPath.APES, vbNormalFocus
             GoTo NextStep
         End If
         
@@ -152,12 +137,10 @@ Public Sub pfOpenWork()
 
 NextStep:
     'open roughdraft doc
-    'TODO: PATH
-    Shell "C:\WINDOWS\explorer.exe """ & sRoughDraftPath & "", vbNormalFocus
+    Shell "C:\WINDOWS\explorer.exe """ & cJob.DocPath.RoughDraft & "", vbNormalFocus
 
-    'TODO: PATH
-    'open audio folder  'T:\Production\2InProgress\1915\Audio
-    Shell "C:\WINDOWS\explorer.exe """ & sAudioFolder & "", vbNormalFocus
+    'open audio folder
+    Shell "C:\WINDOWS\explorer.exe """ & cJob.DocPath.AudioFolder & "", vbNormalFocus
     
 
 End Sub

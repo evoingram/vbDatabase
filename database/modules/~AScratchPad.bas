@@ -596,8 +596,7 @@ Private Sub emptyFunction()
     
     Debug.Print "test"
     
-    'TODO: PATH
-    'Call pfSendWordDocAsEmail("PP-FactoredInvoiceEmail", "Transcript Delivery & Invoice", "T:\Production\2InProgress\1945\Generated\595617.pdf")
+    'Call pfSendWordDocAsEmail("PP-FactoredInvoiceEmail", "Transcript Delivery & Invoice", cJob.DocPath.InvoiceP)
     'On Error Resume Next
 
 End Sub

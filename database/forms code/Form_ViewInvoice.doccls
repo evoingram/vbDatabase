@@ -7,20 +7,23 @@ Private Sub btnViewInvoice_Click()
 
     Dim rstCourtDates As DAO.Recordset
     Dim sInvoiceNumber As String
-    Dim sInvoicePath As String
     Dim wbViewInvoice As Object
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Me.btnVIJobNumberField.Value
+    
     Set rstCourtDates = CurrentDb.OpenRecordset("SELECT * FROM COURTDATES WHERE ID = " & sCourtDatesID & ";")
-    sInvoiceNumber = rstCourtDates.Fields("InvoiceNo").Value
+        sInvoiceNumber = rstCourtDates.Fields("InvoiceNo").Value
+    
     rstCourtDates.Close
+    
     Set rstCourtDates = Nothing
-    'TODO: PATH
-    sInvoicePath = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".pdf"
+    
     Me.txtInvoiceNo.Value = sInvoiceNumber
-    If Len(Dir(sInvoicePath, vbDirectory)) <> 0 Then
+    If Len(Dir(cJob.DocPath.InvoiceP, vbDirectory)) <> 0 Then
         With Me.wbViewInvoice
-            .Navigate2 sInvoicePath
+            .Navigate2 cJob.DocPath.InvoiceP
             .Requery
         End With
     Else

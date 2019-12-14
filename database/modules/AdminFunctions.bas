@@ -172,9 +172,10 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     '============================================================================
     'TODO: come back to add ssl ftp
     Dim seopFTPSettings As New SessionOptions
-    Dim sInProgressPath As String
     Dim tropFTPSettings As New TransferOptions
     Dim transferResult As TransferOperationResult
+    
+    Dim cJob As New Job
 
 
     With seopFTPSettings                         ' Setup session options
@@ -187,14 +188,11 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     mySession.Open seopFTPSettings               ' Connect
     tropFTPSettings.TransferMode = TransferMode_Binary ' Upload files
     tropFTPSettings.FileMask = "*>=1D"
-    sInProgressPath = "\\HUBCLOUD\evoingram\Production\1ToBeEntered\"
 
-
-    Set transferResult = mySession.GetFiles("/public_html/ProjectSend/upload/files/", sInProgressPath, False, tropFTPSettings)
+    Set transferResult = mySession.GetFiles("/public_html/ProjectSend/upload/files/", cJob.DocPath.UNFileInbox, False, tropFTPSettings)
     transferResult.Check                         ' Throw on any error
 
-    'TODO: PATH
-    MsgBox "You may now find any files downloaded today in T:\Production\1ToBeEntered\."
+    MsgBox "You may now find any files downloaded today in" & cJob.DocPath.FileInbox & "."
 
 End Sub
 
@@ -207,16 +205,19 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
     ' Description : process emails in Outlook folder named AccessTest and places them in db as UnprocessedCommunication
     '============================================================================
 
-    Dim oOutlookNamespace As Outlook.Namespace
-    Dim adocOutlookExport As ADODB.Connection
-    Dim adorstOutlookExport As ADODB.Recordset
-    Dim oOutLookMAPIFolder As Outlook.MAPIFolder
-    Dim oOutlookMail As Outlook.MailItem
     Dim dReceived As Date
     Dim sReceivedTime As String
     Dim sEmailHyperlink As String
     Dim sTableHyperilnk As String
 
+    Dim oOutlookNamespace As Outlook.Namespace
+    Dim adocOutlookExport As ADODB.Connection
+    Dim adorstOutlookExport As ADODB.Recordset
+    Dim oOutLookMAPIFolder As Outlook.MAPIFolder
+    Dim oOutlookMail As Outlook.MailItem
+    
+    Dim cJob As New Job
+    
     Set oOutlookNamespace = GetNamespace("MAPI")
     Set oOutlookPickedFolder = oOutlookNamespace.PickFolder
     Set adocOutlookExport = CreateObject("ADODB.Connection")
@@ -225,8 +226,7 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
     For Each oOutlookMail In oOutlookPickedFolder.Items
         dReceived = oOutlookMail.ReceivedTime
         sReceivedTime = Format(dReceived, "YYYYMMDD-hhmm")
-    'TODO: PATH
-        oOutlookMail.SaveAs "T:\Database\Emails\" & sReceivedTime & "-Email.msg", 3
+        oOutlookMail.SaveAs cJob.DocPath.EmailDirectory & sReceivedTime & "-Email.msg", 3
     Next
 
     If (oOutlookPickedFolder.Folders.Count > 0) Then
@@ -241,13 +241,12 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
     For Each oOutlookMail In oOutlookPickedFolder.Items
         dReceived = oOutlookMail.ReceivedTime
         sReceivedTime = Format(dReceived, "YYYYMMDD-hhmm")
-    'TODO: PATH
-        oOutlookMail.SaveAs "T:\Database\Emails\" & sReceivedTime & "-Email.msg", 3
-        sEmailHyperlink = "T:\Database\Emails\" & sReceivedTime & "-Email.msg"
+        oOutlookMail.SaveAs cJob.DocPath.EmailDirectory & sReceivedTime & "-Email.msg", 3
+        sEmailHyperlink = cJob.DocPath.EmailDirectory & sReceivedTime & "-Email.msg"
         sTableHyperilnk = sReceivedTime & "-Email" & "#" & sEmailHyperlink & "#"
         adorstOutlookExport.AddNew
-        adorstOutlookExport("FileHyperlink") = sTableHyperilnk
-        adorstOutlookExport("DateCreated") = dReceived
+            adorstOutlookExport("FileHyperlink") = sTableHyperilnk
+            adorstOutlookExport("DateCreated") = dReceived
         adorstOutlookExport.Update
     Next
 
@@ -291,22 +290,19 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     'IF NO, MINUS ONE PAGE
     '============================================================================
 
-    Dim dbAQC As Database
-    Dim qdf As QueryDef
-    Dim oAcrobatDoc As Object
-    Dim sTranscriptPDFPath As String
-    Dim sActualQuantity1 As String
-    Dim sActualQuantity As String
     Dim sQuestion As String
     Dim sAnswer As String
     Dim sSQL As String
 
+    Dim qdf As QueryDef
+    
+    Dim oAcrobatDoc As Object
+    
+    Dim cJob As New Job
+    
     Set oAcrobatDoc = New AcroPDDoc
 
-    'TODO: PATH
-    sTranscriptPDFPath = "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-FINAL.pdf"
-
-    oAcrobatDoc.Open (sTranscriptPDFPath)        'update file location
+    oAcrobatDoc.Open (cJob.DocPath.TranscriptFPB)        'update file location
 
     sActualQuantity = oAcrobatDoc.GetNumPages
     sQuestion = "This transcript came to " & sActualQuantity & " pages.  Is the table of authorities on a separate page from the CoA?"
@@ -322,8 +318,7 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     
         If sAnswer = vbNo Then                   'IF NO THEN THIS HAPPENS
     
-            sActualQuantity1 = InputBox("How many billable pages was this transcript?")
-            sActualQuantity = sActualQuantity1
+            sActualQuantity = InputBox("How many billable pages was this transcript?")
         
         Else                                     'if yes then this happens
         End If
@@ -338,21 +333,17 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     
         If sAnswer = vbNo Then                   'IF NO THEN THIS HAPPENS
     
-            sActualQuantity1 = InputBox("How many billable pages was this transcript?")
-            sActualQuantity = sActualQuantity1
+            sActualQuantity = InputBox("How many billable pages was this transcript?")
         
         Else                                     'if yes then this happens
     
-            sActualQuantity1 = InputBox("How many billable pages was this transcript?")
-            sActualQuantity = sActualQuantity1
-        
+            sActualQuantity = InputBox("How many billable pages was this transcript?")
+            
         End If
     
     End If
 
     oAcrobatDoc.Close
-
-    Set dbAQC = CurrentDb
 
 
 
@@ -361,14 +352,14 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     sSQL = "UPDATE [CourtDates] SET [CourtDates].[ActualQuantity] = " & sActualQuantity & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
 
     '@Ignore AssignmentNotUsed
-    Set qdf = dbAQC.CreateQueryDef("", sSQL)
-    dbAQC.Execute sSQL
+    Set qdf = CurrentDb.CreateQueryDef("", sSQL)
+    CurrentDb.Execute sSQL
 
     Set qdf = Nothing
 
     DoCmd.OpenQuery "FinalUnitPriceQuery"        'PRE-QUERY FOR FINAL SUBTOTAL
-    dbAQC.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
-    dbAQC.Close
+    CurrentDb.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
+    CurrentDb.Close
 End Sub
 
 Public Sub pfReadXML()
@@ -391,12 +382,12 @@ Public Sub pfReadXML()
     Dim formDOM As DOMDocument60                 'Currently opened xml file
     Dim ixmlRoot As IXMLDOMElement
     Dim Rng As Range
+    Dim cJob As New Job
 
-    'TODO: PATH
-    sOutputPath = Dir("T:\Production\4ShippingXMLs\Output\")
+    sOutputPath = Dir(cJob.DocPath.ShippingOutputFolder)
     Do While Len(sOutputPath) > 0
-        sFullOutputPath = "T:\Production\4ShippingXMLs\Output\" & sOutputPath
-        sFullOutputDonePath = "T:\Production\4ShippingXMLs\done" & sOutputPath
+        sFullOutputPath = cJob.DocPath.ShippingOutputFolder & sOutputPath
+        sFullOutputDonePath = cJob.DocPath.ShippingFolder & "done" & sOutputPath
     
         Set formDOM = New DOMDocument60          'Open the xml file
         formDOM.resolveExternals = False         'using schema yes/no true/false
@@ -405,7 +396,6 @@ Public Sub pfReadXML()
     
         Set ixmlRoot = formDOM.DocumentElement   'Get document reference
     
-    'TODO: PATH
         sCourtDatesID = ixmlRoot.SelectSingleNode("//DAZzle/Package/ReferenceID").Text
         dShipDate = ixmlRoot.SelectSingleNode("//DAZzle/Package/PostmarkDate").Text
         dShipDateFormatted = DateSerial(Left(dShipDate, 4), Mid(dShipDate, 5, 2), Right(dShipDate, 2))
@@ -427,8 +417,9 @@ Public Sub pfReadXML()
         dHearingDate = rstCurrentJob.Fields("HearingDate").Value
         sAudioLength = rstCurrentJob.Fields("AudioLength").Value
         rstCurrentJob.Close
-    
-        sOutputPath = Dir
+        
+        'TODO: Don't need this?
+        'sOutputPath = Dir
     
         Name sFullOutputPath As sFullOutputDonePath 'move file to other folder
     
@@ -447,35 +438,28 @@ Public Sub pfFileRenamePrompt()
     ' Description : renames transcript to specified name, mainly for contractors
     '============================================================================
 
-    Dim db As Database
-
     Dim sUserInput As String
-    Dim sFinalTranscriptPath As String
     Dim sChkBxFiledNotFiled As String
-    Dim sCoverPath As String
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sFinalTranscriptPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.docx"
-    sCoverPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
+    
     sUserInput = InputBox("Enter the desired document name without the extension" & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Rename your document." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Enter the new name for the transcript here, without the extension." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date")
 
     If sUserInput = "Enter the new name for the transcript here, without the extension." Or sUserInput = "" Then
         Exit Sub
     End If
 
-    'TODO: PATH
-    sClientTranscriptName = "I:\" & sCourtDatesID & "\Transcripts\" & sUserInput & ".docx"
-
-    FileCopy sCoverPath, sFinalTranscriptPath
-    Name sFinalTranscriptPath As sClientTranscriptName
+    FileCopy cJob.DocPath.CourtCover, cJob.DocPath.TranscriptFD
+    Name cJob.DocPath.TranscriptFD As cJob.DocPath.JobDirectoryT & sUserInput & ".docx"
 
     MsgBox "File renamed to " & sClientTranscriptName & ".  Next we will deliver the transcript."
 
     Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
     Call pfSendWordDocAsEmail("ContractorTranscriptsReady", "Transcripts Ready", sClientTranscriptName)
 
-    sChkBxFiledNotFiled = "update [CourtDates] set FiledNotFiled =(Yes) WHERE ID=" & sCourtDatesID & ";"
+    sChkBxFiledNotFiled = "UPDATE [CourtDates] SET FiledNotFiled =(Yes) WHERE ID=" & sCourtDatesID & ";"
 
     CurrentDb.Execute sChkBxFiledNotFiled
 
@@ -532,89 +516,83 @@ Public Sub pfCheckFolderExistence()
     ' Call command: Call pfCheckFolderExistence
     ' Description : checks for Audio, Transcripts, FTP, WorkingFiles, Notes subfolders and RoughDraft and creates if not exists
     '============================================================================
-    Dim sIPJobPath As String
-    Dim sTemplatePath As String
 
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sIPJobPath = "I:\" & sCourtDatesID
-    sTemplatePath = "T:\Database\Templates\"
 
-    If Len(Dir(sIPJobPath, vbDirectory)) = 0 Then
-        MkDir sIPJobPath
+    If Len(Dir(cJob.DocPath.JobDirectory, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectory
     End If
-    If Len(Dir(sIPJobPath & "\FTP\", vbDirectory)) = 0 Then
-        MkDir sIPJobPath & "\FTP\"
+    If Len(Dir(cJob.DocPath.JobDirectoryF, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectoryF
     End If
-    If Len(Dir(sIPJobPath & "\WorkingFiles\", vbDirectory)) = 0 Then
-        MkDir sIPJobPath & "\WorkingFiles\"
+    If Len(Dir(cJob.DocPath.JobDirectoryW, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectoryW
     End If
-    If Len(Dir(sIPJobPath & "\Audio\", vbDirectory)) = 0 Then
-        MkDir sIPJobPath & "\Audio\"
+    If Len(Dir(cJob.DocPath.JobDirectoryA, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectoryA
     End If
-    If Len(Dir(sIPJobPath & "\Transcripts\", vbDirectory)) = 0 Then
-        MkDir sIPJobPath & "\Transcripts\"
+    If Len(Dir(cJob.DocPath.JobDirectoryT, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectoryT
     End If
-    If Len(Dir(sIPJobPath & "\Notes", vbDirectory)) = 0 Then
-        MkDir sIPJobPath & "\Notes"
+    If Len(Dir(cJob.DocPath.JobDirectoryN, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectoryN
     End If
-    If Len(Dir(sIPJobPath & "\Generated", vbDirectory)) = 0 Then
-        MkDir sIPJobPath & "\Generated"
+    If Len(Dir(cJob.DocPath.JobDirectoryG, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectoryG
     End If
-    If Len(Dir(sIPJobPath & "\Backups", vbDirectory)) = 0 Then
-        MkDir sIPJobPath & "\Backups"
+    If Len(Dir(cJob.DocPath.JobDirectoryB, vbDirectory)) = 0 Then
+        MkDir cJob.DocPath.JobDirectoryB
     End If
-
-    'TODO: PATH
-
+    
     If sJurisdiction Like "*Food and Drug Administration*" Then
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft-FDA.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-FDA.docx", cJob.DocPath.RoughDraft
         End If
     
     ElseIf sJurisdiction Like "*NonCourt*" Then
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
         End If
     
     ElseIf sJurisdiction Like "*FDA*" Then
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft-FDA.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-FDA.docx", cJob.DocPath.RoughDraft
         End If
     
     ElseIf sJurisdiction Like "*Weber Oregon*" Then
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft-WeberOR.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberOR.docx", cJob.DocPath.RoughDraft
         End If
     
     ElseIf sJurisdiction Like "*Weber Nevada*" Then
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft-WeberNV.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberNV.docx", cJob.DocPath.RoughDraft
         End If
     
     ElseIf sJurisdiction Like "*Weber Bankruptcy*" Then
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
         End If
     
     ElseIf sJurisdiction Like "*AVT*" Then
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
         End If
     
     Else
 
-        If Len(Dir(sIPJobPath & "\" & "RoughDraft.docx")) = 0 Then
-            FileCopy sTemplatePath & "Stage2s\RoughDraft.docx", sIPJobPath & "\" & "RoughDraft.docx"
+        If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
         End If
     
     End If
@@ -630,23 +608,21 @@ Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
     ' Description : adds entry to CommunicationHistory
     '============================================================================
 
-    Dim db As DAO.Database
     Dim rstCHAdd As DAO.Recordset
     Dim sCHHyperlink As String
-    Dim sCurrentDocPath As String
 
-    'TODO: PATH
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    sCurrentDocPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & sCHTopic & ".docx"
-    sCHHyperlink = sCourtDatesID & "-" & sCHTopic & "#" & sCurrentDocPath & "#"
+    
+    sCHHyperlink = sCourtDatesID & "-" & sCHTopic & "#" & cJob.DocPath.JobDirectoryGN & sCHTopic & ".docx" & "#"
 
-    Set db = CurrentDb
-    Set rstCHAdd = db.OpenRecordset("CommunicationHistory")
+    Set rstCHAdd = CurrentDb.OpenRecordset("CommunicationHistory")
 
     rstCHAdd.AddNew
-    rstCHAdd("FileHyperlink").Value = sCHHyperlink
-    rstCHAdd("DateCreated").Value = Now
-    rstCHAdd("CourtDatesID").Value = sCourtDatesID
+        rstCHAdd("FileHyperlink").Value = sCHHyperlink
+        rstCHAdd("DateCreated").Value = Now
+        rstCHAdd("CourtDatesID").Value = sCourtDatesID
     rstCHAdd.Update
 
     rstCHAdd.Close
@@ -1145,20 +1121,22 @@ Public Sub pfGenerateJobTasks()
     Dim sTaskCategory As String
     Dim sPriority As String
     Dim sTaskDescription As String
-    Dim sIPJobPath As String
+    
     Dim iTypingTime As Long
     Dim iAudioProofTime As Long
     Dim iTaskMinuteLength As Long
+    
     Dim dStart As Date
     Dim dDue As Date
+    
     Dim qdf As QueryDef
     Dim rstTasks As DAO.Recordset
+    
+    Dim cJob As New Job
 
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    'TODO: PATH
-    sIPJobPath = "I:\" & sCourtDatesID
     sTaskTitle = "(1.1) Enter job & contacts into database:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = Now + 1
     dStart = Date
@@ -1169,7 +1147,7 @@ Public Sub pfGenerateJobTasks()
     sTaskDescription = "|Case Name:  " & sParty1 & " v. " & sParty2 & "   |" & Chr(13) & _
                                                                                        "|Case Nos.:  " & sCaseNumber1 & "   |   " & sCaseNumber2 & "   |" & Chr(13) & _
                                                                                        "|Due Date:  " & dDue & "   |   Turnaround:  " & sTurnaroundTime & " calendar days   |" & _
-                                                                                       "|Client:   " & sCompany & "   |   Folder:   " & sIPJobPath & "   |" & Chr(13) & _
+                                                                                       "|Client:   " & sCompany & "   |   Folder:   " & cJob.DocPath.JobDirectory & "   |" & Chr(13) & _
                                                                                        "|Exp. Advance/Deposit Date:  " & dExpectedAdvanceDate & "   |" & Chr(13) & _
                                                                                        "|Exp. Rebate Date:  " & dExpectedRebateDate & "   |" & Chr(13) & _
                                                                                        "|Estimate:  " & sSubtotal & "   |"
@@ -1892,18 +1870,22 @@ Public Sub pfCommHistoryExportSub()
     ' Description : exports emails to CommunicationsHistory table
     '============================================================================
 
-    Dim nsOutlookNmSpc As Outlook.Namespace
-
-    Dim oOutlookAccessTestFolder As Object
-    Dim oOutLookMAPIFolder As Outlook.MAPIFolder
-    Dim oOutlookMail As Outlook.MailItem
-    Dim dEmailReceived As Date
+    
     Dim sEmailReceivedTime As String
     Dim sDriveHyperlink As String
     Dim sSenderName As String
     Dim sCommHistoryHyperlink As String
+
+    Dim nsOutlookNmSpc As Outlook.Namespace
+    Dim oOutLookMAPIFolder As Outlook.MAPIFolder
+    Dim oOutlookMail As Outlook.MailItem
+    Dim oOutlookAccessTestFolder As Object
+    
     Dim rs As DAO.Recordset
-    Dim FNme As String
+    
+    Dim dEmailReceived As Date
+    
+    Dim cJob As New Job
 
     Set nsOutlookNmSpc = GetNamespace("MAPI")
     Set oOutlookAccessTestFolder = nsOutlookNmSpc.Folders(sCompanyEmail).Folders("Inbox").Folders("AccessTest")
@@ -1915,11 +1897,10 @@ Public Sub pfCommHistoryExportSub()
         sEmailReceivedTime = Format(dEmailReceived, "YYYYMMDD-hhmm") 'convert time to good string value
     
         'save email on hard drive in in progress
-    'TODO: PATH
-        oOutlookMail.SaveAs "T:\Database\Emails\" & sEmailReceivedTime & "-" & sSenderName & "-Email.msg", 3
+        oOutlookMail.SaveAs cJob.DocPath.EmailDirectory & sEmailReceivedTime & "-" & sSenderName & "-Email.msg", 3
         dEmailReceived = oOutlookMail.ReceivedTime
         sEmailReceivedTime = Format(dEmailReceived, "YYYYMMDD-hhmm")
-        sDriveHyperlink = "T:\Database\Emails\" & sEmailReceivedTime & "-" & sSenderName & "-Email.msg"
+        sDriveHyperlink = cJob.DocPath.EmailDirectory & sEmailReceivedTime & "-" & sSenderName & "-Email.msg"
     
         'string for link to email in access hyperlink field
         sCommHistoryHyperlink = sEmailReceivedTime & "-" & sSenderName & "-Email" & "#" & sDriveHyperlink & "#" '
@@ -1927,11 +1908,11 @@ Public Sub pfCommHistoryExportSub()
         Set rs = CurrentDb.OpenRecordset("SELECT * FROM CommunicationHistory")
     
         rs.AddNew
-        rs("FileHyperlink") = sCommHistoryHyperlink
-        rs("FileHyperlink1") = sCommHistoryHyperlink
-        rs("DateCreated") = dEmailReceived
-        rs("CourtDatesID") = Null
-        rs("CustomersID") = Null
+            rs("FileHyperlink") = sCommHistoryHyperlink
+            rs("FileHyperlink1") = sCommHistoryHyperlink
+            rs("DateCreated") = dEmailReceived
+            rs("CourtDatesID") = Null
+            rs("CustomersID") = Null
         rs.Update
     
         On Error GoTo eHandler
@@ -1946,7 +1927,6 @@ Public Sub pfCommHistoryExportSub()
     rs.Close
 
     Set rs = Nothing
-    'Set adoConn = Nothing
     Set nsOutlookNmSpc = Nothing
     Set oOutlookAccessTestFolder = Nothing
 
@@ -1954,7 +1934,7 @@ Public Sub pfCommHistoryExportSub()
 
 eHandler:
 
-    'MsgBox ("The email " & FNme & " failed to save.")
+    'MsgBox ("The email failed to save.")
     'MsgBox Err.Description & " (" & Err.Number & ")"
 
     Resume Next
@@ -2094,18 +2074,18 @@ Public Sub pfAskforAudio()
     ' Description : prompts to select audio to copy to job no.'s audio folder
     '============================================================================
 
-    Dim fd As FileDialog
-    Dim iFileChosen As Long
     Dim sFileName As String
-    Dim sAudioFolder As String
-    Dim sNewAudioPath As String
+    
+    Dim iFileChosen As Long
     Dim i As Long
+    
     Dim fs As Object
+    Dim fd As FileDialog
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sAudioFolder = "I:\" & sCourtDatesID & "\Audio\"
-    sNewAudioPath = sAudioFolder & ""
+    
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
     'use the standard title and filters, but change the initial folder
     fd.InitialFileName = "T:\"
@@ -2121,12 +2101,10 @@ Public Sub pfAskforAudio()
             Debug.Print fd.InitialFileName & "\" & fd.SelectedItems(i)
             Debug.Print fd.SelectedItems(i)
             sFileName = Right$(fd.SelectedItems(i), Len(fd.SelectedItems(i)) - InStrRev(fd.SelectedItems(i), "\"))
-            sNewAudioPath = sAudioFolder & sFileName
-            Debug.Print sNewAudioPath
-            Debug.Print Len(Dir(sNewAudioPath, vbDirectory))
+            Debug.Print Len(Dir(cJob.DocPath.JobDirectoryA & sFileName, vbDirectory))
         
-            If Len(Dir(sNewAudioPath, vbDirectory)) = 0 Then
-                FileCopy fd.SelectedItems(i), sNewAudioPath
+            If Len(Dir(cJob.DocPath.JobDirectoryA & sFileName, vbDirectory)) = 0 Then
+                FileCopy fd.SelectedItems(i), cJob.DocPath.JobDirectoryA & sFileName
             End If
         
         Next i
@@ -2147,38 +2125,29 @@ Public Sub pfAskforNotes()
     '============================================================================
 
 
-    Dim fd As FileDialog
-    Dim iFileChosen As Long
     Dim sFileName As String
-    Dim sAudioFolder As String
-    Dim sNewAudioPath As String
-    Dim sNewNotesName As String
     Dim sOriginalNotesPath As String
-    Dim sNotesPath As String
-    Dim i As Long
-    Dim fs As Object
-    Dim sWorkingCopyPath As String
-    Dim sTranscriptWD As String
-    Dim sFinalTranscriptWD As String
-    Dim sFinalTranscriptNoExt As String
-    Dim sCourtCoverPath As String
     Dim sAnswerPDFPrompt As String
     Dim sMakePDFPrompt As String
+    
+    Dim i As Long
+    Dim iFileChosen As Long
+    
+    Dim fs As Object
+    Dim oVBComponent As Object
+    Dim fd As FileDialog
+    
     Dim oWordApp As Word.Application
     Dim oWordDoc As Word.Document
-    Dim oVBComponent As Object
+    
     Dim rngStory As Range
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sAudioFolder = "I:\" & sCourtDatesID & "\Notes\"
-    sNewAudioPath = sAudioFolder & ""
-    'TODO: PATH
-    sNewNotesName = "I:\" & sCourtDatesID & "\Notes\" & sCourtDatesID & "-Notes.pdf"
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
     'use the standard title and filters, but change the initial folder
-    'TODO: PATH
-    fd.InitialFileName = "T:\"
+    fd.InitialFileName = cJob.DocPath.sDrive & ":\"
     fd.InitialView = msoFileDialogViewList
     fd.Title = "Select your Notes."
     fd.AllowMultiSelect = True                   'allow multiple file selection
@@ -2187,23 +2156,20 @@ Public Sub pfAskforNotes()
     If iFileChosen = -1 Then
         For i = 1 To fd.SelectedItems.Count      'copy each of the files chosen
             sFileName = Right$(fd.SelectedItems(i), Len(fd.SelectedItems(i)) - InStrRev(fd.SelectedItems(i), "\"))
-            sNewAudioPath = sAudioFolder & sFileName
+            
+            'TODO: Come back and delete
+            'Debug.Print cJob.DocPath.Notes
+            'Debug.Print cJob.DocPath.JobDirectoryA & sFileName
         
-            Debug.Print sNewNotesName
-            Debug.Print sNewAudioPath
-        
-            If Len(Dir(sNewAudioPath, vbDirectory)) = 0 Then
+            If Len(Dir(cJob.DocPath.JobDirectoryA & sFileName, vbDirectory)) = 0 Then
         
         
                 'open in word and save as notes pdf
         
                 sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+                
                 sOriginalNotesPath = fd.SelectedItems(i)
-    'TODO: PATH
-                sNotesPath = "I:\" & sCourtDatesID & "\Notes\" & sCourtDatesID & "-Notes.PDF"
-        
                 sMakePDFPrompt = "Next we will make a PDF copy.  Click yes when ready."
-        
                 sAnswerPDFPrompt = MsgBox(sMakePDFPrompt, vbQuestion + vbYesNo, "???")
         
                 If sAnswerPDFPrompt = vbNo Then  'Code for No
@@ -2232,7 +2198,7 @@ Public Sub pfAskforNotes()
                     oWordDoc.Application.DisplayAlerts = False
         
                     'save as pdf
-                    oWordDoc.ExportAsFixedFormat outputFileName:=sNotesPath, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
+                    oWordDoc.ExportAsFixedFormat outputFileName:=cJob.DocPath.Notes, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
                         
                     oWordDoc.Close SaveChanges:=False
         
@@ -2242,8 +2208,8 @@ Public Sub pfAskforNotes()
                 Set oWordDoc = Nothing
                 Set oWordApp = Nothing
             
-                FileCopy fd.SelectedItems(i), sNewAudioPath
-                FileCopy fd.SelectedItems(i), sNewNotesName
+                FileCopy fd.SelectedItems(i), cJob.DocPath.JobDirectoryA & sFileName
+                FileCopy fd.SelectedItems(i), cJob.DocPath.Notes
             End If
         Next i
     End If
