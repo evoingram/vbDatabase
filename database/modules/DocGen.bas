@@ -10,7 +10,7 @@ Option Explicit
 '   NONE
 
 'functions:
-'pfGenericExportandMailMerge:  Description:  exports to specified template from :\Database\Templates and saves in \Production\2InProgress\####\
+'pfGenericExportandMailMerge:  Description:  exports to specified template from \Database\Templates and saves in \Production\2InProgress\####\
 '                          Arguments:    sQueryName, sExportTopic
 'pfSendWordDocAsEmail:         Description:  sends Word document as an e-mail body
 '                          Arguments:    vCHTopic, vSubject, Optional sAttachment1, sAttachment2, sAttachment3, sAttachment4
@@ -41,7 +41,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call pfGenericExportandMailMerge(sQueryName, sExportTopic)
-    ' Description:  exports to specified template from :\Database\Templates and saves in \Production\2InProgress\####\
+    ' Description:  exports to specified template from \Database\Templates and saves in \Production\2InProgress\####\
     '============================================================================
 
     Dim sExportedTemplatePath As String

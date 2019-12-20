@@ -755,12 +755,45 @@ Public Property Let WordIndexT(sInput As String)
     pWordIndexT = WordIndexT
 End Property
 Public Property Get WordIndexDBT() As String
+    WordIndexDBT = pWordIndexDBT
+End Property
+
+Public Property Let WordIndexDBT(sInput As String)
+    pWordIndexDBT = WordIndexDBT
+End Property
+
+Public Property Get WordIndexDB() As String
     WordIndexDB = pWordIndexDB
 End Property
 
 Public Property Let WordIndexDB(sInput As String)
     pWordIndexDB = WordIndexDB
 End Property
+
+Public Property Get JurisdictionRefs() As String
+    JurisdictionRefs = pJurisdictionRefs
+End Property
+
+Public Property Let JurisdictionRefs(sInput As String)
+    pJurisdictionRefs = JurisdictionRefs
+End Property
+
+Public Property Get DBScripts() As String
+    DBScripts = pDBScripts
+End Property
+
+Public Property Let DBScripts(sInput As String)
+    pDBScripts = DBScripts
+End Property
+
+Public Property Get SpeechUP() As String
+    SpeechUP = pSpeechUP
+End Property
+
+Public Property Let SpeechUP(sInput As String)
+    pSpeechUP = SpeechUP
+End Property
+
 
 Public Sub Class_Initialize()
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -873,6 +906,7 @@ Public Sub Class_Initialize()
         pWordIndexT = psDrive & ":\Database\Templates\Stage2s\TR-WordIndex.dotm"
         pXMLAfter = psDrive & ":\Database\Scripts\InProgressExcels\AfterXML.xml"
         pXMLBefore = psDrive & ":\Database\Scripts\InProgressExcels\BeforeXML.xml"
+        pDBScripts = psDrive & ":\Database\Scripts\"
         
         pJobDirectory = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/"
         pJobDirectoryG = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/"
@@ -904,6 +938,9 @@ Public Sub Class_Initialize()
         pDistillerSettings = "C:\Program Files (x86)\Adobe\Acrobat 9.0\Acrobat\Settings\Standard.joboptions"
         pDistillerSettings1 = "C:\users\inqui\Standard1.joboptions"
         
+        pJurisdictionRefs = psDrive & ":\Administration\Jurisdiction References\"
+        
+       pSpeech = "S" & ":\UnprocessedAudio\Prepared\"
 End Sub
 
 

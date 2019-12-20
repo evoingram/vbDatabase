@@ -2231,7 +2231,7 @@ Public Sub pfTypeRoughDraftF()
     Set oRoughDraft = CreateObject("Scripting.FileSystemObject")
 
     If sJurisdiction = "Weber Nevada" Then
-    'TODO: PATH
+    
         If Not oRoughDraft.FileExists(cJob.DocPath.RoughDraft) Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberNV.docx", cJob.DocPath.RoughDraft
         End If

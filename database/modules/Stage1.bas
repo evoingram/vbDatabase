@@ -547,8 +547,6 @@ Public Sub pfEnterNewJob()
         Call pfStage1Ppwk
     End If
 
-
-    'TODO: PATH
     Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA) 'code for processing audio
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     MsgBox "Thanks, job entered!  Job number is " & sCourtDatesID & " if you want to process it!"
@@ -1171,19 +1169,24 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
     ' Name        : pfPlayAudioFolder
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call fPlayAudioFolder("\Production\2InProgress\" & sCourtDatesID & "\Audio\")
+    ' Call command: Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA)
     ' Description : plays audio folder
     '============================================================================
 
-    Dim blNotFirstIteration As Boolean
-    Dim fiCurrentFile As File
-    Dim foHFolder As Folder
     Dim sExtension As String
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim FSO As Scripting.FileSystemObject
-    Dim item As Variant
     Dim sFileTypes() As String
+    
+    Dim blNotFirstIteration As Boolean
+    
+    Dim fiCurrentFile As File
+    Dim foHFolder As Folder
+    Dim FSO As Scripting.FileSystemObject
+    
+    Dim item As Variant
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1219,25 +1222,23 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
             sFileTypes = Array("csx", "inf")
                 
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*csx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-CourtSmartPlay.bat")
+                If fiCurrentFile Like "*csx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-CourtSmartPlay.bat")
                 If fiCurrentFile Like "*inf*" Then Exit For
             Next
                 
             sFileTypes = Array("mp3", "mp4", "wav", "mpeg", "wma", "wmv", "divx", "m4v", "mov", "wmv")
                 
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*mp3*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*mp4*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wav*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*mpeg*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wma*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*divx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*m4v*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*mov*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mp3*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mp4*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wav*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mpeg*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wma*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*divx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*m4v*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mov*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
             Next
                 
         Next fiCurrentFile
@@ -1258,15 +1259,20 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
     ' Description : process audio in /Audio/ folder
     '============================================================================
 
-    Dim blNotFirstIteration As Boolean
-    Dim fiCurrentFile As File
-    Dim foHFolder As Folder
     Dim sExtension As String
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim FSO As Scripting.FileSystemObject
     Dim sFileTypes() As String
+    
+    Dim blNotFirstIteration As Boolean
+    
+    Dim fiCurrentFile As File
+    Dim foHFolder As Folder
+    Dim FSO As Scripting.FileSystemObject
+    
     Dim item As Variant
+    
+    Dim cJob As New Job
 
     sQuestion = "Would you like to process the audio for job number " & sCourtDatesID & "?  Make sure the audio is in the \Audio\folder before proceeding."
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -1294,24 +1300,22 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
             sFileTypes = Array("csx")
                     
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*csx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-CourtSmartPlay.bat")
+                If fiCurrentFile Like "*csx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-CourtSmartPlay.bat")
             Next
                     
             sFileTypes = Array("mp3", "mp4", "wav", "mpeg", "wma", "wmv", "divx", "m4v", "mov", "wmv")
                     
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*mp3*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*mp4*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wav*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*mpeg*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wma*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*divx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*m4v*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*mov*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mp3*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mp4*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wav*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mpeg*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wma*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*divx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*m4v*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mov*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
             Next
                     
         Next fiCurrentFile
@@ -1505,7 +1509,6 @@ Public Sub pfStage1Ppwk()
     ' Description : completes all stage 1 tasks
     '============================================================================
 
-
     Dim sCourtRulesPath1 As String
     Dim sCourtRulesPath2 As String
     Dim sCourtRulesPath3 As String
@@ -1537,10 +1540,8 @@ Public Sub pfStage1Ppwk()
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    'TODO: PATH
     sCourtRulesPath1 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-Rates.pdf"
     sCourtRulesPath2 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
     sCourtRulesPath3 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-SampleTranscript.pdf"
@@ -1552,8 +1553,6 @@ Public Sub pfStage1Ppwk()
     sCourtRulesPath9 = cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties-2.pdf"
     sCourtRulesPath10 = "T:\Administration\Jurisdiction References\Massachusetts\uniformtranscriptformat.pdf"
 
-
-    'TODO: PATH
     sCourtRulesPath1a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-Rates.pdf"
     sCourtRulesPath2a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
     sCourtRulesPath3a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-SampleTranscript.pdf"
