@@ -23,7 +23,6 @@ Option Explicit
 '                       Arguments:    sFile, sMacroName
 'pfSendTrackingEmail:   Description:  generates tracking number e-mail for customer
 '                       Arguments:    NONE
-    'TODO: PATH
 'fZIPTranscripts:       Description:  zips transcripts folder in I:\####\
 '                       Arguments:    NONE
 'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in I:\####\
@@ -74,11 +73,12 @@ Public Sub pfStage4Ppwk()
     Dim qdf As QueryDef
     Dim sAnswer As String
     Dim sQuestion As String
-    Dim sIPCompletedFolderPath As String
-    Dim sCompletedFolderPath As String
     Dim sFactoredChkBxSQL As String
     Dim sBillingURL As String
     Dim sPaymentDueDate As Date
+    
+    Dim cJob As New Job
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     Call pfGetOrderingAttorneyInfo
@@ -458,13 +458,10 @@ Public Sub pfStage4Ppwk()
     If sAnswer = vbNo Then                       'Code for No
         MsgBox "Job " & sCourtDatesID & " will not be completed."
     Else
-        Set db = CurrentDb
-    'TODO: PATH
-        sIPCompletedFolderPath = "I:\" & sCourtDatesID & "\*.*"
-        sCompletedFolderPath = "T:\Production\3Complete\" & sCourtDatesID & "\*.*"
-        Shell "cmd /c move '" & sIPCompletedFolderPath & "' " & sCompletedFolderPath & _
+        Shell "cmd /c move '" & cJob.DocPath.JobDirectory & "*.*" & "' " & cJob.DocPath.CompleteFolder & sCourtDatesID & "\*.*" & _
               ", vbNormalFocus"
-        db.Execute "Update CommunicationHistory Set [FileHyperlink] = Replace(FileHyperlink, " & "'2InProgress\" & sCourtDatesID & "', '3Complete\" & sCourtDatesID & "') WHERE fileHyperLink LIKE '*2InProgress\" & sCourtDatesID & "*';"
+        CurrentDb.Execute "Update CommunicationHistory Set [FileHyperlink] = Replace(FileHyperlink, " & _
+            "'2InProgress\" & sCourtDatesID & "', '3Complete\" & sCourtDatesID & "') WHERE fileHyperLink LIKE '*2InProgress\" & sCourtDatesID & "*';"
 
         MsgBox "Job " & sCourtDatesID & " has been moved to /3Complete/ and document history hyperlinks have been updated."
     End If
@@ -505,23 +502,13 @@ Public Sub fTranscriptDeliveryF()
     Dim sQuestion As String
     Dim sAnswer As String
     Dim sFiledNotFiledSQL As String
-    Dim sPDFFinalTranscript As String
-    Dim sWordFinalTranscript As String
-    Dim sWorkingCopyPath As String
-    Dim sInvoiceWD As String
-    Dim sInvoicePDF As String
-    Dim db As Database
+    
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
-
+    
+    Dim cJob As New Job
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-    'TODO: PATH
-    sPDFFinalTranscript = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
-    sWordFinalTranscript = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.docx"
-    sWorkingCopyPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
-    sInvoiceWD = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & sInvoiceNumber & ".docx"
-    sInvoicePDF = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & sInvoiceNumber & ".pdf"
 
     'checks for Audio, Transcripts, FTP, WorkingFiles subfolders and creates if not exists
     Call pfCheckFolderExistence
@@ -570,13 +557,13 @@ Public Sub fTranscriptDeliveryF()
         ElseIf sJurisdiction = "District of Hawaii" Then
     
             Application.FollowHyperlink ("https://ecf.hib.uscourts.gov/cgi-bin/login.pl")
-            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", sPDFFinalTranscript, sWordFinalTranscript, sWorkingCopyPath)
+            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
         ElseIf sJurisdiction = "Eastern District of Pennsylvania" Then
     
             Application.FollowHyperlink ("https://ecf.paeb.uscourts.gov/cgi-bin/login.pl")
             'Call FileTranscriptSendEmail(sCompanyEmail)
-            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", sPDFFinalTranscript, sWordFinalTranscript, sWorkingCopyPath)
+            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
         ElseIf sJurisdiction = "District of Connecticut" Then
     
@@ -598,7 +585,7 @@ Public Sub fTranscriptDeliveryF()
     
             Application.FollowHyperlink ("https://efiling.caeb.uscourts.gov/LoginPage.aspx")
             'Call FileTranscriptSendEmail(sCompanyEmail)
-            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", sPDFFinalTranscript, sWordFinalTranscript, sWorkingCopyPath)
+            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
         ElseIf sJurisdiction = "Southern District of California" Then
     
@@ -608,7 +595,7 @@ Public Sub fTranscriptDeliveryF()
     
             Application.FollowHyperlink ("https://efiling.caeb.uscourts.gov/LoginPage.aspx")
             'Call FileTranscriptSendEmail(sCompanyEmail)
-            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", sPDFFinalTranscript, sWordFinalTranscript, sWorkingCopyPath)
+            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
         ElseIf sJurisdiction = "Central District of Illinois" Then
     
@@ -665,7 +652,7 @@ Public Sub fTranscriptDeliveryF()
         ElseIf sJurisdiction = "District of Oregon" Then
     
             Application.FollowHyperlink ("https://ecf.orb.uscourts.gov/cgi-bin/login.pl")
-            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", sPDFFinalTranscript, sWordFinalTranscript, sWorkingCopyPath)
+            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
             'Call FileTranscriptSendEmail(sCompanyEmail)
     
         ElseIf sJurisdiction = "District of Rhode Island" Then
@@ -693,8 +680,8 @@ Public Sub fTranscriptDeliveryF()
             MsgBox "Transcript will not print."
         Else                                     'Code for Yes
     
-            Call fEmailtoPrint(sPDFFinalTranscript)
-            Call fEmailtoPrint(sPDFFinalTranscript)
+            Call fEmailtoPrint(cJob.DocPath.TranscriptFP)
+            Call fEmailtoPrint(cJob.DocPath.TranscriptFP)
         
             Set oWordApp = Nothing
             Set oWordApp = GetObject(, "Word.Application")
@@ -702,14 +689,14 @@ Public Sub fTranscriptDeliveryF()
                 Set oWordApp = CreateObject("Word.Application")
             End If
             oWordApp.Application.Visible = False
-            Set oWordDoc = oWordApp.Documents.Open(sInvoiceWD)
-            oWordDoc.SaveAs2 FileName:=sInvoicePDF
+            Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.InvoiceD)
+            oWordDoc.SaveAs2 FileName:=cJob.DocPath.InvoiceP
         
         
             oWordApp.Quit
             Set oWordApp = Nothing
         
-            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", sPDFFinalTranscript, sWordFinalTranscript, sWorkingCopyPath, sInvoicePDF)
+            Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC, cJob.DocPath.InvoiceP)
         
         End If
     End If
@@ -718,9 +705,8 @@ ContractorFile:
         'Code for No
         MsgBox "Transcript will not be filed."
     Else
-        Set db = CurrentDb
         sFiledNotFiledSQL = "update [CourtDates] set FiledNotFiled =(Yes) WHERE ID=" & sCourtDatesID & ";"
-        db.Execute sFiledNotFiledSQL
+        CurrentDb.Execute sFiledNotFiledSQL
         MsgBox "Transcript has been marked filed."
     End If
     Call pfClearGlobals
@@ -735,26 +721,20 @@ Public Sub fGenerateZIPsF()
     ' Description : parent function to ZIP various necessary files going to customer
     '============================================================================
 
-    Dim TranscriptWC As String
-    Dim FindReplaceTranscriptD As String
-    Dim FinalTranscriptPathwordWC As String
-    Dim FindReplaceTranscriptF As String
-    'TODO: what's going on here?  come back
-    Dim naceTranscriptP As String
-    Dim vInvoiceFilePathPPDF As String
-    Dim sourceFile As String
-    Dim destinationfile As String
-    Dim sourcefile1 As String
-    Dim destinationfile1 As String
+    Dim sQuestion As String
+    Dim sAnswer As String
+    
     Dim filecopied As Object
-    Dim MyNote As String
-    Dim answer As String
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
-    If sJurisdiction Like "*Weber Nevada*" Or sJurisdiction Like "*Weber Bankruptcy*" Or sJurisdiction Like "*Weber Oregon*" Or sJurisdiction Like "*Food and Drug Administration*" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" Or sJurisdiction Like "*eScribers*" Or sJurisdiction Like "*AVTranz*" Then
+    If sJurisdiction Like "*Weber Nevada*" Or sJurisdiction Like "*Weber Bankruptcy*" Or sJurisdiction Like "*Weber Oregon*" _
+    Or sJurisdiction Like "*Food and Drug Administration*" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" _
+    Or sJurisdiction Like "*eScribers*" Or sJurisdiction Like "*AVTranz*" Then
         GoTo Line2
     Else
     End If
@@ -771,8 +751,7 @@ Line2:
     Call fPrint2upPDF
     Call fPrint4upPDF
 
-    'TODO: PATH
-    FileCopy "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-WordIndex.PDF", "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-WordIndex.PDF"
+    FileCopy cJob.DocPath.WordIndexP, cJob.DocPath.WordIndexPB
 
     MsgBox "Thank you.  Next, we will ZIP your files."
 
@@ -785,18 +764,16 @@ Line2:
     Call fUploadZIPsPrompt                       'upload zips to ftp
     'Call pfBurnCD 'burn CD
 
-    MyNote = "Do you want to open the job folder?"
-    answer = MsgBox(MyNote, vbQuestion + vbYesNo, "???")
+    sQuestion = "Do you want to open the job folder?"
+    sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
-    If answer = vbNo Then                        'Code for No
+    If sAnswer = vbNo Then                        'Code for No
 
-    'TODO: PATH
         MsgBox "Go to I:\ to open the job folder."
     
     Else                                         'Code for yes
 
-    'TODO: PATH
-        Call Shell("explorer.exe" & " " & "I:\" & sCourtDatesID, vbNormalFocus)
+        Call Shell("explorer.exe" & " " & cJob.DocPath.JobDirectory, vbNormalFocus)
     
     End If
 
@@ -873,23 +850,19 @@ Public Sub fZIPAudio()
     ' Description : zips audio folder in I:\####\
     '============================================================================
 
-    Dim sourceFile As String
-    Dim destinationfile As String
-    Dim sourcefile1 As String
-    Dim destinationfile1 As String
-    Dim filecopied As Object
-    Dim FileNameZip1 As String
-    Dim foldername1 As String
-    Dim filenamezipFTPTRS As String
-    Dim foldernameFTP As String
-    Dim dbVideoCollection As Database
-    Dim rstCourtDates As DAO.Recordset
     Dim defpath As String
+    
+    Dim rstCourtDates As DAO.Recordset
+    
     Dim strDate As Date
+    
+    Dim filecopied As Object
     Dim oApp As Object
-    'TODO: Universal Change dbVideoCollection database/other db names to proper name
-    Set dbVideoCollection = CurrentDb
-    Set rstCourtDates = dbVideoCollection.OpenRecordset("CourtDates")
+    
+    Dim cJob As New Job
+    
+    'TODO: Universal change database/other db names to proper name
+    Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     defpath = CurrentProject.Path
 
@@ -897,39 +870,27 @@ Public Sub fZIPAudio()
         defpath = defpath & "\"
     End If
 
-    'TODO: PATH
-    foldername1 = "I:\" & sCourtDatesID & "\Audio\"
     '@Ignore AssignmentNotUsed, AssignmentNotUsed
-    foldernameFTP = "I:\" & sCourtDatesID & "\FTP"
-
-    'TODO: PATH
+    
     strDate = Format(Now, " dd-mmm-yy h-mm-ss")
-    FileNameZip1 = "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Audio" & ".zip"
-    filenamezipFTPTRS = "I:\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Audio" & ".zip"
 
-    Call pfNewZip(FileNameZip1)                  'create empty zip file
-    Call pfNewZip(filenamezipFTPTRS)             'create empty zip file
+    Call pfNewZip(cJob.DocPath.ZAudioB)                  'create empty zip file
+    Call pfNewZip(cJob.DocPath.ZAudioF)             'create empty zip file
 
     Set oApp = CreateObject("Shell.Application")
 
     'Copy the files to the compressed folder
-    'TODO: PATH
-    oApp.Namespace("I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Audio" & ".zip").CopyHere oApp.Namespace("I:\" & sCourtDatesID & "\Audio\").Items
+    oApp.Namespace(cJob.DocPath.ZAudioB).CopyHere oApp.Namespace("I:\" & sCourtDatesID & "\Audio\").Items
 
-    foldernameFTP = "I:\" & sCourtDatesID & "\FTP\" '<< Change
-    filenamezipFTPTRS = foldernameFTP & sCourtDatesID & "-Audio" & ".zip"
+    
+    oApp.Namespace(cJob.DocPath.ZAudioF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
 
-    oApp.Namespace("I:\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Audio" & ".zip").CopyHere oApp.Namespace("I:\" & sCourtDatesID & "\Audio\").Items
-
-
-    'TODO: PATH
-    While oApp.Namespace("I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Audio" & ".zip").Items.Count <> oApp.Namespace("I:\" & sCourtDatesID & "\Audio\").Items.Count
+    While oApp.Namespace(cJob.DocPath.ZAudioB).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count
 
         DoEvents
     Wend
 
-    'TODO: PATH
-    'While oApp.Namespace("I:\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Audio" & ".zip").Items.Count <> oApp.Namespace("I:\" & sCourtDatesID & "\Audio\").Items.Count
+    'While oApp.Namespace(cJob.DocPath.ZAudioF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count
     'DoEvents
     
     'Wend
@@ -939,7 +900,7 @@ Public Sub fZIPAudio()
     'come back
     
     
-    MsgBox "You find the ZIP file here: " & FileNameZip1
+    MsgBox "Find the ZIP file here: " & cJob.DocPath.ZAudioB
 End Sub
 
 Public Sub fZIPAudioTranscripts()
@@ -952,69 +913,54 @@ Public Sub fZIPAudioTranscripts()
     ' Description : zips audio & transcripts folders in I:\####\
     '============================================================================
 
-    Dim sourceFile As String
-    Dim destinationfile As String
-    Dim sourcefile1 As String
-    Dim destinationfile1 As String
     Dim strDate As String
     Dim defpath As String
-    Dim foldernameaudio As String
-    Dim foldernameTranscripts As String
-    Dim FileNameZip2 As String
     Dim FolderName2 As String
-    Dim filenamezipFTP As String
-    Dim foldernameFTP As String
+    
     Dim filecopied As Object
     Dim oApp As Object
-    Dim FileNameZipATRS As String
-    Dim FileNameZipFTPATRS As String
+    
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    'TODO: PATH
     defpath = CurrentProject.Path
     If Right(defpath, 1) <> "\" Then
         defpath = defpath & "\"
     End If
+    
     strDate = Format(Now, " dd-mmm-yy h-mm-ss")
     
-    foldernameaudio = "I:\" & sCourtDatesID & "\Audio\"
-    foldernameTranscripts = "I:\" & sCourtDatesID & "\Transcripts\"
-    foldernameFTP = "I:\" & sCourtDatesID & "\FTP\"
-
-    FileNameZipATRS = "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-AudioTranscripts" & ".zip"
-    FileNameZipFTPATRS = foldernameFTP & sCourtDatesID & "-AudioTranscripts" & ".zip"
-
-
-    Call pfNewZip(FileNameZipATRS)               'create empty zip files
-    Call pfNewZip(FileNameZipFTPATRS)
+    Call pfNewZip(cJob.DocPath.ZAudioTranscriptsB)               'create empty zip files
+    Call pfNewZip(cJob.DocPath.ZAudioTranscriptsF)
 
     Set oApp = CreateObject("Shell.Application")
 
-    FolderName2 = (oApp.Namespace(foldernameaudio).Items.Count) + (oApp.Namespace(foldernameTranscripts).Items.Count)
+    FolderName2 = (oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count) + (oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count)
 
     'Copy the files to the compressed folder
-    oApp.Namespace(FileNameZipATRS).CopyHere oApp.Namespace(foldernameTranscripts).Items
+    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
 
-    While oApp.Namespace(foldernameTranscripts).Items.Count <> oApp.Namespace(FileNameZipATRS).Items.Count
+    While oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).Items.Count
         DoEvents
     Wend
     On Error GoTo 0
-    oApp.Namespace(FileNameZipATRS).CopyHere oApp.Namespace(foldernameaudio).Items
+    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
 
-    While oApp.Namespace(FileNameZipFTPATRS).Items.Count <> oApp.Namespace(FileNameZipATRS).Items.Count
+    While oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).Items.Count
         DoEvents
     Wend
     On Error GoTo 0
-    oApp.Namespace(FileNameZipFTPATRS).CopyHere oApp.Namespace(foldernameaudio).Items
+    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
 
-    While oApp.Namespace(foldernameaudio).Items.Count <> oApp.Namespace(FileNameZipFTPATRS).Items.Count
+    While oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).Items.Count
         DoEvents
     Wend
     On Error GoTo 0
-    oApp.Namespace(FileNameZipFTPATRS).CopyHere oApp.Namespace(foldernameTranscripts).Items
+    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
 
     On Error Resume Next
-    While oApp.Namespace(FileNameZipATRS).Items.Count <> oApp.Namespace(FileNameZipFTPATRS).Items.Count
+    While oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).Items.Count
         DoEvents
     Wend
     On Error GoTo 0
@@ -1025,7 +971,7 @@ Public Sub fZIPAudioTranscripts()
 
     
 
-    MsgBox "You find the zipfile here: " & FileNameZipATRS
+    MsgBox "You find the zipfile here: " & cJob.DocPath.ZAudioTranscriptsB
 
 End Sub
 
@@ -1039,67 +985,51 @@ Public Sub fZIPTranscripts()
     ' Description : zips transcripts folder in I:\####\
     '============================================================================
 
-    Dim sourceFile As String
-    Dim destinationfile As String
-    Dim sourcefile1 As String
-    Dim destinationfile1 As String
+    Dim defpath As String
+    
+    Dim strDate As Date
+    
+    Dim rstCourtDates As DAO.Recordset
+    
     Dim filecopied As Object
     Dim oApp As Object
-    Dim FileNameZip1 As String
-    Dim foldername1 As String
-    Dim filenamezipFTPTRS As String
-    Dim foldernameFTP As String
-    Dim dbVideoCollection As Database
-    Dim rstCourtDates As DAO.Recordset
-    Dim defpath As String
-    Dim strDate As Date
-    Set dbVideoCollection = CurrentDb
-    Set rstCourtDates = dbVideoCollection.OpenRecordset("CourtDates")
+    
+    Dim cJob As New Job
+    
+    Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    'TODO: PATH
     defpath = CurrentProject.Path
     If Right(defpath, 1) <> "\" Then
         defpath = defpath & "\"
     End If
 
-    '@Ignore AssignmentNotUsed
-    foldername1 = "I:\" & sCourtDatesID & "\Transcripts\"
-    foldernameFTP = "I:\" & sCourtDatesID & "\FTP"
-
     strDate = Format(Now, " dd-mmm-yy h-mm-ss")
-    FileNameZip1 = "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcripts" & ".zip"
-    filenamezipFTPTRS = "I:\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Transcripts" & ".zip"
 
     'Create empty Zip File
-    Call pfNewZip(FileNameZip1)
-    Call pfNewZip(filenamezipFTPTRS)
+    Call pfNewZip(cJob.DocPath.ZTranscriptsB)
+    Call pfNewZip(cJob.DocPath.ZTranscriptsF)
 
     Set oApp = CreateObject("Shell.Application")
 
-    'TODO: PATH
     'Copy the files to the compressed folder
-    oApp.Namespace("I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcripts" & ".zip").CopyHere oApp.Namespace("I:\" & sCourtDatesID & "\Transcripts\").Items
+    oApp.Namespace(cJob.DocPath.ZTranscriptsB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
 
-    foldernameFTP = "I:\" & sCourtDatesID & "\FTP\"
-    filenamezipFTPTRS = foldernameFTP & sCourtDatesID & "-Transcripts" & ".zip"
-    oApp.Namespace("I:\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Transcripts" & ".zip").CopyHere oApp.Namespace("I:\" & sCourtDatesID & "\Transcripts\").Items
+    oApp.Namespace(cJob.DocPath.ZTranscriptsF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
 
-    'TODO: PATH
     On Error Resume Next
-    While oApp.Namespace("I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcripts" & ".zip").Items.Count <> oApp.Namespace("I:\" & sCourtDatesID & "\Transcripts\").Items.Count
+    While oApp.Namespace(cJob.DocPath.ZTranscriptsB).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count
         DoEvents
     Wend
     On Error GoTo 0
 
-    'TODO: PATH
     On Error Resume Next
-    While oApp.Namespace("I:\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Transcripts" & ".zip").Items.Count <> oApp.Namespace("I:\" & sCourtDatesID & "\Transcripts\").Items.Count
+    While oApp.Namespace(cJob.DocPath.ZTranscriptsF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count
         DoEvents
     Wend
     On Error GoTo 0
 
-    MsgBox "You find the ZIP file here: " & FileNameZip1
+    MsgBox "You find the ZIP file here: " & cJob.DocPath.ZTranscriptsB
 
 End Sub
 
@@ -1115,6 +1045,7 @@ Public Sub fRunXLSMacro(sFile As String, sMacroName As String)
 
     Dim oExcelApp As New Excel.Application
     Dim oExcelWkbk As New Excel.Workbook
+    
     Dim sFileName As String
  
     'Set oExcelApp = CreateObject("Excel.Application")
@@ -1157,13 +1088,13 @@ Public Sub pfSendTrackingEmail()
     ' Description : generates tracking number e-mail for customer
     '============================================================================
 
-    Dim Rng As Range
     Dim vTrackingNumber As String
     Dim deliverySQLstring As String
+    
     Dim rs As DAO.Recordset
 
-
-
+    Dim Rng As Range
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1252,7 +1183,7 @@ Public Sub fAudioDone()
     'to be added
     'Else
     'else try to open express scribe
-    'TODO: PATH
+    'TODO: Possibly come back for path
     '    Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeDone.bat")
     '  Next Fil
       
@@ -1260,43 +1191,6 @@ Public Sub fAudioDone()
     'Exit Do
 End Sub
 
-Public Sub fDistiller(sExportTopic As String)
-    '============================================================================
-    ' Name        : fDistiller
-    ' Author      : Erica L Ingram
-    ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call fDistiller(sExportTopic)
-    ' Description : distills for PDFs
-    'TODO: PATH
-    '               s2UpPSPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-" & sExportTopic & ".ps"
-    '               sFinalPDFPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-" & sExportTopic & ".pdf"
-    '============================================================================
-
-    Dim aaAcroApp As Acrobat.AcroApp
-    Dim aaAcroAVDoc As Acrobat.AcroAVDoc
-    Dim aaAcroPDDoc As Acrobat.AcroPDDoc
-    Dim pdTranscriptFinalDistiller As PdfDistiller
-    Dim sDistillerSettings As String
-    Dim s2UpPSPath As String
-    Dim sFinalPDFPath As String
-
-    'TODO: PATH
-    s2UpPSPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-" & sExportTopic & ".ps"
-    sFinalPDFPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-" & sExportTopic & ".pdf"
-    sDistillerSettings = "C:\Program Files (x86)\Adobe\Acrobat 9.0\Acrobat\Settings\Standard.joboptions"
-
-    Set pdTranscriptFinalDistiller = New PdfDistiller
-    pdTranscriptFinalDistiller.FileToPdf strInputPostscript:=s2UpPSPath, strOutputPDF:=sFinalPDFPath, strJobOptions:=sDistillerSettings
-
-    Set pdTranscriptFinalDistiller = Nothing
-    aaAcroPDDoc.Close
-    aaAcroApp.CloseAllDocs
-
-    Set aaAcroPDDoc = Nothing
-    Set aaAcroAVDoc = Nothing
-    Set aaAcroApp = Nothing
-
-End Sub
 
 Public Sub fPrint2upPDF()
     On Error GoTo eHandler
@@ -1308,33 +1202,24 @@ Public Sub fPrint2upPDF()
     ' Description : prints 2-up transcript PDF
     '============================================================================
 
-
-    Dim sTranscriptsFolderFinalPDF As String
-    Dim sTranscriptsFolder2upPDF As String
-    Dim sTranscript2upPSPath As String
     Dim sJavascriptPrint As String
-    Dim jobsettings As String
-    Dim sLogFilePath As String
-
+    
     Dim aaAcroApp As Acrobat.AcroApp
     Dim aaAcroAVDoc As Acrobat.AcroAVDoc
     Dim aaAcroPDDoc As Acrobat.AcroPDDoc
-    Dim bret As Variant
-    Dim pp As Object
-
     Dim pdTranscriptFinalDistiller As PdfDistiller
     Dim aaAFormApp As AFORMAUTLib.AFormApp
+    
+    Dim pp As Object
+
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sTranscriptsFolderFinalPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
-    sTranscriptsFolder2upPDF = "/i/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
-    sTranscript2upPSPath = "/i/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.ps"
-
+    
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(sTranscriptsFolderFinalPDF, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, "") Then
         aaAcroAVDoc.Maximize (1)
     
         Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
@@ -1348,34 +1233,23 @@ Public Sub fPrint2upPDF()
                          & "pp.nUpPageBorder=false;" _
                          & "pp.nUpNumPagesV=2;" _
                          & "pp.nUpNumPagesH=1;" _
-                         & "pp.fileName=" & Chr(34) & sTranscript2upPSPath & Chr(34) & ";" _
+                         & "pp.fileName=" & Chr(34) & cJob.DocPath.T2upPS & Chr(34) & ";" _
                          & "this.print(pp);"
         '& "oPDFPrintSettings.bui=false;" _
 
         aaAFormApp.Fields.ExecuteThisJavascript sJavascriptPrint
     
-        aaAcroPDDoc.Save PDSaveFull, sTranscript2upPSPath
+        aaAcroPDDoc.Save PDSaveFull, cJob.DocPath.T2upPS
         aaAcroPDDoc.Close
         aaAcroApp.CloseAllDocs
     
     End If
 
-
-    'TODO: PATH
-    sTranscript2upPSPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-Transcript-FINAL-2up.ps"
-    sTranscriptsFolder2upPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
-    jobsettings = "C:\Users\inqui\Standard1.joboptions"
-
-
     Set pdTranscriptFinalDistiller = New PdfDistiller
 
-    pdTranscriptFinalDistiller.FileToPdf sTranscript2upPSPath, sTranscriptsFolder2upPDF, jobsettings ', jobsettings
-    'Debug.Print bret
-    'TODO: PATH
-    sTranscriptsFolder2upPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
-    sTranscript2upPSPath = "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
+    pdTranscriptFinalDistiller.FileToPdf cJob.DocPath.T2upPS, cJob.DocPath.Transcript2up, cJob.DocPath.DistillerSettings1 ', jobsettings
 
-    FileCopy sTranscriptsFolder2upPDF, sTranscript2upPSPath
+    FileCopy cJob.DocPath.Transcript2up, cJob.DocPath.Transcript2upB
 
     Set pdTranscriptFinalDistiller = Nothing
 
@@ -1384,19 +1258,16 @@ eHandlerX:
     Set aaAcroAVDoc = Nothing
     Set aaAcroApp = Nothing
 
-    'TODO: PATH
-    sLogFilePath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-2up.log"
     'Check that file exists
-    If Len(Dir$(sLogFilePath)) > 0 Then
+    If Len(Dir$(cJob.DocPath.T2upLog)) > 0 Then
         'First remove readonly attribute, if set
-        SetAttr sLogFilePath, vbNormal
+        SetAttr cJob.DocPath.T2upLog, vbNormal
         'Then delete the file
-        Kill sLogFilePath
+        Kill cJob.DocPath.T2upLog
     End If
 
 
-    MsgBox "2-up condensed transcript saved at " & sTranscript2upPSPath
-    Exit Sub
+    MsgBox "2-up condensed transcript saved at " & cJob.DocPath.T2upPS
 
 eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
@@ -1414,13 +1285,7 @@ Public Sub fPrint4upPDF()
     ' Description : prints 4-up transcript PDF
     '============================================================================
 
-    Dim sTranscriptsFolderFinalPDF As String
-    Dim sTranscriptsFolder4upPDF As String
-    Dim sTranscript4upPSPath As String
-    Dim sTranscript4upPDFPath As String
-    Dim sAcrobatJobSettings As String
     Dim sJavascriptPrint As String
-    Dim sLogFilePath As String
 
     Dim aaAcroApp As Acrobat.AcroApp
     Dim aaAcroAVDoc As Acrobat.AcroAVDoc
@@ -1429,17 +1294,14 @@ Public Sub fPrint4upPDF()
     Dim aaAFormApp As AFORMAUTLib.AFormApp
     Dim oPDFPrintSettings As Object
 
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sTranscriptsFolderFinalPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
-    sTranscriptsFolder4upPDF = "/i/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
-    sTranscript4upPSPath = "/i/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-4up.ps"
 
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(sTranscriptsFolderFinalPDF, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, "") Then
 
         aaAcroAVDoc.Maximize (1)
     
@@ -1454,52 +1316,43 @@ Public Sub fPrint4upPDF()
                          & "pp.nUpPageBorder=false;" _
                          & "pp.nUpNumPagesV=2;" _
                          & "pp.nUpNumPagesH=2;" _
-                         & "pp.fileName=" & Chr(34) & sTranscript4upPSPath & Chr(34) & ";" _
+                         & "pp.fileName=" & Chr(34) & cJob.DocPath.T4upPS & Chr(34) & ";" _
                          & "this.print(pp);"
         '& "oPDFPrintSettings.bui=false;" _
 
 
         
         aaAFormApp.Fields.ExecuteThisJavascript sJavascriptPrint
-        aaAcroPDDoc.Save PDSaveFull, sTranscript4upPSPath
+        aaAcroPDDoc.Save PDSaveFull, cJob.DocPath.T4upPS
         aaAcroPDDoc.Close
         aaAcroApp.CloseAllDocs
     
     End If
 
-    'TODO: PATH
-    sTranscript4upPSPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-Transcript-FINAL-4up.ps"
-    sTranscript4upPDFPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
-    sAcrobatJobSettings = "C:\Users\inqui\Standard1.joboptions"
-
     Set pdTranscriptFinalDistiller = New PdfDistiller
-    pdTranscriptFinalDistiller.FileToPdf strInputPostscript:=sTranscript4upPSPath, strOutputPDF:=sTranscript4upPDFPath, strJobOptions:=sAcrobatJobSettings
+    pdTranscriptFinalDistiller.FileToPdf strInputPostscript:=cJob.DocPath.T4upPS, strOutputPDF:=cJob.DocPath.Transcript4up, strJobOptions:=cJob.DocPath.DistillerSettings1
 
-    'TODO: PATH
-    sTranscriptsFolder4upPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
-    sTranscript4upPSPath = "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
 
-    FileCopy sTranscriptsFolder4upPDF, sTranscript4upPSPath
+    FileCopy cJob.DocPath.Transcript4up, cJob.DocPath.Transcript4upB
 
     Set pdTranscriptFinalDistiller = Nothing
+    
 eHandlerX:
     Set aaAcroPDDoc = Nothing
     Set aaAcroAVDoc = Nothing
     Set aaAcroApp = Nothing
 
 
-    'TODO: PATH
-    sLogFilePath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-4up.log"
     'Check that file exists
-    If Len(Dir$(sLogFilePath)) > 0 Then
+    If Len(Dir$(cJob.DocPath.T4upLog)) > 0 Then
         'First remove readonly attribute, if set
-        SetAttr sLogFilePath, vbNormal
+        SetAttr cJob.DocPath.T4upLog, vbNormal
         'Then delete the file
-        Kill sLogFilePath
+        Kill cJob.DocPath.T4upLog
     End If
 
 
-    MsgBox "4-up condensed transcript saved at " & sTranscript4upPDFPath
+    MsgBox "4-up condensed transcript saved at " & cJob.DocPath.Transcript4up
     Exit Sub
 
 eHandler:
@@ -1512,9 +1365,9 @@ Public Sub fPrintKCIEnvelope()
 
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim sEnvelopePath As String
-    'TODO: PATH
-    sEnvelopePath = "T:\Database\Templates\Stage4s\Envelope-KCI.pdf"
+    
+    Dim cJob As New Job
+    
     sQuestion = "Print KCI envelope? (MAKE SURE ENVELOPE IS PRINT SIDE UP, ADHESIVE ON THE RIGHT INSIDE PRINTER TRAY)"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???") '
 
@@ -1524,7 +1377,7 @@ Public Sub fPrintKCIEnvelope()
     
     Else                                         'Code for yes
 
-        Call fEmailtoPrint(sEnvelopePath)
+        Call fEmailtoPrint(cJob.DocPath.KCIEnvelope)
     
     End If
 
@@ -1540,6 +1393,10 @@ Public Sub fAcrobatKCIInvoice()
     '============================================================================
     '
     On Error GoTo eHandler
+    
+    Dim sCaseName As String
+    Dim sContactName As String
+    
     Dim aaAcroApp As Acrobat.AcroApp
     Dim aaAcroAVDoc As Acrobat.AcroAVDoc
     Dim aaAcroPDDoc As Acrobat.AcroPDDoc
@@ -1547,15 +1404,11 @@ Public Sub fAcrobatKCIInvoice()
     Dim aaFoFiGroup As AFORMAUTLib.Fields
     Dim aaFormField As AFORMAUTLib.Field
 
-    Dim sKCICompletedPath As String
-    Dim sCaseName As String
-    Dim sContactName As String
-
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sKCICompletedPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-KCICompleted.pdf"
 
-    FileCopy "T:\Database\Templates\Stage4s\KCICompleted.pdf", sKCICompletedPath
+    FileCopy cJob.DocPath.KCITemplate, cJob.DocPath.KCIEmpty
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1565,7 +1418,7 @@ Public Sub fAcrobatKCIInvoice()
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(sKCICompletedPath, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.KCIEmpty, "") Then
         aaAcroAVDoc.Maximize (1)
     
         Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
@@ -1582,10 +1435,7 @@ Public Sub fAcrobatKCIInvoice()
             If aaFormField.Name = "Date" Then aaFormField.Value = Date
         Next aaFormField
     
-    'TODO: PATH
-        sKCICompletedPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-KCICompleted1.pdf"
-    
-        aaAcroPDDoc.Save PDSaveFull, sKCICompletedPath
+        aaAcroPDDoc.Save PDSaveFull, cJob.DocPath.KCIFilled
         aaAcroPDDoc.Close
     End If
 
@@ -1598,11 +1448,7 @@ eHandlerX:
 
     MsgBox "Done processing"
     Exit Sub
-
-
-
-
-
+    
 
 eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Details"
@@ -1620,15 +1466,10 @@ Public Sub pfUpload(ByRef mySession As Session)
     ' Description : sends to website ftp
     '============================================================================
 
-    Dim sAudioZIPPath As String
-    Dim sTranscriptsZIPPath As String
-    Dim sAudioTranscriptsZIPPath As String
-    Dim sFTPAudioTranscriptsZIPPath As String
-    Dim sFTPTranscriptsZIPPath As String
-    Dim sFTPAudioZIPPath As String
-    Dim mySessionOptions As New SessionOptions
-    Dim sIPCurrentJobFolder As String
 
+    Dim mySessionOptions As New SessionOptions
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     
@@ -1644,34 +1485,30 @@ Public Sub pfUpload(ByRef mySession As Session)
     mySession.Open mySessionOptions              'connect
 
     Dim myTransferOptions As New TransferOptions 'upload files
+    
     myTransferOptions.TransferMode = TransferMode_Binary
-
-    sIPCurrentJobFolder = "\\HUBCLOUD\evoingram\Production\2InProgress\" & sCourtDatesID & "\"
-    sFTPAudioTranscriptsZIPPath = "\\HUBCLOUD\evoingram\Production\2InProgress\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-AudioTranscripts" & ".zip"
-    sFTPTranscriptsZIPPath = "\\HUBCLOUD\evoingram\Production\2InProgress\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Transcripts" & ".zip"
-    sFTPAudioZIPPath = "\\HUBCLOUD\evoingram\Production\2InProgress\" & sCourtDatesID & "\FTP\" & sCourtDatesID & "-Audio" & ".zip"
-    sAudioZIPPath = sIPCurrentJobFolder & sCourtDatesID & "-Audio" & ".zip"
-    sTranscriptsZIPPath = sIPCurrentJobFolder & sCourtDatesID & "-Transcripts" & ".zip"
-    sAudioTranscriptsZIPPath = sIPCurrentJobFolder & sCourtDatesID & "-AudioTranscripts" & ".zip"
 
     Dim transferResult As TransferOperationResult
     Dim transferResult2 As TransferOperationResult
     Dim transferResult3 As TransferOperationResult
 
-    Set transferResult = mySession.PutFiles(sFTPAudioTranscriptsZIPPath, "/public_html/ProjectSend/upload/files/", False, myTransferOptions)
-    Set transferResult2 = mySession.PutFiles(sFTPTranscriptsZIPPath, "/public_html/ProjectSend/upload/files/", False, myTransferOptions)
-    Set transferResult3 = mySession.PutFiles(sFTPAudioZIPPath, "/public_html/ProjectSend/upload/files/", False, myTransferOptions)
+    Set transferResult = mySession.PutFiles(cJob.DocPath.ZAudioTranscriptsF, "/public_html/ProjectSend/upload/files/", False, myTransferOptions)
+    Set transferResult2 = mySession.PutFiles(cJob.DocPath.ZTranscriptsF, "/public_html/ProjectSend/upload/files/", False, myTransferOptions)
+    Set transferResult3 = mySession.PutFiles(cJob.DocPath.ZAudioF, "/public_html/ProjectSend/upload/files/", False, myTransferOptions)
 
-    transferResult.Check                         'throw on any error
+    transferResult.Check 'throw on any error
     transferResult2.Check
     transferResult3.Check
  
 
-    Dim transfer As TransferEventArgs            'display results
+    Dim transfer As TransferEventArgs 'display results
+    
     For Each transfer In transferResult.Transfers
         MsgBox "Upload of " & transfer.FileName & " succeeded"
     Next
+    
     Call pfClearGlobals
+    
 End Sub
 
 Public Sub fPrivatePrint()
@@ -1682,23 +1519,14 @@ Public Sub fPrivatePrint()
     ' Call command: Call fPrivatePrint
     ' Description : prompts to send necessary transcript files to print@aquoco.co to be printed
     '============================================================================
-    '
-    Dim sCDLabelPath As String
-    Dim s2upPath As String
-    Dim s4upPath As String
-    Dim sTranscriptPDFPath As String
+    
     Dim sQuestion As String
     Dim sAnswer As String
 
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sCDLabelPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CDLabel.PDF"
-    s2upPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-2up.PDF"
-    s4upPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL-4up.PDF"
-    sTranscriptPDFPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.PDF"
-
-
+    Dim cJob As New Job
     
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+        
     'print 2-up (no without sfc intns)
     sQuestion = "Print 2-up transcript?  Do not do so unless specifically requested."
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -1706,7 +1534,7 @@ Public Sub fPrivatePrint()
     If sAnswer = vbNo Then                       'Code for No
         MsgBox "2-up transcript will not print."
     Else                                         'Code for yes
-        Call fEmailtoPrint(s2upPath)
+        Call fEmailtoPrint(cJob.DocPath.Transcript2up)
     End If
 
 
@@ -1717,7 +1545,7 @@ Public Sub fPrivatePrint()
     If sAnswer = vbNo Then                       'Code for No
         MsgBox "4-up transcript will not print."
     Else                                         'Code for yes
-        Call fEmailtoPrint(s4upPath)
+        Call fEmailtoPrint(cJob.DocPath.Transcript4up)
     End If
 
 
@@ -1728,7 +1556,7 @@ Public Sub fPrivatePrint()
     If sAnswer = vbNo Then                       'Code for No
         MsgBox "Transcript will not print."
     Else                                         'Code for yes
-        Call fEmailtoPrint(sTranscriptPDFPath)
+        Call fEmailtoPrint(cJob.DocPath.TranscriptFP)
     End If
 
 
@@ -1739,7 +1567,7 @@ Public Sub fPrivatePrint()
     If sAnswer = vbNo Then                       'Code for No
         MsgBox "CD label will not print."
     Else                                         'Code for yes
-        Call fEmailtoPrint(sCDLabelPath)
+        Call fEmailtoPrint(cJob.DocPath.CDLabelP)
     End If
 
 
@@ -1755,17 +1583,7 @@ Public Sub fExportRecsToXML()
     ' Description : exports ShippingOptionsQ entries to XML
     '============================================================================
 
-    Dim qdf As DAO.QueryDef
     Dim sTrackingNumber As String
-    Dim sSavedXMLFileName As String
-    Dim prm As DAO.Parameter
-    Dim rs As DAO.Recordset
-
-    Dim rstCommHistory As DAO.Recordset
-    Dim rstShippingOptions As DAO.Recordset
-    Dim rstPkgType As DAO.Recordset
-    Dim rstMailC As DAO.Recordset
-    Dim rs1 As DAO.Recordset
     Dim sNewSQL As String
     Dim SQLString As String
     Dim sMailClassNo As String
@@ -1773,6 +1591,17 @@ Public Sub fExportRecsToXML()
     Dim sPackageType As String
     Dim sMailClass As String
 
+    Dim qdf As DAO.QueryDef
+    Dim prm As DAO.Parameter
+    Dim rs As DAO.Recordset
+    Dim rstCommHistory As DAO.Recordset
+    Dim rstShippingOptions As DAO.Recordset
+    Dim rstPkgType As DAO.Recordset
+    Dim rstMailC As DAO.Recordset
+    Dim rs1 As DAO.Recordset
+    
+    Dim cJob As New Job
+    
     SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
     Set rs1 = CurrentDb.OpenRecordset(SQLString)
     sMailClassNo = rs1.Fields("MailClass").Value
@@ -1825,17 +1654,15 @@ Public Sub fExportRecsToXML()
         sCourtDatesID = rstShippingOptions.Fields("CourtDatesID").Value
         sTrackingNumber = rstShippingOptions.Fields("TrackingNumber").Value
     'TODO: PATH
-        sSavedXMLFileName = "T:\Production\4ShippingXMLs\" & sCourtDatesID & "-" & sTrackingNumber & "-shipping.xml"
-        Application.ExportXML acExportQuery, qdf.Name, sSavedXMLFileName 'export to XML
+        Application.ExportXML acExportQuery, qdf.Name, cJob.DocPath.ShippingXML4 'export to XML
 
         rstShippingOptions.MoveNext
 
         'add shipping xml entry to comm history table
-        sSavedXMLFileName = sCourtDatesID & "-ShippingXML" & "#" & sSavedXMLFileName & "#"
         Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
     
         rstCommHistory.AddNew
-        rstCommHistory("FileHyperlink").Value = sSavedXMLFileName
+        rstCommHistory("FileHyperlink").Value = sCourtDatesID & "-ShippingXML" & "#" & cJob.DocPath.ShippingXML4 & "#"
         rstCommHistory("DateCreated").Value = Now
         rstCommHistory("CourtDatesID").Value = sCourtDatesID
         rstCommHistory.Update
@@ -1865,16 +1692,12 @@ Public Sub fAppendXMLFiles()
     Dim file3 As New MSXML2.DOMDocument60
     Dim appendNode As MSXML2.IXMLDOMNode
     Dim FSO As New Scripting.FileSystemObject
-    Dim sXMLAfter As String
-    Dim sXMLBefore As String
 
-    'TODO: PATH
-    sXMLAfter = "T:\Database\Scripts\InProgressExcels\AfterXML.xml"
-    sXMLBefore = "T:\Database\Scripts\InProgressExcels\BeforeXML.xml"
+    Dim cJob As New Job
 
     ' Load your xml files in to a DOM document
-    file1.Load sXMLBefore
-    file2.Load sXMLAfter
+    file1.Load cJob.DocPath.XMLBefore
+    file2.Load cJob.DocPath.XMLAfter
 
     ' iterate the childnodes of the second file, appending to the first file
 
@@ -1907,37 +1730,33 @@ Public Sub fCourtofAppealsIXML()
     '============================================================================
 
     Dim sTSOCourtDatesID As String
-    Dim sTempShippingOQ As String
-    Dim sCOAXML As String
-    Dim sCOAXMLJF As String
-    Dim sOutputXMLStringSQLFile As String
-    Dim sOutputXMLStringSQL As String
-    Dim sTempShippingOQPath As String
     Dim sTempShipOptions As String
     Dim sTempShippingOQ1 As String
-    Dim sTempShipOptionsXLSM As String
     Dim sMacroName As String
-    Dim rstTempShippingOQ1 As DAO.Recordset
-    Dim rstCommHistory As DAO.Recordset
-    Dim rstMailC As DAO.Recordset
-    Dim rstPkgType As DAO.Recordset
-    Dim qdf As DAO.QueryDef
-    Dim qdf1 As QueryDef
-    Dim oExcelApp As New Excel.Application
-    Dim oExcelWkbk As New Excel.Workbook
-    Dim oExcelSheet As New Excel.Worksheet
-    Dim oExcelWkbk2 As New Excel.Workbook
     Dim sQueryName As String
-    Dim sTSQExcelFileName As String
     Dim SQLString As String
     Dim sMailClassNo As String
     Dim sPackageTypeNo As String
     Dim sMailClass As String
     Dim sPackageType As String
     Dim sNewSQL As String
+    Dim sCHHyperlinkXML As String
+    
+    Dim rstTempShippingOQ1 As DAO.Recordset
+    Dim rstCommHistory As DAO.Recordset
+    Dim rstMailC As DAO.Recordset
+    Dim rstPkgType As DAO.Recordset
     Dim rs1 As DAO.Recordset
     Dim rstShippingOptions As DAO.Recordset
-    Dim sCHHyperlinkXML As String
+    Dim qdf As DAO.QueryDef
+    Dim qdf1 As QueryDef
+    
+    Dim oExcelApp As New Excel.Application
+    Dim oExcelWkbk As New Excel.Workbook
+    Dim oExcelSheet As New Excel.Worksheet
+    Dim oExcelWkbk2 As New Excel.Workbook
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1945,65 +1764,55 @@ Public Sub fCourtofAppealsIXML()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-
-
     Call pfCurrentCaseInfo                       'refresh transcript info
         
     '@Ignore AssignmentNotUsed
     sQueryName = "TempShippingOptionsQ"
-    'TODO: PATH
-    '@Ignore AssignmentNotUsed
-    sTSQExcelFileName = "T:\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
 
     SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
     Set rs1 = CurrentDb.OpenRecordset(SQLString)
-    sMailClassNo = rs1.Fields("MailClass").Value
-    sPackageTypeNo = rs1.Fields("PackageType").Value
+        sMailClassNo = rs1.Fields("MailClass").Value
+        sPackageTypeNo = rs1.Fields("PackageType").Value
     rs1.Close
 
     '(SELECT MailClass FROM MailClass WHERE [ID] = " & sMailClassNo & ") as MailClass
     Set rstMailC = CurrentDb.OpenRecordset("SELECT MailClass FROM MailClass WHERE [ID] = " & sMailClassNo)
-    sMailClass = rstMailC.Fields("MailClass").Value
+        sMailClass = rstMailC.Fields("MailClass").Value
     rstMailC.Close
 
     '(SELECT PackageType FROM PackageType WHERE [ID] = " & sPackageTypeNo & ") as PackageType
     Set rstPkgType = CurrentDb.OpenRecordset("SELECT PackageType FROM PackageType WHERE [ID] = " & sPackageTypeNo)
-    sPackageType = rstPkgType.Fields("PackageType").Value
+        sPackageType = rstPkgType.Fields("PackageType").Value
     rstPkgType.Close
 
     sNewSQL = "SELECT " & Chr(34) & sMailClass & Chr(34) & " as MailClass, " & Chr(34) & sPackageType & Chr(34) & _
-                                                                                                                " as PackageType, Width, Length, Depth, PriorityMailExpress1030, HolidayDelivery, SundayDelivery, SaturdayDelivery, SignatureRequired, " & _
-                                                                                                                "Stealth, ReplyPostage, InsuredMail, COD, RestrictedDelivery, AdultSignatureRestricted, AdultSignatureRequired, ReturnReceipt, CertifiedMail, " & _
-                                                                                                                "SignatureConfirmation, USPSTracking, CourtDatesIDLK as ReferenceID, " & Chr(34) & "Court of Appeals Div I Clerks Office," & Chr(34) & " AS ToName, " & _
-                                                                                                                Chr(34) & "600 University St" & Chr(34) & " AS ToAddress1, " & Chr(34) & "One Union Square" & Chr(34) & " AS ToAddress2, " & Chr(34) & sCompanyCity & Chr(34) _
-                                                                                                              & " AS ToCity, " & Chr(34) & sCompanyState & Chr(34) & " AS ToState, " & _
-                                                                                                                Chr(34) & "98101" & Chr(34) & " AS ToPostalCode, Value, Description, WeightOz, ActualWeight, ActualWeightText, ToEmail, ToPhone " & _
-                                                                                                                "FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
-
-    sOutputXMLStringSQLFile = "\\HUBCLOUD\evoingram\Production\4ShippingXMLs\Output\" & sCourtDatesID & "-CoA-Output.xml"
+              " as PackageType, Width, Length, Depth, PriorityMailExpress1030, HolidayDelivery, SundayDelivery, SaturdayDelivery, SignatureRequired, " & _
+              "Stealth, ReplyPostage, InsuredMail, COD, RestrictedDelivery, AdultSignatureRestricted, AdultSignatureRequired, ReturnReceipt, CertifiedMail, " & _
+              "SignatureConfirmation, USPSTracking, CourtDatesIDLK as ReferenceID, " & Chr(34) & "Court of Appeals Div I Clerks Office," & Chr(34) & " AS ToName, " & _
+              Chr(34) & "600 University St" & Chr(34) & " AS ToAddress1, " & Chr(34) & "One Union Square" & Chr(34) & " AS ToAddress2, " & Chr(34) & sCompanyCity & Chr(34) _
+              & " AS ToCity, " & Chr(34) & sCompanyState & Chr(34) & " AS ToState, " & _
+              Chr(34) & "98101" & Chr(34) & " AS ToPostalCode, Value, Description, WeightOz, ActualWeight, ActualWeightText, ToEmail, ToPhone " & _
+              "FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
 
     Set rstShippingOptions = CurrentDb.OpenRecordset("SELECT * FROM ShippingOptions WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";")
     
     rstShippingOptions.Edit
-    rstShippingOptions.Fields("Output") = sOutputXMLStringSQLFile
+    rstShippingOptions.Fields("Output") = cJob.DocPath.ShippingOutputFolder & sCourtDatesID & "-CoA-Output.xml"
     rstShippingOptions.Update
 
     '@Ignore AssignmentNotUsed
     sTempShippingOQ1 = "TempShippingOptionsQ1"
-    'TODO: PATH
-    '@Ignore AssignmentNotUsed
-    sTempShippingOQPath = "T:\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
 
     Set rstTempShippingOQ1 = CurrentDb.OpenRecordset(sNewSQL)
     '@Ignore AssignmentNotUsed
     sTSOCourtDatesID = rstTempShippingOQ1("ReferenceID").Value
 
     Set oExcelApp = CreateObject("Excel.Application")
-    Set oExcelWkbk = oExcelApp.Workbooks.Open(sTempShippingOQPath)
+    Set oExcelWkbk = oExcelApp.Workbooks.Open(cJob.DocPath.TempShipOptionsQ1XLSM)
 
     sTempShipOptions = "TempShippingOptionsQ"
     Set oExcelSheet = oExcelWkbk.Sheets(sTempShipOptions)
-    oExcelSheet.Cells(2, 1).Value = sOutputXMLStringSQLFile
+    oExcelSheet.Cells(2, 1).Value = cJob.DocPath.ShippingOutputFolder & sCourtDatesID & "-CoA-Output.xml"
     oExcelSheet.Cells(2, 24).Value = "Court of Appeals Div I Clerk's Office"
     oExcelSheet.Cells(2, 25).Value = "600 University Street"
     oExcelSheet.Cells(2, 26).Value = "One Union Square"
@@ -2022,21 +1831,16 @@ Public Sub fCourtofAppealsIXML()
     Set rstTempShippingOQ1 = Nothing
     Set qdf1 = Nothing
 
-    'TODO: PATH
-    sTempShipOptionsXLSM = "T:\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
     sMacroName = "ExportXMLCOA"
 
-    Call fRunXLSMacro(sTempShipOptionsXLSM, sMacroName)
+    Call fRunXLSMacro(cJob.DocPath.TempShipOptionsQ1XLSM, sMacroName)
 
-    'TODO: PATH
-    sCOAXML = "T:\Production\4ShippingXMLs\" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
-    sCOAXMLJF = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
-
-    FileCopy sCOAXML, sCOAXMLJF
+    FileCopy cJob.DocPath.ShippingCOAXML4, cJob.DocPath.ShippingCOAXML
+    
     On Error GoTo 0
 
     'add shipping xml entry to comm history table
-    sCHHyperlinkXML = sCourtDatesID & "CoADiv1-ShippingXML" & "#" & sCOAXML & "#"
+    sCHHyperlinkXML = sCourtDatesID & "-CoADiv1-ShippingXML" & "#" & cJob.DocPath.ShippingCOAXML & "#"
     Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
 
     rstCommHistory.AddNew

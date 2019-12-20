@@ -74,7 +74,6 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
     Dim oSubfolder As Object
 
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
-    'TODO: PATH
     sPreparedPath = "S:\UnprocessedAudio\Prepared\" 'Change to identify your main folder
     sCompletedPath = "T:\Production\3Complete"
     Set oRootFolder = oFolderObject.GetFolder(sPreparedPath)
@@ -91,7 +90,6 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
         
                 If oCurrentFile Like "*.doc" Or oCurrentFile Like "*.docx" Then
             
-    'TODO: PATH
                     sFullCompletedDocPath = sCompletedPath & "\" & sFolderName & "\" & oCurrentFileString
                 
                     FileCopy sFullCompletedDocPath, oCurrentFile
@@ -176,9 +174,7 @@ Public Sub pfPrepareTranscript()
     Dim sTextToFind As String
     Dim sReplacementText As String
     Dim wsStyle As Word.Style
-
-
-    'TODO: PATH
+    
     sPreparedPath = "S:\UnprocessedAudio\Prepared\"
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     Set oRootFolder = oFolderObject.GetFolder(sPreparedPath)
@@ -197,7 +193,6 @@ Public Sub pfPrepareTranscript()
                     Debug.Print oSubfolder.Path
                 
                     Set oWordApp = CreateObject("Word.Application")
-    'TODO: PATH
                     Set oPreparedWD = oWordApp.Documents.Open(FileName:=oSubfolder.Path & "\" & sCurrentFile)
                     oPreparedWD.Activate
                     'preparing transcripts (for each docx)
@@ -343,7 +338,6 @@ Public Sub pfPrepareTranscript()
                         .Application.Selection.EndKey Unit:=wdStory, Extend:=wdExtend
                         .Application.Selection.delete Unit:=wdCharacter, Count:=1
                         .Save
-    'TODO: PATH
                         .SaveAs2 FileName:="S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Transcript.txt", FileFormat:=wdFormatText
                     
                         sTextToFind = "</s> (wavfilename)"
@@ -383,7 +377,6 @@ Public Sub pfRunCopyTranscTextBAT()
 
     Dim PathCrnt As String
 
-    'TODO: PATH
     PathCrnt = "S:\UnprocessedAudio\Unprepared"
     Call Shell(PathCrnt & "\CopyTranscriptTXT.bat " & PathCrnt)
 End Sub
@@ -406,7 +399,6 @@ Public Sub pfSRTranscribe()
 
     Dim PathCrnt As String
 
-    'TODO: PATH
     PathCrnt = "S:\UnprocessedAudio\Prepared"
 
     Call Shell(PathCrnt & "\SRTranscribe.bat " & PathCrnt)
@@ -455,7 +447,6 @@ Public Sub pfTrainAudio()
     '
     Dim PathCrnt As String
 
-    'TODO: PATH
     PathCrnt = "S:\UnprocessedAudio\Prepared"
     Call Shell(PathCrnt & "\audiotrain.bat " & PathCrnt)
 
@@ -472,7 +463,6 @@ Public Sub pfRenameBaseFiles()
 
     Dim PathCrnt As String
 
-    'TODO: PATH
     PathCrnt = "S:\UnprocessedAudio\Prepared"
     Call Shell(PathCrnt & "\FileRename.bat " & PathCrnt)
 End Sub
@@ -487,7 +477,6 @@ Public Sub pfSplitAudio()
     '============================================================================
     Dim PathCrnt As String
 
-    'TODO: PATH
     PathCrnt = "S:\UnprocessedAudio\Prepared"
     Call Shell(PathCrnt & "\splitaudio.bat " & PathCrnt)
 End Sub
@@ -503,7 +492,6 @@ Public Sub pfPrepareAudio()
 
     Dim PathCrnt As String
 
-    'TODO: PATH
     PathCrnt = "S:\UnprocessedAudio\Prepared"
     Call Shell(PathCrnt & "\audioprep.bat " & PathCrnt)
 End Sub
@@ -645,15 +633,12 @@ Public Sub pfAddSubfolder()
     Dim sConcatenatedAudioPath As String
 
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
-    'TODO: PATH
     sUnprocessedAudioPath = "S:\UnprocessedAudio\"
     Set oRootFolder = oFolderObject.GetFolder(sUnprocessedAudioPath)
 
     For Each oSubfolder In oRootFolder.SubFolders
 
         Debug.Print oSubfolder.Path
-    
-    'TODO: PATH
         sConcatenatedAudioPath = oSubfolder.Path & "\ConcatenatedAudio"
     
         If Not oFolderObject.FolderExists(sConcatenatedAudioPath) Then
@@ -704,7 +689,6 @@ Public Sub pfCorpusUpload()
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
     sFieldName = "corpus"
-    'TODO: PATH
     sPreparedPath = "S:\UnprocessedAudio\Prepared\"
 
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
@@ -781,7 +765,6 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
-    'TODO: PATH
     sCorpusPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base-corpus.txt"
     sFilePathDIC = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.dic"
     sFilePathLM = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.lm"
@@ -913,13 +896,11 @@ Public Sub pfDoFolder(Folder As Variant)
         Debug.Print sSubfolder
      
         If InStr(1, sSubfolder, "WorkingFiles") Then
-    'TODO: PATH
             sCorpusPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base-corpus.txt"
             sDICPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.dic"
             sLMPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.lm"
     
             Set oWordApp = CreateObject("Word.Application")
-    'TODO: PATH
             Set oTranscriptionWD = oWordApp.Documents.Open("S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\base.transcription")
         
             With oTranscriptionWD

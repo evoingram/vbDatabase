@@ -68,40 +68,41 @@ Public Function addRSet(sTableName As String) As String
     Dim x As Long
 
     Dim dInvoiceDate As Date
+    
+    Dim cJob As New Job
 
     Select Case sTableName
 
         Case "TempCourtDates"
             'add new case/transcript order to tempcourtdates
-        'TODO: PATH
-            sPartialPath = "T:\Database\Scripts\InProgressExcels\jotform"
-            sExtensionXLS = ".xlsx"
-            sExtensionXLSM = ".xlsm"
-            sFullPathXLS = sPartialPath & sExtensionXLS
-            sFullPathXLSM = sPartialPath & sExtensionXLSM
+        'TODO: come back if this doesn't work
+            'sPartialPath = "T:\Database\Scripts\InProgressExcels\jotform"
+            'sExtensionXLS = ".xlsx"
+            'sExtensionXLSM = ".xlsm"
+            'sFullPathXLS = cJob.DocPath.OrderFormXLS
+            'sFullPathXLSM = cJob.DocPath.OrderFormXLSM
             Set oExcelApp = CreateObject("Excel.Application")
             
-            Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLSM, Local:=True)
+            Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormXLSM, Local:=True)
             oExcelMacroWB.Application.DisplayAlerts = False
             oExcelMacroWB.Application.Visible = False
-            oExcelMacroWB.SaveAs Replace(sFullPathXLSM, sExtensionXLSM, sExtensionXLS), FileFormat:=xlWorkbookDefault
+            oExcelMacroWB.SaveAs Replace(cJob.DocPath.OrderFormXLSM, ".xlsm", ".xls"), FileFormat:=xlWorkbookDefault
             oExcelMacroWB.Close True
             Set oExcelMacroWB = Nothing
             
-            Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLS, Local:=True)
+            Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormXLSX, Local:=True)
             oExcelWB.Application.DisplayAlerts = False
             oExcelWB.Application.Visible = False
-            oExcelWB.SaveAs Replace(sFullPathXLS, sExtensionXLS, ".csv"), FileFormat:=6
+            oExcelWB.SaveAs Replace(cJob.DocPath.OrderFormXLSX, ".xls", ".csv"), FileFormat:=6
             oExcelWB.Close True
             Set oExcelWB = Nothing
              
             
-        'TODO: PATH
             DoCmd.TransferText TransferType:=acImportDelim, TableName:="TempCourtDates", _
-                               FileName:="T:\Database\Scripts\InProgressExcels\Jotform.csv", HasFieldNames:=True
+                               FileName:=cJob.DocPath.OrderFormCSV, HasFieldNames:=True
             CurrentDb.TableDefs.Refresh
             
-            'come back add if filing/factoring to xlsm
+            'TODO: come back add if filing/factoring to xlsm
             sFiled = InputBox("Are we filing this, yes or no?")
             sFactoring = InputBox("Are we factoring this, yes or no?")
             
@@ -215,7 +216,7 @@ Public Function addRSet(sTableName As String) As String
         'delete empty entries from table
         CurrentDb.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] IS NULL;"
         
-        'come back return anything???
+        'TODO: come back return anything???
         Exit Function
 
     Case "Cases"
@@ -264,34 +265,33 @@ Public Function addRSet(sTableName As String) As String
     Case "Customers"
         'add new appearances to tempcustomers
         'add new entry to customers from TempCustomers?
-    'TODO: PATH
-        sPartialPath = "T:\Database\Scripts\InProgressExcels\JotformCustomers"
-        sExtensionXLS = ".xlsx"
-        sExtensionXLSM = ".xlsm"
-        sFullPathXLS = sPartialPath & sExtensionXLS
-        sFullPathXLSM = sPartialPath & sExtensionXLSM
+    'TODO: Come back if this doesn't work
+        'sPartialPath = "T:\Database\Scripts\InProgressExcels\JotformCustomers"
+        'sExtensionXLS = ".xlsx"
+        'sExtensionXLSM = ".xlsm"
+        'sFullPathXLS = sPartialPath & sExtensionXLS
+        'sFullPathXLSM = sPartialPath & sExtensionXLSM
         Set oExcelApp = CreateObject("Excel.Application")
         
-        Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(sFullPathXLSM)
+        Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(cJob.DocPath.OrderFormCustomersXLSM)
         oExcelMacroWB.Application.DisplayAlerts = False
         oExcelMacroWB.Application.Visible = False
-        oExcelMacroWB.SaveAs Replace(sFullPathXLSM, sExtensionXLSM, sExtensionXLS), FileFormat:=xlWorkbookDefault
+        oExcelMacroWB.SaveAs Replace(cJob.DocPath.OrderFormCustomersXLSM, ".xlsm", ".xls"), FileFormat:=xlWorkbookDefault
         oExcelMacroWB.Close True
         Set oExcelMacroWB = Nothing
         
         Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLS, Local:=True)
         oExcelWB.Application.DisplayAlerts = False
         oExcelWB.Application.Visible = False
-        oExcelWB.SaveAs Replace(sFullPathXLS, sExtensionXLS, ".csv"), FileFormat:=6
+        oExcelWB.SaveAs Replace(cJob.DocPath.OrderFormCustomersXLSX, ".xls", ".csv"), FileFormat:=6
         
         oExcelWB.Close True
         Set oExcelWB = Nothing
                 
                 
         'get appearances into database
-    'TODO: PATH
         DoCmd.TransferText TransferType:=acImportDelim, TableName:="TempCustomers", _
-                           FileName:="T:\Database\Scripts\InProgressExcels\JotformCustomers.csv", HasFieldNames:=True
+                           FileName:=cJob.DocPath.OrderFormCustomersCSV, HasFieldNames:=True
                         
         Call fCheckTempCustomersCustomers
         Call fCheckTempCasesCases
