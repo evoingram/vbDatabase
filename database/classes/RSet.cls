@@ -75,7 +75,7 @@ Public Function addRSet(sTableName As String) As String
 
         Case "TempCourtDates"
             'add new case/transcript order to tempcourtdates
-        'TODO: come back if this doesn't work
+        'TODO: does this work or not?  Delete if it does.
             'sPartialPath = "T:\Database\Scripts\InProgressExcels\jotform"
             'sExtensionXLS = ".xlsx"
             'sExtensionXLSM = ".xlsm"
@@ -102,7 +102,7 @@ Public Function addRSet(sTableName As String) As String
                                FileName:=cJob.DocPath.OrderFormCSV, HasFieldNames:=True
             CurrentDb.TableDefs.Refresh
             
-            'TODO: come back add if filing/factoring to xlsm
+            'TODO: add if filing/factoring to xlsm
             sFiled = InputBox("Are we filing this, yes or no?")
             sFactoring = InputBox("Are we factoring this, yes or no?")
             
@@ -216,7 +216,7 @@ Public Function addRSet(sTableName As String) As String
         'delete empty entries from table
         CurrentDb.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] IS NULL;"
         
-        'TODO: come back return anything???
+        'TODO: is this supposed to return anything?
         Exit Function
 
     Case "Cases"
@@ -265,7 +265,7 @@ Public Function addRSet(sTableName As String) As String
     Case "Customers"
         'add new appearances to tempcustomers
         'add new entry to customers from TempCustomers?
-    'TODO: Come back if this doesn't work
+    'TODO: Does this work?  Delete if it does.
         'sPartialPath = "T:\Database\Scripts\InProgressExcels\JotformCustomers"
         'sExtensionXLS = ".xlsx"
         'sExtensionXLSM = ".xlsm"
@@ -355,7 +355,7 @@ Public Function addRSet(sTableName As String) As String
         Set rstTempJob = Nothing
         'Set rstCurrentJob = Nothing
 
-        'come back return anything?
+        'TODO: Return anything?
         addRSet = sCourtDatesID
         
 

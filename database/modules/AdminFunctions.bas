@@ -170,7 +170,7 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     ' Call command: Call pfDownloadFTPsite(mySession)
     ' Description : downloads files modified today (a.k.a. new files on FTP)
     '============================================================================
-    'TODO: come back to add ssl ftp
+    'TODO: ftp
     Dim seopFTPSettings As New SessionOptions
     Dim tropFTPSettings As New TransferOptions
     Dim transferResult As TransferOperationResult
@@ -913,7 +913,8 @@ Public Sub pfReformatTable()
     ' Call command: Call pfReformatTable
     ' Description : reformats scraped Bar addresses to useable format for table
     '============================================================================
-    'TODO: pfReformatTable come back and check what's going on here to finish it if necessary
+    'TODO: pfReformatTable check what's going on here to finish it if necessary
+    
     'change all commas to semicolons
     'export to xls
     'delete columns ID, Eligibility, ActiveL, practice area
@@ -1116,7 +1117,7 @@ Public Sub pfGenerateJobTasks()
     ' Call command: Call pfGenerateJobTasks
     ' Description : generates job tasks in the Tasks table
     '============================================================================
-    'TODO: pfGenerateJobTasks can probably break this into separate functions come back
+    'TODO: pfGenerateJobTasks can probably break this into separate functions
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
@@ -1429,7 +1430,7 @@ Public Sub pfDailyTaskAddFunction()
     ' Call command: Call pfDailyTaskAddFunction
     ' Description : adds static daily tasks to Tasks table
     '============================================================================
-    'TODO: pfDailyTaskAddFunction can probably break this into separate functions come back
+    'TODO: pfDailyTaskAddFunction can probably break this into separate functions
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
@@ -1548,7 +1549,7 @@ Public Sub pfWeeklyTaskAddFunction()
     ' Call command: Call pfWeeklyTaskAddFunction
     ' Description : adds static weekly tasks to Tasks table
     '============================================================================
-    'TODO: pfWeeklyTaskAddFunction can probably break this into separate functions come back
+    'TODO: pfWeeklyTaskAddFunction can probably break this into separate functions
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
@@ -1775,7 +1776,7 @@ Public Sub pfMonthlyTaskAddFunction()
     ' Call command: Call pfMonthlyTaskAddFunction
     ' Description : adds static monthly tasks to Tasks table
     '============================================================================
-    'TODO: pfMonthlyTaskAddFunction can probably break this into separate functions come back
+    'TODO: pfMonthlyTaskAddFunction can probably break this into separate functions
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
@@ -2156,10 +2157,6 @@ Public Sub pfAskforNotes()
     If iFileChosen = -1 Then
         For i = 1 To fd.SelectedItems.Count      'copy each of the files chosen
             sFileName = Right$(fd.SelectedItems(i), Len(fd.SelectedItems(i)) - InStrRev(fd.SelectedItems(i), "\"))
-            
-            'TODO: Come back and delete
-            'Debug.Print cJob.DocPath.Notes
-            'Debug.Print cJob.DocPath.JobDirectoryA & sFileName
         
             If Len(Dir(cJob.DocPath.JobDirectoryA & sFileName, vbDirectory)) = 0 Then
         
@@ -2716,33 +2713,9 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
 
     Call fWLGenerateJSONInfo
 
-    'TODO: fWunderlistAdd can delete following comment lines when known safe come back
-    'Dim sFile3 As String
-    'sFile1 = "C:\other\3.txt"
-    'sFile2 = "C:\other\4.txt"
-    'sFile3 = "C:\other\5.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-
-    'Dim sLine3 As String
-    'Open sFile3 For Input As #3
-    'Line Input #3, sLine3
-    'Close #3
-
 
     '@Ignore AssignmentNotUsed
     sEmail = sCompanyEmail
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sToken = sLine3
-    'sToken = ""
-
     '{
     '  "list_id": 12345,
     '  "title": "Hallo",
@@ -2855,30 +2828,7 @@ Public Sub fWunderlistGetTasksOnList()
 
     Call fWLGenerateJSONInfo
 
-    'TODO: fWunderlistGetTasksOnList can delete following comment lines when known safe come back
-    'Dim sFile3 As String
-    'sFile1 = "C:\other\3.txt"
-    'sFile2 = "C:\other\4.txt"
-    'sFile3 = "C:\other\5.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-
-    'Dim sLine3 As String
-    'Open sFile3 For Input As #3
-    'Line Input #3, sLine3
-    'Close #3
-    'sToken = ""
-
     sEmail = sCompanyEmail
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sToken = sLine3
     '{
     '  "list_id": 12345
     '}
@@ -2996,25 +2946,6 @@ Public Sub fWunderlistGetLists()
     '}
 
     Call fWLGenerateJSONInfo
-
-    'TODO: fWunderlistGetLists can delete following comment lines when known safe come back
-    'Dim sFile3 As String
-    'sFile1 = "C:\other\3.txt"
-    'sFile2 = "C:\other\4.txt"
-    'sFile3 = "C:\other\5.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-
-    'dim sLine3 As String
-    'Open sFile3 For Input As #3
-    'Line Input #3, sLine3
-    'Close #3
     'https://www.wunderlist.com/oauth/authorize?client_id=ID&redirect_uri=URL&state=RANDOM
 
     '@Ignore AssignmentNotUsed
@@ -3022,11 +2953,7 @@ Public Sub fWunderlistGetLists()
 
     '@Ignore AssignmentNotUsed
     sEmail = sCompanyEmail
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sToken = sLine3
-    'sToken = ""
-
+    
     sURL2 = "https://a.wunderlist.com/api/v1/user"
     '{
     '  "list_id": 12345,
@@ -3118,30 +3045,9 @@ Public Sub fWunderlistGetFolders()
 
     Call fWLGenerateJSONInfo
 
-    'TODO: fWunderlistGetFolders can delete following comment lines when known safe come back
-    'sFile1 = "C:\other\3.txt"
-    'sFile2 = "C:\other\4.txt"
-    'sFile3 = "C:\other\5.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-
-    'Open sFile3 For Input As #3
-    'Line Input #3, sLine3
-    'Close #3
-
     '@Ignore AssignmentNotUsed
     sEmail = sCompanyEmail
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sToken = sLine3
-    'sToken = ""
-
+    
     'gets list of folders or folder revisions
 
     'GET a.wunderlist.com/api/v1/folders to get list of all folders
@@ -3234,7 +3140,6 @@ Public Sub pfUSCRuleScraper1()
 
     'front matter
     'http://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title11-chapter3-front&num=0&edition=prelim
-
 
     For x = 1 To 54
             

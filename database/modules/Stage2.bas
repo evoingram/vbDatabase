@@ -2360,7 +2360,7 @@ Public Sub pfReplaceAQC()
     Call pfRoughDraftToCoverF
     Call FPJurors
     'Call pfTCEntryReplacement
-    'come back
+    ''TODO: What is going on here?
     Call pfFindRepCitationLinks
 
 End Sub

@@ -220,7 +220,7 @@ Public Sub pfBurnCD()
         Set oWSHShell = CreateObject("WScript.Shell")
         Set oShell = CreateObject("Shell.Application")
         sBurnDir = oWSHShell.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\" & "Explorer\Shell Folders\CD Burning")
-        'come back
+        'TODO: What is going on here?
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     
@@ -336,7 +336,7 @@ Public Sub pfCreateRegularPDF()
         End With
     End If
 
-    'TODO: lock document in whole and save as final come back
+    'TODO: lock document in whole and save as final
     oWordDoc.Protect Type:=wdAllowOnlyReading, noReset:=True, password:="wrts0419"
     oWordDoc.SaveAs FileName:=cJob.DocPath.TranscriptFD 'sFinalTranscriptNoExt
     oWordDoc.ExportAsFixedFormat outputFileName:=sFinalTranscriptNoExt, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks

@@ -894,10 +894,7 @@ Public Sub fZIPAudio()
     
     'Wend
     
-    
-    
-    'come back
-    
+    'TODO: What is going on here?
     
     MsgBox "Find the ZIP file here: " & cJob.DocPath.ZAudioB
 End Sub
@@ -1096,7 +1093,7 @@ Public Sub pfSendTrackingEmail()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     deliverySQLstring = "SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";"
-    'TODO: pfSendTrackingEmail get current values and delete following come back
+    'TODO: pfSendTrackingEmail get current values and delete following
     Set rs = CurrentDb.OpenRecordset(deliverySQLstring)
     vTrackingNumber = rs.Fields("TrackingNumber").Value
     sParty1 = rs.Fields("Party1").Value
@@ -1180,7 +1177,6 @@ Public Sub fAudioDone()
     'to be added
     'Else
     'else try to open express scribe
-    'TODO: Possibly come back for path
     '    Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeDone.bat")
     '  Next Fil
       

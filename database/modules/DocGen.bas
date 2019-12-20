@@ -557,7 +557,7 @@ Public Sub fFactorInvoicEmailF()
     sFactoringXLS = cJob.DocPath.TemplateFolder4 & "Client_Basic_Schedule.xls" 'make factoring csv
     sGeneratedFactoringXLS = cJob.DocPath.JobDirectoryW & "Client_Basic_Schedule.xls"
 
-    'TODO: fFactorInvoicEmailF can delete following lines when known safe come back
+    'TODO: fFactorInvoicEmailF can delete following lines when known safe
     'sUnitPriceSQL = "SELECT UnitPrice from CourtDates where ID = " & sCourtDatesID & ";" 'get unitprice id
     'Set db = CurrentDb
     'Set rstUPCourtDates = CurrentDb.OpenRecordset(sUnitPriceSQL)
@@ -636,7 +636,7 @@ Public Sub fInfoNeededEmailF()
     ' Call command: Call fInfoNeededEmailF
     ' Description : creates info needed e-mail
     '============================================================================
-    'TODO: fInfoNeededEmailF not used anymore come back
+    'TODO: fInfoNeededEmailF not used anymore
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
     Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
     Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
@@ -790,7 +790,7 @@ Public Sub fSendShippingTrackingEmail()
     ' Call command: Call fSendShippingTrackingEmail
     ' Description : creates shipping confirmation e-mail sent to client
     '============================================================================
-    'TODO: fSendShippingTrackingEmail not used come back
+    'TODO: fSendShippingTrackingEmail not used
     Call pfGenericExportandMailMerge(qnTRCourtUnionAppAddrQ, "Stage4s\Shipped")
     Call pfSendWordDocAsEmail("Shipped", "Shipping Confirmation") 'shipped email
     Call pfCommunicationHistoryAdd("Shipped")

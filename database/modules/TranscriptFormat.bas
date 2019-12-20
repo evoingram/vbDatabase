@@ -2222,7 +2222,6 @@ Public Sub pfFindRepCitationLinks()
     'TODO: PATH
     sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     
-    
     'On Error Resume Next
     'On Error GoTo 0
     
@@ -2241,7 +2240,7 @@ Public Sub pfFindRepCitationLinks()
     sEndCHT = " |"
     
     ReDim sSearchTermArray(0 To 0)
-    'Get all the document text and store it in a variable. COME BACK
+    'Get all the document text and store it in a variable. 'TODO: What is going on here?
     Set rCurrentSearch = oWordDoc.Range
      
     On Error Resume Next
@@ -2263,7 +2262,7 @@ Public Sub pfFindRepCitationLinks()
     
     Set rCurrentSearch = oWordDoc.Range
     sCurrentSearch = rCurrentSearch.Text
-    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'add usc table come back
+    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'TODO: add usc table
     'Loop sCurrentSearch till you can't find any more matching "terms"
     x = UBound(sSearchTermArray) - LBound(sSearchTermArray) + 1
     Debug.Print x
@@ -2317,7 +2316,7 @@ ExitLoop:
         sInitialSearchSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation] = " & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & ";"
         'look each one up in CitationHyperlinks
         Debug.Print "Initial Search SQL" & sInitialSearchSQL
-        'come back
+        'TODO: What is going on here?
         'GoTo NextSearchTerm
         Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
                 
@@ -2416,7 +2415,7 @@ ExitLoop:
             Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
             Set sID = Parsed.item("results")
             
-            'create new table TempCitations come back
+            'create new table TempCitations 'TODO: What is going on here?
                                         
             On Error Resume Next
             CurrentDb.Execute "DROP TABLE TempCitations"
@@ -2484,7 +2483,7 @@ ExitLoop:
                     qReplaceHyperlink = "https://www.courtlistener.com/" & sAbsoluteURL 'format is test#http://www.cnn.com#, can't add hyperlink field to a table in vba
                     iLongCitationLength = 253 - Len(sCitation)
                             
-                    'come back
+                    'TODO: What is going on here?
                     'GoTo NextSearchTerm
                     sQFindCitation = Left(sQFindCitation, iLongCitationLength)
                     sQLongCitation = sQFindCitation & ", " & sCitation
@@ -2500,7 +2499,7 @@ ExitLoop:
                             
                     'add citations to new temporary table TempCitations with field j
                             
-                    'come back
+                    'TODO: What is going on here?
                     'GoTo NextSearchTerm
                     Set rstCurrentHyperlink = CurrentDb.OpenRecordset("TempCitations")
                     rstCurrentHyperlink.AddNew
@@ -2598,7 +2597,7 @@ NextSearchTerm:
     If iStartPos = 0 Then GoTo ExitLoop1
             
             
-    'come back
+    'TODO: What is going on here?
     'GoTo NextSearchTerm
     'GoTo NextSearchTerm
     Set rstCurrentHyperlink = CurrentDb.OpenRecordset(sCurrentLinkSQL)
@@ -2636,7 +2635,7 @@ NextSearchTerm:
             
         'use that info on word document
                 
-        'come back
+        'TODO: What is going on here?
         'GoTo NextSearchTerm
         oWordDoc.Application.Selection.Find.ClearFormatting
         oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
@@ -2679,8 +2678,6 @@ NextSearchTerm:
                                  
         'End With
                
-               
-               
         If sQCHCategory = "1" Then
                 
             oWordDoc.Application.ActiveWindow.ActivePane.View.ShowAll = Not oWordDoc.Application.ActiveWindow.ActivePane.View.ShowAll
@@ -2721,9 +2718,6 @@ NextSearchTerm:
         x = x + 1
     Loop
     rstCurrentHyperlink.Close
-        
-    
-    
     
 ExitLoop1:
     With oWordDoc.Application.Selection.Find
@@ -2814,7 +2808,7 @@ ExitLoop1:
     
     
 Done:
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'TODO: job number come back
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'TODO: job number
     'TODO: PATH
     sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     oWordDoc.SaveAs2 FileName:=sFileName         'save and close word doc
@@ -2873,7 +2867,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmarks make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmarks make sure this is correc
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDocCover, "Untitled")
     '@Ignore AssignmentNotUsed, AssignmentNotUsed
@@ -2896,7 +2890,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2906,7 +2900,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(1)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2916,7 +2910,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2926,7 +2920,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2936,7 +2930,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2946,7 +2940,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2956,7 +2950,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2966,7 +2960,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2975,9 +2969,7 @@ Public Sub pfTopOfTranscriptBookmark()
     MsgBox ("Hit okay after you've moved all bookmarks to their corresponding headings; General, Witnesses, or Exhibits; and also created the Authorities bookmark structure.")
 
     n = PDoc.Save(PDSaveFull, sTranscriptsFolderFinalPDF)
-
-
-
+    
     'for each -Transcript-FINAL.pdf in \Transcripts\ do the following
 
     If PDocCover.InsertPages(numpages - 1, PDoc, 0, PDoc.GetNumPages(), True) = False Then
@@ -2987,9 +2979,6 @@ Public Sub pfTopOfTranscriptBookmark()
     If PDocCover.Save(PDSaveFull, sTranscriptVolumesALLPath) = False Then
         MsgBox "Cannot save the modified document"
     End If
-    
-    
-    
     
     PDoc.Close
     PDocCover.Close

@@ -147,7 +147,7 @@ Public Const sCompanyState As String = "WA"
 Public Const sCompanyZIP As String = "98119"
 Public Const sZCountryCode As String = "US"
 
-'TODO: CurrentCaseInfo module, why isn't this used?  Come back
+'TODO: CurrentCaseInfo module, why isn't this used?
 '@Ignore ConstantNotUsed
 Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
 '@Ignore ConstantNotUsed

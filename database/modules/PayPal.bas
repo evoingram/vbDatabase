@@ -565,7 +565,7 @@ Public Sub fPPDraft()
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
 
-    'todo: update PPID & PPStatus
+    'TODO: update PPID & PPStatus
     Dim sUpdatePPStatus As String
     Dim sUpdatePPID As String
     sUpdatePPStatus = "UPDATE CourtDates SET PPStatus = " & Chr(34) & vStatus & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
@@ -1603,7 +1603,7 @@ Public Sub fPPGetInvoiceInfo()
         .abort
         'Debug.Print "--------------------------------------------"
     End With
-    'get info for invoice, call separate function for it maybe 'come back
+    'get info for invoice, call separate function for it maybe ''TODO: What is going on here?
     vInvoiceID = sPPID                           'rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
   
     'Debug.Print "RESPONSETEXT--------------------------------------------"
