@@ -84,6 +84,7 @@ Private Sub testClassesInfo()
     sCourtDatesID = 1874
     cJob.FindFirst "ID=" & sCourtDatesID
     Debug.Print cJob.ID
+    Debug.Print cJob.Status.AddRDtoCover
     Debug.Print cJob.AudioLength
     Debug.Print cJob.TurnaroundTime
     Debug.Print cJob.CaseInfo.Party1
@@ -99,8 +100,12 @@ Private Sub testClassesInfo()
     Debug.Print cJob.CaseInfo.Party1
     Debug.Print cJob.UnitPrice
     Debug.Print cJob.InventoryRateCode
+    cJob.Status.AddRDtoCover = True
+    Debug.Print cJob.Status.AddRDtoCover
+    'cJob.Update
     'On Error GoTo 0
 End Sub
+
 
 '@Ignore EmptyMethod
 '@Ignore ProcedureNotUsed

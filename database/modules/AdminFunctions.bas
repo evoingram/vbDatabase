@@ -177,7 +177,6 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     
     Dim cJob As New Job
 
-
     With seopFTPSettings                         ' Setup session options
         .Protocol = Protocol_Ftp
         .HostName = "ftp.aquoco.co"
@@ -371,11 +370,7 @@ Public Sub pfReadXML()
     ' Description : reads shipping XML and sends "Shipped" email to client
     '============================================================================
 
-
-    Dim sFullOutputDonePath As String
     Dim sTrackingNumber As String
-    Dim sOutputPath As String
-    Dim sFullOutputPath As String
     Dim dShipDate As Date
     Dim dShipDateFormatted As Date
     Dim rstCurrentJob As DAO.Recordset
@@ -384,15 +379,12 @@ Public Sub pfReadXML()
     Dim Rng As Range
     Dim cJob As New Job
 
-    sOutputPath = Dir(cJob.DocPath.ShippingOutputFolder)
-    Do While Len(sOutputPath) > 0
-        sFullOutputPath = cJob.DocPath.ShippingOutputFolder & sOutputPath
-        sFullOutputDonePath = cJob.DocPath.ShippingFolder & "done" & sOutputPath
+    Do While Len(Dir(cJob.DocPath.ShippingOutputFolder)) > 0
     
         Set formDOM = New DOMDocument60          'Open the xml file
         formDOM.resolveExternals = False         'using schema yes/no true/false
         formDOM.validateOnParse = False          'Parser validate document?  Still parses well-formed XML
-        formDOM.Load (sFullOutputPath)
+        formDOM.Load (cJob.DocPath.ShippingOutputFolder & Dir(cJob.DocPath.ShippingOutputFolder))
     
         Set ixmlRoot = formDOM.DocumentElement   'Get document reference
     
@@ -404,24 +396,11 @@ Public Sub pfReadXML()
         Set rstCurrentJob = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE ID = " & sCourtDatesID & ";")
     
         rstCurrentJob.Edit
-        rstCurrentJob.Fields("ShipDate").Value = dShipDateFormatted
-        rstCurrentJob.Fields("TrackingNumber").Value = sTrackingNumber
+            rstCurrentJob.Fields("ShipDate").Value = dShipDateFormatted
+            rstCurrentJob.Fields("TrackingNumber").Value = sTrackingNumber
         rstCurrentJob.Update
-    
-        Set rstCurrentJob = CurrentDb.OpenRecordset("SELECT * FROM [TR-Court-Q-3] WHERE [ID] = " & sCourtDatesID & ";")
-    
-        'global variables to use in next function
-        sParty1 = rstCurrentJob.Fields("Party1").Value
-        sParty2 = rstCurrentJob.Fields("Party2").Value
-        sCaseNumber1 = rstCurrentJob.Fields("CaseNumber1").Value
-        dHearingDate = rstCurrentJob.Fields("HearingDate").Value
-        sAudioLength = rstCurrentJob.Fields("AudioLength").Value
-        rstCurrentJob.Close
         
-        'TODO: Don't need this?
-        'sOutputPath = Dir
-    
-        Name sFullOutputPath As sFullOutputDonePath 'move file to other folder
+        Name cJob.DocPath.ShippingOutputFolder & Dir(cJob.DocPath.ShippingOutputFolder) As cJob.DocPath.ShippingFolder & "done" & Dir(cJob.DocPath.ShippingOutputFolder) 'move file to other folder
     
         Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
        
@@ -445,7 +424,10 @@ Public Sub pfFileRenamePrompt()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
-    sUserInput = InputBox("Enter the desired document name without the extension" & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Rename your document." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Enter the new name for the transcript here, without the extension." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date")
+    sUserInput = InputBox("Enter the desired document name without the extension" & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & _
+    "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Rename your document." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" _
+    & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Enter the new name for the transcript here, without the extension." & Chr(13) & _
+    "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date")
 
     If sUserInput = "Enter the new name for the transcript here, without the extension." Or sUserInput = "" Then
         Exit Sub
@@ -518,9 +500,6 @@ Public Sub pfCheckFolderExistence()
     '============================================================================
 
     Dim cJob As New Job
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     If Len(Dir(cJob.DocPath.JobDirectory, vbDirectory)) = 0 Then
         MkDir cJob.DocPath.JobDirectory
@@ -651,7 +630,6 @@ Public Sub pfStripIllegalChar(sInput As String)
     StripIllegalChar = oRegex.Replace(sInput, "")
 
     Set oRegex = Nothing
-     
  
 End Sub
 
@@ -690,6 +668,7 @@ Public Sub pfBrowseForFolder(sSavePath As String, Optional OpenAt As String)
 
     Dim oShell As Object
     Dim oBrowsedFolder As Object
+    
     Dim vEnvUserProfile As Variant
  
     vEnvUserProfile = CStr(Environ("USERPROFILE"))
@@ -699,9 +678,6 @@ Public Sub pfBrowseForFolder(sSavePath As String, Optional OpenAt As String)
     Set oBrowsedFolder = oShell.BrowseForFolder(0, "Please choose a folder", 0, vEnvUserProfile & "\My Documents\")
  
     sSavePath = oBrowsedFolder.Self.Path
-
-    On Error Resume Next
-    On Error GoTo 0
      
     Set oShell = Nothing
    
@@ -1109,6 +1085,32 @@ Public Sub pfPriorityPointsAlgorithm()
 
 End Sub
 
+
+Private Sub AddTaskToTasks(sTaskTitle As String, _
+                     iTaskMinuteLength As Long, _
+                     sPriority As String, _
+                     dDue As Date, _
+                     sTaskCategory As String, _
+                     sTaskDescription As String, _
+                     Optional dStart As Date)
+    Dim rstTasks As DAO.Recordset
+    
+    Set rstTasks = CurrentDb.OpenRecordset("Tasks")
+
+    rstTasks.AddNew
+    rstTasks.Fields("Title").Value = sTaskTitle
+    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
+    rstTasks.Fields("Priority").Value = sPriority
+    rstTasks.Fields("Start Date").Value = dStart
+    rstTasks.Fields("Due Date").Value = dDue
+    rstTasks.Fields("Category").Value = sTaskCategory
+    rstTasks.Fields("Description").Value = sTaskDescription
+    rstTasks.Update
+    
+    rstTasks.Close
+
+End Sub
+
 Public Sub pfGenerateJobTasks()
     '============================================================================
     ' Name        : pfGenerateJobTasks
@@ -1117,7 +1119,7 @@ Public Sub pfGenerateJobTasks()
     ' Call command: Call pfGenerateJobTasks
     ' Description : generates job tasks in the Tasks table
     '============================================================================
-    'TODO: pfGenerateJobTasks can probably break this into separate functions
+    
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
@@ -1130,11 +1132,7 @@ Public Sub pfGenerateJobTasks()
     Dim dStart As Date
     Dim dDue As Date
     
-    Dim qdf As QueryDef
-    Dim rstTasks As DAO.Recordset
-    
     Dim cJob As New Job
-
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1144,58 +1142,24 @@ Public Sub pfGenerateJobTasks()
     iTaskMinuteLength = "2"
     sTaskCategory = "production"
     sPriority = "(1) Stage 1"
-
     sTaskDescription = "|Case Name:  " & sParty1 & " v. " & sParty2 & "   |" & Chr(13) & _
-                                                                                       "|Case Nos.:  " & sCaseNumber1 & "   |   " & sCaseNumber2 & "   |" & Chr(13) & _
-                                                                                       "|Due Date:  " & dDue & "   |   Turnaround:  " & sTurnaroundTime & " calendar days   |" & _
-                                                                                       "|Client:   " & sCompany & "   |   Folder:   " & cJob.DocPath.JobDirectory & "   |" & Chr(13) & _
-                                                                                       "|Exp. Advance/Deposit Date:  " & dExpectedAdvanceDate & "   |" & Chr(13) & _
-                                                                                       "|Exp. Rebate Date:  " & dExpectedRebateDate & "   |" & Chr(13) & _
-                                                                                       "|Estimate:  " & sSubtotal & "   |"
-
-
-    Set rstTasks = CurrentDb.OpenRecordset("Tasks")
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+                       "|Case Nos.:  " & sCaseNumber1 & "   |   " & sCaseNumber2 & "   |" & Chr(13) & _
+                       "|Due Date:  " & dDue & "   |   Turnaround:  " & sTurnaroundTime & " calendar days   |" & _
+                       "|Client:   " & sCompany & "   |   Folder:   " & cJob.DocPath.JobDirectory & "   |" & Chr(13) & _
+                       "|Exp. Advance/Deposit Date:  " & dExpectedAdvanceDate & "   |" & Chr(13) & _
+                       "|Exp. Rebate Date:  " & dExpectedRebateDate & "   |" & Chr(13) & _
+                       "|Estimate:  " & sSubtotal & "   |"
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(1.2) Payment:  If factored, proceed with set-up.  If not, send invoice & wait for payment :  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = Now + 1
     iTaskMinuteLength = "2"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(1.3) Generate documents: cover, autocorrect, AGshortcuts, Xero CSV, CD label, transcripts ready, package-enclosed letter:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = Now + 1
     iTaskMinuteLength = "2"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     iTypingTime = Round((((sAudioLength * 3) / 60) + 1), 0)
 
@@ -1204,222 +1168,85 @@ Public Sub pfGenerateJobTasks()
         dDue = dDueDate - 3
         iTaskMinuteLength = "60"
         sPriority = "(2) Stage 2"
+        Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
     
-        rstTasks.AddNew
-        rstTasks.Fields("Title").Value = sTaskTitle
-        rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-        rstTasks.Fields("Priority").Value = sPriority
-        rstTasks.Fields("Start Date").Value = dStart
-        rstTasks.Fields("Due Date").Value = dDue
-        rstTasks.Fields("Category").Value = sTaskCategory
-        rstTasks.Fields("Description").Value = sTaskDescription
-        rstTasks.Update
     Next i
-
 
     sTaskTitle = "(3.1) Find/replace add to cover page:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 2
     iTaskMinuteLength = "3"
     sPriority = "(3) Stage 3"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(3.2) Hyperlink:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 2
     iTaskMinuteLength = "15"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(3.3) Send email if more info needed and hold transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 2
     iTaskMinuteLength = "2"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     iAudioProofTime = Round((((sAudioLength * 1.5) / 60) + 1), 0)
+    
     For i = 1 To iAudioProofTime
+    
         sTaskTitle = "(3.4) Audio-proof:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
         dDue = dDueDate - 2
         iTaskMinuteLength = "60"
-
-        rstTasks.AddNew
-        rstTasks.Fields("Title").Value = sTaskTitle
-        rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-        rstTasks.Fields("Priority").Value = sPriority
-        rstTasks.Fields("Start Date").Value = dStart
-        rstTasks.Fields("Due Date").Value = dDue
-        rstTasks.Fields("Category").Value = sTaskCategory
-        rstTasks.Fields("Description").Value = sTaskDescription
-        rstTasks.Update
+        Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
+        
     Next i
-
 
     sTaskTitle = "(4.1) Make final transcript docs, pdf, zip, etc:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "3"
     sPriority = "(4) Stage 4"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
+    
     sTaskTitle = "(4.2) Invoice if balance due or factored.  Refund if applicable:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "1"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.3) Deliver as necessary electronically if transcript not held:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "1"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.4) Send invoice to factoring:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "1"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.5) File transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "3"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.6) Burn CD for mailing:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "2"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.7) Generate xmls for shipping:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "1"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.8) Produce & mail transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "15"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.9) Add tracking number and shipping cost to DB.  Notify client:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = dDueDate - 1
     iTaskMinuteLength = "2"
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
-
-    rstTasks.Close
-    Set rstTasks = Nothing
     Call pfClearGlobals
+    
 End Sub
 
 Public Sub pfDailyTaskAddFunction()
@@ -1430,16 +1257,13 @@ Public Sub pfDailyTaskAddFunction()
     ' Call command: Call pfDailyTaskAddFunction
     ' Description : adds static daily tasks to Tasks table
     '============================================================================
-    'TODO: pfDailyTaskAddFunction can probably break this into separate functions
+    
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
     Dim sTaskDescription As String
     Dim dDue As Date
-    Dim rstTasks As DAO.Recordset
     Dim iTaskMinuteLength As Long
-
-    Set rstTasks = CurrentDb.OpenRecordset("Tasks")
 
     sTaskCategory = "GTD Daily"
     dDue = Now + 1
@@ -1447,97 +1271,37 @@ Public Sub pfDailyTaskAddFunction()
     sTaskDescription = "none"
     iTaskMinuteLength = "2"
     sTaskTitle = "List action items, projects, waiting-fors, calendar events, someday/maybes as appropriate"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     iTaskMinuteLength = "2"
     sTaskTitle = "replied to all e-mails, checked & processed all voicemails"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
+    
     iTaskMinuteLength = "2"
     sTaskTitle = "export e-mails and check communication"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     iTaskMinuteLength = "10"
     sTaskTitle = "review jobs sent to me"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     iTaskMinuteLength = "10"
     sTaskTitle = "review tasks bin and process"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     sTaskCategory = "personal"
     iTaskMinuteLength = "60"
     sTaskTitle = "art time"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     iTaskMinuteLength = "60"
     sTaskTitle = "yoga"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
-    rstTasks.Close
-    Set rstTasks = Nothing
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 End Sub
 
@@ -1549,18 +1313,16 @@ Public Sub pfWeeklyTaskAddFunction()
     ' Call command: Call pfWeeklyTaskAddFunction
     ' Description : adds static weekly tasks to Tasks table
     '============================================================================
-    'TODO: pfWeeklyTaskAddFunction can probably break this into separate functions
+    
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
     Dim sTaskDescription As String
+    
     Dim vStartDate As Date
     Dim dDue As Date
-    Dim rstTasks As DAO.Recordset
+    
     Dim iTaskMinuteLength As Long
-
-    Set rstTasks = CurrentDb.OpenRecordset("Tasks")
-
 
     sTaskCategory = "GTD Weekly"
     dDue = Now + 5
@@ -1568,203 +1330,68 @@ Public Sub pfWeeklyTaskAddFunction()
     sTaskDescription = "none"
     iTaskMinuteLength = "5"
     sTaskTitle = "empty head about uncaptured new items"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "5"
     sTaskTitle = "file material away"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     iTaskMinuteLength = "5"
     sTaskTitle = "stage R/R material"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "10"
     sTaskTitle = "update payment bill calendar"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     iTaskMinuteLength = "10"
     sTaskTitle = "budget"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 
     iTaskMinuteLength = "10"
     sTaskTitle = "review events coming up"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "10"
     sTaskTitle = "review lists"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "10"
     sTaskTitle = "review long-term projects"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "10"
     sTaskTitle = "review sales reports"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     sTaskCategory = "business admin"
     iTaskMinuteLength = "60"
     sTaskTitle = "update AQC manual"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "60"
     sTaskTitle = "do 1 hour government contracts or business/marketing plan work"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     sTaskCategory = "personal"
     iTaskMinuteLength = "20"
     sTaskTitle = "vacuum"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "20"
     sTaskTitle = "groceries"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "30"
     sTaskTitle = "laundry"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "60"
     sTaskTitle = "Clean house"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
-
-    rstTasks.Close
-    Set rstTasks = Nothing
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
 End Sub
 
@@ -1781,12 +1408,10 @@ Public Sub pfMonthlyTaskAddFunction()
     Dim sTaskCategory As String
     Dim sPriority As String
     Dim sTaskDescription As String
+    
     Dim iTaskMinuteLength As Long
+    
     Dim dDue As Date
-    Dim rstTasks As DAO.Recordset
-
-    Set rstTasks = CurrentDb.OpenRecordset("Tasks")
-
 
     sTaskCategory = "GTD Monthly"
     dDue = Now + 20
@@ -1794,71 +1419,24 @@ Public Sub pfMonthlyTaskAddFunction()
     sTaskDescription = "none"
     iTaskMinuteLength = "15"
     sTaskTitle = "Brainstorm Creative Ideas"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "15"
     sTaskTitle = "Review 1 to 2 Year Goals"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "15"
     sTaskTitle = "Review Roles and Current Responsibilities"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
+    
     iTaskMinuteLength = "15"
     sTaskTitle = "Review Someday or Maybe list"
-
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
     iTaskMinuteLength = "15"
     sTaskTitle = "Review Support Files"
+    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription)
 
-    rstTasks.AddNew
-    rstTasks.Fields("Title").Value = sTaskTitle
-    rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
-    rstTasks.Fields("Priority").Value = sPriority
-    rstTasks.Fields("Due Date").Value = dDue
-    rstTasks.Fields("Category").Value = sTaskCategory
-    rstTasks.Fields("Description").Value = sTaskDescription
-    rstTasks.Update
-
-
-    rstTasks.Close
-    Set rstTasks = Nothing
 End Sub
 
 Public Sub pfCommHistoryExportSub()
@@ -2000,17 +1578,22 @@ Public Sub pfMoveSelectedMessages()
     ' Description : move selected messages to network drive
     '============================================================================
 
+    Dim sSenderName As String
+    
     Dim oOutlookApp As Outlook.Application
     Dim nsOutlookNmSpc As Outlook.Namespace
     Dim oDestinationFolder As Outlook.MAPIFolder
     Dim oSourceFolder As Outlook.Folder
+    
     Dim oCurrentExplorer As Explorer
     Dim oSelection As Selection
+    
     Dim oSubSelection As Object
+    
     Dim vObjectVariant As Variant
+    
     Dim lMovedItems As Long
     Dim iDateDifference As Long
-    Dim sSenderName As String
 
     Set oOutlookApp = Application
     Set nsOutlookNmSpc = oOutlookApp.GetNamespace("MAPI")
@@ -2148,6 +1731,7 @@ Public Sub pfAskforNotes()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
+    
     'use the standard title and filters, but change the initial folder
     fd.InitialFileName = cJob.DocPath.sDrive & ":\"
     fd.InitialView = msoFileDialogViewList
@@ -2373,9 +1957,7 @@ NextNumber1:
                         rstCitationHyperlinks.Fields("WebAddress").Value = sWebAddress
                         rstCitationHyperlinks.Fields("CHCategory").Value = sCHCategory
                         rstCitationHyperlinks.Update
-                    
-                    
-                    
+                        
                     End If
 
     
@@ -2425,7 +2007,6 @@ Public Sub pfUSCRuleScraper()
 
     vRules = Array("CR ", "CrR ", "RAP ", "Rule ", "RCW ", "ER ")
     vRuleNumbers = Array("", "", "")
-
 
     For i = 1 To 54
         'Title 1-54
@@ -2663,46 +2244,22 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
     '============================================================================
 
     Dim sURL As String
-    Dim sUserName As String
-    Dim sPassword As String
-    Dim sAuth As String
-    Dim stringJSON As String
-    Dim sEmail As String
     Dim vInvoiceID As String
     Dim apiWaxLRS As String
-    Dim vErrorIssue As String
-    Dim sInvoiceTime As String
+    Dim json1 As String
+    
     Dim oRequest As Object
     Dim Json As Object
     Dim oWebBrowser As Object
-    Dim vStatus As String
-    Dim vTotal As String
-    Dim sURL1 As String
-    Dim sURL2 As String
+    Dim vDetails As Object
+    
     Dim rstRates As DAO.Recordset
 
     Dim resp As Variant
     Dim response As Variant
     Dim rep As Variant
-    Dim vDetails As Object
-    Dim sToken As String
-    Dim json1 As String
-    Dim json2 As String
-    Dim json3 As String
-    Dim json4 As String
-    Dim json5 As String
-    Dim Parsed As Dictionary
-    Dim vErrorName As String
-    Dim vErrorMessage As String
-    Dim vErrorILink As String
-    Dim vErrorDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine1 As String
-    Dim sLine2 As String
-    Dim sLocal As String
-    Dim sResponseText As String
+    
+    Dim parsed As Dictionary
     '{
     '  "list_id": 12345,
     '  "title": "Hallo",
@@ -2714,9 +2271,6 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
 
     Call fWLGenerateJSONInfo
 
-
-    '@Ignore AssignmentNotUsed
-    sEmail = sCompanyEmail
     '{
     '  "list_id": 12345,
     '  "title": "Hallo",
@@ -2735,10 +2289,10 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
                           "}"
-    Debug.Print "JSON1--------------------------------------------"
-    Debug.Print json1
+    'Debug.Print "JSON1--------------------------------------------"
+    'Debug.Print json1
 
-    Debug.Print "RESPONSETEXT--------------------------------------------"
+    'Debug.Print "RESPONSETEXT--------------------------------------------"
     sURL = "https://a.wunderlist.com/api/v1/tasks" '?completed=False" & bCompleted  '?list_id=" & sWLListID & '"&?title=" & sTitle &
     '"&?assignee_id=" & lAssigneeID & "&?completed=" & bCompleted & "&?due_date=" & sDueDate
     With CreateObject("WinHttp.WinHttpRequest.5.1")
@@ -2749,21 +2303,21 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
         .setRequestHeader "Content-Type", "application/json"
         .send json1
         apiWaxLRS = .responseText
-        Debug.Print apiWaxLRS
-        Debug.Print "--------------------------------------------"
-        Debug.Print "Status:  " & .Status
-        Debug.Print "--------------------------------------------"
-        Debug.Print "StatusText:  " & .StatusText
-        Debug.Print "--------------------------------------------"
-        Debug.Print "ResponseBody:  " & .responseBody
-        Debug.Print "--------------------------------------------"
+        'Debug.Print apiWaxLRS
+        'Debug.Print "--------------------------------------------"
+        'Debug.Print "Status:  " & .Status
+        'Debug.Print "--------------------------------------------"
+        'Debug.Print "StatusText:  " & .StatusText
+        'Debug.Print "--------------------------------------------"
+        'Debug.Print "ResponseBody:  " & .responseBody
+        'Debug.Print "--------------------------------------------"
         .abort
     End With
     'Next
-    Debug.Print "--------------------------------------------"
-    Debug.Print "Task Title:  " & sTitle & "   |   List ID:  " & sWLListID & " " & lAssigneeID
-    Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & sDueDate
-    Debug.Print "--------------------------------------------"
+    'Debug.Print "--------------------------------------------"
+    'Debug.Print "Task Title:  " & sTitle & "   |   List ID:  " & sWLListID & " " & lAssigneeID
+    'Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & sDueDate
+    'Debug.Print "--------------------------------------------"
     'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
 End Sub
@@ -2778,46 +2332,30 @@ Public Sub fWunderlistGetTasksOnList()
     '============================================================================
 
     Dim sURL As String
-    Dim sUserName As String
-    Dim sPassword As String
-    Dim sAuth As String
-    Dim stringJSON As String
-    Dim sEmail As String
     Dim vInvoiceID As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
-    Dim oRequest As Object
-    Dim Json As Object
-    Dim oWebBrowser As Object
     Dim vStatus As String
     Dim vTotal As String
-    Dim sURL1 As String
-    Dim sURL2 As String
-    Dim rstRates As DAO.Recordset
-
-    Dim resp As Variant
-    Dim response As Variant
-    Dim rep As Variant
-    Dim vDetails As Object
-    Dim sToken As String
     Dim json1 As String
-    Dim json2 As String
-    Dim json3 As String
-    Dim json4 As String
-    Dim json5 As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine1 As String
-    Dim sLine2 As String
-    Dim sLocal As String
-    Dim sResponseText As String
+
+    Dim resp As Variant
+    Dim response As Variant
+    Dim rep As Variant
+    
+    Dim vDetails As Object
+    Dim oRequest As Object
+    Dim Json As Object
+    Dim oWebBrowser As Object
+        
+    Dim parsed As Dictionary
+    
+    Dim rstRates As DAO.Recordset
     '{
     '  "list_id": 12345,
     '  "title": "Hallo",
@@ -2829,7 +2367,6 @@ Public Sub fWunderlistGetTasksOnList()
 
     Call fWLGenerateJSONInfo
 
-    sEmail = sCompanyEmail
     '{
     '  "list_id": 12345
     '}
@@ -2837,9 +2374,9 @@ Public Sub fWunderlistGetTasksOnList()
     
     json1 = "{" & Chr(34) & "list_id" & Chr(34) & ": " & sWLListID & "}"
 
-    Debug.Print "JSON1--------------------------------------------"
-    Debug.Print json1
-    Debug.Print "RESPONSETEXT--------------------------------------------"
+    'Debug.Print "JSON1--------------------------------------------"
+    'Debug.Print json1
+    'Debug.Print "RESPONSETEXT--------------------------------------------"
     sURL = "https://a.wunderlist.com/api/v1/tasks?list_id=" & sWLListID
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
@@ -2849,10 +2386,10 @@ Public Sub fWunderlistGetTasksOnList()
         .setRequestHeader "Content-Type", "application/json"
         .send json1
         apiWaxLRS = .responseText
-        Debug.Print apiWaxLRS
-        Debug.Print "--------------------------------------------"
-        Debug.Print .Status
-        Debug.Print .StatusText
+        'Debug.Print apiWaxLRS
+        'Debug.Print "--------------------------------------------"
+        'Debug.Print .Status
+        'Debug.Print .StatusText
         .abort
     End With
     
@@ -2860,7 +2397,7 @@ Public Sub fWunderlistGetTasksOnList()
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
     apiWaxLRS = "{" & Chr(34) & "List" & Chr(34) & ":" & apiWaxLRS & "}"
     '"total_amount":{"currency":"USD","value":"3.00"},
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     'sInvoiceNumber = Parsed("number") 'third level array
     'vInvoiceID = Parsed("id") 'third level array
     'vStatus = Parsed("status") 'third level array
@@ -2868,7 +2405,7 @@ Public Sub fWunderlistGetTasksOnList()
     'vErrorName = Parsed("id") '("value") 'second level array
     'vErrorMessage = Parsed("due_date") '("value") 'second level array
     'vErrorILink = Parsed("links") '("value") 'second level array
-    Set vDetails = Parsed("list")                'second level array
+    Set vDetails = parsed("list")                'second level array
     For Each rep In vDetails                     ' third level objects
         vErrorIssue = rep("id")
         vErrorDetails = rep("due_date")
@@ -2897,46 +2434,33 @@ Public Sub fWunderlistGetLists()
     '============================================================================
 
     Dim sURL As String
-    Dim sUserName As String
-    Dim sPassword As String
-    Dim sAuth As String
-    Dim stringJSON As String
-    Dim sEmail As String
     Dim vInvoiceID As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
+    Dim vStatus As String
+    Dim vTotal As String
+    Dim sToken As String
+    Dim json1 As String
+    Dim sLocal As String
+    Dim vErrorName As String
+    Dim vErrorMessage As String
+    Dim vErrorILink As String
+    Dim vErrorDetails As String
+    
     Dim oRequest As Object
     Dim Json As Object
     Dim oWebBrowser As Object
-    Dim vStatus As String
-    Dim vTotal As String
-    Dim sURL1 As String
-    Dim sURL2 As String
+    Dim vDetails As Object
+    
     Dim rstRates As DAO.Recordset
 
     Dim resp As Variant
     Dim response As Variant
     Dim rep As Variant
-    Dim vDetails As Object
-    Dim sToken As String
-    Dim json1 As String
-    Dim json2 As String
-    Dim json3 As String
-    Dim json4 As String
-    Dim json5 As String
-    Dim Parsed As Dictionary
-    Dim vErrorName As String
-    Dim vErrorMessage As String
-    Dim vErrorILink As String
-    Dim vErrorDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine1 As String
-    Dim sLine2 As String
-    Dim sLocal As String
-    Dim sResponseText As String
+    
+    Dim parsed As Dictionary
+    
     '{
     '  "list_id": 12345,
     '  "title": "Hallo",
@@ -2952,10 +2476,6 @@ Public Sub fWunderlistGetLists()
     '@Ignore AssignmentNotUsed
     sLocal = "'urn:ietf:wg:oauth:2.0:oob','oob'" '"https://localhost/"
 
-    '@Ignore AssignmentNotUsed
-    sEmail = sCompanyEmail
-    
-    sURL2 = "https://a.wunderlist.com/api/v1/user"
     '{
     '  "list_id": 12345,
     '  "title": "Hallo",
@@ -2967,15 +2487,7 @@ Public Sub fWunderlistGetLists()
     'Public lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
     json1 = "{" & Chr(34) & "list_id" & Chr(34) & ": " & sWLListID & "}"
-    Debug.Print "JSON1--------------------------------------------"
-    Debug.Print json1
-    'Debug.Print "JSON2--------------------------------------------"
-    'Debug.Print json2
-    'Debug.Print "JSON3--------------------------------------------"
-    'Debug.Print json3
-    'Debug.Print "JSON4--------------------------------------------"
-    'Debug.Print json4
-    Debug.Print "RESPONSETEXT--------------------------------------------"
+    'Debug.Print "RESPONSETEXT--------------------------------------------"
     sURL = "https://a.wunderlist.com/api/v1/lists"
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
@@ -2983,31 +2495,30 @@ Public Sub fWunderlistGetLists()
         .setRequestHeader "X-Access-Token", Environ("apiWunderlistT")
         .setRequestHeader "X-Client-ID", Environ("apiWunderlistUN")
         .setRequestHeader "Content-Type", "application/json"
-        json5 = json1
-        .send json5
+        .send json1
         apiWaxLRS = .responseText
         .abort
-        Debug.Print apiWaxLRS
-        Debug.Print "--------------------------------------------"
+        'Debug.Print apiWaxLRS
+        'Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("links")                '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("links")                '("value") 'second level array
     '
     'Set vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
     '    vErrorIssue = rep("field")
     '    vErrorDetails = rep("issue")
     'Next
-    Debug.Print "--------------------------------------------"
-    Debug.Print "Error Name:  " & vErrorName
-    Debug.Print "Error Message:  " & vErrorMessage
-    Debug.Print "Error Info Link:  " & vErrorILink
-    Debug.Print "--------------------------------------------"
-    Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLListID & " " & lAssigneeID
-    Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & " "
-    Debug.Print "--------------------------------------------"
+    'Debug.Print "--------------------------------------------"
+    'Debug.Print "Error Name:  " & vErrorName
+    'Debug.Print "Error Message:  " & vErrorMessage
+    'Debug.Print "Error Info Link:  " & vErrorILink
+    'Debug.Print "--------------------------------------------"
+    'Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLListID & " " & lAssigneeID
+    'Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & " "
+    'Debug.Print "--------------------------------------------"
     'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
 End Sub
@@ -3022,32 +2533,18 @@ Public Sub fWunderlistGetFolders()
     '============================================================================
 
     Dim sURL As String
-    Dim sUserName As String
     Dim sResponseText As String
     Dim json1 As String
-    Dim sPassword As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sEmail As String
-    Dim sToken As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sFile3 As String
-    Dim sText As String
-    Dim sLine1 As String
-    Dim sLine2 As String
-    Dim sLine3 As String
 
+    Dim parsed As Dictionary
 
     Call fWLGenerateJSONInfo
-
-    '@Ignore AssignmentNotUsed
-    sEmail = sCompanyEmail
     
     'gets list of folders or folder revisions
 
@@ -3069,7 +2566,7 @@ Public Sub fWunderlistGetFolders()
     '  ...
     ']
 
-    Debug.Print "RESPONSETEXT--------------------------------------------"
+    'Debug.Print "RESPONSETEXT--------------------------------------------"
 
     'sURL = "https://a.wunderlist.com/api/v1/folders"
     sURL = "https://a.wunderlist.com/api/v1/folder_revisions"
@@ -3081,21 +2578,21 @@ Public Sub fWunderlistGetFolders()
         .send
         apiWaxLRS = .responseText
         .abort
-        Debug.Print apiWaxLRS
-        Debug.Print "--------------------------------------------"
+        'Debug.Print apiWaxLRS
+        'Debug.Print "--------------------------------------------"
     End With
     apiWaxLRS = Left(apiWaxLRS, Len(apiWaxLRS) - 1)
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    vErrorName = Parsed("id")                    '("value") 'second level array
-    vErrorMessage = Parsed("title")              '("value") 'second level array
-    vErrorILink = Parsed("list_ids")             '("value") 'second level array
-    vErrorIssue = Parsed("revision")             '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    vErrorName = parsed("id")                    '("value") 'second level array
+    vErrorMessage = parsed("title")              '("value") 'second level array
+    vErrorILink = parsed("list_ids")             '("value") 'second level array
+    vErrorIssue = parsed("revision")             '("value") 'second level array
 
-    Debug.Print "--------------------------------------------"
-    Debug.Print "Folder ID:  " & vErrorName & "   |   " & "Folder Title:  " & vErrorMessage
-    Debug.Print "List IDs in Folder:  " & vErrorILink & "   |   " & "Revision No.:  " & vErrorIssue
-    Debug.Print "--------------------------------------------"
+    'Debug.Print "--------------------------------------------"
+    'Debug.Print "Folder ID:  " & vErrorName & "   |   " & "Folder Title:  " & vErrorMessage
+    'Debug.Print "List IDs in Folder:  " & vErrorILink & "   |   " & "Revision No.:  " & vErrorIssue
+    'Debug.Print "--------------------------------------------"
 
 End Sub
 
@@ -3109,9 +2606,6 @@ Public Sub pfUSCRuleScraper1()
     ' Call command: Call pfUSCRuleScraper()
     ' Description:  validates and builds links for all us code, no front matter, no appendices
     '============================================================================
-    Dim rstCitationHyperlinks As DAO.Recordset
-    Dim iErrorNum As Long
-    Dim sCHCategory As Long
     Dim sFindCitation As String
     Dim sLongCitation As String
     Dim sRuleNumber As String
@@ -3123,10 +2617,12 @@ Public Sub pfUSCRuleScraper1()
     Dim sSubtitleNumber As String
     Dim sSectionNumber As String
     Dim Title As String
+    
     Dim objHttp As Object
 
     Dim vRuleNumbers() As Variant
     Dim vRules() As Variant
+    
     Dim i As Long
     Dim j As Long
     Dim k As Long
@@ -3135,7 +2631,12 @@ Public Sub pfUSCRuleScraper1()
     Dim w As Long
     Dim x As Long
     Dim y As Long
+    Dim iErrorNum As Long
+    Dim sCHCategory As Long
     Dim z As Long
+    
+    Dim rstCitationHyperlinks As DAO.Recordset
+    
     'vRules = Array("CR ", "CrR ", "RAP ", "Rule ", "RCW ", "ER ")
     'vRuleNumbers = Array("", "", "")
 
@@ -3286,8 +2787,6 @@ NextNumber1:
                     rstCitationHyperlinks.Fields("CHCategory").Value = sCHCategory
                     rstCitationHyperlinks.Update
                 
-                
-                
                 End If
 
     
@@ -3301,9 +2800,6 @@ NextNumber2:
     
         For i = 1 To 999
             'build related subtitle links
-                
-    
-            
             'subtitle
             'http://uscode.house.gov/view.xhtml?path=/prelim@title51/subtitle1&edition=prelim
             'http://uscode.house.gov/view.xhtml?path=/prelim@title26/subtitleG&edition=prelim
@@ -3344,8 +2840,6 @@ NextNumber2:
                 rstCitationHyperlinks.Fields("CHCategory").Value = sCHCategory
                 rstCitationHyperlinks.Update
         
-        
-        
             End If
 
     
@@ -3362,7 +2856,6 @@ NextNumber3:
             'subtitle
             'http://uscode.house.gov/view.xhtml?path=/prelim@title51/subtitle1&edition=prelim
             'http://uscode.house.gov/view.xhtml?path=/prelim@title26/subtitleG&edition=prelim
-            
             
             'generate variables
             sSubtitleNumber = vSubtitleLetters(j)
@@ -3409,9 +2902,6 @@ NextNumber4:
             
         Next
     
-    
-    
-    
         For k = 1 To 200000
             'build related section links
                 
@@ -3457,21 +2947,15 @@ NextNumber4:
                 rstCitationHyperlinks.Fields("WebAddress").Value = sWebAddress
                 rstCitationHyperlinks.Fields("CHCategory").Value = sCHCategory
                 rstCitationHyperlinks.Update
-            
-            
-            
+                
             End If
-    
     
             Set objHttp = Nothing
 NextNumber5:
-        
             
         Next
-    
 
     Next
-
 
     On Error GoTo 0
 
@@ -3500,10 +2984,14 @@ Public Sub pfRCWRuleScraper1()
     Dim sTitle3 As String
     Dim sCheck As String
     Dim sTitle4 As String
+    
     Dim oHTTPText As Object
+    
     Dim vLettersArray1() As Variant
     Dim vLettersArray2() As Variant
+    
     Dim rstCitationHyperlinks As DAO.Recordset
+    
     Dim iErrorNum As Long
     Dim sCHCategory As Long
     Dim m As Long
@@ -3578,15 +3066,11 @@ Public Sub pfRCWRuleScraper1()
                     rstCitationHyperlinks.Fields("CHCategory").Value = sCHCategory
                     rstCitationHyperlinks.Update
                     
-                    
-                    
                 End If
     
     
                 Set oHTTPText = Nothing
 NextNumber3:
-            
-            
             
                 DoEvents
             Next
@@ -3654,8 +3138,6 @@ NextNumber3:
                             rstCitationHyperlinks.Fields("WebAddress").Value = sWebAddress
                             rstCitationHyperlinks.Fields("CHCategory").Value = sCHCategory
                             rstCitationHyperlinks.Update
-                        
-                            
                             
                         End If
     
@@ -3671,10 +3153,6 @@ NextNumber4:
             DoEvents
         Next
 
-
-    
-    
-
     Next
     On Error GoTo 0
 
@@ -3684,6 +3162,14 @@ End Sub
 
 Public Sub pfMARuleScraper()
     
+    '============================================================================
+    ' Name        : pfMARuleScraper
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfMARuleScraper()
+    ' Description:  scrapes all code from MA site
+    '============================================================================
+
     On Error Resume Next
     Dim sFindCitation As String
     Dim sLongCitation As String
@@ -3695,13 +3181,16 @@ Public Sub pfMARuleScraper()
     Dim sCurrentTitle As String
     Dim sCurrentChapter As String
     Dim sCurrentSection As String
+    
     Dim objHttp As Object
+    
     Dim vLetterArray() As Variant
     Dim vRomanArray() As Variant
+    
     Dim rstCitationHyperlinks As DAO.Recordset
+    
     Dim iErrorNum As Long
     Dim sCHCategory As Long
-
     Dim i As Long
     Dim j As Long
     Dim k As Long
@@ -3711,14 +3200,6 @@ Public Sub pfMARuleScraper()
     Dim x As Long
     Dim y As Long
     Dim z As Long
-
-    '============================================================================
-    ' Name        : pfMARuleScraper
-    ' Author      : Erica L Ingram
-    ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call pfMARuleScraper()
-    ' Description:  scrapes all code from MA site
-    '============================================================================
 
     'possibly find mass website of laws to scrape
     'https://malegislature.gov/Laws/GeneralLaws/PartI/TitleXII/Chapter71/Section37O
@@ -3946,8 +3427,6 @@ Public Sub fUnCompleteTimeMgmtTasks()
     ' Description:  unchecks all status boxes for a job number
     '============================================================================
 
-
-
     Dim rstCommHistory As DAO.Recordset
     Dim sQuestion As String
     Dim sAnswer As String
@@ -3979,7 +3458,6 @@ StartHere:
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
-
     Set rstCommHistory = CurrentDb.OpenRecordset("SELECT * FROM Tasks WHERE Title LIKE '*" & sCourtDatesID & "*';")
     'SELECT * FROM Tasks WHERE Priority='(1) Stage 1' AND Title LIKE '*1945*';
     If Not rstCommHistory.EOF Then
@@ -3988,7 +3466,6 @@ StartHere:
         GoTo EndHere
 
     End If
-
 
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
@@ -4026,7 +3503,6 @@ Public Sub fCompleteTimeMgmtTasks()
     '============================================================================
     'Call fWunderlistGetTasksOnList 'insert function name here
 
-
     Dim rstCommHistory As DAO.Recordset
     Dim sQuestion As String
     Dim sAnswer As String
@@ -4043,7 +3519,6 @@ StartHere:
         GoTo EndHere
 
     End If
-
 
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
@@ -4081,7 +3556,6 @@ Public Sub fCompleteStatusBoxes()
     '============================================================================
     'Call fWunderlistGetTasksOnList 'insert function name here
 
-
     Dim rstCommHistory As DAO.Recordset
     Dim sQuestion As String
     Dim sAnswer As String
@@ -4099,7 +3573,6 @@ StartHere:
         GoTo EndHere
 
     End If
-
 
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
@@ -4141,7 +3614,6 @@ Public Sub fCompleteStage1Tasks()
     '============================================================================
     'Call fWunderlistGetTasksOnList 'insert function name here
 
-
     Dim rstCommHistory As DAO.Recordset
     Dim sQuestion As String
     Dim sAnswer As String
@@ -4160,7 +3632,6 @@ StartHere:
 
     End If
 
-
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
         For x = 2 To 10
@@ -4174,7 +3645,6 @@ StartHere:
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
-
     Set rstCommHistory = CurrentDb.OpenRecordset("SELECT * FROM Tasks WHERE Priority='(1) Stage 1' AND Title LIKE '*" & sCourtDatesID & "*';")
     'SELECT * FROM Tasks WHERE Priority='(1) Stage 1' AND Title LIKE '*1945*';
 
@@ -4185,7 +3655,6 @@ StartHere:
 
     End If
 
-
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
         rstCommHistory.Fields("Completed").Value = True
@@ -4195,8 +3664,6 @@ StartHere:
 
     rstCommHistory.Close
     Set rstCommHistory = Nothing
-
-
 
 EndHere:
     sQuestion = "Do you want to complete another one?"
@@ -4226,7 +3693,6 @@ Public Sub fCompleteStage2Tasks()
     '============================================================================
     'Call fWunderlistGetTasksOnList 'insert function name here
 
-
     Dim rstCommHistory As DAO.Recordset
     Dim sQuestion As String
     Dim sAnswer As String
@@ -4245,7 +3711,6 @@ StartHere:
 
     End If
 
-
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
         For x = 11 To 15
@@ -4254,7 +3719,6 @@ StartHere:
         rstCommHistory.Update
         rstCommHistory.MoveNext
     Loop
-
 
     rstCommHistory.Close
     Set rstCommHistory = Nothing
@@ -4281,7 +3745,6 @@ StartHere:
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
-
 EndHere:
     sQuestion = "Do you want to complete another one?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -4298,7 +3761,6 @@ EndHere:
 
     End If
 
-
 End Sub
 
 Public Sub fCompleteStage3Tasks()
@@ -4310,7 +3772,6 @@ Public Sub fCompleteStage3Tasks()
     ' Description:  checks all stage 3 status boxes for a job number
     '============================================================================
     'Call fWunderlistGetTasksOnList 'insert function name here
-
 
     Dim rstCommHistory As DAO.Recordset
     Dim sQuestion As String
@@ -4339,15 +3800,11 @@ StartHere:
         rstCommHistory.MoveNext
     Loop
 
-
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
-
     Set rstCommHistory = CurrentDb.OpenRecordset("SELECT * FROM Tasks WHERE Priority='(3) Stage 3' AND Title LIKE '*" & sCourtDatesID & "*';")
     'SELECT * FROM Tasks WHERE Priority='(1) Stage 1' AND Title LIKE '*1945*';
-
-
 
     If Not rstCommHistory.EOF Then
         rstCommHistory.MoveFirst
@@ -4356,14 +3813,12 @@ StartHere:
 
     End If
 
-
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
         rstCommHistory.Fields("Completed").Value = True
         rstCommHistory.Update
         rstCommHistory.MoveNext
     Loop
-
 
 EndHere:
     sQuestion = "Do you want to complete another one?"
@@ -4396,7 +3851,6 @@ Public Sub fCompleteStage4Tasks()
     '============================================================================
     'Call fWunderlistGetTasksOnList 'insert function name here
 
-
     Dim rstCommHistory As DAO.Recordset
     Dim sQuestion As String
     Dim sAnswer As String
@@ -4415,7 +3869,6 @@ StartHere:
 
     End If
 
-
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
         For x = 21 To 28
@@ -4425,10 +3878,8 @@ StartHere:
         rstCommHistory.MoveNext
     Loop
 
-
     rstCommHistory.Close
     Set rstCommHistory = Nothing
-
 
     Set rstCommHistory = CurrentDb.OpenRecordset("SELECT * FROM Tasks WHERE Priority='(4) Stage 4' AND Title LIKE '*" & sCourtDatesID & "*';")
     'SELECT * FROM Tasks WHERE Priority='(1) Stage 1' AND Title LIKE '*1945*';
@@ -4440,7 +3891,6 @@ StartHere:
 
     End If
 
-
     Do Until rstCommHistory.EOF = True
         rstCommHistory.Edit
         rstCommHistory.Fields("Completed").Value = True
@@ -4450,7 +3900,6 @@ StartHere:
 
     rstCommHistory.Close
     Set rstCommHistory = Nothing
-
 
 EndHere:
     sQuestion = "Do you want to complete another one?"
@@ -4481,8 +3930,6 @@ Public Sub fFixBarAddressField()
     ' Call command: Call fFixBarAddressField()
     ' Description:  fixes address field in baraddresses table
     '============================================================================
-    Dim rstBarAddresses As DAO.Recordset
-    Dim rstCustomers As DAO.Recordset
     Dim sBarNameArray() As String
     Dim sAddressArray() As String
     Dim sCityArray() As String
@@ -4499,20 +3946,19 @@ Public Sub fFixBarAddressField()
     Dim sAddress1 As String
     Dim sAddress2 As String
 
+    Dim rstBarAddresses As DAO.Recordset
+    Dim rstCustomers As DAO.Recordset
+    
     'Customer fields: id, Company, MrMs, LastName, FirstName, EmailAddress, JobTitle, BusinessPhone
     'MobilePhone, FaxNumber, Address, City, State, ZIP, Web Page, Notes, FactoringApproved
  
-
-
     Set rstBarAddresses = CurrentDb.OpenRecordset("BarAddresses")
     rstBarAddresses.MoveFirst
     
-    Debug.Print "--------------------------------"
+    'Debug.Print "--------------------------------"
 
-    
     Do Until rstBarAddresses.EOF = True
         
-    
         'get bar name, company name, address field value, phone
         sBarName = rstBarAddresses.Fields("BarName").Value
         sCompany = rstBarAddresses.Fields("Company").Value
@@ -4567,17 +4013,14 @@ Public Sub fFixBarAddressField()
             If sCityArray1(2) <> "" Then sZIP = Left(sCityArray1(2), 5)
         End If
     
-        Debug.Print sCompany
-        Debug.Print sFirstName & " " & sLastName
-        Debug.Print sAddress1
-        If sAddress2 <> "" Then Debug.Print sAddress2
-        Debug.Print sCity & ", " & sState & " " & sZIP
-        Debug.Print sPhone
-        Debug.Print "--------------------------------"
+        'Debug.Print sCompany
+        'Debug.Print sFirstName & " " & sLastName
+        'Debug.Print sAddress1
+        'If sAddress2 <> "" Then Debug.Print sAddress2
+        'Debug.Print sCity & ", " & sState & " " & sZIP
+        'Debug.Print sPhone
+        'Debug.Print "--------------------------------"
         
-        
-        
-    
         'new customers record
         Set rstCustomers = CurrentDb.OpenRecordset("Customers")
         rstCustomers.AddNew

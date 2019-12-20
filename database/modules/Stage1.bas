@@ -1724,7 +1724,7 @@ Public Sub fWunderlistAddNewJob()
     Dim lFolderID As Long
     Dim iListID As Long
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
     
     Call pfCurrentCaseInfo
 
@@ -1763,9 +1763,9 @@ Public Sub fWunderlistAddNewJob()
         apiWaxLRS = .responseText
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    iListID = Parsed("id")                       'get new list_id
-    sTitle = Parsed("title")
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    iListID = parsed("id")                       'get new list_id
+    sTitle = parsed("title")
     
     'get folder ID
     
@@ -1790,11 +1790,11 @@ Public Sub fWunderlistAddNewJob()
     '@Ignore AssignmentNotUsed
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
     
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    vErrorName = Parsed("id")                    '("value") 'second level array
-    vErrorMessage = Parsed("title")
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    vErrorName = parsed("id")                    '("value") 'second level array
+    vErrorMessage = parsed("title")
     Dim rep As Object
-    Set rep = Parsed("list_ids")
+    Set rep = parsed("list_ids")
     
     vErrorILink = ""
     Dim x As Long
@@ -1808,7 +1808,7 @@ Public Sub fWunderlistAddNewJob()
         End If
         x = x + 1
     Next
-    vErrorIssue = Parsed("revision")
+    vErrorIssue = parsed("revision")
 
     'put list in folder ID
 
@@ -1887,10 +1887,10 @@ Public Sub fWunderlistAddNewJob()
         Debug.Print "--------------------------------------------"
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = Parsed("list_id")                  'get new list_id
-    sTitle = Parsed("title")
+    iListID = parsed("list_id")                  'get new list_id
+    sTitle = parsed("title")
 
 
     'create a task add JSON
@@ -1924,10 +1924,10 @@ Public Sub fWunderlistAddNewJob()
         
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = Parsed("list_id")                  'get new list_id
-    sTitle = Parsed("title")
+    iListID = parsed("list_id")                  'get new list_id
+    sTitle = parsed("title")
 
     'create a task add JSON
         
@@ -1959,10 +1959,10 @@ Public Sub fWunderlistAddNewJob()
         apiWaxLRS = .responseText
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = Parsed("list_id")                  'get new list_id
-    sTitle = Parsed("title")
+    iListID = parsed("list_id")                  'get new list_id
+    sTitle = parsed("title")
 
     'create a task add JSON
     
@@ -1994,12 +1994,12 @@ Public Sub fWunderlistAddNewJob()
         apiWaxLRS = .responseText
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
     '@Ignore AssignmentNotUsed
-    iListID = Parsed("list_id")                  'get new list_id
+    iListID = parsed("list_id")                  'get new list_id
     '@Ignore AssignmentNotUsed
-    sTitle = Parsed("title")
+    sTitle = parsed("title")
 
 End Sub
 

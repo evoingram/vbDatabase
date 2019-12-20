@@ -2166,7 +2166,7 @@ Public Sub pfFindRepCitationLinks()
     Dim sOriginalSearchTerm As String
     Dim vBookmarkName As String
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
     
     Dim x As Integer
     Dim y As Integer
@@ -2389,8 +2389,8 @@ ExitLoop:
             End With
             x = 1
             y = 1
-            Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-            Set sID = Parsed.item("results")
+            Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+            Set sID = parsed.item("results")
             
             'create new table TempCitations 'TODO: What is going on here?
                                         

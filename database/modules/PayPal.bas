@@ -419,7 +419,7 @@ Public Sub fPPDraft()
     
     Dim vDetails As Object
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
     
     Call fPPGenerateJSONInfo
     Call pfGetOrderingAttorneyInfo
@@ -449,8 +449,8 @@ Public Sub fPPDraft()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         .abort
         Debug.Print "--------------------------------------------"
     End With
@@ -539,14 +539,14 @@ Public Sub fPPDraft()
         Debug.Print apiWaxLRS
         'Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
     '
     'Set vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
@@ -647,7 +647,7 @@ Public Sub fPayPalUpdateCheck()
     Dim rstQuery As DAO.Recordset
     Dim rstQuery1 As DAO.Recordset
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
     
     Call fPPGetInvoiceInfo
 
@@ -697,8 +697,8 @@ Public Sub fPayPalUpdateCheck()
                     .send ("grant_type=client_credentials")
                     apiWaxLRS = .responseText
                     Debug.Print apiWaxLRS
-                    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-                    sToken = Parsed("access_token") 'third level array
+                    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+                    sToken = parsed("access_token") 'third level array
                     .abort
                     'Debug.Print "--------------------------------------------"
                 End With
@@ -721,10 +721,10 @@ Public Sub fPayPalUpdateCheck()
                     Debug.Print apiWaxLRS
                     Debug.Print "--------------------------------------------"
                 End With
-                Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-                sInvoiceNumber = Parsed("number") 'third level array
-                vInvoiceID = Parsed("id")        'third level array
-                vStatus = Parsed("status")       'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
+                Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+                sInvoiceNumber = parsed("number") 'third level array
+                vInvoiceID = parsed("id")        'third level array
+                vStatus = parsed("status")       'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
                 'CANCELLED, REFUNDED, PARTIALLY_REFUNDED, MARKED AS REFUNDED
                                                                         
                 Debug.Print "--------------------------------------------"
@@ -1576,7 +1576,7 @@ Public Sub fPPGetInvoiceInfo()
     Dim oRequest As Object
     Dim Json As Object
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
 
     Call fPPGenerateJSONInfo
 
@@ -1598,8 +1598,8 @@ Public Sub fPPGetInvoiceInfo()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         .abort
         'Debug.Print "--------------------------------------------"
     End With
@@ -1623,19 +1623,19 @@ Public Sub fPPGetInvoiceInfo()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
     'CANCELLED, REFUNDED, PARTIALLY_REFUNDED, MARKED AS REFUNDED
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
-    vDetails = Parsed("details")                 'second level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
+    vDetails = parsed("details")                 'second level array
     'For Each rep In vDetails ' third level objects
-    vErrorIssue = Parsed("field")
-    vErrorDetails = Parsed("issue")
+    vErrorIssue = parsed("field")
+    vErrorDetails = parsed("issue")
     'Next
     Debug.Print "--------------------------------------------"
     Debug.Print "Error Name:  " & vErrorName
@@ -1725,7 +1725,7 @@ Public Sub fPPRefund()
     Dim qdf As QueryDef
     Dim rstQuery As DAO.Recordset
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
     
     Dim cJob As New Job
     Call fPPGenerateJSONInfo
@@ -1796,8 +1796,8 @@ Public Sub fPPRefund()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         sAuth = ""
         .abort
         Debug.Print "--------------------------------------------"
@@ -1829,15 +1829,15 @@ Public Sub fPPRefund()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
-    vDetails = Parsed("details")                 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
+    vDetails = parsed("details")                 'second level array
     'For Each rep In vDetails ' third level objects
     '   vErrorIssue = rep("field")
     '  vErrorDetails = rep("issue")
@@ -1962,7 +1962,7 @@ Public Sub fPPUpdate()
     Dim oRequest As Object
     Dim Json As Object
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
     
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1990,8 +1990,8 @@ Public Sub fPPUpdate()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         sAuth = ""
         .abort
         Debug.Print "--------------------------------------------"
@@ -2060,14 +2060,14 @@ Public Sub fPPUpdate()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
     'vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
     '    vErrorIssue = rep("field")
@@ -2172,7 +2172,7 @@ Public Sub fManualPPPayment()
     Dim qdf As QueryDef
     Dim rstQInfoInvNo As DAO.Recordset
 
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
 
     Call fPPGenerateJSONInfo
     Call pfGetOrderingAttorneyInfo
@@ -2204,8 +2204,8 @@ Public Sub fManualPPPayment()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         sAuth = ""
         .abort
         Debug.Print "--------------------------------------------"
@@ -2244,14 +2244,14 @@ Public Sub fManualPPPayment()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
     'vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
     '    vErrorIssue = rep("field")

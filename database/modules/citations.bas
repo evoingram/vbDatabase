@@ -633,7 +633,7 @@ Dim sInputCourt As String
 Dim sURL As String
 Dim apiWaxLRS As String
 
-Dim Parsed As Dictionary
+Dim parsed As Dictionary
             sInputCourt = "scotus+ca1+ca2+ca3+ca4+ca5+ca6+ca7+ca8+ca9+ca10+ca11+cadc+cafc+ag+afcca+asbca+armfor+acca+uscfc+tax+mc+mspb+nmcca+cavc+bva+fiscr+fisc+cit+usjc+jpml+sttex+stp+cc+com+ccpa+cusc+eca+tecoa+reglrailreorgct+kingsbench"
 
             If sInputState = "Alabama" Then
@@ -713,7 +713,7 @@ Dim Parsed As Dictionary
             End With
             x = 1
             y = 1
-            Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-            Set apiCourtListener = Parsed.item("results")
+            Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+            Set apiCourtListener = parsed.item("results")
     
 End Function
