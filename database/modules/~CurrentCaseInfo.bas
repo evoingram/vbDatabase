@@ -527,7 +527,6 @@ Public Sub pfCurrentCaseInfo1()
     Dim rstTRCourtUnionAA As DAO.Recordset
     Dim qdf As QueryDef
 
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
     qdf.Parameters(0) = sCourtDatesID

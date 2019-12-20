@@ -452,7 +452,7 @@ Public Sub pfEnterNewJob()
 
     rstCurrentStatusesEntry.Close
 
-    Call pfCheckFolderExistence                  'checks for job folders/rough draft
+    Call pfCheckFolderExistence 'checks for job folders/rough draft
 
     'import appearancesId from tempcustomers into courtdates
     sTempCustomersSQL = "SELECT * FROM TempCustomers;"
@@ -1254,7 +1254,6 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
     ' Name        : pfProcessAudioFolder
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
-    'TODO: PATH
     ' Call command: Call fProcessAudioFolder("\Production\2InProgress\" & sCourtDatesID & "\Audio\")
     ' Description : process audio in /Audio/ folder
     '============================================================================

@@ -42,7 +42,6 @@ Public Sub pfStage3Ppwk()
     Dim cJob As New Job
 
     Call pfGetOrderingAttorneyInfo
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     Call pfUpdateCheckboxStatus("AudioProof")
 
@@ -200,8 +199,6 @@ Public Sub pfBurnCD()
     Dim cJob As New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     sQuestion = "Is there a blank CD in the D drive?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")

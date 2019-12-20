@@ -82,7 +82,6 @@ Public Sub pfStage4Ppwk()
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     Call pfGetOrderingAttorneyInfo
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     If sJurisdiction Like "*AVT*" Then
         'paypal commands
@@ -510,9 +509,6 @@ Public Sub fTranscriptDeliveryF()
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    'checks for Audio, Transcripts, FTP, WorkingFiles subfolders and creates if not exists
-    Call pfCheckFolderExistence
-
     sQuestion = "Have you filed or are you filing the transcript?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
     If sJurisdiction = "*AVT*" Then
@@ -729,8 +725,6 @@ Public Sub fGenerateZIPsF()
     Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     If sJurisdiction Like "*Weber Nevada*" Or sJurisdiction Like "*Weber Bankruptcy*" Or sJurisdiction Like "*Weber Oregon*" _
     Or sJurisdiction Like "*Food and Drug Administration*" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" _

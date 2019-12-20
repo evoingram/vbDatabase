@@ -2,11 +2,12 @@
 Option Compare Database
 Option Explicit
 
-'JurisdictionRef
 Private Sub WBCViewJobFolder_OnUpdated()
     Dim sTranscriptDir As String
     Dim sJobNumberDirectory As String
     Dim sAppName As String
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Call pfCurrentCaseInfo

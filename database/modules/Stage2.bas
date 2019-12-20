@@ -117,7 +117,6 @@ Public Sub pfStage2Ppwk()
     
     Else                                         'Code for yes
     
-        Call pfCheckFolderExistence              'checks for job folder and creates it if not exists
         Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
         Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
         'Call fInfoNeededEmailF
@@ -2303,8 +2302,6 @@ Public Sub pfTypeRoughDraftF()
         End If
     Else
     End If
-
-    Call pfCheckFolderExistence
 
     DoCmd.OpenForm FormName:="PJType"            'open window with AGShortcuts, SpeakerList, and jurisdiction notes
 

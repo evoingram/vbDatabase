@@ -44,12 +44,8 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     ' Description:  exports to specified template from \Database\Templates and saves in \Production\2InProgress\####\
     '============================================================================
 
-    Dim sExportedTemplatePath As String
-    Dim sTemplatePath As String
-    Dim sOutputPDF As String
     Dim sExportInfoCSVPath As String
     Dim sArray() As String
-    Dim sExportTopic1 As String
     Dim sQueryName As String
     
     Dim iCount As Long
@@ -63,8 +59,6 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     Dim oExcelApp As Excel.Application
     
     Dim cJob As New Job
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     If sMerge = "Case" Then
 
@@ -110,14 +104,8 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     End If
 
     sArray = Split(sExportTopic, "\")
-    
-    sExportTopic1 = sArray(1)
-    
-    sExportedTemplatePath = cJob.DocPath.JobDirectoryGN & sExportTopic1 & ".docx"
-    sTemplatePath = cJob.DocPath.TemplateFolder & sExportTopic & "-Template.docx" 'export topic is folder\subject
 
-
-    Set oWordAppDoc = GetObject(sTemplatePath, "Word.Document")
+    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder & sArray(1) & "-Template.docx", "Word.Document") 'sArray(1)/export topic is folder\subject
     oWordAppDoc.Application.Visible = False
 
     oWordAppDoc.MailMerge.OpenDataSource _
@@ -128,17 +116,14 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
                                                                                 , SQLStatement:="SELECT * FROM `AAAAADataRange`", SQLStatement1:=""
     'SubType:=wdMergeSubTypeAccess
     ', Connection:= _
-    "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & sExportedTemplatePath & ";Mode=Read;Extended Properties=" & Chr(34) & Chr(34) & "HDR=YES;IMEX=1;" _
+    "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & cJob.DocPath.JobDirectoryGN & sArray(1) & ".docx" & ";Mode=Read;Extended Properties=" & Chr(34) & Chr(34) & "HDR=YES;IMEX=1;" _
     & Chr(34) & Chr(34) & ";Jet OLEDB:System database=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & _
     ";Jet OLEDB:Engine Type=34;Jet OLEDB"
         
     oWordAppDoc.MailMerge.Execute
-
     oWordAppDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
-    sOutputPDF = cJob.DocPath.JobDirectoryGN & sExportTopic1 & ".pdf"
-    oWordAppDoc.Application.ActiveDocument.ExportAsFixedFormat outputFileName:=sOutputPDF, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
-    oWordAppDoc.Application.ActiveDocument.SaveAs FileName:=sExportedTemplatePath
-
+    oWordAppDoc.Application.ActiveDocument.ExportAsFixedFormat outputFileName:=cJob.DocPath.JobDirectoryGN & sArray(1) & ".pdf", ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
+    oWordAppDoc.Application.ActiveDocument.SaveAs FileName:=cJob.DocPath.JobDirectoryGN & sArray(1) & ".docx"
     oWordAppDoc.Application.ActiveDocument.Close
     Set oWordAppDoc = Nothing
 
@@ -156,25 +141,22 @@ Public Sub pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
     'attachments optional
     ' Description:  sends Word document as an e-mail body
     '============================================================================
-    Dim sTemplateAddress As String
-    Dim sCourtDatesID As String
     
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
+    
     Dim oWordApp As New Word.Application
     Dim oWordEditor As Word.editor
     Dim oWordDoc As New Word.Document
     
     Dim cJob As New Job
     
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-
-    sTemplateAddress = cJob.DocPath.JobDirectoryGN & vCHTopic & ".docx"
     Set oOutlookApp = CreateObject("Outlook.Application")
     Set oOutlookMail = oOutlookApp.CreateItem(0)
     Set oWordApp = CreateObject("Word.Application")
-    Set oWordDoc = oWordApp.Documents.Open(sTemplateAddress)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.JobDirectoryGN & vCHTopic & ".docx")
     oWordDoc.Content.Copy
+    
     With oOutlookMail
         .To = ""
         .CC = ""
@@ -228,10 +210,7 @@ Public Sub pfCreateCDLabel()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    Call pfCheckFolderExistence                  'check for main folders and create if not exists
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    
-    'DoCmd.OutputTo ObjectType:=acOutputQuery, ObjectName:=qnTRCourtUnionAppAddrQ, OutputFormat:=acFormatXLS, Outputfile:=cJob.DocPath.CaseInfo, AutoStart:=False 'query info for label
+    Call pfCurrentCaseInfo 'refresh transcript info
 
     DoCmd.TransferSpreadsheet TransferType:=acExport, TableName:=qnTRCourtUnionAppAddrQ, FileName:=cJob.DocPath.CaseInfo
 
@@ -298,7 +277,6 @@ Public Sub pfSelectCoverTemplate()
     
     Dim sFDAQuery As String
 
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     sFDAQuery = "Food" & "*" & "and" & "*" & "Drug" & "*" & "Administration"
 
@@ -493,7 +471,6 @@ Public Sub fCreatePELLetter()
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
     Call pfGenericExportandMailMerge("Case", "Stage1s\PackageEnclosedLetter")
 
     sQuestion = "Print letter to enclose with transcript?"
@@ -545,7 +522,6 @@ Public Sub fFactorInvoicEmailF()
     Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
-    Call pfCheckFolderExistence
 
     Call pfGenericExportandMailMerge("Case", "Stage4s\FactorInvoiceEmail")
 
@@ -637,7 +613,6 @@ Public Sub fInfoNeededEmailF()
     ' Description : creates info needed e-mail
     '============================================================================
     'TODO: fInfoNeededEmailF not used anymore
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
     Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
     Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
 
