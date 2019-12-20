@@ -601,17 +601,3 @@ Private Sub emptyFunction()
 
 End Sub
 
-Public Sub psRenameFiles()
-
-    Dim RetVal As Variant
-
-    ChDir "T:\Production\1ToBeEntered\Sunlark\KCRecorderOnline" 'Change folder to desired folder
-    RetVal = Dir("*.*")                          'Get first file in folder
-    Do While Len(Nz(RetVal)) > 0                 'Rename until no more files
-        Name RetVal As Left$(RetVal, Len(RetVal)) & ".xls" 'Rename
-        RetVal = Dir()                           'Get next file to rename
-    Loop
-    Debug.Print "Done!"
-End Sub
-
-

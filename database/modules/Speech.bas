@@ -62,20 +62,21 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
     ' Description : copies transcripts from /completed/ folder in T drive to corresponding /prepared/ folder in S drive
     '============================================================================
 
-    Dim sCompletedPath As String
     Dim sPreparedPath As String
     Dim sFullCompletedDocPath As String
     Dim oCurrentFileString As String
     Dim sFileExtension As String
     Dim sFolderName As String
+    
     Dim oFolderObject As Object
     Dim oRootFolder As Object
     Dim oCurrentFile As Object
     Dim oSubfolder As Object
 
+    Dim cJob As New Job
+    
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     sPreparedPath = "S:\UnprocessedAudio\Prepared\" 'Change to identify your main folder
-    sCompletedPath = "T:\Production\3Complete"
     Set oRootFolder = oFolderObject.GetFolder(sPreparedPath)
     For Each oSubfolder In oRootFolder.oSubfolders
         Set oCurrentFile = oSubfolder.Files
@@ -90,7 +91,7 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
         
                 If oCurrentFile Like "*.doc" Or oCurrentFile Like "*.docx" Then
             
-                    sFullCompletedDocPath = sCompletedPath & "\" & sFolderName & "\" & oCurrentFileString
+                    sFullCompletedDocPath = cJob.DocPath.CompleteFolder & "\" & sFolderName & "\" & oCurrentFileString
                 
                     FileCopy sFullCompletedDocPath, oCurrentFile
                 

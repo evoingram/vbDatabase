@@ -75,12 +75,6 @@ Public Function addRSet(sTableName As String) As String
 
         Case "TempCourtDates"
             'add new case/transcript order to tempcourtdates
-        'TODO: does this work or not?  Delete if it does.
-            'sPartialPath = "T:\Database\Scripts\InProgressExcels\jotform"
-            'sExtensionXLS = ".xlsx"
-            'sExtensionXLSM = ".xlsm"
-            'sFullPathXLS = cJob.DocPath.OrderFormXLS
-            'sFullPathXLSM = cJob.DocPath.OrderFormXLSM
             Set oExcelApp = CreateObject("Excel.Application")
             
             Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormXLSM, Local:=True)
@@ -265,12 +259,6 @@ Public Function addRSet(sTableName As String) As String
     Case "Customers"
         'add new appearances to tempcustomers
         'add new entry to customers from TempCustomers?
-    'TODO: Does this work?  Delete if it does.
-        'sPartialPath = "T:\Database\Scripts\InProgressExcels\JotformCustomers"
-        'sExtensionXLS = ".xlsx"
-        'sExtensionXLSM = ".xlsm"
-        'sFullPathXLS = sPartialPath & sExtensionXLS
-        'sFullPathXLSM = sPartialPath & sExtensionXLSM
         Set oExcelApp = CreateObject("Excel.Application")
         
         Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(cJob.DocPath.OrderFormCustomersXLSM)

@@ -23,11 +23,11 @@ Option Explicit
 '                       Arguments:    sFile, sMacroName
 'pfSendTrackingEmail:   Description:  generates tracking number e-mail for customer
 '                       Arguments:    NONE
-'fZIPTranscripts:       Description:  zips transcripts folder in I:\####\
+'fZIPTranscripts:       Description:  zips transcripts folder in \Production\2InProgress\####\
 '                       Arguments:    NONE
-'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in I:\####\
+'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in \Production\2InProgress\####\
 '                       Arguments:    NONE
-'fZIPAudio:             Description:  zips audio folder in I:\####\
+'fZIPAudio:             Description:  zips audio folder in \Production\2InProgress\####\
 '                       Arguments:    NONE
 'fUploadZIPsPrompt:     Description:  asks if you want to upload ZIPs to FTP
 '                       Arguments:    NONE
@@ -768,7 +768,7 @@ Line2:
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
     If sAnswer = vbNo Then                        'Code for No
-
+        'TODO: standardize drive
         MsgBox "Go to I:\ to open the job folder."
     
     Else                                         'Code for yes
@@ -846,7 +846,7 @@ Public Sub fZIPAudio()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPAudio
-    ' Description : zips audio folder in I:\####\
+    ' Description : zips audio folder in \Production\2InProgress\####\
     '============================================================================
 
     Dim defpath As String
@@ -879,7 +879,7 @@ Public Sub fZIPAudio()
     Set oApp = CreateObject("Shell.Application")
 
     'Copy the files to the compressed folder
-    oApp.Namespace(cJob.DocPath.ZAudioB).CopyHere oApp.Namespace("I:\" & sCourtDatesID & "\Audio\").Items
+    oApp.Namespace(cJob.DocPath.ZAudioB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
 
     
     oApp.Namespace(cJob.DocPath.ZAudioF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
@@ -905,7 +905,7 @@ Public Sub fZIPAudioTranscripts()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPAudioTranscripts
-    ' Description : zips audio & transcripts folders in I:\####\
+    ' Description : zips audio & transcripts folders in \Production\2InProgress\####\
     '============================================================================
 
     Dim strDate As String
@@ -976,7 +976,7 @@ Public Sub fZIPTranscripts()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPTranscripts
-    ' Description : zips transcripts folder in I:\####\
+    ' Description : zips transcripts folder in \Production\2InProgress\####\
     '============================================================================
 
     Dim defpath As String

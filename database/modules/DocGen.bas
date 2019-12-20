@@ -10,7 +10,7 @@ Option Explicit
 '   NONE
 
 'functions:
-'pfGenericExportandMailMerge:  Description:  exports to specified template from T:\Database\Templates and saves in I:\####\
+'pfGenericExportandMailMerge:  Description:  exports to specified template from :\Database\Templates and saves in \Production\2InProgress\####\
 '                          Arguments:    sQueryName, sExportTopic
 'pfSendWordDocAsEmail:         Description:  sends Word document as an e-mail body
 '                          Arguments:    vCHTopic, vSubject, Optional sAttachment1, sAttachment2, sAttachment3, sAttachment4
@@ -41,7 +41,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call pfGenericExportandMailMerge(sQueryName, sExportTopic)
-    ' Description:  exports to specified template from T:\Database\Templates and saves in I:\####\
+    ' Description:  exports to specified template from :\Database\Templates and saves in \Production\2InProgress\####\
     '============================================================================
 
     Dim sExportedTemplatePath As String
@@ -836,6 +836,7 @@ Public Sub pfPrepareCover()
         sCurrentJobID = rstJobsByCase.Fields("ID").Value
 
         'copy other transcript pdfs for same volume into \transcripts\ folder
+        'TODO: standardize drive
         sOriginalCurrentTranscriptPath = "I:\" & sCurrentJobID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
         sNewCurrentTranscriptPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
     

@@ -2089,6 +2089,7 @@ Public Sub pfAskforAudio()
     
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
     'use the standard title and filters, but change the initial folder
+    'TODO: Change drive
     fd.InitialFileName = "T:\"
     fd.InitialView = msoFileDialogViewList
     fd.Title = "Select the audio for this transcript."

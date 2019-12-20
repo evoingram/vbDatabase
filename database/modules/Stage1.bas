@@ -1171,7 +1171,7 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
     ' Name        : pfPlayAudioFolder
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call fPlayAudioFolder("I:\" & sCourtDatesID & "\Audio\")
+    ' Call command: Call fPlayAudioFolder("\Production\2InProgress\" & sCourtDatesID & "\Audio\")
     ' Description : plays audio folder
     '============================================================================
 
@@ -1254,7 +1254,7 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     'TODO: PATH
-    ' Call command: Call fProcessAudioFolder("I:\" & sCourtDatesID & "\Audio\")
+    ' Call command: Call fProcessAudioFolder("\Production\2InProgress\" & sCourtDatesID & "\Audio\")
     ' Description : process audio in /Audio/ folder
     '============================================================================
 
@@ -1533,37 +1533,37 @@ Public Sub pfStage1Ppwk()
     Dim sAnswer As String
 
     Dim cJob As New Job
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-
     'TODO: PATH
-    sCourtRulesPath1 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-Rates.pdf"
-    sCourtRulesPath2 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
-    sCourtRulesPath3 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-SampleTranscript.pdf"
-    sCourtRulesPath4 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
-    sCourtRulesPath5 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
-    sCourtRulesPath6 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
-    sCourtRulesPath7 = "T:\Database\Templates\Stage1s\CourtRules-HowFileApprovedJurisdictions.pdf"
-    sCourtRulesPath8 = "T:\Database\Templates\Stage1s\CourtRules-WACounties.pdf"
-    sCourtRulesPath9 = "T:\Database\Templates\Stage1s\CourtRules-WACounties-2.pdf"
+    sCourtRulesPath1 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-Rates.pdf"
+    sCourtRulesPath2 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
+    sCourtRulesPath3 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-SampleTranscript.pdf"
+    sCourtRulesPath4 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
+    sCourtRulesPath5 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
+    sCourtRulesPath6 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
+    sCourtRulesPath7 = cJob.DocPath.TemplateFolder1 & "CourtRules-HowFileApprovedJurisdictions.pdf"
+    sCourtRulesPath8 = cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties.pdf"
+    sCourtRulesPath9 = cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties-2.pdf"
     sCourtRulesPath10 = "T:\Administration\Jurisdiction References\Massachusetts\uniformtranscriptformat.pdf"
 
 
     'TODO: PATH
-    sCourtRulesPath1a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-Rates.pdf"
-    sCourtRulesPath2a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
-    sCourtRulesPath3a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-SampleTranscript.pdf"
-    sCourtRulesPath4a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
-    sCourtRulesPath5a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
-    sCourtRulesPath6a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
-    sCourtRulesPath7a = "I:\" & sCourtDatesID & "\Notes\CourtRules-HowFileApprovedJurisdictions.pdf"
-    sCourtRulesPath8a = "I:\" & sCourtDatesID & "\Notes\CourtRules-WACounties.pdf"
-    sCourtRulesPath9a = "I:\" & sCourtDatesID & "\Notes\CourtRules-WACounties-2.pdf"
-    sCourtRulesPath10a = "I:\" & sCourtDatesID & "\Notes\uniformtranscriptformat.pdf"
+    sCourtRulesPath1a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-Rates.pdf"
+    sCourtRulesPath2a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
+    sCourtRulesPath3a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-SampleTranscript.pdf"
+    sCourtRulesPath4a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
+    sCourtRulesPath5a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
+    sCourtRulesPath6a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
+    sCourtRulesPath7a = cJob.DocPath.JobDirectoryN & "CourtRules-HowFileApprovedJurisdictions.pdf"
+    sCourtRulesPath8a = cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf"
+    sCourtRulesPath9a = cJob.DocPath.JobDirectoryN & "CourtRules-WACounties-2.pdf"
+    sCourtRulesPath10a = cJob.DocPath.JobDirectoryN & "uniformtranscriptformat.pdf"
 
     Call pfSelectCoverTemplate                   'cover page prompt
 
