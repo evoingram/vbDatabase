@@ -1,8 +1,6 @@
 Attribute VB_Name = "TranscriptFormat"
 '@Folder("Database.Production.Modules")
 Option Compare Database
-Option Explicit
- 
 '============================================================================
 'class module cmTranscriptFormat
 
@@ -2166,21 +2164,6 @@ Public Sub pfFindRepCitationLinks()
     Dim sQLongCitation As String
     Dim sQCHCategory As String
     Dim sQWebAddress As String
-    
-    Dim rep As Variant
-    Dim resp As Variant
-    Dim sCitation As Variant
-    Dim oEntry As Variant
-    
-    Dim sID As Object
-    Dim oCitations As Object
-    Dim oRequest As Object
-    Dim vDetails As Object
-    
-    Dim Parsed As Dictionary
-    
-    Dim rstCurrentSearchMatching As DAO.Recordset
-    Dim rCurrentCitation As Range
     Dim sCurrentCitation As String
     Dim sCitationList() As String
     Dim sHyperlinkList() As String
@@ -2196,34 +2179,48 @@ Public Sub pfFindRepCitationLinks()
     Dim sCurrentTerm As String
     Dim sCLChoiceList As String
     Dim sQFindCitation As String
-    Dim x As Long
-    Dim y As Long
-    Dim z As Long
-    Dim j As Long
-    Dim iLongCitationLength As Long
-    Dim iStartPos As Long
-    Dim iStopPos As Long
+    Dim sInitialSearchSQL As String
+    Dim sOriginalSearchTerm As String
+    Dim vBookmarkName As String
+    
+    Dim Parsed As Dictionary
+    
+    Dim x As Integer
+    Dim y As Integer
+    Dim z As Integer
+    Dim j As Integer
+    Dim iLongCitationLength As Integer
+    Dim iStartPos As Integer
+    Dim iStopPos As Integer
+    Dim i As Integer
+    
     Dim letter As Variant
     Dim sSearchTermArray() As Variant
+    Dim rep As Variant
+    Dim resp As Variant
+    Dim sCitation As Variant
+    Dim oEntry As Variant
+    
+    Dim sID As Object
+    Dim oCitations As Object
+    Dim oRequest As Object
+    Dim vDetails As Object
+    
+    
+    Dim rCurrentCitation As Range
     Dim rCurrentSearch As Range
     Dim oWordApp As Word.Application
     Dim oWordDoc As Word.Document
-    Dim sInitialSearchSQL As String
-    Dim sOriginalSearchTerm As String
-    Dim rstCurrentHyperlink As DAO.Recordset
     
-    Dim i As Long
-    Dim vBookmarkName As String
+    Dim rstCurrentHyperlink As DAO.Recordset
+    Dim rstCurrentSearchMatching As DAO.Recordset
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
     x = 1
     
     'TODO: PATH
     sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-    
-    
-    
-    
     
     
     'On Error Resume Next
@@ -2244,14 +2241,8 @@ Public Sub pfFindRepCitationLinks()
     sEndCHT = " |"
     
     ReDim sSearchTermArray(0 To 0)
-    
     'Get all the document text and store it in a variable. COME BACK
     Set rCurrentSearch = oWordDoc.Range
-    
-    
-   
-    
-     
      
     On Error Resume Next
      
@@ -2274,7 +2265,8 @@ Public Sub pfFindRepCitationLinks()
     sCurrentSearch = rCurrentSearch.Text
     sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'add usc table come back
     'Loop sCurrentSearch till you can't find any more matching "terms"
-    
+    x = UBound(sSearchTermArray) - LBound(sSearchTermArray) + 1
+    Debug.Print x
     Do Until x = 0
         If y > 1 Then
             sCurrentLinkSQL = sCurrentLinkSQL & " OR [FindCitation]=" & Chr(34)
@@ -2282,10 +2274,8 @@ Public Sub pfFindRepCitationLinks()
         If x = 0 Then GoTo Done
         iStartPos = InStr(x, sCurrentSearch, sBeginCHT, vbTextCompare)
         If iStartPos = 0 Then GoTo ExitLoop
-        '@Ignore AssignmentNotUsed
         iStopPos = InStr(iStartPos, sCurrentSearch, sEndCHT, vbTextCompare)
         If iStopPos = 0 Then GoTo ExitLoop
-        '@Ignore AssignmentNotUsed
         sCurrentTerm = Mid$(sCurrentSearch, iStartPos + Len(sBeginCHT), iStopPos - iStartPos - Len(sEndCHT))
         x = InStr(iStopPos, sCurrentSearch, sBeginCHT, vbTextCompare)
         sCurrentTerm = Left(sCurrentTerm, Len(sCurrentTerm) - 4)
@@ -2295,10 +2285,10 @@ Public Sub pfFindRepCitationLinks()
         sSearchTermArray(UBound(sSearchTermArray)) = sCurrentTerm
         'construct sql statement from this
         sCurrentLinkSQL = sCurrentLinkSQL & sCurrentTerm & Chr(34)
-        'Debug.Print "Current Search Term:  " & sCurrentTerm
-        'Debug.Print "Current Search Array:  " & Join(sSearchTermArray, ", ")
-        'Debug.Print "SQL Statement:  " & sCurrentLinkSQL
-        'Debug.Print "----------------------------------------------------------"
+        Debug.Print "Current Search Term:  " & sCurrentTerm
+        Debug.Print "Current Search Array:  " & Join(sSearchTermArray, ", ")
+        Debug.Print "SQL Statement:  " & sCurrentLinkSQL
+        Debug.Print "----------------------------------------------------------"
         
         sOriginalSearchTerm = ""
         
@@ -2326,7 +2316,7 @@ ExitLoop:
     For x = 1 To (UBound(sSearchTermArray) - 1)
         sInitialSearchSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation] = " & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & ";"
         'look each one up in CitationHyperlinks
-                
+        Debug.Print "Initial Search SQL" & sInitialSearchSQL
         'come back
         'GoTo NextSearchTerm
         Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
@@ -2409,17 +2399,6 @@ ExitLoop:
                 sURL = "https://www.courtlistener.com/api/rest/v3/search/" & "?q=" & sInput1 & "&q=" & sInput2 & "&court=" & sInputCourt & "&order_by=score+desc&stat_Precedential=on" & "&fields=caseName" '
             End If
                     
-            'Get token; sign up at https://www.courtlistener.com/api/
-                    
-            'get token into variable
-            'TODO: pfFindRepCitationLinks can delete following lines when known safe come back
-            'sFile1 = "C:\other\10.txt"
-                    
-            'Open sFile1 For Input As #1
-            'Line Input #1, sLine1
-            'Close #1
-            'sToken = ""
-                    
             With CreateObject("WinHttp.WinHttpRequest.5.1")
                 .Open "GET", sURL, False         'options or head
                 .setRequestHeader "Accept", "application/json"
@@ -2435,11 +2414,8 @@ ExitLoop:
             x = 1
             y = 1
             Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-                    
-            'come back
-            'GoTo NextSearchTerm
-            Set sID = Parsed("results")
-
+            Set sID = Parsed.item("results")
+            
             'create new table TempCitations come back
                                         
             On Error Resume Next
@@ -2459,9 +2435,9 @@ ExitLoop:
                     
                 For Each rep In sID
                         
-                    If Not IsNull(rep("citation")) Then
+                    If Not IsNull(rep.item("citation")) Then
                                 
-                        Set oCitations = rep("citation")
+                        Set oCitations = rep.item("citation")
                                     
                         For Each oEntry In oCitations
                             If oEntry = "null" Or oEntry = "" Or oEntry = Null Or oEntry = "Null" Then
@@ -2496,11 +2472,11 @@ ExitLoop:
                     End If
                     sCitation = Right(sCitation, Len(sCitation) - 2)
                     'Debug.Print "Citation Number:  " & sCitation
-                    sCaseName = rep("caseName")
+                    sCaseName = rep.item("caseName")
                     'Debug.Print "Case Name:  " & sCaseName
-                    sAbsoluteURL = rep("absolute_url")
+                    sAbsoluteURL = rep.item("absolute_url")
                     'Debug.Print "URL:  https://www.courtlistener.com" & sAbsoluteURL
-                    sCourt = rep("court")
+                    sCourt = rep.item("court")
                     'Debug.Print "Court:  " & sCourt
                             
                     'prepare to add citations to new temporary table TempCitations
@@ -2575,26 +2551,26 @@ ExitLoop:
             'do something with your choice
             Select Case z
                     
-            Case 0
-                'go to next term to search
-                GoTo NextSearchTerm
-                            
-            Case Else
-                'enter choice into database
-                Set rstCurrentHyperlink = CurrentDb.OpenRecordset("CitationHyperlinks")
-                rstCurrentHyperlink.AddNew
-                rstCurrentHyperlink.Fields("FindCitation").Value = sOriginalSearchTerm 'sQFindCitation
-                            
-                rstCurrentHyperlink.Fields("ReplaceHyperlink").Value = qReplaceHyperlink
-                            
-                rstCurrentHyperlink.Fields("LongCitation").Value = sQLongCitation
-                rstCurrentHyperlink.Fields("ChCategory").Value = 1
-                rstCurrentHyperlink.Fields("WebAddress").Value = sAbsoluteURL
-                rstCurrentHyperlink.Update
-                'Debug.Print "Citation:  " & sQLongCitation & " | Web Address:  " & sAbsoluteURL
-                'Debug.Print "z:  " & z
-                'Debug.Print "----------------------------------------------------------"
-                            
+                Case 0
+                    'go to next term to search
+                    GoTo NextSearchTerm
+                                
+                Case Else
+                    'enter choice into database
+                    Set rstCurrentHyperlink = CurrentDb.OpenRecordset("CitationHyperlinks")
+                    rstCurrentHyperlink.AddNew
+                    rstCurrentHyperlink.Fields("FindCitation").Value = sOriginalSearchTerm 'sQFindCitation
+                                
+                    rstCurrentHyperlink.Fields("ReplaceHyperlink").Value = qReplaceHyperlink
+                                
+                    rstCurrentHyperlink.Fields("LongCitation").Value = sQLongCitation
+                    rstCurrentHyperlink.Fields("ChCategory").Value = 1
+                    rstCurrentHyperlink.Fields("WebAddress").Value = sAbsoluteURL
+                    rstCurrentHyperlink.Update
+                    'Debug.Print "Citation:  " & sQLongCitation & " | Web Address:  " & sAbsoluteURL
+                    'Debug.Print "z:  " & z
+                    'Debug.Print "----------------------------------------------------------"
+                                
                             
             End Select
                     
@@ -2604,9 +2580,6 @@ ExitLoop:
             'Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
             'rstCurrentSearchMatching.MoveFirst
                 
-                    
-                    
-                    
                     
                     
         End If
@@ -2629,12 +2602,6 @@ NextSearchTerm:
     'GoTo NextSearchTerm
     'GoTo NextSearchTerm
     Set rstCurrentHyperlink = CurrentDb.OpenRecordset(sCurrentLinkSQL)
-    
-    
-    
-    
-    
-            
                     
                 
     Do While rstCurrentHyperlink.EOF = False

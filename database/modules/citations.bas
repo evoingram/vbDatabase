@@ -2,7 +2,7 @@ Attribute VB_Name = "citations"
 '@Folder("Database.Production.Modules")
 Option Compare Database
 
-Public Sub pfFindRepCitationLinks()
+Public Sub pfFindRepCitationLinks3()
     '============================================================================
     ' Name        : pfFindRepCitationLinks
     ' Author      : Erica L Ingram
@@ -11,7 +11,8 @@ Public Sub pfFindRepCitationLinks()
     ' Description : find and link citation markings like phonetic in transcript
     '============================================================================
 
-
+    'TODO: Change old citation functions to this one
+    
     'for each result from Word doc query
 
     'look up in database

@@ -16,8 +16,8 @@ Dim pNetWorkFolder As String
 
 Private pCourtCover As String
 Private pCaseInfo As String
-Private pInvoicePDF As String
-Private pInvoiceDocx As String
+Private pInvoiceP As String
+Private pInvoiceD As String
 Private pShippingXML As String
 Private pShippingCOAXML As String
 Private pInvoiceInfo As String
@@ -80,7 +80,7 @@ Private pOrderFormXLSX As String
 Private pOrderFormCSV As String
 
 Public Property Get InvoiceP() As String
-    InvoiceP = pInvoicePDF
+    InvoiceP = pInvoiceP
 End Property
 
 Public Property Get InvoiceD() As String
@@ -628,6 +628,56 @@ Public Property Let CompleteFolder(sInput As String)
     pCompleteFolder = CompleteFolder
 End Property
 
+Public Property Get DistillerSettings() As String
+    DistillerSettings = pDistillerSettings
+End Property
+
+Public Property Let DistillerSettings(sInput As String)
+    pDistillerSettings = DistillerSettings
+End Property
+
+Public Property Get DistillerSettings1() As String
+    DistillerSettings1 = pDistillerSettings1
+End Property
+
+Public Property Let DistillerSettings1(sInput As String)
+    pDistillerSettings1 = DistillerSettings1
+End Property
+
+Public Property Get KCITemplate() As String
+    KCITemplate = pKCITemplate
+End Property
+
+Public Property Let KCITemplate(sInput As String)
+    pKCITemplate = KCITemplate
+End Property
+
+Public Property Get CDLabelP() As String
+    CDLabelP = pCDLabelP
+End Property
+
+Public Property Let CDLabelP(sInput As String)
+    pCDLabelP = CDLabelP
+End Property
+
+Public Property Get XMLAfter() As String
+    XMLAfter = pXMLAfter
+End Property
+
+Public Property Let XMLAfter(sInput As String)
+    pXMLAfter = XMLAfter
+End Property
+
+Public Property Get XMLBefore() As String
+    XMLBefore = pXMLBefore
+End Property
+
+Public Property Let XMLBefore(sInput As String)
+    pXMLBefore = XMLBefore
+End Property
+
+
+
 Public Sub Class_Initialize()
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         psDrive = "T"
@@ -637,8 +687,8 @@ Public Sub Class_Initialize()
         'shipping xml templates maybe
         
         'TODO: Refresh invoice number on this function
-        pInvoicePDF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".pdf"
-        pInvoiceDocx = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".docx"
+        pInvoiceP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".pdf"
+        pInvoiceD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".docx"
         'TODO: Check COA shipping xml file name
         pShippingXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-Shipping.xml"
         pShippingCOAXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
@@ -655,6 +705,7 @@ Public Sub Class_Initialize()
         pPPCSV = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PayPalInvoiceCSV.csv"
         pPPButton = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PPButton.html"
         pCDLabel = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pub"
+        pCDLabelP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pdf"
         pT2upPS = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.ps"
         pT4upPS = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-4up.ps"
         pT2upLog = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.log"
@@ -710,6 +761,7 @@ Public Sub Class_Initialize()
         pWordIndexDB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-WordIndex.docx"
         
         pKCIEnvelope = psDrive & ":/Database\Templates\Stage4s\Envelope-KCI.pdf"
+        pKCITemplate = psDrive & ":\Database\Templates\Stage4s\KCICompleted.pdf"
         pPQTemplate = psDrive & ":/Database\Templates\Stage1s\PriceQuoteEmail-Template.docx"
         pPQXLS = psDrive & ":/Database\Scripts\InProgressExcels\Temp-Export-PQE.xlsx"
         pPQEmail = psDrive & ":/Database\Templates\Stage1s\PriceQuoteEmail.docx"
@@ -725,6 +777,9 @@ Public Sub Class_Initialize()
         pTemplateFolder3 = psDrive & ":/Database/Templates/Stage3s/"
         pTemplateFolder4 = psDrive & ":/Database/Templates/Stage4s/"
         pTempShipOptionsQ1XLSM = psDrive & ":\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
+        
+        pXMLAfter = psDrive & ":\Database\Scripts\InProgressExcels\AfterXML.xml"
+        pXMLBefore = psDrive & ":\Database\Scripts\InProgressExcels\BeforeXML.xml"
         
         pJobDirectory = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/"
         pJobDirectoryG = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/"
@@ -752,6 +807,9 @@ Public Sub Class_Initialize()
         pUNFileInbox = pNetWorkFolder & "Production/1ToBeEntered/"
         
         pEmailDirectory = psDrive & ":\Database\Emails\"
+        
+        pDistillerSettings = "C:\Program Files (x86)\Adobe\Acrobat 9.0\Acrobat\Settings\Standard.joboptions"
+        pDistillerSettings1 = "C:\users\inqui\Standard1.joboptions"
         
 End Sub
 
