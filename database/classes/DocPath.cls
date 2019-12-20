@@ -747,7 +747,20 @@ End Property
 Public Property Let PPDepositE(sInput As String)
     pPPDepositE = PPDepositE
 End Property
+Public Property Get WordIndexT() As String
+    WordIndexT = pWordIndexT
+End Property
 
+Public Property Let WordIndexT(sInput As String)
+    pWordIndexT = WordIndexT
+End Property
+Public Property Get WordIndexDBT() As String
+    WordIndexDB = pWordIndexDB
+End Property
+
+Public Property Let WordIndexDB(sInput As String)
+    pWordIndexDB = WordIndexDB
+End Property
 
 Public Sub Class_Initialize()
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -765,10 +778,10 @@ Public Sub Class_Initialize()
         pShippingCOAXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
         pShippingXML4 = psDrive & ":\Production\4ShippingXMLs\" & sCourtDatesID & "-shipping.xml"
         pShippingCOAXML4 = psDrive & ":/Production/4ShippingXMLs/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
-        pShippingOutputFolder = "T:\Production\4ShippingXMLs\Output\"
+        pShippingOutputFolder = psDrive & ":\Production\4ShippingXMLs\Output\"
         pRoughDraft = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/RoughDraft.docx"
-        pShippingFolder = "T:\Production\4ShippingXMLs\"
-        pCompleteFolder = "T:\Production\3Complete\"
+        pShippingFolder = psDrive & ":\Production\4ShippingXMLs\"
+        pCompleteFolder = psDrive & ":\Production\3Complete\"
         
         pCaseInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CaseInfo.xls"
         pInvoiceInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-InvoiceInfo.xls"
@@ -855,9 +868,9 @@ Public Sub Class_Initialize()
         pTemplateFolder4 = psDrive & ":/Database/Templates/Stage4s/"
         pTempShipOptionsQ1XLSM = psDrive & ":\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
         pPPFIET = psDrive & ":\Database\Templates\Stage4s\PP-FactoredInvoiceEmail-Template.docx"
-        pPPBalanceDueT = "T:\Database\Templates\Stage4s\PP-BalanceDueInvoiceEmail.docx"
-        pPPDIET = ":\Database\Templates\Stage1s\PP-DraftInvoiceEmail-Template.docx"
-        
+        pPPBalanceDueT = psDrive & ":\Database\Templates\Stage4s\PP-BalanceDueInvoiceEmail.docx"
+        pPPDIET = psDrive & ":\Database\Templates\Stage1s\PP-DraftInvoiceEmail-Template.docx"
+        pWordIndexT = psDrive & ":\Database\Templates\Stage2s\TR-WordIndex.dotm"
         pXMLAfter = psDrive & ":\Database\Scripts\InProgressExcels\AfterXML.xml"
         pXMLBefore = psDrive & ":\Database\Scripts\InProgressExcels\BeforeXML.xml"
         
@@ -879,7 +892,7 @@ Public Sub Class_Initialize()
         pJobDirectoryNN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/" & sCourtDatesID & "-"
         
         pAPFTR = "C:\Program Files (x86)\FTR\ForTheRecord\TheRecordPlayer.exe"
-        pAPCS = "T:\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
+        pAPCS = psDrive & ":\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
         pAPCV = "C:\Program Files (x86)\JAVS\CaseViewer\CaseViewer3.exe"
         pAPES = "C:\Program Files (x86)\NCH Software\Scribe\scribe.exe"
         
