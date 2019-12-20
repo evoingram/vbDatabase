@@ -31,14 +31,15 @@ Public Sub pfStage3Ppwk()
     ' Description : completes all stage 3 tasks
     '============================================================================
 
-    Dim sContTrReadyPath As String
+    Dim sDeliveryURL As String
+    
     Dim oWordApp As New Word.Application
     Dim oWordEditor As Word.editor
     Dim oWordDoc As New Word.Document
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
-    Dim sDeliveryURL As String
 
+    Dim cJob As New Job
 
     Call pfGetOrderingAttorneyInfo
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
@@ -79,12 +80,7 @@ Public Sub pfStage3Ppwk()
         Set oOutlookMail = oOutlookApp.CreateItem(0)
     
         Set oWordApp = CreateObject("Word.Application")
-    
-    'TODO: PATH
-        sContTrReadyPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-ContractorTranscriptsReady" & ".docx"
-    
-        Set oWordDoc = oWordApp.Documents.Open(sContTrReadyPath)
-    
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.TranscriptsReadyCD)
         oWordDoc.Content.Copy
     
         With oOutlookMail
@@ -115,10 +111,7 @@ Public Sub pfStage3Ppwk()
         Set oOutlookMail = oOutlookApp.CreateItem(0)
         Set oWordApp = CreateObject("Word.Application")
     
-    'TODO: PATH
-        sContTrReadyPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-ContractorTranscriptsReady" & ".docx"
-    
-        Set oWordDoc = oWordApp.Documents.Open(sContTrReadyPath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.TranscriptsReadyCD)
         oWordDoc.Content.Copy
     
         With oOutlookMail
@@ -150,10 +143,8 @@ Public Sub pfStage3Ppwk()
         Set oOutlookMail = oOutlookApp.CreateItem(0)
     
         Set oWordApp = CreateObject("Word.Application")
-    'TODO: PATH
-        sContTrReadyPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-ContractorTranscriptsReady" & ".docx"
     
-        Set oWordDoc = oWordApp.Documents.Open(sContTrReadyPath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.TranscriptsReadyCD)
         oWordDoc.Content.Copy
     
         With oOutlookMail
@@ -198,17 +189,16 @@ Public Sub pfBurnCD()
 
     Dim sAnswer As String
     Dim sQuestion As String
-    'TODO: duplicate? come back
-    Dim qnViewJobFormAppearancesQ As String
     Dim sDrive As String
-    Dim sSource As String
     Dim sCDVolumeName As String
     Dim sBurnDir As String
+    
     Dim oWSHShell As Object
     Dim oShell As Object
     Dim oSource As Object
 
-
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
@@ -222,25 +212,19 @@ Public Sub pfBurnCD()
     
     Else                                         'Code for yes
  
-    'TODO: PATH
         sDrive = InputBox("Driveletter : ", "Driveletter", "D") & ":\" 'CD burner drive letter
-        '@Ignore AssignmentNotUsed
-        sSource = "I:\" & sCourtDatesID & "\FTP\" 'source directory
-        sCDVolumeName = sCourtDatesID            'CD volume name (16-char max)
+        sCDVolumeName = sCourtDatesID   'CD volume name (16-char max)
         '@Ignore ConstantNotUsed
         Const MY_COMPUTER = &H11
     
         Set oWSHShell = CreateObject("WScript.Shell")
         Set oShell = CreateObject("Shell.Application")
-    'TODO: PATH
         sBurnDir = oWSHShell.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\" & "Explorer\Shell Folders\CD Burning")
         'come back
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-        sSource = "I:\" & sCourtDatesID & "\FTP\" 'source directory
     
     
-        Set oSource = oShell.Namespace(sSource)
+        Set oSource = oShell.Namespace(cJob.DocPath.JobDirectoryF)
         oShell.Namespace(sBurnDir).CopyHere oSource.Items
         oShell.Namespace(&H11&).ParseName(sDrive).InvokeVerbEx ("Write these files to CD")
     
@@ -256,30 +240,24 @@ Public Sub pfCreateRegularPDF()
     ' Call command: Call pfCreateRegularPDF
     ' Description : creates final PDF of transcript and saves to main/transcripts folders
     '============================================================================
-
-    Dim sWorkingCopyPath As String
-    Dim sTranscriptWD As String
-    Dim sFinalTranscriptWD As String
+    
     Dim sFinalTranscriptNoExt As String
-    Dim sCourtCoverPath As String
     Dim sAnswerPDFPrompt As String
     Dim sMakePDFPrompt As String
 
     Dim oWordApp As Word.Application
     Dim oWordDoc As Word.Document
+    
     Dim oVBComponent As Object
+    
     Dim rngStory As Range
 
-'
-
-
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sWorkingCopyPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
-    sTranscriptWD = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript.docx"
-    sFinalTranscriptWD = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.docx"
+
     sFinalTranscriptNoExt = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
+    
     sMakePDFPrompt = "Next we will make a PDF copy.  Click yes when ready."
     sAnswerPDFPrompt = MsgBox(sMakePDFPrompt, vbQuestion + vbYesNo, "???")
 
@@ -287,21 +265,17 @@ Public Sub pfCreateRegularPDF()
         MsgBox "No PDF copy will be made."
     
     Else                                         'Code for yes
-
-    'TODO: PATH
-        sCourtCoverPath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     
         'Set oWordApp = GetObject(, "Word.Application")
-    
+        
         If Err <> 0 Then
             Set oWordApp = CreateObject("Word.Application")
         End If
-    
-        Set oWordDoc = GetObject(sCourtCoverPath, "Word.Document")
+        
+        Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
         oWordDoc.Application.Visible = False
         oWordDoc.Application.DisplayAlerts = False
-
-        'Set oWordDoc = oWordApp.Documents.Open(FileName:=sCourtCoverPath)
+        'Set oWordDoc = oWordApp.Documents.Open(FileName:=cJob.DocPath.CourtCover)
 
     
         With oWordDoc
@@ -364,7 +338,7 @@ Public Sub pfCreateRegularPDF()
 
     'TODO: lock document in whole and save as final come back
     oWordDoc.Protect Type:=wdAllowOnlyReading, noReset:=True, password:="wrts0419"
-    oWordDoc.SaveAs FileName:=sFinalTranscriptWD 'sFinalTranscriptNoExt
+    oWordDoc.SaveAs FileName:=cJob.DocPath.TranscriptFD 'sFinalTranscriptNoExt
     oWordDoc.ExportAsFixedFormat outputFileName:=sFinalTranscriptNoExt, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
     oWordDoc.Close SaveChanges:=False
     Set oWordDoc = Nothing
@@ -376,9 +350,8 @@ Public Sub pfCreateRegularPDF()
 
     MsgBox "Created Regular PDF Copy!"
 
-    'TODO: PATH
-    FileCopy sFinalTranscriptWD, "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-FINAL.docx"
-    FileCopy sFinalTranscriptNoExt & ".pdf", "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-Transcript-FINAL.pdf"
+    FileCopy cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptFDB
+    FileCopy cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFPB
 
 End Sub
 
@@ -403,31 +376,33 @@ Public Sub fDynamicHeaders()
     'stop at CertBMK
     'save & close
 
+    Dim sBookmarkName As String
+    Dim sHeading As String
+    Dim sHeadings() As String
+    
     Dim oWordApp As Word.Application
     Dim oWordDoc As Word.Document
     Dim oWordField As Field
     Dim oWordSection As Section
+    
     Dim x As Long
     Dim y As Long
     Dim z As Long
-    Dim sFileName As String
-    Dim sBookmarkName As String
-    Dim sHeading As String
-    Dim sHeadings() As String
+    
     Dim oRange As Range
+    
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     'Call pfCurrentCaseInfo
-
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-
+    
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
 
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     oWordDoc.Application.Visible = True
 
     'go to roughbkmk, beginning of body
@@ -542,7 +517,7 @@ Public Sub fDynamicHeaders()
     
     
     'save & close
-    oWordDoc.SaveAs2 FileName:=sFileName
+    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
     oWordDoc.Close
     oWordApp.Quit
     On Error GoTo 0
@@ -561,41 +536,44 @@ Public Sub pfHeaders()
     ' Description : add sections and headers programmatically
     '============================================================================
 
-    Dim astrHeadings As Variant
-    Dim rCurrentSection As Range
-    Dim HdrRange As Range
-    Dim bFound As Boolean
-    Dim oWordDoc As New Word.Document
-    Dim oWordApp As New Word.Application
-    Dim sFileName As String
     Dim sCurrentSection As String
     Dim sCurrentHeading As String
+    Dim aStyleList() As String
+    Dim sStyleName As String
+    ReDim aStyleList(1 To 1) As String
+    Dim sListStyle As String
+    
+    Dim astrHeadings As Variant
+    Dim StyleName As Variant
+    Dim Header As Variant
+    
+    Dim bFound As Boolean
+    
+    Dim oWordDoc As New Word.Document
+    Dim oWordApp As New Word.Application
+    Dim sec As Word.Section
+    Dim rCurrentSection As Range
+    Dim HdrRange As Range
+    
     Dim intItem As Long
     Dim iCurrentSectionNo As Long
     Dim intLevel As Long
-    Dim aStyleList() As String
-    Dim sStyleName As String
-    Dim StyleName As Variant
-    Dim Header As Variant
-    Dim sListStyle As String
-    bFound = True
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    Debug.Print ("---------------------------------------------")
-    ReDim aStyleList(1 To 1) As String
     Dim x As Long
     Dim z As Long
     Dim k As Long
     Dim oHF As HeaderFooter
     Dim iMaxHeadingsCount As Long
-    Dim sec As Word.Section
     Dim iHeadingsNumber As Long
     Dim iSectionNumber As Long
     Dim iSectionIndex As Long
 
+    Dim cJob As New Job
+    
+    bFound = True
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
+    Debug.Print ("---------------------------------------------")
+    
 
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -604,7 +582,7 @@ Public Sub pfHeaders()
         Set oWordApp = CreateObject("Word.Application")
     End If
 
-    Set oWordDoc = GetObject(sFileName, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
 
     oWordDoc.Application.Visible = True
 
@@ -695,41 +673,25 @@ Public Sub pfHeaders()
         
         
             For Each StyleName In aStyleList
-                
                 For Each sec In oWordDoc.Sections
-                                
                     With sec.Headers(wdHeaderFooterPrimary)
-                        
                         'header formatting
-                    
                         '.Selection.HeaderFooter.LinkToPrevious = False
-                                       
                         .LinkToPrevious = False
-                    
-                    
                     End With
-                             
                 Next sec
-            
             Next StyleName
-                
         Next
-            
-            
+        
         oWordDoc.Application.Selection.HomeKey Unit:=wdStory
-    
-    
             
         intItem = 2
     
         oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1
     
         'For intItem = 2 To oWordDoc.Sections.Count + 1
-    
-                       
         astrHeadings = oWordDoc.GetCrossReferenceItems(wdRefTypeHeading)
         
-    
         For Each sec In oWordDoc.Sections
             
             iSectionIndex = sec.Index
@@ -737,21 +699,15 @@ Public Sub pfHeaders()
             iSectionNumber = iSectionIndex
                         
             If iHeadingsNumber > UBound(astrHeadings) Then GoTo NextItem
-                
             If iHeadingsNumber = 0 Then iHeadingsNumber = 1
-                
             If UBound(astrHeadings) = 0 Then GoTo NextItem
-                
             sCurrentHeading = astrHeadings(iHeadingsNumber)
             intLevel = GetLevel(CStr(astrHeadings(iHeadingsNumber)))
             sStyleName = "Heading " & intLevel
-                
             iMaxHeadingsCount = UBound(astrHeadings)
                 
             'add headers to each section
-                        
             If iSectionNumber <= iMaxHeadingsCount + 1 Then
-                        
                 sCurrentHeading = astrHeadings(iHeadingsNumber)
                 intLevel = GetLevel(CStr(astrHeadings(iHeadingsNumber)))
                     
@@ -815,7 +771,7 @@ NextItem:
             
     End With
 
-    oWordDoc.SaveAs2 FileName:=sFileName
+    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
     oWordDoc.Close
     On Error GoTo 0
     Set oWordApp = Nothing
@@ -827,6 +783,8 @@ End Sub
 
 Public Sub pfTopOfTranscriptBookmark()
 
+    Dim bTitle As String
+    
     Dim AcroApp As Acrobat.CAcroApp
     Dim PDoc As Acrobat.CAcroPDDoc
     Dim PDocAll As Acrobat.CAcroPDDoc
@@ -834,17 +792,16 @@ Public Sub pfTopOfTranscriptBookmark()
     Dim ADoc As AcroAVDoc
     Dim PDBookmark As AcroPDBookmark
     Dim PDFPageView As AcroAVPageView
-    Dim bTitle As String
-    Dim n As Variant
-    Dim sTranscriptsFolderFinalPDF As String
-    Dim sTranscriptVolumesALLPath As String
-    Dim sVolumesCoverPath As String
-    Dim oPDFBookmarks As Object
     Dim parentBookmark As AcroPDBookmark
+    
+    Dim oPDFBookmarks As Object
     Dim jso As Object
     Dim BookMarkRoot As Object
+    
     Dim numpages As Variant
-
+    Dim n As Variant
+    
+    Dim cJob As New Job
 
     Set AcroApp = CreateObject("AcroExch.App")
 
@@ -854,19 +811,12 @@ Public Sub pfTopOfTranscriptBookmark()
     Set ADoc = CreateObject("AcroExch.AVDoc")
     Set PDBookmark = CreateObject("AcroExch.PDBookmark", "")
 
-    'TODO: PATH
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    sTranscriptsFolderFinalPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
-    sTranscriptVolumesALLPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcripts-All.pdf"
-    sVolumesCoverPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Cover.pdf"
-
+    
     'Table of Contents Bookmark
+    PDocCover.Open (cJob.DocPath.WACoverP)
 
-
-
-    PDocCover.Open (sVolumesCoverPath)
-
-    Set ADoc = PDocCover.OpenAVDoc(sVolumesCoverPath)
+    Set ADoc = PDocCover.OpenAVDoc(cJob.DocPath.WACoverP)
     Set PDFPageView = ADoc.GetAVPageView()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
@@ -874,14 +824,14 @@ Public Sub pfTopOfTranscriptBookmark()
     bTitle = PDBookmark.GetByTitle(PDocCover, "Untitled")
     bTitle = PDBookmark.SetTitle("Table of Contents")
 
-    n = PDocCover.Save(PDSaveFull, sVolumesCoverPath)
+    n = PDocCover.Save(PDSaveFull, cJob.DocPath.WACoverP)
 
     ' Insert the pages of Part2 after the end of Part1
     numpages = PDocCover.GetNumPages()
     
-    PDoc.Open (sTranscriptsFolderFinalPDF)
+    PDoc.Open (cJob.DocPath.TranscriptFP)
 
-    Set ADoc = PDoc.OpenAVDoc(sTranscriptsFolderFinalPDF)
+    Set ADoc = PDoc.OpenAVDoc(cJob.DocPath.TranscriptFP)
     SendKeys ("^{HOME}")
     Set PDFPageView = ADoc.GetAVPageView()
 
@@ -945,17 +895,15 @@ Public Sub pfTopOfTranscriptBookmark()
 
     MsgBox ("Hit okay after you've moved all bookmarks to their corresponding headings; General, Witnesses, or Exhibits; and also created the Authorities bookmark structure.")
 
-    n = PDoc.Save(PDSaveFull, sTranscriptsFolderFinalPDF)
-
-
-
+    n = PDoc.Save(PDSaveFull, cJob.DocPath.TranscriptFP)
+    
     'for each -Transcript-FINAL.pdf in \Transcripts\ do the following
 
     If PDocCover.InsertPages(numpages - 1, PDoc, 0, PDoc.GetNumPages(), True) = False Then
         MsgBox "Cannot insert pages"
     End If
 
-    If PDocCover.Save(PDSaveFull, sTranscriptVolumesALLPath) = False Then
+    If PDocCover.Save(PDSaveFull, cJob.DocPath.WAConsolidatedP) = False Then
         MsgBox "Cannot save the modified document"
     End If
     
@@ -982,31 +930,25 @@ Public Sub fPDFBookmarks()
     ' Description : prints 2-up transcript PDF
     '============================================================================
 
-
-    Dim sTranscriptsFolderFinalPDF As String
-    Dim sTranscriptsFolder2upPDF As String
-    Dim sTranscript2upPSPath As String
     Dim sJavascriptPrint As String
-    Dim jobsettings As String
-    Dim sLogFilePath As String
 
     Dim aaAcroApp As Acrobat.AcroApp
     Dim aaAcroAVDoc As Acrobat.AcroAVDoc
     Dim aaAcroPDDoc As Acrobat.AcroPDDoc
-    Dim bret As Variant
+    
     Dim pp As Object
 
     Dim pdTranscriptFinalDistiller As PdfDistiller
     Dim aaAFormApp As AFORMAUTLib.AFormApp
 
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sTranscriptsFolderFinalPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
 
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(sTranscriptsFolderFinalPDF, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, "") Then
         aaAcroAVDoc.Maximize (1)
     
         Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
@@ -1028,7 +970,8 @@ Public Sub fPDFBookmarks()
 
         aaAFormApp.Fields.ExecuteThisJavascript sJavascriptPrint
     
-        aaAcroPDDoc.Save PDSaveFull, sTranscriptsFolderFinalPDF
+        aaAcroPDDoc.Save PDSaveFull, cJob.DocPath.TranscriptFP
+        'TODO: Why is this commented off?
         'aaAcroPDDoc.Close
         'aaAcroApp.CloseAllDocs
     
