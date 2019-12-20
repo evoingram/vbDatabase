@@ -133,6 +133,7 @@ Public Const qnTRCourtUnionAppAddrQ As String = "TR-Court-Union-AppAddr"
 Public Const qnOrderingAttorneyInfo As String = "OrderingAttorneyInfo"
 Public Const qnQInfobyInvNo As String = "QInfobyInvoiceNumber"
 Public Const qTempShippingOptions As String = "TempShippingOptionsQ"
+Public Const qTRIQPlusCases As String = "TRInvoiQPlusCases"
 
 Public Const sCompanyEmail As String = "inquiries@aquoco.co"
 Public Const sCompanyFirstName As String = "Erica"

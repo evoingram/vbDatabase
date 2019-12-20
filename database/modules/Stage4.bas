@@ -846,7 +846,6 @@ Public Sub fZIPAudio()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPAudio
-    'TODO: PATH
     ' Description : zips audio folder in I:\####\
     '============================================================================
 
@@ -909,7 +908,6 @@ Public Sub fZIPAudioTranscripts()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPAudioTranscripts
-    'TODO: PATH
     ' Description : zips audio & transcripts folders in I:\####\
     '============================================================================
 
@@ -981,7 +979,6 @@ Public Sub fZIPTranscripts()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPTranscripts
-    'TODO: PATH
     ' Description : zips transcripts folder in I:\####\
     '============================================================================
 
@@ -1653,7 +1650,6 @@ Public Sub fExportRecsToXML()
     
         sCourtDatesID = rstShippingOptions.Fields("CourtDatesID").Value
         sTrackingNumber = rstShippingOptions.Fields("TrackingNumber").Value
-    'TODO: PATH
         Application.ExportXML acExportQuery, qdf.Name, cJob.DocPath.ShippingXML4 'export to XML
 
         rstShippingOptions.MoveNext

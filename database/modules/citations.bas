@@ -108,12 +108,11 @@ Public Sub pfFindRepCitationLinks3()
     Dim rstCurrentHyperlink As DAO.Recordset
     Dim rstCurrentSearchMatching As DAO.Recordset
     
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
     x = 1
-    
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     
     
     'On Error Resume Next
@@ -126,7 +125,7 @@ Public Sub pfFindRepCitationLinks3()
     
     
     Set oWordApp = CreateObject("Word.Application")
-    Set oWordDoc = oWordApp.Documents.Open(sFileName) 'open word document
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
     y = 1
@@ -144,7 +143,7 @@ Public Sub pfFindRepCitationLinks3()
         Set oWordApp = CreateObject("Word.Application")
     End If
     On Error GoTo 0
-    Set oWordDoc = oWordApp.Documents.Open(sFileName) 'open word document
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
     y = 1
@@ -618,9 +617,7 @@ ExitLoop1:
     
 Done:
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'TODO: job number
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-    oWordDoc.SaveAs2 FileName:=sFileName         'save and close word doc
+    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover         'save and close word doc
     oWordDoc.Close wdDoNotSaveChanges
     oWordApp.Quit
     

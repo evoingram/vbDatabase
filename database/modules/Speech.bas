@@ -161,19 +161,22 @@ Public Sub pfPrepareTranscript()
     ' Description : makes changes to each transcript so it fits into speech recognition requirements
     '============================================================================
 
-    Dim oFolderObject As Scripting.FileSystemObject
-    Dim oRootFolder As Object
-    Dim oSubfolder As Object
-    Dim oPreparedWD As New Word.Document
-    Dim oWordApp As New Word.Application
-    Dim oCurrentFile As Object
     Dim sPreparedPath As String
     Dim sFileExtension As String
     Dim sCurrentFile As String
     Dim sFolderName As String
     Dim sTextToFind As String
     Dim sReplacementText As String
+    
+    Dim oRootFolder As Object
+    Dim oSubfolder As Object
+    Dim oCurrentFile As Object
+    
+    Dim oPreparedWD As New Word.Document
+    Dim oWordApp As New Word.Application
     Dim wsStyle As Word.Style
+    
+    Dim oFolderObject As Scripting.FileSystemObject
     
     sPreparedPath = "S:\UnprocessedAudio\Prepared\"
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
