@@ -763,7 +763,7 @@ Line2:
 
     If sAnswer = vbNo Then                        'Code for No
         'TODO: standardize drive
-        MsgBox "Go to I:\ to open the job folder."
+        MsgBox "Go to " & cJob.DocPath.InProgressFolder & " to open the job folder."
     
     Else                                         'Code for yes
 
@@ -1145,6 +1145,8 @@ Public Sub fAudioDone()
     ' Call command: Call fAudioDone
     ' Description : completes audio in express scribe
     '============================================================================
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     'If FSO Is Nothing Then Set FSO = New Scripting.FileSystemObject
@@ -1171,7 +1173,7 @@ Public Sub fAudioDone()
     'to be added
     'Else
     'else try to open express scribe
-    '    Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeDone.bat")
+    '    Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeDone.bat")
     '  Next Fil
       
     'Line2:

@@ -252,8 +252,7 @@ Public Sub pfCreateRegularPDF()
     Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: standardize drive
-    sFinalTranscriptNoExt = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
+    sFinalTranscriptNoExt = cJob.DocPath.InProgressFolder & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
     
     sMakePDFPrompt = "Next we will make a PDF copy.  Click yes when ready."
     sAnswerPDFPrompt = MsgBox(sMakePDFPrompt, vbQuestion + vbYesNo, "???")

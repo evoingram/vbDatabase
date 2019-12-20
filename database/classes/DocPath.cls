@@ -94,15 +94,12 @@ Public Property Get ShippingCOAXML() As String
     ShippingCOAXML = pShippingCOAXML
 End Property
 
-
 Public Property Get ShippingXML4() As String
     ShippingXML4 = pShippingXML4
 End Property
 Public Property Get ShippingCOAXML4() As String
     ShippingCOAXML4 = pShippingCOAXML4
 End Property
-
-
 
 Public Property Get CaseInfo() As String
     CaseInfo = pCaseInfo
@@ -794,6 +791,21 @@ Public Property Let SpeechUP(sInput As String)
     pSpeechUP = SpeechUP
 End Property
 
+Public Property Get InProgressFolder() As String
+    InProgressFolder = pInProgressFolder
+End Property
+
+Public Property Let InProgressFolder(sInput As String)
+    pInProgressFolder = InProgressFolder
+End Property
+
+Public Property Get ToBeEnteredFolder() As String
+    ToBeEnteredFolder = pToBeEnteredFolder
+End Property
+
+Public Property Let ToBeEnteredFolder(sInput As String)
+    pToBeEnteredFolder = ToBeEnteredFolder
+End Property
 
 Public Sub Class_Initialize()
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -815,6 +827,8 @@ Public Sub Class_Initialize()
         pRoughDraft = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/RoughDraft.docx"
         pShippingFolder = psDrive & ":\Production\4ShippingXMLs\"
         pCompleteFolder = psDrive & ":\Production\3Complete\"
+        pInProgressFolder = psDrive & ":/Production/2InProgress/"
+        pToBeEnteredFolder = psDrive & ":/Production/1ToBeEntered/"
         
         pCaseInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CaseInfo.xls"
         pInvoiceInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-InvoiceInfo.xls"

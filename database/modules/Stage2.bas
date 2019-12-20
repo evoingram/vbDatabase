@@ -119,7 +119,6 @@ Public Sub pfStage2Ppwk()
     
         Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
         Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
-        'Call fInfoNeededEmailF
         Call pfUpdateCheckboxStatus("SpellingsEmail")
     
 EndIf1:

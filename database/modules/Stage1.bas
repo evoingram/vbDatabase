@@ -1550,7 +1550,7 @@ Public Sub pfStage1Ppwk()
     sCourtRulesPath7 = cJob.DocPath.TemplateFolder1 & "CourtRules-HowFileApprovedJurisdictions.pdf"
     sCourtRulesPath8 = cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties.pdf"
     sCourtRulesPath9 = cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties-2.pdf"
-    sCourtRulesPath10 = "T:\Administration\Jurisdiction References\Massachusetts\uniformtranscriptformat.pdf"
+    sCourtRulesPath10 = cJob.DocPath.JurisdictionRefs & "Massachusetts\uniformtranscriptformat.pdf"
 
     sCourtRulesPath1a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-Rates.pdf"
     sCourtRulesPath2a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
@@ -1633,14 +1633,14 @@ Public Sub pfStage1Ppwk()
 
 
 Line2:                                           'every jurisdiction converges here
-    DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd 'export xero csv
+    DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd 'export xero csv
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
+    DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
 
     'TODO: xero api
     sURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"

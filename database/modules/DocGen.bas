@@ -24,15 +24,11 @@ Option Explicit
 '                          Arguments:    NONE
 'fFactorInvoicEmailF:          Description:  creates e-mail to submit invoice to factoring
 '                          Arguments:    NONE
-'fInfoNeededEmailF:            Description:  creates info needed e-mail
-'                          Arguments:    NONE
 'pfInvoicesCSV:                Description:  creates CSVs used for invoicing
 '                          Arguments:    NONE
 'fCreateWorkingCopy:           Description:  creates "working copy" sent to client
 '                          Arguments:    NONE
-'fSendShippingTrackingEmail:   Description:  creates shipping confirmation e-mail sent to client
-'                          Arguments:    NONE
-        
+
 '============================================================================
 
 Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
@@ -209,7 +205,8 @@ Public Sub pfCreateCDLabel()
     Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     Call pfCurrentCaseInfo 'refresh transcript info
 
     DoCmd.TransferSpreadsheet TransferType:=acExport, TableName:=qnTRCourtUnionAppAddrQ, FileName:=cJob.DocPath.CaseInfo
@@ -232,7 +229,7 @@ Public Sub pfCreateCDLabel()
         rstCommHistory("FileHyperlink").Value = sCommHistoryHyperlink
         rstCommHistory("DateCreated").Value = Now
         rstCommHistory("CourtDatesID").Value = sCourtDatesID
-        rstCommHistory("CustomersID").Value = sCustomerID
+        rstCommHistory("CustomersID").Value = cJob.App0.ID
     rstCommHistory.Update
 
     'sQuestion = "Want to burn the CD?"
@@ -277,7 +274,6 @@ Public Sub pfSelectCoverTemplate()
     
     Dim sFDAQuery As String
 
-
     sFDAQuery = "Food" & "*" & "and" & "*" & "Drug" & "*" & "Administration"
 
     Call pfCurrentCaseInfo                       'refresh transcript info
@@ -316,7 +312,6 @@ Public Sub pfCreateCover(sTemplatePath As String)
     '============================================================================
 
     Dim sCommHistoryAddSQL As String
-    Dim sFullTemplatePath As String
     Dim sSource As String
     
     Dim oExcelApp As New Excel.Application
@@ -328,19 +323,12 @@ Public Sub pfCreateCover(sTemplatePath As String)
     Dim oDocuments As Object
     
     Dim x As Long
-    Dim iCount As Long
     
     Dim rstCommHistory As DAO.Recordset
     
     Dim cJob As New Job
-    
-    Call pfCurrentCaseInfo  'refresh transcript info
 
-    sFullTemplatePath = cJob.DocPath.TemplateFolder & sTemplatePath 'sTemplatePath is folder\subject
-
-    iCount = Len(Dir(cJob.DocPath.CaseInfo))
-
-    If iCount = 0 Then
+    If Len(Dir(cJob.DocPath.CaseInfo)) = 0 Then
 
         DoCmd.OutputTo acOutputQuery, qnTRCourtUnionAppAddrQ, acFormatXLS, cJob.DocPath.CaseInfo, False
     
@@ -361,8 +349,7 @@ Public Sub pfCreateCover(sTemplatePath As String)
         End With
     
         oExcelApp.Application.Quit
-
-
+        
     Else
         'do nothing if it exists
     
@@ -380,7 +367,7 @@ Public Sub pfCreateCover(sTemplatePath As String)
         .Application.Visible = True
     End With
 
-    Set oWordDoc = GetObject(sFullTemplatePath, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.TemplateFolder & sTemplatePath, "Word.Document") 'sTemplatePath is folder\subject
 
     On Error GoTo 0
 
@@ -402,7 +389,6 @@ Public Sub pfCreateCover(sTemplatePath As String)
         .MailMerge.MainDocumentType = wdNotAMergeDocument
     
     End With
-    'EndTime
 
     Set oDocuments = Documents
     For x = oDocuments.Count To 1 Step -1
@@ -417,7 +403,7 @@ Public Sub pfCreateCover(sTemplatePath As String)
             End If
         End If
     
-        Debug.Print sSource
+        'Debug.Print sSource
         If sSource = "Form Letters1" Then
             Documents("Form Letters1").Activate
             Documents("Form Letters1").SaveAs FileName:=cJob.DocPath.CourtCover
@@ -433,14 +419,8 @@ Public Sub pfCreateCover(sTemplatePath As String)
     Set oWordApp = Nothing
     Set oExcelApp = Nothing
 
-
     Call pfCreateBookmarks
-
     Call pfCreateIndexesTOAs
-
-    'sCommHistoryAddSQL = "Update CommunicationHistory Set [CommunicationHistory].[Hyperlink]=" & Chr(34) & "[TR-Court-Union-AppAddr]![CourtDatesID]#" & cJob.DocPath.CourtCover & Chr(34) & ";"
-    'CurrentDb.Execute sCommHistoryAddSQL
-
 
     Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
     rstCommHistory.AddNew
@@ -469,8 +449,6 @@ Public Sub fCreatePELLetter()
     
     Dim cJob As New Job
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
     Call pfGenericExportandMailMerge("Case", "Stage1s\PackageEnclosedLetter")
 
     sQuestion = "Print letter to enclose with transcript?"
@@ -497,16 +475,10 @@ Public Sub fFactorInvoicEmailF()
 
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim sFactoringXLS As String
     Dim sUnitPrice As String
-    Dim sGenerateXeroCSVSQL As String
-    Dim sGeneratedFactoringXLS As String
     Dim sContactName As String
     Dim sPONumber As String
-    Dim sFactoringURL As String
     Dim sUnitPriceSQL As String
-    Dim sInvoiceAmount As String
-    Dim sInvoiceNumber As String
     
     Dim rstUPCourtDates As DAO.Recordset
     Dim rstUnitPrice As DAO.Recordset
@@ -516,8 +488,6 @@ Public Sub fFactorInvoicEmailF()
     
     Dim oExcelApp As New Excel.Application
     Dim oExcelWB As New Excel.Workbook
-    
-    Dim iNetTerm As Long
     
     Dim cJob As New Job
 
@@ -529,10 +499,6 @@ Public Sub fFactorInvoicEmailF()
 
     Call pfCommunicationHistoryAdd("FactorInvoiceEmail")
 
-    '@Ignore AssignmentNotUsed
-    sFactoringXLS = cJob.DocPath.TemplateFolder4 & "Client_Basic_Schedule.xls" 'make factoring csv
-    sGeneratedFactoringXLS = cJob.DocPath.JobDirectoryW & "Client_Basic_Schedule.xls"
-
     'TODO: fFactorInvoicEmailF can delete following lines when known safe
     'sUnitPriceSQL = "SELECT UnitPrice from CourtDates where ID = " & sCourtDatesID & ";" 'get unitprice id
     'Set db = CurrentDb
@@ -541,29 +507,24 @@ Public Sub fFactorInvoicEmailF()
     'rstUPCourtDates.Close
     'Set rstUPCourtDates = Nothing
 
+    'TODO: implement class for rates/unit prices
     sUnitPriceSQL = "SELECT Rate from UnitPrice where ID = " & sUnitPrice & ";" 'get proper rate
     Set rstUnitPrice = CurrentDb.OpenRecordset(sUnitPriceSQL)
-    sUnitPrice = rstUnitPrice.Fields("Rate").Value
+        sUnitPrice = rstUnitPrice.Fields("Rate").Value
     rstUnitPrice.Close
     Set rstUnitPrice = Nothing
 
-    sGenerateXeroCSVSQL = "SELECT XeroInvoiceCSV.ContactName, XeroInvoiceCSV.InvoiceNumber, XeroInvoiceCSV.Reference, XeroInvoiceCSV.InvoiceDate, 28 From XeroInvoiceCSV WHERE XeroInvoiceCSV.Reference= " & sCourtDatesID & ";"
-    Set qdf = CurrentDb.QueryDefs("FactoringCSVQuery")
-    qdf.Parameters(0) = sActualQuantity
-    qdf.Parameters(1) = sCourtDatesID
+    Set qdf = CurrentDb.QueryDefs(qFCSVQ)
+        qdf.Parameters(0) = cJob.ActualQuantity
+        qdf.Parameters(1) = sCourtDatesID
     Set rstFactoringCSV = qdf.OpenRecordset
     rstFactoringCSV.MoveFirst
-    sInvoiceAmount = (sActualQuantity * sUnitPrice)
-    iNetTerm = 28
-    sContactName = rstFactoringCSV.Fields("ContactName").Value
-    sInvoiceNumber = rstFactoringCSV.Fields("InvoiceNumber").Value
-    sPONumber = rstFactoringCSV.Fields("PO Number").Value
-    dInvoiceDate = rstFactoringCSV.Fields("Invoice Date").Value
-
-    DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acReadOnly
-
+    
+        sContactName = rstFactoringCSV.Fields("ContactName").Value
+        sPONumber = rstFactoringCSV.Fields("PO Number").Value
+        
     Set oExcelApp = CreateObject("Excel.Application")
-    Set oExcelWB = oExcelApp.Workbooks.Open(sFactoringXLS)
+    Set oExcelWB = oExcelApp.Workbooks.Open(cJob.DocPath.TemplateFolder4 & "Client_Basic_Schedule.xls")
 
     With oExcelWB
         .Application.DisplayAlerts = False
@@ -572,12 +533,12 @@ Public Sub fFactorInvoicEmailF()
         .Application.ActiveCell.Select
         MsgBox .Application.ActiveCell.Address
         .Application.ActiveCell.Offset(1, 2).Value = sContactName
-        .Application.ActiveCell.Offset(2, 2).Value = sInvoiceNumber
+        .Application.ActiveCell.Offset(2, 2).Value = cJob.InvoiceNo
         .Application.ActiveCell.Offset(3, 2).Value = sPONumber
-        .Application.ActiveCell.Offset(4, 2).Value = dInvoiceDate
-        .Application.ActiveCell.Offset(5, 2).Value = iNetTerm
-        .Application.ActiveCell.Offset(6, 2).Value = sInvoiceAmount
-        .SaveAs FileName:=sGeneratedFactoringXLS, FileFormat:=xlExcel8
+        .Application.ActiveCell.Offset(4, 2).Value = cJob.InvoiceDate
+        .Application.ActiveCell.Offset(5, 2).Value = 28 'net terms
+        .Application.ActiveCell.Offset(6, 2).Value = (cJob.ActualQuantity * sUnitPrice)
+        .SaveAs FileName:=cJob.DocPath.JobDirectoryW & "Client_Basic_Schedule.xls", FileFormat:=xlExcel8
         .Close
     End With
 
@@ -593,30 +554,16 @@ Public Sub fFactorInvoicEmailF()
         Call pfSendWordDocAsEmail("FactorInvoiceEmail", "Invoice to Factor", cJob.DocPath.InvoiceP) 'send email and add attachment yourself (from xero)
     End If
 
-    sFactoringURL = "https://cirrus.factorfox.net/"
-    Application.FollowHyperlink (sFactoringURL)
+    Application.FollowHyperlink ("https://cirrus.factorfox.net/")
     
     Call pfUpdateCheckboxStatus("InvoicetoFactorEmail")
 
     qdf.Close
     CurrentDb.Close
-    
     Call pfClearGlobals
+    
 End Sub
 
-Public Sub fInfoNeededEmailF()
-    '============================================================================
-    ' Name        : fInfoNeededEmailF
-    ' Author      : Erica L Ingram
-    ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call fInfoNeededEmailF
-    ' Description : creates info needed e-mail
-    '============================================================================
-    'TODO: fInfoNeededEmailF not used anymore
-    Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
-    Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
-
-End Sub
 
 Public Sub pfInvoicesCSV()
     '============================================================================
@@ -627,30 +574,21 @@ Public Sub pfInvoicesCSV()
     ' Description : creates CSVs used for invoicing
     '============================================================================
 
-    Dim sXeroImportURL As String
-    
     Dim cJob As New Job
-    
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    Call pfGetOrderingAttorneyInfo
-
-
-    DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
-    DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
+    'DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
+    DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
 
     'real factoring csv plus invoice generated FactoringCSVQuery
+    If cJob.App0.FactoringApproved = True Then
 
-    If sFactoringApproved = True Then
-
-        DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acAdd
-        DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", cJob.DocPath.XeroCSV, True
+        DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
+        DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.XeroCSV, True
     
     Else
     End If
 
-    sXeroImportURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
-    Application.FollowHyperlink (sXeroImportURL)
+    Application.FollowHyperlink ("https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES")
 
 
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
@@ -680,8 +618,6 @@ Public Sub fCreateWorkingCopy()
     Dim wsSection As Word.Section
     
     Dim cJob As New Job
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     Call pfWordIndexer
 
@@ -757,21 +693,6 @@ Public Sub fCreateWorkingCopy()
 
 End Sub
 
-Public Sub fSendShippingTrackingEmail()
-    '============================================================================
-    ' Name        : fSendShippingTrackingEmail
-    ' Author      : Erica L Ingram
-    ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call fSendShippingTrackingEmail
-    ' Description : creates shipping confirmation e-mail sent to client
-    '============================================================================
-    'TODO: fSendShippingTrackingEmail not used
-    Call pfGenericExportandMailMerge(qnTRCourtUnionAppAddrQ, "Stage4s\Shipped")
-    Call pfSendWordDocAsEmail("Shipped", "Shipping Confirmation") 'shipped email
-    Call pfCommunicationHistoryAdd("Shipped")
-
-End Sub
-
 Public Sub pfPrepareCover()
     '============================================================================
     ' Name        : pfPrepareCover
@@ -801,7 +722,7 @@ Public Sub pfPrepareCover()
     
     'query for all dates & job numbers for a case
     Set rstJobsByCase = CurrentDb.OpenRecordset("SELECT * FROM Courtdates WHERE CasesID = " & cJob.CaseInfo.ID & ";")
-    x = rstJobsByCase.RecordCount
+        x = rstJobsByCase.RecordCount
     rstJobsByCase.MoveFirst
     y = 1
     'loop through each one
@@ -811,24 +732,20 @@ Public Sub pfPrepareCover()
         sCurrentJobID = rstJobsByCase.Fields("ID").Value
 
         'copy other transcript pdfs for same volume into \transcripts\ folder
-        'TODO: standardize drive
-        sOriginalCurrentTranscriptPath = "I:\" & sCurrentJobID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
-        sNewCurrentTranscriptPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
+        sOriginalCurrentTranscriptPath = cJob.DocPath.InProgressFolder & sCurrentJobID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
+        sNewCurrentTranscriptPath = cJob.DocPath.InProgressFolder & sCourtDatesID & "\Transcripts\" & sCurrentJobID & "-Transcript-FINAL.pdf"
     
         If Not sOriginalCurrentTranscriptPath = sNewCurrentTranscriptPath Then
             FileCopy sOriginalCurrentTranscriptPath, sNewCurrentTranscriptPath
         End If
-        'list current date on volumes cover
-        sVolumeText = "Volume " & y & ":  " & Format(cJob.HearingDate, "dddd, mmmm d, yyyy")
-        Debug.Print sVolumeText
+        
         On Error Resume Next
         Set oWordApp = GetObject(, "Word.Application")
     
         If Err <> 0 Then
             Set oWordApp = CreateObject("Word.Application")
         End If
-    
-        '@Ignore AssignmentNotUsed
+        
         Set oWordDoc = GetObject(cJob.DocPath.WACoverD, "Word.Document")
     
     
@@ -840,6 +757,9 @@ Public Sub pfPrepareCover()
     
         sBookmarkName = "VolumeBMK0" & y
         
+        'list current date on volumes cover
+        sVolumeText = "Volume " & y & ":  " & Format(cJob.HearingDate, "dddd, mmmm d, yyyy")
+        'Debug.Print sVolumeText
         With oWordDoc
             .bookmarks(sBookmarkName).Select
             .Application.Selection.TypeText Text:=sVolumeText

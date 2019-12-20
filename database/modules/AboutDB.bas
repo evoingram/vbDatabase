@@ -202,13 +202,9 @@ Option Explicit
 '                          Arguments:    NONE
 'fFactorInvoicEmailF:          Description:  creates e-mail to submit invoice to factoring
 '                          Arguments:    NONE
-'fInfoNeededEmailF:            Description:  creates info needed e-mail
-'                          Arguments:    NONE
 'pfInvoicesCSV:                Description:  creates CSVs used for invoicing
 '                          Arguments:    NONE
 'fCreateWorkingCopy:           Description:  creates "working copy" sent to client
-'                          Arguments:    NONE
-'fSendShippingTrackingEmail:   Description:  creates shipping confirmation e-mail sent to client
 '                          Arguments:    NONE
         
 '============================================================================
