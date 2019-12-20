@@ -117,10 +117,8 @@ Public Sub pfStage2Ppwk()
     
     Else                                         'Code for yes
     
-        Call pfCheckFolderExistence              'checks for job folder and creates it if not exists
         Call pfSendWordDocAsEmail("InfoNeeded", "Spellings/Information Needed")
         Call pfCommunicationHistoryAdd("InfoNeeded") 'save in commhistory
-        'Call fInfoNeededEmailF
         Call pfUpdateCheckboxStatus("SpellingsEmail")
     
 EndIf1:
@@ -2231,86 +2229,78 @@ Public Sub pfTypeRoughDraftF()
     Set oRoughDraft = CreateObject("Scripting.FileSystemObject")
 
     If sJurisdiction = "Weber Nevada" Then
-    'TODO: PATH
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\" & "RoughDraft.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\RoughDraft-WeberNV.docx", "I:\" & sCourtDatesID & "\" & "RoughDraft.docx"
+    
+        If Not oRoughDraft.FileExists(cJob.DocPath.RoughDraft) Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberNV.docx", cJob.DocPath.RoughDraft
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "Transcribing Manual.PDF") Then
-            FileCopy "T:\Database\Templates\Stage1s\Transcribing Manual.PDF", "I:\" & sCourtDatesID & "\Notes\" & "Transcribing Manual.PDF"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "Transcribing Manual.PDF") Then
+            FileCopy cJob.DocPath.TemplateFolder1 & "Transcribing Manual.PDF", cJob.DocPath.JobDirectoryN & "Transcribing Manual.PDF"
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "Proofreading Manual - nevada.PDF") Then
-            FileCopy "T:\Database\Templates\Stage3s\Proofreading Manual - nevada.PDF", "I:\" & sCourtDatesID & "\Notes\" & "Proofreading Manual - nevada.PDF"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "Proofreading Manual - nevada.PDF") Then
+            FileCopy cJob.DocPath.TemplateFolder3 & "Proofreading Manual - nevada.PDF", cJob.DocPath.JobDirectoryN & "Proofreading Manual - nevada.PDF"
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "WeberNVSample.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\WeberNVSample.docx", "I:\" & sCourtDatesID & "\Notes\" & "WeberNVSample.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "WeberNVSample.docx") Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "WeberNVSample.docx", cJob.DocPath.JobDirectoryN & "WeberNVSample.docx"
         End If
     Else
     End If
 
-    'TODO: PATH
     If sJurisdiction = "Weber Bankruptcy" Then
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "WeberBKSample.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\WeberNVSample.docx", "I:\" & sCourtDatesID & "\Notes\" & "WeberNVSample.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "WeberBKSample.docx") Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "WeberNVSample.docx", cJob.DocPath.JobDirectoryN & "WeberNVSample.docx"
         End If
     Else
     End If
 
-    'TODO: PATH
     If sJurisdiction = "Weber Oregon" Then
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\" & "RoughDraft.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\RoughDraft-WeberOR.docx", "I:\" & sCourtDatesID & "\" & "RoughDraft.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.RoughDraft) Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberOR.docx", cJob.DocPath.RoughDraft
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "WeberORSample.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\WeberORSample.docx", "I:\" & sCourtDatesID & "\Notes\" & "WeberORSample.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "WeberORSample.docx") Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "WeberORSample.docx", cJob.DocPath.JobDirectoryN & "WeberORSample.docx"
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "WeberORSample1.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\WeberORSample1.docx", "I:\" & sCourtDatesID & "\Notes\" & "WeberORSample1.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "WeberORSample1.docx") Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "WeberORSample1.docx", cJob.DocPath.JobDirectoryN & "WeberORSample1.docx"
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "WeberORSampleTM.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\WeberORSampleTM.docx", "I:\" & sCourtDatesID & "\Notes\" & "WeberORSampleTM.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "WeberORSampleTM.docx") Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "WeberORSampleTM.docx", cJob.DocPath.JobDirectoryN & "WeberORSampleTM.docx"
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "WeberORSample2.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\WeberORSample2.docx", "I:\" & sCourtDatesID & "\Notes\" & "WeberORSample2.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "WeberORSample2.docx") Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "WeberORSample2.docx", cJob.DocPath.JobDirectoryN & "WeberORSample2.docx"
         End If
     Else
     End If
 
-    'TODO: PATH
     If sJurisdiction = "USBC Western Washington" Then
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "BankruptcyWAGuide.pdf") Then
-            FileCopy "T:\Database\Templates\Stage1s\BankruptcyWAGuide.pdf", "I:\" & sCourtDatesID & "\Notes\" & "BankruptcyWAGuide.pdf"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "BankruptcyWAGuide.pdf") Then
+            FileCopy cJob.DocPath.TemplateFolder1 & "BankruptcyWAGuide.pdf", cJob.DocPath.JobDirectoryN & "BankruptcyWAGuide.pdf"
         End If
     Else
     End If
 
-    'TODO: PATH
     If sJurisdiction = "Food and Drug Administration" Then
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\" & "RoughDraft.docx") Then
-            FileCopy "T:\Database\Templates\Stage2s\RoughDraft-FDA.docx", "I:\" & sCourtDatesID & "\" & "RoughDraft.docx"
+        If Not oRoughDraft.FileExists(cJob.DocPath.RoughDraft) Then
+            FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-FDA.docx", cJob.DocPath.RoughDraft
         End If
     Else
     End If
 
-    'TODO: PATH
     If sJurisdiction = "*Superior Court*" Then
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "CourtRules-WACounties.pdf") Then
-            FileCopy "T:\Database\Templates\Stage1s\CourtRules-WACounties.pdf", "I:\" & sCourtDatesID & "\Notes\" & "CourtRules-WACounties.pdf"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf") Then
+            FileCopy cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties.pdf", cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf"
         End If
     Else
     End If
-
-    'TODO: PATH
+    
     If sJurisdiction = "*USBC*" Then
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf") Then
-            FileCopy "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf", "I:\" & sCourtDatesID & "\Notes\" & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf") Then
+            FileCopy cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf", cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
         End If
-        If Not oRoughDraft.FileExists("I:\" & sCourtDatesID & "\Notes\" & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf") Then
-            FileCopy "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf", "I:\" & sCourtDatesID & "\Notes\" & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
+        If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf") Then
+            FileCopy cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf", cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
         End If
     Else
     End If
-
-    Call pfCheckFolderExistence
 
     DoCmd.OpenForm FormName:="PJType"            'open window with AGShortcuts, SpeakerList, and jurisdiction notes
 
@@ -2360,7 +2350,7 @@ Public Sub pfReplaceAQC()
     Call pfRoughDraftToCoverF
     Call FPJurors
     'Call pfTCEntryReplacement
-    'come back
+    ''TODO: What is going on here?
     Call pfFindRepCitationLinks
 
 End Sub

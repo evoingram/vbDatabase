@@ -42,7 +42,6 @@ Public Sub pfStage3Ppwk()
     Dim cJob As New Job
 
     Call pfGetOrderingAttorneyInfo
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     Call pfUpdateCheckboxStatus("AudioProof")
 
@@ -201,8 +200,6 @@ Public Sub pfBurnCD()
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
-
     sQuestion = "Is there a blank CD in the D drive?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
@@ -220,7 +217,7 @@ Public Sub pfBurnCD()
         Set oWSHShell = CreateObject("WScript.Shell")
         Set oShell = CreateObject("Shell.Application")
         sBurnDir = oWSHShell.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\" & "Explorer\Shell Folders\CD Burning")
-        'come back
+        'TODO: What is going on here?
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     
@@ -255,8 +252,7 @@ Public Sub pfCreateRegularPDF()
     Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-
-    sFinalTranscriptNoExt = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
+    sFinalTranscriptNoExt = cJob.DocPath.InProgressFolder & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
     
     sMakePDFPrompt = "Next we will make a PDF copy.  Click yes when ready."
     sAnswerPDFPrompt = MsgBox(sMakePDFPrompt, vbQuestion + vbYesNo, "???")
@@ -336,7 +332,7 @@ Public Sub pfCreateRegularPDF()
         End With
     End If
 
-    'TODO: lock document in whole and save as final come back
+    'TODO: lock document in whole and save as final
     oWordDoc.Protect Type:=wdAllowOnlyReading, noReset:=True, password:="wrts0419"
     oWordDoc.SaveAs FileName:=cJob.DocPath.TranscriptFD 'sFinalTranscriptNoExt
     oWordDoc.ExportAsFixedFormat outputFileName:=sFinalTranscriptNoExt, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks

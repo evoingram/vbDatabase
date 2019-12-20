@@ -133,6 +133,10 @@ Public Const qnTRCourtUnionAppAddrQ As String = "TR-Court-Union-AppAddr"
 Public Const qnOrderingAttorneyInfo As String = "OrderingAttorneyInfo"
 Public Const qnQInfobyInvNo As String = "QInfobyInvoiceNumber"
 Public Const qTempShippingOptions As String = "TempShippingOptionsQ"
+Public Const qTRIQPlusCases As String = "TRInvoiQPlusCases"
+Public Const qFCSVQ As String = "FactoringCSVQuery"
+Public Const qSelectXero As String = "SelectXero"
+Public Const qXeroCSVQ As String = "XeroCSVQuery"
 
 Public Const sCompanyEmail As String = "inquiries@aquoco.co"
 Public Const sCompanyFirstName As String = "Erica"
@@ -146,7 +150,7 @@ Public Const sCompanyState As String = "WA"
 Public Const sCompanyZIP As String = "98119"
 Public Const sZCountryCode As String = "US"
 
-'TODO: CurrentCaseInfo module, why isn't this used?  Come back
+'TODO: CurrentCaseInfo module, why isn't this used?
 '@Ignore ConstantNotUsed
 Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
 '@Ignore ConstantNotUsed
@@ -525,7 +529,6 @@ Public Sub pfCurrentCaseInfo1()
 
     Dim rstTRCourtUnionAA As DAO.Recordset
     Dim qdf As QueryDef
-
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)

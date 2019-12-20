@@ -23,11 +23,11 @@ Option Explicit
 '                       Arguments:    sFile, sMacroName
 'pfSendTrackingEmail:   Description:  generates tracking number e-mail for customer
 '                       Arguments:    NONE
-'fZIPTranscripts:       Description:  zips transcripts folder in I:\####\
+'fZIPTranscripts:       Description:  zips transcripts folder in \Production\2InProgress\####\
 '                       Arguments:    NONE
-'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in I:\####\
+'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in \Production\2InProgress\####\
 '                       Arguments:    NONE
-'fZIPAudio:             Description:  zips audio folder in I:\####\
+'fZIPAudio:             Description:  zips audio folder in \Production\2InProgress\####\
 '                       Arguments:    NONE
 'fUploadZIPsPrompt:     Description:  asks if you want to upload ZIPs to FTP
 '                       Arguments:    NONE
@@ -82,7 +82,6 @@ Public Sub pfStage4Ppwk()
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     Call pfGetOrderingAttorneyInfo
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     If sJurisdiction Like "*AVT*" Then
         'paypal commands
@@ -510,9 +509,6 @@ Public Sub fTranscriptDeliveryF()
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    'checks for Audio, Transcripts, FTP, WorkingFiles subfolders and creates if not exists
-    Call pfCheckFolderExistence
-
     sQuestion = "Have you filed or are you filing the transcript?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
     If sJurisdiction = "*AVT*" Then
@@ -730,8 +726,6 @@ Public Sub fGenerateZIPsF()
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
-
     If sJurisdiction Like "*Weber Nevada*" Or sJurisdiction Like "*Weber Bankruptcy*" Or sJurisdiction Like "*Weber Oregon*" _
     Or sJurisdiction Like "*Food and Drug Administration*" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" _
     Or sJurisdiction Like "*eScribers*" Or sJurisdiction Like "*AVTranz*" Then
@@ -768,8 +762,8 @@ Line2:
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
     If sAnswer = vbNo Then                        'Code for No
-
-        MsgBox "Go to I:\ to open the job folder."
+        'TODO: standardize drive
+        MsgBox "Go to " & cJob.DocPath.InProgressFolder & " to open the job folder."
     
     Else                                         'Code for yes
 
@@ -846,8 +840,7 @@ Public Sub fZIPAudio()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPAudio
-    'TODO: PATH
-    ' Description : zips audio folder in I:\####\
+    ' Description : zips audio folder in \Production\2InProgress\####\
     '============================================================================
 
     Dim defpath As String
@@ -880,7 +873,7 @@ Public Sub fZIPAudio()
     Set oApp = CreateObject("Shell.Application")
 
     'Copy the files to the compressed folder
-    oApp.Namespace(cJob.DocPath.ZAudioB).CopyHere oApp.Namespace("I:\" & sCourtDatesID & "\Audio\").Items
+    oApp.Namespace(cJob.DocPath.ZAudioB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
 
     
     oApp.Namespace(cJob.DocPath.ZAudioF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
@@ -895,10 +888,7 @@ Public Sub fZIPAudio()
     
     'Wend
     
-    
-    
-    'come back
-    
+    'TODO: What is going on here?
     
     MsgBox "Find the ZIP file here: " & cJob.DocPath.ZAudioB
 End Sub
@@ -909,8 +899,7 @@ Public Sub fZIPAudioTranscripts()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPAudioTranscripts
-    'TODO: PATH
-    ' Description : zips audio & transcripts folders in I:\####\
+    ' Description : zips audio & transcripts folders in \Production\2InProgress\####\
     '============================================================================
 
     Dim strDate As String
@@ -981,8 +970,7 @@ Public Sub fZIPTranscripts()
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
     ' Call command: Call fZIPTranscripts
-    'TODO: PATH
-    ' Description : zips transcripts folder in I:\####\
+    ' Description : zips transcripts folder in \Production\2InProgress\####\
     '============================================================================
 
     Dim defpath As String
@@ -1099,7 +1087,7 @@ Public Sub pfSendTrackingEmail()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     deliverySQLstring = "SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";"
-    'TODO: pfSendTrackingEmail get current values and delete following come back
+    'TODO: pfSendTrackingEmail get current values and delete following
     Set rs = CurrentDb.OpenRecordset(deliverySQLstring)
     vTrackingNumber = rs.Fields("TrackingNumber").Value
     sParty1 = rs.Fields("Party1").Value
@@ -1157,6 +1145,8 @@ Public Sub fAudioDone()
     ' Call command: Call fAudioDone
     ' Description : completes audio in express scribe
     '============================================================================
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     'If FSO Is Nothing Then Set FSO = New Scripting.FileSystemObject
@@ -1183,8 +1173,7 @@ Public Sub fAudioDone()
     'to be added
     'Else
     'else try to open express scribe
-    'TODO: Possibly come back for path
-    '    Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeDone.bat")
+    '    Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeDone.bat")
     '  Next Fil
       
     'Line2:
@@ -1653,7 +1642,6 @@ Public Sub fExportRecsToXML()
     
         sCourtDatesID = rstShippingOptions.Fields("CourtDatesID").Value
         sTrackingNumber = rstShippingOptions.Fields("TrackingNumber").Value
-    'TODO: PATH
         Application.ExportXML acExportQuery, qdf.Name, cJob.DocPath.ShippingXML4 'export to XML
 
         rstShippingOptions.MoveNext

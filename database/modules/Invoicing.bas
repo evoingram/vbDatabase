@@ -90,7 +90,7 @@ Public Sub fApplyShipDateTrackingNumber()
                         Call pfCommunicationHistoryAdd("TrackingNumber") 'comms history entry for paypal email
                         'get tracking number and ship date
                     
-                        'update courtdates shipdate and tracking number come back
+                        'update courtdates shipdate and tracking number 'TODO: What is going on here?
                     
                     Else
                     End If
@@ -930,7 +930,7 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    'TODO: come back need query for shipping iExpenseAmount + info from CourtDates and Customers
+    'TODO: need query for shipping iExpenseAmount + info from CourtDates and Customers
     Set qdf1 = CurrentDb.QueryDefs(qnTRCourtQ)
     qdf1.Parameters(0) = sCourtDatesID
     Set rstShippingExpenseEntry = qdf1.OpenRecordset

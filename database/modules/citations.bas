@@ -108,12 +108,11 @@ Public Sub pfFindRepCitationLinks3()
     Dim rstCurrentHyperlink As DAO.Recordset
     Dim rstCurrentSearchMatching As DAO.Recordset
     
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
     x = 1
-    
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     
     
     'On Error Resume Next
@@ -126,7 +125,7 @@ Public Sub pfFindRepCitationLinks3()
     
     
     Set oWordApp = CreateObject("Word.Application")
-    Set oWordDoc = oWordApp.Documents.Open(sFileName) 'open word document
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
     y = 1
@@ -144,7 +143,7 @@ Public Sub pfFindRepCitationLinks3()
         Set oWordApp = CreateObject("Word.Application")
     End If
     On Error GoTo 0
-    Set oWordDoc = oWordApp.Documents.Open(sFileName) 'open word document
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
     y = 1
@@ -618,9 +617,7 @@ ExitLoop1:
     
 Done:
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'TODO: job number
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-    oWordDoc.SaveAs2 FileName:=sFileName         'save and close word doc
+    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover         'save and close word doc
     oWordDoc.Close wdDoNotSaveChanges
     oWordApp.Quit
     
@@ -636,7 +633,7 @@ Dim sInputCourt As String
 Dim sURL As String
 Dim apiWaxLRS As String
 
-Dim Parsed As Dictionary
+Dim parsed As Dictionary
             sInputCourt = "scotus+ca1+ca2+ca3+ca4+ca5+ca6+ca7+ca8+ca9+ca10+ca11+cadc+cafc+ag+afcca+asbca+armfor+acca+uscfc+tax+mc+mspb+nmcca+cavc+bva+fiscr+fisc+cit+usjc+jpml+sttex+stp+cc+com+ccpa+cusc+eca+tecoa+reglrailreorgct+kingsbench"
 
             If sInputState = "Alabama" Then
@@ -716,7 +713,7 @@ Dim Parsed As Dictionary
             End With
             x = 1
             y = 1
-            Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-            Set apiCourtListener = Parsed.item("results")
+            Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+            Set apiCourtListener = parsed.item("results")
     
 End Function

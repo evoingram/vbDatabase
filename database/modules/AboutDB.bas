@@ -4,8 +4,7 @@ Attribute VB_Name = "AboutDB"
 Option Compare Database
 Option Explicit
 
- 
-'folder organization in 'T:\Production\2InProgress' or 'I:\'
+'folder organization in '\Production\2InProgress'
 '####
 'Audio:         Audio files
 'Notes:         Paperwork provided
@@ -47,9 +46,6 @@ Option Explicit
 '####-Transcript-FINAL-4up.pdf
 '####-WordIndex.docx
 '####-Transcript-WorkingCopy.docx
-
-
-
 
 
 
@@ -192,7 +188,7 @@ Option Explicit
 
 'functions:
 
-'pfGenericExportandMailMerge:  Description:  exports to specified template from T:\Database\Templates\ and saves in I:\####\
+'pfGenericExportandMailMerge:  Description:  exports to specified template from \Database\Templates\ and saves in \Production\2InProgress\####\
 '                          Arguments:    sQueryName, sExportTopic
 'pfSendWordDocAsEmail:         Description:  sends Word document as an e-mail body
 '                          Arguments:    vCHTopic, vSubject, Optional sAttachment1, sAttachment2, sAttachment3, sAttachment4
@@ -206,13 +202,9 @@ Option Explicit
 '                          Arguments:    NONE
 'fFactorInvoicEmailF:          Description:  creates e-mail to submit invoice to factoring
 '                          Arguments:    NONE
-'fInfoNeededEmailF:            Description:  creates info needed e-mail
-'                          Arguments:    NONE
 'pfInvoicesCSV:                Description:  creates CSVs used for invoicing
 '                          Arguments:    NONE
 'fCreateWorkingCopy:           Description:  creates "working copy" sent to client
-'                          Arguments:    NONE
-'fSendShippingTrackingEmail:   Description:  creates shipping confirmation e-mail sent to client
 '                          Arguments:    NONE
         
 '============================================================================
@@ -381,11 +373,11 @@ Option Explicit
 'pfSendTrackingEmail:   Description:  generates tracking number e-mail for customer
 '                       Arguments:    NONE
     
-'fZIPTranscripts:       Description:  zips transcripts folder in I:\####\
+'fZIPTranscripts:       Description:  zips transcripts folder in \Production\2InProgress\####\
 '                       Arguments:    NONE
-'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in I:\####\
+'fZIPAudioTranscripts:  Description:  zips audio & transcripts folders in \Production\2InProgress\####\
 '                       Arguments:    NONE
-'fZIPAudio:             Description:  zips audio folder in I:\####\
+'fZIPAudio:             Description:  zips audio folder in \Production\2InProgress\####\
 '                       Arguments:    NONE
 'fUploadZIPsPrompt:     Description:  asks if you want to upload ZIPs to FTP
 '                       Arguments:    NONE

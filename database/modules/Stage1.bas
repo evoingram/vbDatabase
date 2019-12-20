@@ -59,8 +59,7 @@ Public Sub fAssignPS()
     Dim sAnswer As String
     Dim sBrowserPath As String
 
-    'TODO: PATH
-    sBrowserPath = """C:\Program Files\Mozilla Firefox\firefox.exe"""
+    sBrowserPath = """C:\Program Files (x86)\BraveSoftware\Brave-Browser\Application\brave.exe"""
     sQuestion = "Do you want to assign this file in ProjectSend?"
 
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -82,28 +81,6 @@ Public Sub pfEnterNewJob()
     ' Description : import job info to db from xlsm file
     '============================================================================
 
-    Dim x As Long
-    Dim db As DAO.Database
-    Dim oExcelWB As Excel.Workbook
-    Dim oExcelMacroWB As Excel.Workbook
-    Dim oExcelApp As Object
-
-    Dim rstTempJob As DAO.Recordset
-    Dim rstCurrentJob As DAO.Recordset
-    Dim rstCurrentCasesID As DAO.Recordset
-    Dim rstTempCourtDates As DAO.Recordset
-    Dim rstTempCases As DAO.Recordset
-    Dim rstTempCustomers As DAO.Recordset
-    Dim rstCurrentStatusesEntry As DAO.Recordset
-    Dim rstMaxCasesID As DAO.Recordset
-    Dim rstCourtDatesID As DAO.Recordset
-
-
-    Dim sExtensionXLSM As String
-    Dim sExtensionXLS As String
-    Dim sFullPathXLS As String
-    Dim sFullPathXLSM As String
-    Dim sPartialPath As String
     Dim sTurnaroundTimesCD As String
     Dim sInvoiceNumber As String
     Dim sNewCourtDatesRowSQL As String
@@ -118,84 +95,86 @@ Public Sub pfEnterNewJob()
     Dim sQuestion As String
     Dim sAppNumber As String
     Dim sTempCustomersSQL As String
-
     Dim sFactoring As String
     Dim sFiled As String
     Dim sBrandingTheme As String
     Dim sUnitPrice As String
     Dim sIRC As String
     Dim sAccountCode As String
+    
+    Dim oExcelApp As Object
+    
+    Dim x As Long
+    
     Dim dInvoiceDate As Date
+    
+    Dim rstTempJob As DAO.Recordset
+    Dim rstCurrentJob As DAO.Recordset
+    Dim rstCurrentCasesID As DAO.Recordset
+    Dim rstTempCourtDates As DAO.Recordset
+    Dim rstTempCases As DAO.Recordset
+    Dim rstTempCustomers As DAO.Recordset
+    Dim rstCurrentStatusesEntry As DAO.Recordset
+    Dim rstMaxCasesID As DAO.Recordset
+    Dim rstCourtDatesID As DAO.Recordset
+    
+    Dim oExcelWB As Excel.Workbook
+    Dim oExcelMacroWB As Excel.Workbook
 
-    'TODO: PATH
-    sPartialPath = "T:\Database\Scripts\InProgressExcels\JotformCustomers"
-    sExtensionXLS = ".xlsx"
-    sExtensionXLSM = ".xlsm"
-    sFullPathXLS = sPartialPath & sExtensionXLS
-    sFullPathXLSM = sPartialPath & sExtensionXLSM
+    Dim cJob As New Job
+
     Set oExcelApp = CreateObject("Excel.Application")
 
-    Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(sFullPathXLSM)
+    Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(cJob.DocPath.OrderFormCustomersXLSM)
     oExcelMacroWB.Application.DisplayAlerts = False
     oExcelMacroWB.Application.Visible = False
-    oExcelMacroWB.SaveAs Replace(sFullPathXLSM, sExtensionXLSM, sExtensionXLS), FileFormat:=xlWorkbookDefault
+    oExcelMacroWB.SaveAs Replace(cJob.DocPath.OrderFormCustomersXLSM, ".xlsm", ".xlsx"), FileFormat:=xlWorkbookDefault
     oExcelMacroWB.Close True
     Set oExcelMacroWB = Nothing
 
-    Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLS, Local:=True)
+    Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormCustomersXLSX, Local:=True)
     oExcelWB.Application.DisplayAlerts = False
     oExcelWB.Application.Visible = False
-    oExcelWB.SaveAs Replace(sFullPathXLS, sExtensionXLS, ".csv"), FileFormat:=6
+    oExcelWB.SaveAs Replace(cJob.DocPath.OrderFormCustomersXLSX, ".xlsx", ".csv"), FileFormat:=6
 
     oExcelWB.Close True
     Set oExcelWB = Nothing
-
-    Set db = CurrentDb                           'Re-link the CSV Table
+    
     On Error Resume Next:   On Error GoTo 0
-    db.TableDefs.Refresh
+    CurrentDb.TableDefs.Refresh
 
-    'TODO: PATH
-    sPartialPath = "T:\Database\Scripts\InProgressExcels\jotform"
-    sFullPathXLS = sPartialPath & sExtensionXLS
-    sFullPathXLSM = sPartialPath & sExtensionXLSM
-
-    Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLSM, Local:=True)
+    Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormXLSM, Local:=True)
     oExcelMacroWB.Application.DisplayAlerts = False
     oExcelMacroWB.Application.Visible = False
-    oExcelMacroWB.SaveAs Replace(sFullPathXLSM, sExtensionXLSM, sExtensionXLS), FileFormat:=xlWorkbookDefault
+    oExcelMacroWB.SaveAs Replace(cJob.DocPath.OrderFormXLSM, ".xlsm", ".xlsx"), FileFormat:=xlWorkbookDefault
     oExcelMacroWB.Close True
     Set oExcelMacroWB = Nothing
 
-    Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLS, Local:=True)
+    Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormXLSX, Local:=True)
     oExcelWB.Application.DisplayAlerts = False
     oExcelWB.Application.Visible = False
-    oExcelWB.SaveAs Replace(sFullPathXLS, sExtensionXLS, ".csv"), FileFormat:=6
+    oExcelWB.SaveAs Replace(cJob.DocPath.OrderFormXLSX, ".xlsx", ".csv"), FileFormat:=6
     oExcelWB.Close True
     Set oExcelWB = Nothing
 
  
-    Set db = CurrentDb                           'Re-link the CSV Table
     On Error Resume Next:   On Error GoTo 0
-    db.TableDefs.Refresh
+    CurrentDb.TableDefs.Refresh
 
-    'TODO: PATH
     DoCmd.TransferText TransferType:=acImportDelim, TableName:="TempCourtDates", _
-                       FileName:="T:\Database\Scripts\InProgressExcels\Jotform.csv", HasFieldNames:=True
-    db.TableDefs.Refresh
+                       FileName:=cJob.DocPath.OrderFormCSV, HasFieldNames:=True
+    CurrentDb.TableDefs.Refresh
 
-    Set db = CurrentDb
     On Error Resume Next:   On Error GoTo 0
-    db.TableDefs.Refresh
+    CurrentDb.TableDefs.Refresh
 
-    'TODO: PATH
     DoCmd.TransferText TransferType:=acImportDelim, TableName:="TempCustomers", _
-                       FileName:="T:\Database\Scripts\InProgressExcels\JotformCustomers.csv", HasFieldNames:=True
+                       FileName:=cJob.DocPath.OrderFormCustomersCSV, HasFieldNames:=True
 
-    Set db = CurrentDb
     On Error Resume Next:   On Error GoTo 0
-    db.TableDefs.Refresh
+    CurrentDb.TableDefs.Refresh
 
-    Set rstTempCourtDates = db.OpenRecordset("TempCourtDates")
+    Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
     rstTempCourtDates.MoveFirst
     sJurisdiction = rstTempCourtDates.Fields("JurisDiction").Value
     sAudioLength = rstTempCourtDates.Fields("AudioLength").Value
@@ -246,7 +225,7 @@ Public Sub pfEnterNewJob()
         sIRC = 56
     End Select
 
-    'come back insert filed/factoring boxes in xlsm/csv
+    'TODO: insert filed/factoring boxes in xlsm/csv
     sFiled = InputBox("Are we filing this, yes or no?")
     sFactoring = InputBox("Are we factoring this, yes or no?")
 
@@ -305,7 +284,7 @@ Public Sub pfEnterNewJob()
     dInvoiceDate = (Date + sTurnaround) - 2
     dDueDate = (Date + sTurnaround) - 2
     sAccountCode = 400
-    db.Execute "UPDATE TempCourtDates SET [InvoiceDate] = " & dInvoiceDate & ", [DueDate] = " & dDueDate & ", [AccountCode] = " & sAccountCode & _
+    CurrentDb.Execute "UPDATE TempCourtDates SET [InvoiceDate] = " & dInvoiceDate & ", [DueDate] = " & dDueDate & ", [AccountCode] = " & sAccountCode & _
                ", [UnitPrice] = " & sUnitPrice & ", [InventoryRateCode] = " & sIRC & ", [BrandingTheme] = " & sBrandingTheme & _
                " WHERE [ID] = " & sCourtDatesID & ";"
 
@@ -336,25 +315,23 @@ Public Sub pfEnterNewJob()
     'rstTempCases.Update
     'rstTempCases.Close
     'rstTempCourtDates.Close
-    Set db = CurrentDb
     sNewCourtDatesRowSQL = "INSERT INTO TempCases (HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
                            "Jurisdiction, Judge, JudgeTitle, Notes) SELECT HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
                            "Jurisdiction, Judge, JudgeTitle, Notes FROM [TempCourtDates];"
-    db.Execute (sNewCourtDatesRowSQL)
+    CurrentDb.Execute (sNewCourtDatesRowSQL)
 
     'delete blank lines
-    db.Execute "DELETE FROM TempCustomers WHERE [Company] = " & Chr(34) & Chr(34) & ";"
-    db.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] IS NULL;"
-    db.Execute "DELETE FROM TempCases WHERE [Party1] = " & Chr(34) & Chr(34) & ";"
+    CurrentDb.Execute "DELETE FROM TempCustomers WHERE [Company] = " & Chr(34) & Chr(34) & ";"
+    CurrentDb.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] IS NULL;"
+    CurrentDb.Execute "DELETE FROM TempCases WHERE [Party1] = " & Chr(34) & Chr(34) & ";"
 
 
     'Perform the import
-    Set db = CurrentDb
     sNewCourtDatesRowSQL = "INSERT INTO CourtDates (HearingDate, HearingStartTime, HearingEndTime, AudioLength, Location, TurnaroundTimesCD, " & _
                            "InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, AccountCode, BrandingTheme) SELECT HearingDate, HearingStartTime, " & _
                            "HearingEndTime, AudioLength, Location, TurnaroundTimesCD, InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, AccountCode, " & _
                            "BrandingTheme FROM [TempCourtDates];"
-    db.Execute (sNewCourtDatesRowSQL)
+    CurrentDb.Execute (sNewCourtDatesRowSQL)
 
     ' store courtdatesID
     Set rstCourtDatesID = CurrentDb.OpenRecordset("SELECT MAX(ID) as IDNo FROM CourtDates")
@@ -363,7 +340,7 @@ Public Sub pfEnterNewJob()
     sCourtDatesID = str(CurrentDb.OpenRecordset("SELECT MAX(ID) FROM CourtDates"))
     [Forms]![NewMainMenu]![ProcessJobSubformNMM].[Form]![JobNumberField].Value = sCourtDatesID
 
-    'come back
+    'TODO: What is going on here?
     Call fCheckTempCustomersCustomers
     Call fCheckTempCasesCases
 
@@ -377,14 +354,14 @@ Public Sub pfEnterNewJob()
     sOrderingID = rstTempJob.Fields("AppID").Value
 
     If IsNull(rstCurrentJob!OrderingID) Then
-        db.Execute "UPDATE CourtDates SET OrderingID = " & sOrderingID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+        CurrentDb.Execute "UPDATE CourtDates SET OrderingID = " & sOrderingID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
     End If
     rstTempJob.Close
     rstCurrentJob.Close
     Set rstTempJob = Nothing
     Set rstCurrentJob = Nothing
 
-    'come back
+    'TODO: not sure what
     Call fGenerateInvoiceNumber
     Call fInsertCalculatedFieldintoTempCourtDates
 
@@ -392,33 +369,33 @@ Public Sub pfEnterNewJob()
     sCurrentJobSQL = "SELECT * FROM CourtDates WHERE ID = " & sCourtDatesID & ";"
     sTempJobSQL = "SELECT * FROM TempCourtDates;"
     sStatusesEntrySQL = "SELECT * FROM Statuses WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-    db.Execute "INSERT INTO Statuses (CourtDatesID) SELECT CourtDatesID FROM TempCourtDates;"
+    CurrentDb.Execute "INSERT INTO Statuses (CourtDatesID) SELECT CourtDatesID FROM TempCourtDates;"
 
-    'Set rstStatuses = db.OpenRecordset("Statuses")
+    'Set rstStatuses = currentdb.OpenRecordset("Statuses")
     'rstStatuses.AddNew
     'rstStatuses.Fields("CourtDatesID").Value = sCourtDatesID
     'rstStatuses.Update
     'rstStatuses.Close
     'Set rstStatuses = Nothing
-    Set rstTempJob = db.OpenRecordset(sTempJobSQL)
-    Set rstCurrentJob = db.OpenRecordset(sCurrentJobSQL)
-    Set rstCurrentStatusesEntry = db.OpenRecordset(sStatusesEntrySQL)
+    Set rstTempJob = CurrentDb.OpenRecordset(sTempJobSQL)
+    Set rstCurrentJob = CurrentDb.OpenRecordset(sCurrentJobSQL)
+    Set rstCurrentStatusesEntry = CurrentDb.OpenRecordset(sStatusesEntrySQL)
     rstCurrentJob.MoveFirst
     Do Until rstCurrentJob.EOF
-        Set rstTempJob = db.OpenRecordset(sTempJobSQL)
+        Set rstTempJob = CurrentDb.OpenRecordset(sTempJobSQL)
         sTurnaroundTimesCD = rstTempJob.Fields("TurnaroundTimesCD")
         sInvoiceNumber = rstTempJob.Fields("InvoiceNo")
         Set rstMaxCasesID = CurrentDb.OpenRecordset("SELECT MAX(ID) FROM Cases;")
         sCasesID = rstMaxCasesID.Fields(0).Value
         rstMaxCasesID.Close
     
-        db.Execute "UPDATE TempCourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+        CurrentDb.Execute "UPDATE TempCourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
         'rstTempJob.Edit
         'rstTempJob.Fields("CasesID") = sCasesID
         'rstTempJob.Update
         'sCasesID = rstTempJob.Fields("CasesID")
     
-        db.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [InvoiceNo] = " & sInvoiceNumber & ";"
+        CurrentDb.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [InvoiceNo] = " & sInvoiceNumber & ";"
         '"SELECT * FROM TempCourtDates WHERE [InvoiceNo]=" & sInvoiceNumber & ";"
         'Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
         'rstTempCDs.Edit
@@ -426,34 +403,34 @@ Public Sub pfEnterNewJob()
         'rstTempCDs.Update
         'rstTempCDs.Close
         'Set rstTempCDs = Nothing
-        'db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+        'CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
     
-        db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & ";"
-        'Set rstTempCDs = db.OpenRecordset("TempCustomers")
+        CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & ";"
+        'Set rstTempCDs = CurrentDb.OpenRecordset("TempCustomers")
         'rstTempCDs.Edit
         'rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
         'rstTempCDs.Update
         'rstTempCDs.Close
         'Set rstTempCDs = Nothing
     
-        db.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [ID] = " & sCourtDatesID & ";"
-        'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+        CurrentDb.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [ID] = " & sCourtDatesID & ";"
+        'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
         'rstTempCDs.Edit
         'If sCasesID <> "" Then rstTempCDs.Fields("CasesID").Value = sCasesID
         'rstTempCDs.Update
         'rstTempCDs.Close
         'Set rstTempCDs = Nothing
     
-        db.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [ID] = " & sCourtDatesID & ";"
-        'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+        CurrentDb.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [ID] = " & sCourtDatesID & ";"
+        'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
         'rstTempCDs.Edit
         'rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
         'rstTempCDs.Update
         'rstTempCDs.Close
         'Set rstTempCDs = Nothing
     
-        db.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [ID] = " & sCourtDatesID & ";"
-        'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+        CurrentDb.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [ID] = " & sCourtDatesID & ";"
+        'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
         'rstTempCDs.Edit
         'rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
         'rstTempCDs.Update
@@ -465,8 +442,8 @@ Public Sub pfEnterNewJob()
             rstCurrentStatusesEntry.Edit
             sStatusesID = rstCurrentStatusesEntry.Fields("ID").Value
             rstCurrentStatusesEntry.Update
-            db.Execute "UPDATE CourtDates SET StatusesID = " & sStatusesID & " WHERE [ID] = " & sCourtDatesID & ";"
-            db.Execute "UPDATE Statuses SET ContactsEntered = True, JobEntered = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE CourtDates SET StatusesID = " & sStatusesID & " WHERE [ID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET ContactsEntered = True, JobEntered = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
         End If
     
         rstCurrentJob.MoveNext
@@ -474,18 +451,16 @@ Public Sub pfEnterNewJob()
     Loop
 
     rstCurrentStatusesEntry.Close
-    db.Close:   Set db = Nothing                 ' close database
 
-    Call pfCheckFolderExistence                  'checks for job folders/rough draft
+    Call pfCheckFolderExistence 'checks for job folders/rough draft
 
     'import appearancesId from tempcustomers into courtdates
-    Set db = CurrentDb
     sTempCustomersSQL = "SELECT * FROM TempCustomers;"
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     sCurrentJobSQL = "SELECT * FROM CourtDates WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-    Set rstTempJob = db.OpenRecordset(sTempCustomersSQL)
-    Set rstCurrentJob = db.OpenRecordset(sCurrentJobSQL)
+    Set rstTempJob = CurrentDb.OpenRecordset(sTempCustomersSQL)
+    Set rstCurrentJob = CurrentDb.OpenRecordset(sCurrentJobSQL)
 
     x = 1
 
@@ -499,12 +474,12 @@ Public Sub pfEnterNewJob()
         If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
             Select Case sAppNumber
             Case "App1", "App2", "App3", "App4", "App5", "App6"
-                db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                CurrentDb.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             Case Else
                 Exit Do
             End Select
         
-            'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
+            'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
             'rstTempCDs.Edit
             'If sAppNumber = "App7" Then
             '    rstTempCDs.Update
@@ -524,25 +499,19 @@ Public Sub pfEnterNewJob()
         End If
         x = x + 1
     Loop
-    db.Close:   Set db = Nothing
-    '@Ignore AssignmentNotUsed
-    Set db = CurrentDb
     'rstCurrentJob.Close
     'rstTempJob.Close
 
-    Set db = CurrentDb                           'create new agshortcuts entry
-    db.Execute "INSERT INTO AGShortcuts (CourtDatesID, CasesID) SELECT CourtDatesID, CasesID FROM TempCourtDates;"
+    CurrentDb.Execute "INSERT INTO AGShortcuts (CourtDatesID, CasesID) SELECT CourtDatesID, CasesID FROM TempCourtDates;"
 
     Call fIsFactoringApproved                    'create new invioce
     Call pfGenerateJobTasks                      'generates job tasks
     Call pfPriorityPointsAlgorithm               'gives tasks priority points
     Call fProcessAudioParent                     'process audio in audio folder
 
-    db.Close:   Set db = Nothing                 ' close database
-    Set db = CurrentDb
-    db.Execute "DELETE FROM TempCourtDates", dbFailOnError
-    db.Execute "DELETE FROM TempCustomers", dbFailOnError
-    db.Execute "DELETE FROM TempCases", dbFailOnError
+    CurrentDb.Execute "DELETE FROM TempCourtDates", dbFailOnError
+    CurrentDb.Execute "DELETE FROM TempCustomers", dbFailOnError
+    CurrentDb.Execute "DELETE FROM TempCases", dbFailOnError
 
     'update statuses dependent on jurisdiction:
     'AddTrackingNumber, GenerateShippingEM, ShippingXMLs, BurnCD, FileTranscript,NoticeofService,SpellingsEmail
@@ -550,18 +519,18 @@ Public Sub pfEnterNewJob()
     Set rstCurrentCasesID = CurrentDb.OpenRecordset("SELECT * FROM Cases WHERE ID=" & sCasesID & ";")
     sJurisdiction = rstCurrentCasesID.Fields("Jurisdiction").Value
     rstCurrentCasesID.Close
-    db.Execute "UPDATE Statuses SET AddTrackingNumber = True, GenerateShippingEM = True, ShippingXMLs = True, " & _
+    CurrentDb.Execute "UPDATE Statuses SET AddTrackingNumber = True, GenerateShippingEM = True, ShippingXMLs = True, " & _
                "BurnCD = True, FileTranscript = True, NoticeofService = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-    'db.Execute "UPDATE Statuses SET WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-    'db.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-    'db.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-    'db.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-    'db.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+    'CurrentDb.Execute "UPDATE Statuses SET WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+    'CurrentDb.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+    'CurrentDb.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+    'CurrentDb.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+    'CurrentDb.Execute "UPDATE Statuses SET  WHERE [CourtDatesID] = " & sCourtDatesID & ";"
 
     Select Case sJurisdiction
     Case "Weber Nevada", "Weber Bankruptcy", "Weber Oregon", "Food and Drug Administration", "FDA", "AVT", _
          "eScribers", "AVTranz", "eScribers NH", "eScribers Bankruptcy", "J&J", "J&J Court Transcribers", "J&J Court"
-        db.Execute "UPDATE Statuses SET SpellingsEmail = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+        CurrentDb.Execute "UPDATE Statuses SET SpellingsEmail = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
     End Select
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -578,9 +547,7 @@ Public Sub pfEnterNewJob()
         Call pfStage1Ppwk
     End If
 
-
-    'TODO: PATH
-    Call fPlayAudioFolder("I:\" & sCourtDatesID & "\Audio\") 'code for processing audio
+    Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA) 'code for processing audio
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     MsgBox "Thanks, job entered!  Job number is " & sCourtDatesID & " if you want to process it!"
 
@@ -595,9 +562,6 @@ Public Sub fCheckTempCustomersCustomers()
     ' Call command: Call fCheckTempCustomersCustomers
     ' Description : retrieve info from TempCustomers/Customers
     '============================================================================
-    Dim rstTempCustomers As DAO.Recordset
-    Dim rstCheckTCuvCu As DAO.Recordset
-    Dim rstCustomers As DAO.Recordset
 
     Dim sCheckTCuAgainstCuSQL As String
     Dim tcFirstName As String
@@ -614,6 +578,10 @@ Public Sub fCheckTempCustomersCustomers()
     Dim tcFactoringApproved As String
     Dim tcCID As String
 
+    Dim rstTempCustomers As DAO.Recordset
+    Dim rstCheckTCuvCu As DAO.Recordset
+    Dim rstCustomers As DAO.Recordset
+    
     Set rstTempCustomers = CurrentDb.OpenRecordset("TempCustomers")
 
     If Not (rstTempCustomers.EOF And rstTempCustomers.BOF) Then
@@ -756,10 +724,6 @@ Public Sub fCheckTempCasesCases()
     ' Description : retrieve info from TempCases/Cases
     '============================================================================
 
-    Dim rstTempCases As DAO.Recordset
-    Dim rstCheckTCavCa As DAO.Recordset
-    Dim rstMaxCasesID As DAO.Recordset
-    Dim rstCurrentJob As DAO.Recordset
     Dim sCheckTCaAgainstCaSQL As String
     Dim sNewCasesIDSQL As String
     Dim tcsCourtDatesID As String
@@ -774,9 +738,12 @@ Public Sub fCheckTempCasesCases()
     Dim tcJurisdiction As String
     Dim tcJudge As String
     Dim tcJudgeTitle As String
-    Dim db As Database
+    
+    Dim rstTempCases As DAO.Recordset
+    Dim rstCheckTCavCa As DAO.Recordset
+    Dim rstMaxCasesID As DAO.Recordset
+    Dim rstCurrentJob As DAO.Recordset
 
-    Set db = CurrentDb
     Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
     rstTempCases.MoveFirst
 
@@ -803,9 +770,9 @@ Public Sub fCheckTempCasesCases()
         sNewCasesIDSQL = "INSERT INTO Cases (HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, Jurisdiction, Judge, JudgeTitle) SELECT HearingTitle, " & _
                          "Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, Jurisdiction, Judge, JudgeTitle FROM [TempCases];"
         
-        db.Execute (sNewCasesIDSQL)
+        CurrentDb.Execute (sNewCasesIDSQL)
     
-        Set rstMaxCasesID = db.OpenRecordset("SELECT MAX(ID) as CasesID From Cases;")
+        Set rstMaxCasesID = CurrentDb.OpenRecordset("SELECT MAX(ID) as CasesID From Cases;")
     
         rstMaxCasesID.MoveFirst
         vCasesID = rstMaxCasesID.Fields("CasesID").Value
@@ -858,7 +825,6 @@ Public Sub fCheckTempCasesCases()
     vCasesID = sCasesID
     Set rstCurrentJob = Nothing
     Set rstCheckTCavCa = Nothing
-    Set db = Nothing
     Set rstTempCases = Nothing
 
     MsgBox "Checked for previous case info."
@@ -873,8 +839,6 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     ' Call command: Call fInsertCalculatedFieldintoTempCourtDates
     ' Description : insert several calculated fields into tempcourtdates
     '============================================================================
-    Dim rstTempCourtDates As DAO.Recordset
-
     Dim iTurnaroundTimesCD As Long
     Dim iAudioLength As Long
     Dim iEstimatedPageCount As Long
@@ -887,7 +851,10 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     Dim sJurisdiction As String
     Dim sUnitPriceRateSrchSQL As String
     Dim InsertCustomersTempCourtDatesSQLstring As String
+    
     Dim rs2 As DAO.Recordset
+    Dim rstTempCourtDates As DAO.Recordset
+
 
     'calculate fields
     Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
@@ -1174,10 +1141,10 @@ Public Sub fProcessAudioParent()
     ' Call command: Call fProcessAudioParent
     ' Description : process audio in express scribe
     '============================================================================
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    Call fProcessAudioFolder("I:\" & sCourtDatesID & "\Audio")
+    
+    Dim cJob As New Job
+    
+    Call fProcessAudioFolder(cJob.DocPath.JobDirectoryA)
 
 End Sub
 
@@ -1190,9 +1157,9 @@ Public Sub fPlayAudioParent()
     ' Description : play audio as appropriate
     '============================================================================
 
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    Call fPlayAudioFolder("I:\" & sCourtDatesID & "\Audio")
+    Dim cJob As New Job
+    
+    Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA)
 
 
 End Sub
@@ -1202,20 +1169,24 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
     ' Name        : pfPlayAudioFolder
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call fPlayAudioFolder("I:\" & sCourtDatesID & "\Audio\")
+    ' Call command: Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA)
     ' Description : plays audio folder
     '============================================================================
 
-    Dim blNotFirstIteration As Boolean
-    Dim fiCurrentFile As File
-    Dim foHFolder As Folder
     Dim sExtension As String
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim FSO As Scripting.FileSystemObject
-    Dim item As Variant
     Dim sFileTypes() As String
-
+    
+    Dim blNotFirstIteration As Boolean
+    
+    Dim fiCurrentFile As File
+    Dim foHFolder As Folder
+    Dim FSO As Scripting.FileSystemObject
+    
+    Dim item As Variant
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1251,25 +1222,23 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
             sFileTypes = Array("csx", "inf")
                 
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*csx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-CourtSmartPlay.bat")
+                If fiCurrentFile Like "*csx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-CourtSmartPlay.bat")
                 If fiCurrentFile Like "*inf*" Then Exit For
             Next
                 
             sFileTypes = Array("mp3", "mp4", "wav", "mpeg", "wma", "wmv", "divx", "m4v", "mov", "wmv")
                 
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*mp3*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*mp4*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wav*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*mpeg*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wma*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*divx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*m4v*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*mov*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mp3*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mp4*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wav*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mpeg*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wma*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*divx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*m4v*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*mov*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribePlay.bat")
             Next
                 
         Next fiCurrentFile
@@ -1285,20 +1254,24 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
     ' Name        : pfProcessAudioFolder
     ' Author      : Erica L Ingram
     ' Copyright   : 2019, A Quo Co.
-    'TODO: PATH
-    ' Call command: Call fProcessAudioFolder("I:\" & sCourtDatesID & "\Audio\")
+    ' Call command: Call fProcessAudioFolder("\Production\2InProgress\" & sCourtDatesID & "\Audio\")
     ' Description : process audio in /Audio/ folder
     '============================================================================
 
-    Dim blNotFirstIteration As Boolean
-    Dim fiCurrentFile As File
-    Dim foHFolder As Folder
     Dim sExtension As String
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim FSO As Scripting.FileSystemObject
     Dim sFileTypes() As String
+    
+    Dim blNotFirstIteration As Boolean
+    
+    Dim fiCurrentFile As File
+    Dim foHFolder As Folder
+    Dim FSO As Scripting.FileSystemObject
+    
     Dim item As Variant
+    
+    Dim cJob As New Job
 
     sQuestion = "Would you like to process the audio for job number " & sCourtDatesID & "?  Make sure the audio is in the \Audio\folder before proceeding."
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -1326,24 +1299,22 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
             sFileTypes = Array("csx")
                     
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*csx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-CourtSmartPlay.bat")
+                If fiCurrentFile Like "*csx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-CourtSmartPlay.bat")
             Next
                     
             sFileTypes = Array("mp3", "mp4", "wav", "mpeg", "wma", "wmv", "divx", "m4v", "mov", "wmv")
                     
             For Each item In sFileTypes
-    'TODO: PATH
-                If fiCurrentFile Like "*mp3*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*mp4*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wav*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*mpeg*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wma*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*divx*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*m4v*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*mov*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
-                If fiCurrentFile Like "*wmv*" Then Call Shell("T:\Database\Scripts\Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mp3*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mp4*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wav*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mpeg*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wma*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*divx*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*m4v*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*mov*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
+                If fiCurrentFile Like "*wmv*" Then Call Shell(cJob.DocPath.DBScripts & "Cortana\Audio-ExpressScribeAdd.bat")
             Next
                     
         Next fiCurrentFile
@@ -1360,19 +1331,7 @@ Public Sub pfPriceQuoteEmail()
     ' Description : generates price quote and sends via e-mail
     '============================================================================
 
-    Dim db As DAO.Database
-    Dim qdfNew As QueryDef
-    Dim qdObj As DAO.QueryDef
-
-    Dim Rng As Range
-    Dim iDateDifference As Long
-    Dim iPageCount As Long
-    Dim iAudioLength As Long
-    Dim dDeadline As Date
-
     Dim sQueryName As String
-    Dim sPQEmailCSVPath As String
-    Dim sPQEmailTemplatePath As String
     Dim sSubtotal1 As String
     Dim sSubtotal2 As String
     Dim sSubtotal3 As String
@@ -1387,18 +1346,29 @@ Public Sub pfPriceQuoteEmail()
     Dim sPageRate5 As String
     Dim sPageRate As String
     Dim sPageRate9 As String
-    Dim sPriceQuoteDocPath As String
-    Dim outputfilestring As String
-    Dim yourVariable As String
-    Dim oWordAppDoc As New Word.Application
-    Dim oOutlookApp As New Outlook.Application
-    Dim oOutlookMail As Object
-    Dim oWordDoc As New Word.Document
-    Dim oWordEditor As Word.editor
-    Dim oWordApp As New Word.Application
     Dim sSubtotal5 As String
     Dim sSubtotal6 As String
     Dim sPageRate10 As String
+
+    Dim oWordAppDoc As New Word.Application
+    Dim oOutlookApp As New Outlook.Application
+    Dim oWordDoc As New Word.Document
+    Dim oWordEditor As Word.editor
+    Dim oWordApp As New Word.Application
+    Dim Rng As Range
+    
+    Dim oOutlookMail As Object
+    
+    Dim qdfNew As QueryDef
+    Dim qdObj As DAO.QueryDef
+
+    Dim iDateDifference As Long
+    Dim iPageCount As Long
+    Dim iAudioLength As Long
+    
+    Dim dDeadline As Date
+    
+    Dim cJob As New Job
 
     dDeadline = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtDeadline]
     iAudioLength = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtAudioLength]
@@ -1470,46 +1440,36 @@ Public Sub pfPriceQuoteEmail()
     '
     'End If
 
-    'TODO: PATH
-    sPQEmailTemplatePath = "T:\Database\Templates\Stage1s\PriceQuoteEmail-Template.docx"
-    sPQEmailCSVPath = "T:\Database\Scripts\InProgressExcels\Temp-Export-PQE.xlsx"
     sQueryName = "SELECT #" & dDeadline & "# AS Deadline, " & iAudioLength & " AS AudioLength, " & iPageCount & " AS PageCount, " _
                & sSubtotal1 & " AS Subtotal1, " & sSubtotal2 & " AS Subtotal2, " & _
                  sSubtotal3 & " AS Subtotal3, " & sSubtotal4 & " AS Subtotal4, " & sSubtotal5 & " AS Subtotal5;"
  
-    Set db = CurrentDb
     On Error Resume Next
-    With db
+    With CurrentDb
         .QueryDefs.delete "tmpDataQry"
         Set qdfNew = .CreateQueryDef("tmpDataQry", sQueryName)
         .Close
     End With
     On Error GoTo 0
 
-    DoCmd.OutputTo acOutputQuery, "tmpDataQry", acFormatXLSX, sPQEmailCSVPath, False
+    DoCmd.OutputTo acOutputQuery, "tmpDataQry", acFormatXLSX, cJob.DocPath.PQXLS, False
 
     Set qdObj = Nothing
-    Set db = Nothing
-
-    'TODO: PATH
-    sPriceQuoteDocPath = "T:\Database\Templates\Stage1s\PriceQuoteEmail.docx"
-
-    Set oWordDoc = oWordApp.Documents.Open(sPQEmailTemplatePath)
+        
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PQTemplate)
 
     'performs mail merge
     oWordDoc.Application.Visible = False
-    oWordDoc.MailMerge.OpenDataSource Name:=sPQEmailCSVPath, ReadOnly:=True
+    oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.PQXLS, ReadOnly:=True
     oWordDoc.MailMerge.Execute
-    oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=sPriceQuoteDocPath
+    oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PQEmail
     oWordDoc.Application.ActiveDocument.Close
 
     'saves file in job number folder in in progress
     oWordDoc.Close SaveChanges:=wdSaveChanges
 
-
     'Set oOutlookApp = CreateObject("Outlook.Application")
-
-
+    
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
 
@@ -1517,7 +1477,7 @@ Public Sub pfPriceQuoteEmail()
         Set oWordApp = CreateObject("Word.Application")
     End If
 
-    Set oWordDoc = oWordApp.Documents.Open(sPriceQuoteDocPath)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PQEmail)
 
     oWordDoc.Content.Copy
 
@@ -1548,7 +1508,6 @@ Public Sub pfStage1Ppwk()
     ' Description : completes all stage 1 tasks
     '============================================================================
 
-
     Dim sCourtRulesPath1 As String
     Dim sCourtRulesPath2 As String
     Dim sCourtRulesPath3 As String
@@ -1568,44 +1527,41 @@ Public Sub pfStage1Ppwk()
     Dim sCourtRulesPath7a As String
     Dim sCourtRulesPath8a As String
     Dim sCourtRulesPath9a As String
-    Dim sXeroCSVPath As String
+    
     Dim sURL As String
     Dim sQuestion As String
     Dim sCourtRulesPath10a As String
     Dim sCourtRulesPath10 As String
     Dim sAnswer As String
 
+    Dim cJob As New Job
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
+    sCourtRulesPath1 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-Rates.pdf"
+    sCourtRulesPath2 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
+    sCourtRulesPath3 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-SampleTranscript.pdf"
+    sCourtRulesPath4 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
+    sCourtRulesPath5 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
+    sCourtRulesPath6 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
+    sCourtRulesPath7 = cJob.DocPath.TemplateFolder1 & "CourtRules-HowFileApprovedJurisdictions.pdf"
+    sCourtRulesPath8 = cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties.pdf"
+    sCourtRulesPath9 = cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties-2.pdf"
+    sCourtRulesPath10 = cJob.DocPath.JurisdictionRefs & "Massachusetts\uniformtranscriptformat.pdf"
 
-    'TODO: PATH
-    sCourtRulesPath1 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-Rates.pdf"
-    sCourtRulesPath2 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
-    sCourtRulesPath3 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-SampleTranscript.pdf"
-    sCourtRulesPath4 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
-    sCourtRulesPath5 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
-    sCourtRulesPath6 = "T:\Database\Templates\Stage1s\CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
-    sCourtRulesPath7 = "T:\Database\Templates\Stage1s\CourtRules-HowFileApprovedJurisdictions.pdf"
-    sCourtRulesPath8 = "T:\Database\Templates\Stage1s\CourtRules-WACounties.pdf"
-    sCourtRulesPath9 = "T:\Database\Templates\Stage1s\CourtRules-WACounties-2.pdf"
-    sCourtRulesPath10 = "T:\Administration\Jurisdiction References\Massachusetts\uniformtranscriptformat.pdf"
-
-
-    'TODO: PATH
-    sCourtRulesPath1a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-Rates.pdf"
-    sCourtRulesPath2a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
-    sCourtRulesPath3a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-SampleTranscript.pdf"
-    sCourtRulesPath4a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
-    sCourtRulesPath5a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
-    sCourtRulesPath6a = "I:\" & sCourtDatesID & "\Notes\CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
-    sCourtRulesPath7a = "I:\" & sCourtDatesID & "\Notes\CourtRules-HowFileApprovedJurisdictions.pdf"
-    sCourtRulesPath8a = "I:\" & sCourtDatesID & "\Notes\CourtRules-WACounties.pdf"
-    sCourtRulesPath9a = "I:\" & sCourtDatesID & "\Notes\CourtRules-WACounties-2.pdf"
-    sCourtRulesPath10a = "I:\" & sCourtDatesID & "\Notes\uniformtranscriptformat.pdf"
+    sCourtRulesPath1a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-Rates.pdf"
+    sCourtRulesPath2a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
+    sCourtRulesPath3a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-SampleTranscript.pdf"
+    sCourtRulesPath4a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
+    sCourtRulesPath5a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-2.pdf"
+    sCourtRulesPath6a = cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptRedactionQA.pdf"
+    sCourtRulesPath7a = cJob.DocPath.JobDirectoryN & "CourtRules-HowFileApprovedJurisdictions.pdf"
+    sCourtRulesPath8a = cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf"
+    sCourtRulesPath9a = cJob.DocPath.JobDirectoryN & "CourtRules-WACounties-2.pdf"
+    sCourtRulesPath10a = cJob.DocPath.JobDirectoryN & "uniformtranscriptformat.pdf"
 
     Call pfSelectCoverTemplate                   'cover page prompt
 
@@ -1677,18 +1633,16 @@ Public Sub pfStage1Ppwk()
 
 
 Line2:                                           'every jurisdiction converges here
-    DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd 'export xero csv
+    DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd 'export xero csv
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sXeroCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-" & "-XeroInvoiceCSV" & ".csv"
 
-    DoCmd.TransferText acExportDelim, , "SelectXero", sXeroCSVPath, True
+    DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
 
-    'come back xero api
+    'TODO: xero api
     sURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
     Application.FollowHyperlink (sURL)           'open xero website
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
@@ -1751,15 +1705,9 @@ Public Sub fWunderlistAddNewJob()
     Dim sDueDate As String
     Dim vErrorDetails As String
     Dim sURL As String
-    Dim sUserName As String
-    Dim sPassword As String
     Dim sEmail As String
-    Dim lFolderID As Long
-    Dim iListID As Long
-    Dim sToken As String
     Dim sJSON As String
     Dim vErrorIssue As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
@@ -1773,6 +1721,11 @@ Public Sub fWunderlistAddNewJob()
     Dim sResponseText As String
     Dim apiWaxLRS As String
 
+    Dim lFolderID As Long
+    Dim iListID As Long
+    
+    Dim parsed As Dictionary
+    
     Call pfCurrentCaseInfo
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1788,38 +1741,15 @@ Public Sub fWunderlistAddNewJob()
     bStarred = "false"
     lFolderID = 13249242                         'id for "Production" folder
 
-
-    'TODO: fWunderlistAddNewJob can delete following comment lines when known safe come back
-    'sFile1 = "C:\other\3.txt"
-    'sFile2 = "C:\other\4.txt"
-    'sFile3 = "C:\other\5.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-
-    'Open sFile3 For Input As #3
-    'Line Input #3, sLine3
-    'Close #3
-
     sEmail = sCompanyEmail
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sToken = sLine3
     sTitle = sCourtDatesID
-    'sToken = ""
-    'sUserName = ""
 
     'create a list JSON
     sJSON = "{" & Chr(34) & "title" & Chr(34) & ": " & Chr(34) & sTitle & Chr(34) & "}"
     
-    Debug.Print "sJSON-------------------------create a list JSON"
-    Debug.Print sJSON
-    Debug.Print "RESPONSETEXT--------------------------------------------"
+    'Debug.Print "sJSON-------------------------create a list JSON"
+    'Debug.Print sJSON
+    'Debug.Print "RESPONSETEXT--------------------------------------------"
     
     sURL = "https://a.wunderlist.com/api/v1/lists"
     
@@ -1833,9 +1763,9 @@ Public Sub fWunderlistAddNewJob()
         apiWaxLRS = .responseText
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    iListID = Parsed("id")                       'get new list_id
-    sTitle = Parsed("title")
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    iListID = parsed("id")                       'get new list_id
+    sTitle = parsed("title")
     
     'get folder ID
     
@@ -1860,11 +1790,11 @@ Public Sub fWunderlistAddNewJob()
     '@Ignore AssignmentNotUsed
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
     
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    vErrorName = Parsed("id")                    '("value") 'second level array
-    vErrorMessage = Parsed("title")
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    vErrorName = parsed("id")                    '("value") 'second level array
+    vErrorMessage = parsed("title")
     Dim rep As Object
-    Set rep = Parsed("list_ids")
+    Set rep = parsed("list_ids")
     
     vErrorILink = ""
     Dim x As Long
@@ -1878,7 +1808,7 @@ Public Sub fWunderlistAddNewJob()
         End If
         x = x + 1
     Next
-    vErrorIssue = Parsed("revision")
+    vErrorIssue = parsed("revision")
 
     'put list in folder ID
 
@@ -1938,9 +1868,9 @@ Public Sub fWunderlistAddNewJob()
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
                           "}"
-    Debug.Print "sJSON-----------------------------------Add Stage 1-4 Tasks"
-    Debug.Print sJSON
-    Debug.Print "RESPONSETEXT--------------------------------------------"
+    'Debug.Print "sJSON-----------------------------------Add Stage 1-4 Tasks"
+    'Debug.Print sJSON
+    'Debug.Print "RESPONSETEXT--------------------------------------------"
     
     sURL = "https://a.wunderlist.com/api/v1/tasks"
     
@@ -1957,10 +1887,10 @@ Public Sub fWunderlistAddNewJob()
         Debug.Print "--------------------------------------------"
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = Parsed("list_id")                  'get new list_id
-    sTitle = Parsed("title")
+    iListID = parsed("list_id")                  'get new list_id
+    sTitle = parsed("title")
 
 
     'create a task add JSON
@@ -1979,7 +1909,6 @@ Public Sub fWunderlistAddNewJob()
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
                           "}"
-        
     
     sURL = "https://a.wunderlist.com/api/v1/tasks"
     
@@ -1995,10 +1924,10 @@ Public Sub fWunderlistAddNewJob()
         
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = Parsed("list_id")                  'get new list_id
-    sTitle = Parsed("title")
+    iListID = parsed("list_id")                  'get new list_id
+    sTitle = parsed("title")
 
     'create a task add JSON
         
@@ -2030,12 +1959,10 @@ Public Sub fWunderlistAddNewJob()
         apiWaxLRS = .responseText
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = Parsed("list_id")                  'get new list_id
-    sTitle = Parsed("title")
-
-
+    iListID = parsed("list_id")                  'get new list_id
+    sTitle = parsed("title")
 
     'create a task add JSON
     
@@ -2067,30 +1994,20 @@ Public Sub fWunderlistAddNewJob()
         apiWaxLRS = .responseText
         .abort
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
     '@Ignore AssignmentNotUsed
-    iListID = Parsed("list_id")                  'get new list_id
+    iListID = parsed("list_id")                  'get new list_id
     '@Ignore AssignmentNotUsed
-    sTitle = Parsed("title")
-
-
+    sTitle = parsed("title")
 
 End Sub
 
 Public Sub autointake()
-    'TODO: autointake what's going on here come back
+    'TODO: autointake what's going on here
     'autoread email form into access db
-    Dim rstOLP As DAO.Recordset
-    Dim rstTempCourtDates As DAO.Recordset
-    Dim rstTempCases As DAO.Recordset
-    Dim rstTempCustomers As DAO.Recordset
     Dim sSubmissionDate As String
     Dim sEmailText As String
-
-
-    Dim x As Long
-    Dim y As Long
     Dim sSplitInfo() As String
     Dim sCSVInfo() As String
     Dim sInfoFields() As String
@@ -2100,7 +2017,6 @@ Public Sub autointake()
     Dim sHearingDate As String
     Dim sCurrentAppString() As String
     Dim sAttorneyNameA() As String
-
     Dim sYourName As String
     Dim sFirstName As String
     Dim sLastName As String
@@ -2143,19 +2059,6 @@ Public Sub autointake()
     Dim dExpectedRebateDate As String
     Dim iEstimatedPageCount As String
     Dim sAccountCode As String
- 
-    Dim db As DAO.Database
-    Dim oExcelWB As Excel.Workbook
-    Dim oExcelMacroWB As Excel.Workbook
-
-    Dim rstTempJob As DAO.Recordset
-    Dim rstCurrentJob As DAO.Recordset
-    Dim rstCurrentCasesID As DAO.Recordset
-    Dim rstCurrentStatusesEntry As DAO.Recordset
-    Dim rstStatuses As DAO.Recordset
-    Dim rstMaxCasesID As DAO.Recordset
-    Dim rstTempCDs As DAO.Recordset
-
     Dim sExtensionXLSM As String
     Dim sExtensionXLS As String
     Dim sFullPathXLS As String
@@ -2177,6 +2080,25 @@ Public Sub autointake()
     Dim sFirstA As String
     Dim sTempCustomersSQL As String
 
+    Dim rstTempJob As DAO.Recordset
+    Dim rstCurrentJob As DAO.Recordset
+    Dim rstCurrentCasesID As DAO.Recordset
+    Dim rstCurrentStatusesEntry As DAO.Recordset
+    Dim rstStatuses As DAO.Recordset
+    Dim rstMaxCasesID As DAO.Recordset
+    Dim rstTempCDs As DAO.Recordset
+    Dim rstOLP As DAO.Recordset
+    Dim rstTempCourtDates As DAO.Recordset
+    Dim rstTempCases As DAO.Recordset
+    Dim rstTempCustomers As DAO.Recordset
+    
+    Dim oExcelWB As Excel.Workbook
+    Dim oExcelMacroWB As Excel.Workbook
+    
+    Dim x As Long
+    Dim y As Long
+    
+    Dim cJob As New Job
 
 
     Set rstOLP = CurrentDb.OpenRecordset("OLPaypalPayments")
@@ -2348,7 +2270,7 @@ Public Sub autointake()
         '
         '        End If
         
-        'come back
+        'TODO: What is going on here?
         sFiled = InputBox("Are we filing this, yes or no?")
         sFactoring = InputBox("Are we factoring this, yes or no?")
         
@@ -2441,7 +2363,7 @@ Public Sub autointake()
         dDueDate = (Date + sTurnaround) - 2
         sAccountCode = 400
 
-        db.Execute "INSERT INTO TempCourtDates (SubmissionDate, FirstName, LastName, MrMs, AFirstName, ALastName, Company, Notes, EmailAddress, " & _
+        CurrentDb.Execute "INSERT INTO TempCourtDates (SubmissionDate, FirstName, LastName, MrMs, AFirstName, ALastName, Company, Notes, EmailAddress, " & _
                    "HardCopy, Address1, Address2, City, State, ZIP, TurnaroundTimesCD, AudioLength, Party1, Party2, CaseNumber1, CaseNumber2, Judge, Jurisdiction, " & _
                    "HearingDate, Party1Name, Party2Name, JudgeTitle, HearingTitle, HearingEndTime, HearingStartTime, Location, InvoiceDate, DueDate, " & _
                    "AccountCode, UnitPrice, InventoryRateCode, BrandingTheme) VALUES (" & _
@@ -2518,8 +2440,7 @@ Public Sub autointake()
         sNewCourtDatesRowSQL = "INSERT INTO TempCases (HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
                                "Jurisdiction, Judge, JudgeTitle, Notes) VALUES HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
                                "Jurisdiction, Judge, JudgeTitle, Notes FROM [TempCourtDates];"
-        db.Execute (sNewCourtDatesRowSQL)
-
+        CurrentDb.Execute (sNewCourtDatesRowSQL)
         
         'enter apps into tempcustomers
         'ask how many appearances
@@ -2579,7 +2500,7 @@ Public Sub autointake()
             '                rstTempCustomers.Update
             '
                 
-            db.Execute "INSERT INTO TempCourtDates (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, " & _
+            CurrentDb.Execute "INSERT INTO TempCourtDates (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, " & _
                        "ZIP, Notes, FactoringApproved) VALUES (" & _
                        sLastName & ", " & sFirstName & ", " & sLastName & ", " & sCompany & ", " & sMrMs & ", " & "" & ", " & "" & ", " & sAddress1 & " " & sAddress2 & ", " & _
                        sCity & ", " & sState & ", " & sZIP & ", " & sEmail & ", " & sFactoring & ");"
@@ -2587,42 +2508,35 @@ Public Sub autointake()
         Next
     
         'run everything else like normal
-                
-                                
-        Set db = CurrentDb
-            
         'delete blank lines
-        db.Execute "DELETE FROM TempCustomers WHERE [Company] = " & Chr(34) & Chr(34) & ";"
-        'db.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] = " & Chr(34) & Chr(34) & ";"
-        db.Execute "DELETE FROM TempCases WHERE [Party1] = " & Chr(34) & Chr(34) & ";"
-            
+        CurrentDb.Execute "DELETE FROM TempCustomers WHERE [Company] = " & Chr(34) & Chr(34) & ";"
+        'CurrentDb.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] = " & Chr(34) & Chr(34) & ";"
+        CurrentDb.Execute "DELETE FROM TempCases WHERE [Party1] = " & Chr(34) & Chr(34) & ";"
             
         'Perform the import
-        Set db = CurrentDb
         sNewCourtDatesRowSQL = "INSERT INTO CourtDates (HearingDate, HearingStartTime, HearingEndTime, AudioLength, Location, TurnaroundTimesCD, InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, AccountCode, BrandingTheme) SELECT HearingDate, HearingStartTime, HearingEndTime, AudioLength, Location, TurnaroundTimesCD, InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, AccountCode, BrandingTheme FROM [TempCourtDates];"
-        db.Execute (sNewCourtDatesRowSQL)
+        CurrentDb.Execute (sNewCourtDatesRowSQL)
             
             
         ' store courtdatesID
-        sCourtDatesID = db.OpenRecordset("SELECT @@IDENTITY")(0)
+        sCourtDatesID = CurrentDb.OpenRecordset("SELECT @@IDENTITY")(0)
             
         [Forms]![NewMainMenu]![ProcessJobSubformNMM].[Form]![JobNumberField].Value = sCourtDatesID
             
         Call fCheckTempCustomersCustomers
         Call fCheckTempCasesCases
             
-        Set db = CurrentDb
         sTempJobSQL = "SELECT * FROM TempCustomers;"
-        Set rstTempJob = db.OpenRecordset(sTempJobSQL)
+        Set rstTempJob = CurrentDb.OpenRecordset(sTempJobSQL)
                 
         sCurrentJobSQL = "SELECT * FROM CourtDates WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-        Set rstCurrentJob = db.OpenRecordset(sCurrentJobSQL)
+        Set rstCurrentJob = CurrentDb.OpenRecordset(sCurrentJobSQL)
             
         rstTempJob.MoveFirst
         sOrderingID = rstTempJob.Fields("AppID").Value
             
         If IsNull(rstCurrentJob!OrderingID) Then
-            db.Execute "UPDATE CourtDates SET OrderingID = " & sOrderingID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE CourtDates SET OrderingID = " & sOrderingID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             rstTempJob.Close
             rstCurrentJob.Close
             Set rstTempJob = Nothing
@@ -2636,16 +2550,16 @@ Public Sub autointake()
         sCurrentJobSQL = "SELECT * FROM CourtDates WHERE ID = " & sCourtDatesID & ";"
         sTempJobSQL = "SELECT * FROM TempCourtDates;"
         sStatusesEntrySQL = "SELECT * FROM Statuses WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-        'db.Execute "INSERT INTO Statuses (" & sCourtDatesID & ");"
-        Set rstStatuses = db.OpenRecordset("Statuses")
+        'CurrentDb.Execute "INSERT INTO Statuses (" & sCourtDatesID & ");"
+        Set rstStatuses = CurrentDb.OpenRecordset("Statuses")
         rstStatuses.AddNew
         rstStatuses.Fields("CourtDatesID").Value = sCourtDatesID
         rstStatuses.Update
         rstStatuses.Close
         Set rstStatuses = Nothing
-        Set rstTempJob = db.OpenRecordset(sTempJobSQL)
-        Set rstCurrentJob = db.OpenRecordset(sCurrentJobSQL)
-        Set rstCurrentStatusesEntry = db.OpenRecordset(sStatusesEntrySQL)
+        Set rstTempJob = CurrentDb.OpenRecordset(sTempJobSQL)
+        Set rstCurrentJob = CurrentDb.OpenRecordset(sCurrentJobSQL)
+        Set rstCurrentStatusesEntry = CurrentDb.OpenRecordset(sStatusesEntrySQL)
         rstCurrentJob.MoveFirst
             
         Do Until rstCurrentJob.EOF
@@ -2655,13 +2569,13 @@ Public Sub autointake()
             sCasesID = rstTempJob.Fields("CasesID")
                 
                             
-            db.Execute "UPDATE TempCourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE TempCourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
             'rstTempJob.Edit
             'rstTempJob.Fields("CasesID") = sCasesID
             'rstTempJob.Update
             'sCasesID = rstTempJob.Fields("CasesID")
                 
-            db.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [InvoiceNo] = " & sInvoiceNumber & ";"
+            CurrentDb.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [InvoiceNo] = " & sInvoiceNumber & ";"
             '"SELECT * FROM TempCourtDates WHERE [InvoiceNo]=" & sInvoiceNumber & ";"
             'Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
             'rstTempCDs.Edit
@@ -2669,44 +2583,41 @@ Public Sub autointake()
             'rstTempCDs.Update
             'rstTempCDs.Close
             'Set rstTempCDs = Nothing
-            'db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            'CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 
-            db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = db.OpenRecordset("TempCustomers")
+            CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & ";"
+            'Set rstTempCDs = CurrentDb.OpenRecordset("TempCustomers")
             'rstTempCDs.Edit
             'rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
             'rstTempCDs.Update
             'rstTempCDs.Close
             'Set rstTempCDs = Nothing
                 
-            db.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [ID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            CurrentDb.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [ID] = " & sCourtDatesID & ";"
+            'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
             'rstTempCDs.Edit
             'If sCasesID <> "" Then rstTempCDs.Fields("CasesID").Value = sCasesID
             'rstTempCDs.Update
             'rstTempCDs.Close
             'Set rstTempCDs = Nothing
                 
-            db.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [ID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            CurrentDb.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [ID] = " & sCourtDatesID & ";"
+            'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
             'rstTempCDs.Edit
             'rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
             'rstTempCDs.Update
             'rstTempCDs.Close
             'Set rstTempCDs = Nothing
                 
-            db.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [ID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            CurrentDb.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [ID] = " & sCourtDatesID & ";"
+            'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
             'rstTempCDs.Edit
             'rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
             'rstTempCDs.Update
             'rstTempCDs.Close
             'Set rstTempCDs = Nothing
                 
-                
-                
-                
-            'db.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [TempCourtDates].[InvoiceNo] = " & sInvoiceNumber & ";"
+            'CurrentDb.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [TempCourtDates].[InvoiceNo] = " & sInvoiceNumber & ";"
             '"SELECT * FROM TempCourtDates WHERE [InvoiceNo]=" & sInvoiceNumber & ";"
             '                Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
             '                rstTempCDs.Edit
@@ -2714,9 +2625,9 @@ Public Sub autointake()
             '                rstTempCDs.Update
             '                rstTempCDs.Close
             '                Set rstTempCDs = Nothing
-            'db.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            'CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             '
-            '                Set rstTempCDs = db.OpenRecordset("TempCustomers")
+            '                Set rstTempCDs = CurrentDb.OpenRecordset("TempCustomers")
             '                rstTempCDs.Edit
             '                rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
             '                rstTempCDs.Update
@@ -2724,9 +2635,9 @@ Public Sub autointake()
             '                Set rstTempCDs = Nothing
             '
             '
-            '                'db.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            '                'CurrentDb.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             '
-            '                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            '                Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
             '                rstTempCDs.Edit
             '                rstTempCDs.Fields("CasesID").Value = sCasesID
             '                rstTempCDs.Update
@@ -2734,10 +2645,10 @@ Public Sub autointake()
             '                Set rstTempCDs = Nothing
             '
                 
-            'db.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            'CurrentDb.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             '
             '
-            '                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            '                Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
             '                rstTempCDs.Edit
             '                rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
             '                rstTempCDs.Update
@@ -2745,9 +2656,9 @@ Public Sub autointake()
             '                Set rstTempCDs = Nothing
             '
                 
-            'db.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            'CurrentDb.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             '
-            '                Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            '                Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
             '                rstTempCDs.Edit
             '                rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
             '                rstTempCDs.Update
@@ -2762,8 +2673,8 @@ Public Sub autointake()
                 rstCurrentStatusesEntry.Edit
                 sStatusesID = rstCurrentStatusesEntry.Fields("ID")
                 rstCurrentStatusesEntry.Update
-                db.Execute "UPDATE CourtDates SET StatusesID = " & sStatusesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-                db.Execute "UPDATE Statuses SET ContactsEntered = True, JobEntered = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+                CurrentDb.Execute "UPDATE CourtDates SET StatusesID = " & sStatusesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                CurrentDb.Execute "UPDATE Statuses SET ContactsEntered = True, JobEntered = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
                     
             End If
                 
@@ -2771,20 +2682,15 @@ Public Sub autointake()
                 
         Loop
             
-        db.Close:   Set db = Nothing             ' close database
-            
         Call pfCheckFolderExistence              'checks for job folders/rough draft
             
         'import appearancesId from tempcustomers into courtdates
             
-            
-            
-        Set db = CurrentDb
         sTempCustomersSQL = "SELECT * FROM TempCustomers;"
         sCurrentJobSQL = "SELECT * FROM CourtDates WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             
-        Set rstTempJob = db.OpenRecordset(sTempCustomersSQL)
-        Set rstCurrentJob = db.OpenRecordset(sCurrentJobSQL)
+        Set rstTempJob = CurrentDb.OpenRecordset(sTempCustomersSQL)
+        Set rstCurrentJob = CurrentDb.OpenRecordset(sCurrentJobSQL)
             
         x = 1
             
@@ -2799,12 +2705,12 @@ Public Sub autointake()
             If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
                 Select Case sAppNumber
                 Case "App1", "App2", "App3", "App4", "App5", "App6"
-                    db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+                    CurrentDb.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 Case Else
                     Exit Do
                 End Select
                     
-                'Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
+                'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
                 'rstTempCDs.Edit
                 'If sAppNumber = "App7" Then
                 '    rstTempCDs.Update
@@ -2825,9 +2731,6 @@ Public Sub autointake()
             x = x + 1
         Loop
 
-
-
-
         '            Do Until rstTempJob.EOF
         '
         '                sCurrentTempApp = rstTempJob.Fields("AppID").Value
@@ -2836,9 +2739,9 @@ Public Sub autointake()
         '                If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
         '
         '
-        '                    'db.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+        '                    'CurrentDb.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
         '
-        '                    Set rstTempCDs = db.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+        '                    Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
         '                    rstTempCDs.Edit
         '                    rstTempCDs.Fields(sAppNumber).Value = sCurrentTempApp
         '                    rstTempCDs.Update
@@ -2858,28 +2761,19 @@ Public Sub autointake()
         '
         '            Loop
         '
-            
-        db.Close:   Set db = Nothing
-        Set db = CurrentDb
         'rstCurrentJob.Close
         'rstTempJob.Close
-            
-            
-            
-            
-        Set db = CurrentDb                       'create new agshortcuts entry
-        db.Execute "INSERT INTO AGShortcuts (CourtDatesID, CasesID) SELECT CourtDatesID, CasesID FROM TempCourtDates;"
+        'create new agshortcuts entry
+        CurrentDb.Execute "INSERT INTO AGShortcuts (CourtDatesID, CasesID) SELECT CourtDatesID, CasesID FROM TempCourtDates;"
             
         Call fIsFactoringApproved                'create new invioce
         Call pfGenerateJobTasks                  'generates job tasks
         Call pfPriorityPointsAlgorithm           'gives tasks priority points
         Call fProcessAudioParent                 'process audio in audio folder
-            
-        db.Close:   Set db = Nothing             ' close database
-        Set db = CurrentDb
-        db.Execute "DELETE FROM TempCourtDates", dbFailOnError
-        db.Execute "DELETE FROM TempCustomers", dbFailOnError
-        db.Execute "DELETE FROM TempCases", dbFailOnError
+        
+        CurrentDb.Execute "DELETE FROM TempCourtDates", dbFailOnError
+        CurrentDb.Execute "DELETE FROM TempCustomers", dbFailOnError
+        CurrentDb.Execute "DELETE FROM TempCases", dbFailOnError
             
         'update statuses dependent on jurisdiction:
         'AddTrackingNumber, GenerateShippingEM, ShippingXMLs, BurnCD, FileTranscript,NoticeofService,SpellingsEmail
@@ -2898,13 +2792,13 @@ Public Sub autointake()
            Or sJurisdiction Like "Food and Drug Administration" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" _
            Or sJurisdiction Like "*eScribers*" Or sJurisdiction Like "*AVTranz*" Then
                 
-            db.Execute "UPDATE Statuses SET AddTrackingNumber = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-            db.Execute "UPDATE Statuses SET GenerateShippingEM = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-            db.Execute "UPDATE Statuses SET ShippingXMLs = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-            db.Execute "UPDATE Statuses SET BurnCD = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-            db.Execute "UPDATE Statuses SET FileTranscript = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-            db.Execute "UPDATE Statuses SET NoticeofService = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-            db.Execute "UPDATE Statuses SET SpellingsEmail = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET AddTrackingNumber = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET GenerateShippingEM = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET ShippingXMLs = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET BurnCD = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET FileTranscript = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET NoticeofService = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE Statuses SET SpellingsEmail = True WHERE [CourtDatesID] = " & sCourtDatesID & ";"
             
         Else
         End If
@@ -2923,10 +2817,8 @@ Public Sub autointake()
         Else                                     'Code for yes
             Call pfStage1Ppwk
         End If
-            
-    'TODO: PATH
-        Call fPlayAudioFolder("I:\" & sCourtDatesID & "\Audio\") 'code for processing audio
-            
+        
+        Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA) 'code for processing audio
             
             
         MsgBox "Thanks, job entered!  Job number is " & sCourtDatesID & " if you want to process it!"
@@ -2943,7 +2835,7 @@ Public Sub autointake()
     If sAnswer = vbNo Then                       'Code for No
         MsgBox "No entries will be deleted."
     Else                                         'Code for yes
-        db.Execute "DELETE FROM OLPayPalPayments", dbFailOnError
+        CurrentDb.Execute "DELETE FROM OLPayPalPayments", dbFailOnError
     End If
 
     sQuestion = "Want to send an order confirmation to the client?"

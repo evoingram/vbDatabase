@@ -64,31 +64,16 @@ Private sTemp As String
 
 Public Sub fSendPPEmailFactored()
     'generates factored invoice email for pp
-    Dim sFile1 As String
-    Dim sInvoicePathPDF As String
-    Dim sLine1 As String
     Dim sInvoiceNumber As String
     Dim sName As String
     Dim vPPInvoiceNo As String
-    Dim sExportedTemplatePath As String
-    Dim sTemplatePath As String
-    Dim sOutputPDF As String
-    Dim sExportInfoCSVPath As String
-    Dim sQueryName As String
     Dim sHTMLPPB As String
-    Dim sInvoicePathDocX As String
     Dim vPPLink As String
-    Dim sFilePath As String
-    Dim sFilePathHTML As String
     Dim sQuestion As String
     Dim sAnswer As String
     Dim sToEmail As String
-    Dim sLine2 As String
-    Dim sFileNameOut As String
     Dim sBuf As String
     Dim sTemp As String
-    Dim sFileName As String
-
 
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
@@ -98,23 +83,19 @@ Public Sub fSendPPEmailFactored()
 
     Dim qdf As QueryDef
     Dim rstQuery As DAO.Recordset
+    
     Dim iFileNum As Long
 
+    Dim cJob As New Job
 
     Call fPPGenerateJSONInfo                     'refreshes some necessary info
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    sQueryName = "TRInvoiQPlusCases"
-    'TODO: PATH
-    sExportedTemplatePath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PP-FactoredInvoiceEmail.docx"
-    sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-InvoiceInfo.xls"
-    sTemplatePath = "T:\Database\Templates\Stage4s\PP-FactoredInvoiceEmail-Template.docx"
-
     Call pfGetOrderingAttorneyInfo               'refreshes some necessary info
     Call pfCurrentCaseInfo                       'refreshes some necessary info
 
-    Set qdf = CurrentDb.QueryDefs(sQueryName)
+    Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
@@ -132,11 +113,6 @@ Public Sub fSendPPEmailFactored()
     vPPInvoiceNo = Right(vPPInvoiceNo, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
 
-    'TODO: PATH
-    sFile1 = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PP-FactoredInvoiceEmail.html"
-    sInvoicePathPDF = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".pdf"
-    sInvoicePathDocX = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".docx"
-
     'create pp invoice link
     vPPLink = "https://www.paypal.com/invoice/p/#" & vPPInvoiceNo
 
@@ -145,19 +121,14 @@ Public Sub fSendPPEmailFactored()
       & "https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-large.png" & _
         Chr(34) & "alt=" & Chr(34) & "Check out with PayPal" & Chr(34) & "/></a></body></html>"
 
-
-    'TODO: PATH
-    sFilePath = "I:\" & sCourtDatesID & "\WorkingFiles\" & "PPButton.txt"
-    sFilePathHTML = "I:\" & sCourtDatesID & "\WorkingFiles\" & "PPButton.html"
-
     'open txt file, save as html file
 
-    Open sFilePath For Output As #1
+    Open cJob.DocPath.PPButtonT For Output As #1
     Write #1, sHTMLPPB
     Close #1
 
     iFileNum = FreeFile
-    Open sFilePath For Input As iFileNum
+    Open cJob.DocPath.PPButtonT For Input As iFileNum
 
     Do Until EOF(iFileNum)
         Line Input #iFileNum, sBuf
@@ -172,28 +143,26 @@ Public Sub fSendPPEmailFactored()
 
 
     iFileNum = FreeFile
-    Open sFilePath For Output As iFileNum
+    Open cJob.DocPath.PPButtonT For Output As iFileNum
 
     Print #iFileNum, sTemp
 
     Close iFileNum
 
-    Name sFilePath As sFilePathHTML              'Save txt file as (if possible)
+    Name cJob.DocPath.PPButtonT As cJob.DocPath.PPButton              'Save txt file as (if possible)
 
     'paste PPButton html into mail merged invoice/PQ at both bookmarks "PPButton" bookmark or #PPB1# AND "PPButton2" or #PPB2#
     Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = False
 
-    Set oWordDoc = oWordApp.Documents.Open(sFilePathHTML)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton)
 
     oWordDoc.Content.Copy
 
     Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = True
 
-    'TODO: PATH
-    sExportedTemplatePath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PP-FactoredInvoiceEmail.docx"
-    Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPFactoredInvoiceEmail)
 
     With oWordDoc.Application
 
@@ -265,7 +234,7 @@ Public Sub fSendPPEmailFactored()
         End With
     
         'save invoice/PQ
-        .ActiveDocument.SaveAs2 FileName:=sExportedTemplatePath
+        .ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPFactoredInvoiceEmail
     
     End With
 
@@ -277,7 +246,7 @@ Public Sub fSendPPEmailFactored()
     
 
     'prompt to ask when pdf is made
-    sQuestion = "Click yes after you have created your final invoice PDF at " & sInvoicePathPDF
+    sQuestion = "Click yes after you have created your final invoice PDF at " & cJob.DocPath.InvoiceP
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
 
@@ -287,19 +256,16 @@ Public Sub fSendPPEmailFactored()
     
     Else                                         'if yes then this happens
     
-        DoCmd.OutputTo acOutputQuery, sQueryName, acFormatXLS, sExportInfoCSVPath, False
+        DoCmd.OutputTo acOutputQuery, qTRIQPlusCases, acFormatXLS, cJob.DocPath.InvoiceInfo, False
     
-
-    'TODO: PATH
-        sTemplatePath = "T:\Database\Templates\Stage4s\PP-FactoredInvoiceEmail-Template.docx"
-        'Set oWordApp = GetObject(sTemplatePath, "Word.Document")
-        Set oWordDoc = oWordApp.Documents.Add(sTemplatePath)
+        'Set oWordApp = GetObject(cJob.DocPath.PPFIET, "Word.Document")
+        Set oWordDoc = oWordApp.Documents.Add(cJob.DocPath.PPFIET)
         oWordApp.Application.Visible = False
     
-        oWordDoc.MailMerge.OpenDataSource Name:=sExportInfoCSVPath, ReadOnly:=True
+        oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.InvoiceInfo, ReadOnly:=True
         oWordDoc.MailMerge.Execute
         oWordDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
-        oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=sExportedTemplatePath
+        oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPFactoredInvoiceEmail
 
     
         oWordApp.Quit
@@ -309,7 +275,7 @@ Public Sub fSendPPEmailFactored()
         Set oWordApp = CreateObject("Word.Application")
         oWordApp.Visible = False
     
-        Set oWordDoc = oWordApp.Documents.Open(sFilePathHTML) 'copy button html file
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton) 'copy button html file
     
         oWordDoc.Content.Copy
         oWordDoc.Close
@@ -319,7 +285,7 @@ Public Sub fSendPPEmailFactored()
         Set oWordDoc = Nothing
 
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPFactoredInvoiceEmail)
 
 
         With oWordDoc.Application
@@ -361,7 +327,7 @@ Public Sub fSendPPEmailFactored()
             End With
     
             'save invoice
-            oWordDoc.SaveAs FileName:=sExportedTemplatePath
+            oWordDoc.SaveAs FileName:=cJob.DocPath.PPFactoredInvoiceEmail
     
     
         End With
@@ -379,7 +345,7 @@ Public Sub fSendPPEmailFactored()
         Set oOutlookMail = oOutlookApp.CreateItem(0)
         On Error Resume Next
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPFactoredInvoiceEmail)
         oWordDoc.Content.Copy
     
         With oOutlookMail                        'email that will also include pp button
@@ -391,7 +357,7 @@ Public Sub fSendPPEmailFactored()
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
             .Display
-            .Attachments.Add (sInvoicePathPDF)
+            .Attachments.Add (cJob.DocPath.InvoiceP)
         End With
     
         oWordDoc.Close
@@ -423,24 +389,14 @@ Public Sub fPPDraft()
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
-    Dim oRequest As Object
-    Dim Json As Object
     Dim vStatus As String
     Dim vTotal As String
-
-    Dim rstRates As DAO.Recordset
-
-    Dim resp As Variant
-    Dim response As Variant
-    Dim rep As Variant
-    Dim vDetails As Object
     Dim sToken As String
     Dim json1 As String
     Dim json2 As String
     Dim json3 As String
     Dim json4 As String
     Dim json5 As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
@@ -452,8 +408,20 @@ Public Sub fPPDraft()
     Dim sLine2 As String
     Dim vInventoryRateCode As String
 
-    Call fPPGenerateJSONInfo
+    Dim oRequest As Object
+    Dim Json As Object
 
+    Dim rstRates As DAO.Recordset
+
+    Dim resp As Variant
+    Dim response As Variant
+    Dim rep As Variant
+    
+    Dim vDetails As Object
+    
+    Dim parsed As Dictionary
+    
+    Call fPPGenerateJSONInfo
     Call pfGetOrderingAttorneyInfo
 
     sIRC = 8
@@ -461,22 +429,7 @@ Public Sub fPPDraft()
     vInventoryRateCode = rstRates.Fields("Code").Value
     rstRates.Close
 
-
-    Debug.Print sCourtDatesID & " " & sInvoiceNumber
-
-    'TODO: fPPDraft can delete following lines when known safe come back
-    'sFile1 = "C:\other\1.txt"
-    'sFile2 = "C:\other\2.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-    'sUserName = sLine1
-    'sPassword = sLine2
+    'Debug.Print sCourtDatesID & " " & sInvoiceNumber
 
     sURL = "https://api.paypal.com/v1/oauth2/token/"
     sEmail = sCompanyEmail
@@ -496,8 +449,8 @@ Public Sub fPPDraft()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         .abort
         Debug.Print "--------------------------------------------"
     End With
@@ -586,14 +539,14 @@ Public Sub fPPDraft()
         Debug.Print apiWaxLRS
         'Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
     '
     'Set vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
@@ -612,7 +565,7 @@ Public Sub fPPDraft()
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
 
-    'todo: update PPID & PPStatus
+    'TODO: update PPID & PPStatus
     Dim sUpdatePPStatus As String
     Dim sUpdatePPID As String
     sUpdatePPStatus = "UPDATE CourtDates SET PPStatus = " & Chr(34) & vStatus & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
@@ -632,11 +585,6 @@ Public Sub fPayPalUpdateCheck()
     '============================================================================
 
     Dim sQueryName As String
-    Dim qdf As QueryDef
-    Dim qdf1 As QueryDef
-    Dim rstQuery As DAO.Recordset
-    Dim rstQuery1 As DAO.Recordset
-
     Dim sURL As String
     Dim sUserName As String
     Dim sPassword As String
@@ -645,8 +593,6 @@ Public Sub fPayPalUpdateCheck()
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
-    Dim oRequest As Object
-    Dim Json As Object
     Dim sInvoiceNo As String
     Dim sEmail As String
     Dim sFirstName As String
@@ -670,16 +616,12 @@ Public Sub fPayPalUpdateCheck()
     Dim vInvoiceID As String
     Dim sInvoiceNumber As String
     Dim vStatus As String
-    Dim resp As Variant
-    Dim response As Variant
-    Dim rep As Variant
     Dim sToken As String
     Dim json1 As String
     Dim json2 As String
     Dim json3 As String
     Dim json4 As String
     Dim json5 As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
@@ -693,6 +635,20 @@ Public Sub fPayPalUpdateCheck()
     Dim sLine2 As String
     Dim vPPStatus As String
 
+    Dim resp As Variant
+    Dim response As Variant
+    Dim rep As Variant
+    
+    Dim oRequest As Object
+    Dim Json As Object
+    
+    Dim qdf As QueryDef
+    Dim qdf1 As QueryDef
+    Dim rstQuery As DAO.Recordset
+    Dim rstQuery1 As DAO.Recordset
+    
+    Dim parsed As Dictionary
+    
     Call fPPGetInvoiceInfo
 
     sQueryName = "QPPStatus"
@@ -723,20 +679,6 @@ Public Sub fPayPalUpdateCheck()
                 vInvoiceID = Right(vInvoiceID, 20)
                 vInvoiceID = Replace(Replace(vInvoiceID, " ", ""), "-", "")
             
-                'TODO: fPayPalUpdateCheck can delete following lines when known safe come back
-                'sFile1 = "C:\other\1.txt"
-                'sFile2 = "C:\other\2.txt"
-            
-                'Open sFile1 For Input As #1
-                'Line Input #1, sLine1
-                'Close #1
-            
-                'Open sFile2 For Input As #2
-                'Line Input #2, sLine2
-                'Close #2
-                'sUserName = sLine1
-                'sPassword = sLine2
-            
                 sURL = "https://api.paypal.com/v1/oauth2/token/"
                 sEmail = sCompanyEmail
                 '  https://api.paypal.com/v1/oauth2/token \
@@ -755,8 +697,8 @@ Public Sub fPayPalUpdateCheck()
                     .send ("grant_type=client_credentials")
                     apiWaxLRS = .responseText
                     Debug.Print apiWaxLRS
-                    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-                    sToken = Parsed("access_token") 'third level array
+                    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+                    sToken = parsed("access_token") 'third level array
                     .abort
                     'Debug.Print "--------------------------------------------"
                 End With
@@ -779,10 +721,10 @@ Public Sub fPayPalUpdateCheck()
                     Debug.Print apiWaxLRS
                     Debug.Print "--------------------------------------------"
                 End With
-                Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-                sInvoiceNumber = Parsed("number") 'third level array
-                vInvoiceID = Parsed("id")        'third level array
-                vStatus = Parsed("status")       'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
+                Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+                sInvoiceNumber = parsed("number") 'third level array
+                vInvoiceID = parsed("id")        'third level array
+                vStatus = parsed("status")       'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
                 'CANCELLED, REFUNDED, PARTIALLY_REFUNDED, MARKED AS REFUNDED
                                                                         
                 Debug.Print "--------------------------------------------"
@@ -827,32 +769,16 @@ Public Sub fSendPPEmailBalanceDue()
     ' Call command: Call fPayPalUpdateCheck()
     ' Description : sends PayPal email for balance due
     '============================================================================
-    '
-    Dim sFile1 As String
-    Dim sInvoicePathPDF As String
-    Dim sLine1 As String
-    Dim sInvoiceNumber As String
+    
     Dim sName As String
     Dim vPPInvoiceNo As String
-    Dim sExportedTemplatePath As String
-    Dim sTemplatePath As String
-    Dim sOutputPDF As String
-    Dim sExportInfoCSVPath As String
-    Dim sQueryName As String
     Dim sHTMLPPB As String
-    Dim sInvoicePathDocX As String
     Dim vPPLink As String
-    Dim sFilePath As String
-    Dim sFilePathHTML As String
     Dim sQuestion As String
     Dim sAnswer As String
     Dim sToEmail As String
-    Dim sLine2 As String
-    Dim sFileNameOut As String
     Dim sBuf As String
     Dim sTemp As String
-    Dim sFileName As String
-
 
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
@@ -862,27 +788,23 @@ Public Sub fSendPPEmailBalanceDue()
 
     Dim qdf As QueryDef
     Dim rstQuery As DAO.Recordset
+    
     Dim iFileNum As Long
 
-
+    Dim cJob As New Job
+    
     Call fPPGenerateJSONInfo
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    sQueryName = "TRInvoiQPlusCases"
-    'TODO: PATH
-    sExportedTemplatePath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-PP-BalanceDueInvoice.docx"
-    sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-InvoiceInfo.xls"
-    sTemplatePath = "T:\Database\Templates\Stage4s\PP-BalanceDueInvoiceEmail.docx"
 
     Call pfGetOrderingAttorneyInfo
     Call pfCurrentCaseInfo
 
-    Set qdf = CurrentDb.QueryDefs(sQueryName)
+    Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
-    sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
     sParty1 = rstQuery.Fields("Party1").Value
     sParty2 = rstQuery.Fields("Party2").Value
     sName = sFirstName & " " & sLastName
@@ -890,31 +812,20 @@ Public Sub fSendPPEmailBalanceDue()
     vPPInvoiceNo = Right(vPPInvoiceNo, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
 
-    'TODO: PATH
-    sFile1 = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PPDepositEmail.html"
-    sInvoicePathPDF = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".pdf"
-    sInvoicePathDocX = "I:\" & sCourtDatesID & "\WorkingFiles\" & sInvoiceNumber & ".docx"
-
-
     'create pp invoice link
     vPPLink = "https://www.paypal.com/invoice/p/#" & vPPInvoiceNo
 
     'create PPButton html (construct string, save it into text file in job folder)
     sHTMLPPB = "<html><body><br><br><a href =" & Chr(34) & vPPLink & Chr(34) & "><img src=" & Chr(34) & "https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-large.png" & _
                                                                                                       Chr(34) & "alt=" & Chr(34) & "Check out with PayPal" & Chr(34) & "/></a></body></html>"
-
-    'TODO: PATH
-    sFilePath = "I:\" & sCourtDatesID & "\WorkingFiles\" & "PPButton.txt"
-    sFilePathHTML = "I:\" & sCourtDatesID & "\WorkingFiles\" & "PPButton.html"
-
     'open txt file, save as html file
 
-    Open sFilePath For Output As #1
+    Open cJob.DocPath.PPButtonT For Output As #1
     Write #1, sHTMLPPB
     Close #1
 
     iFileNum = FreeFile
-    Open sFilePath For Input As iFileNum
+    Open cJob.DocPath.PPButtonT For Input As iFileNum
 
     Do Until EOF(iFileNum)
         Line Input #iFileNum, sBuf
@@ -930,27 +841,27 @@ Public Sub fSendPPEmailBalanceDue()
     'Save txt file as (if possible)
 
     iFileNum = FreeFile
-    Open sFilePath For Output As iFileNum
+    Open cJob.DocPath.PPButtonT For Output As iFileNum
 
     Print #iFileNum, sTemp
 
     Close iFileNum
 
-    Name sFilePath As sFilePathHTML
+    Name cJob.DocPath.PPButtonT As cJob.DocPath.PPButton
 
     'paste PPButton html into mail merged invoice/PQ at both bookmarks "PPButton" bookmark or #PPB1# AND "PPButton2" or #PPB2#
 
     Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = False
 
-    Set oWordDoc = oWordApp.Documents.Open(sFilePathHTML)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton)
 
     oWordDoc.Content.Copy
 
     Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = True
 
-    Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPBalanceDue)
 
     With oWordDoc.Application
 
@@ -1021,7 +932,7 @@ Public Sub fSendPPEmailBalanceDue()
         End With
     
         'save invoice
-        .ActiveDocument.SaveAs2 FileName:=sExportedTemplatePath
+        .ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPBalanceDue
     
     End With
 
@@ -1033,23 +944,23 @@ Public Sub fSendPPEmailBalanceDue()
     
 
     'prompt to ask when pdf is made
-    sQuestion = "Click yes after you have created your final invoice PDF at " & sInvoicePathPDF
+    sQuestion = "Click yes after you have created your final invoice PDF at " & cJob.DocPath.InvoiceP
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
     If sAnswer = vbNo Then                       'IF NO THEN THIS HAPPENS
 
     
-        DoCmd.OutputTo acOutputQuery, sQueryName, acFormatXLS, sExportInfoCSVPath, False
+        DoCmd.OutputTo acOutputQuery, qTRIQPlusCases, acFormatXLS, cJob.DocPath.InvoiceInfo, False
     
-        Set oWordApp = GetObject(sTemplatePath, "Word.Document")
-        Set oWordDoc = oWordApp.Documents.Open(sTemplatePath)
+        Set oWordApp = GetObject(cJob.DocPath.PPBalanceDueT, "Word.Document")
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPBalanceDueT)
     
         oWordApp.Application.Visible = False
     
-        oWordDoc.MailMerge.OpenDataSource Name:=sExportInfoCSVPath, ReadOnly:=True
+        oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.InvoiceInfo, ReadOnly:=True
         oWordDoc.MailMerge.Execute
         oWordDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
-        oWordDoc.Application.ActiveDocument.SaveAs FileName:=sExportedTemplatePath, FileFormat:=wdFormatDocument
+        oWordDoc.Application.ActiveDocument.SaveAs FileName:=cJob.DocPath.PPBalanceDue, FileFormat:=wdFormatDocument
     
         oWordApp.Quit
         Set oWordApp = Nothing
@@ -1057,7 +968,7 @@ Public Sub fSendPPEmailBalanceDue()
         Set oWordApp = CreateObject("Word.Application")
         oWordApp.Visible = False
     
-        Set oWordDoc = oWordApp.Documents.Open(sFilePathHTML)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton)
     
         oWordDoc.Content.Copy
         oWordDoc.Close
@@ -1067,7 +978,7 @@ Public Sub fSendPPEmailBalanceDue()
         Set oWordDoc = Nothing
 
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPBalanceDue)
 
 
         With oWordDoc.Application
@@ -1110,7 +1021,7 @@ Public Sub fSendPPEmailBalanceDue()
     
     
             'save invoice
-            oWordDoc.SaveAs2 FileName:=sExportedTemplatePath
+            oWordDoc.SaveAs2 FileName:=cJob.DocPath.PPBalanceDue
     
         End With
 
@@ -1122,7 +1033,7 @@ Public Sub fSendPPEmailBalanceDue()
     
     
         'generate PP-DraftInvoiceEmail in html format
-        'oWordApp.Application.ActiveDocument.SaveAs filename:=sTemplatePath, FileFormat:=wdFormatHTML
+        'oWordApp.Application.ActiveDocument.SaveAs filename:=cJob.DocPath.PPBalanceDueT, FileFormat:=wdFormatHTML
     
         rstQuery.Close
         Set rstQuery = Nothing
@@ -1133,7 +1044,7 @@ Public Sub fSendPPEmailBalanceDue()
         On Error Resume Next
     
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPBalanceDue)
         oWordDoc.Content.Copy
     
         With oOutlookMail
@@ -1145,7 +1056,7 @@ Public Sub fSendPPEmailBalanceDue()
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
             .Display
-            .Attachments.Add (sInvoicePathPDF)
+            .Attachments.Add (cJob.DocPath.InvoiceP)
         End With
         oWordDoc.Close
         oWordApp.Quit
@@ -1156,17 +1067,17 @@ Public Sub fSendPPEmailBalanceDue()
     Else                                         'if yes then this happens
     
     
-        DoCmd.OutputTo acOutputQuery, sQueryName, acFormatXLS, sExportInfoCSVPath, False
+        DoCmd.OutputTo acOutputQuery, qTRIQPlusCases, acFormatXLS, cJob.DocPath.InvoiceInfo, False
     
         '
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPBalanceDueT)
         oWordApp.Application.Visible = False
     
-        oWordDoc.MailMerge.OpenDataSource Name:=sExportInfoCSVPath, ReadOnly:=True
+        oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.InvoiceInfo, ReadOnly:=True
         oWordDoc.MailMerge.Execute
         oWordDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
-        oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=sExportedTemplatePath
+        oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPBalanceDue
 
     
         oWordDoc.Close
@@ -1176,7 +1087,7 @@ Public Sub fSendPPEmailBalanceDue()
         Set oWordApp = CreateObject("Word.Application")
         oWordApp.Visible = False
     
-        Set oWordDoc = oWordApp.Documents.Open(sFilePathHTML)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton)
     
         oWordDoc.Content.Copy
         oWordDoc.Close
@@ -1186,7 +1097,7 @@ Public Sub fSendPPEmailBalanceDue()
         Set oWordDoc = Nothing
 
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPBalanceDue)
 
 
         With oWordDoc.Application
@@ -1260,7 +1171,7 @@ Public Sub fSendPPEmailBalanceDue()
             End With
     
             'save invoice
-            .ActiveDocument.SaveAs2 FileName:=sExportedTemplatePath
+            .ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPBalanceDue
     
     
         End With
@@ -1272,7 +1183,7 @@ Public Sub fSendPPEmailBalanceDue()
     
     
         'generate PP-DraftInvoiceEmail in html format
-        'oWordApp.Application.ActiveDocument.SaveAs filename:=sTemplatePath, FileFormat:=wdFormatHTML
+        'oWordApp.Application.ActiveDocument.SaveAs filename:=cJob.DocPath.PPBalanceDueT, FileFormat:=wdFormatHTML
     
         rstQuery.Close
         Set rstQuery = Nothing
@@ -1283,7 +1194,7 @@ Public Sub fSendPPEmailBalanceDue()
         On Error Resume Next
     
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPBalanceDue)
         oWordDoc.Content.Copy
     
         With oOutlookMail
@@ -1295,7 +1206,7 @@ Public Sub fSendPPEmailBalanceDue()
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
             .Display
-            .Attachments.Add (sInvoicePathPDF)
+            .Attachments.Add (cJob.DocPath.InvoiceP)
         End With
         oWordDoc.Close
         oWordApp.Quit
@@ -1316,29 +1227,15 @@ Public Sub fSendPPEmailDeposit()
     ' Call command: Call fPayPalUpdateCheck()
     ' Description : generates PayPal email for deposit
     '============================================================================
-    '
-    Dim sFile1 As String
-    Dim sInvoicePathPDF As String
-    Dim sLine1 As String
-    Dim sInvoiceNumber As String
+    
     Dim sName As String
     Dim vPPInvoiceNo As String
-    Dim sExportedTemplatePath As String
-    Dim sTemplatePath As String
-    Dim sOutputPDF As String
-    Dim sExportInfoCSVPath As String
-    Dim sQueryName As String
     Dim sHTMLPPB As String
-    Dim sInvoicePathDocX As String
     Dim vPPLink As String
-    Dim sFilePath As String
-    Dim sFilePathHTML As String
     Dim sQuestion As String
     Dim sAnswer As String
     Dim sToEmail As String
-    Dim sLine2 As String
     Dim sFileNameOut As String
-    Dim sPPStatus As String
 
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
@@ -1351,6 +1248,9 @@ Public Sub fSendPPEmailDeposit()
     Dim rstQuery As DAO.Recordset
     Dim iFileNumIn As Long
     Dim iFileNumOut As Long
+    
+    Dim cJob As New Job
+    
     'your invoice docx template MUST contain the phrase "#PPB1#" AND "#PPB2#" without the quotes somewhere on it.
     'your e-mail docx template MUST contain the phrase "#PPB1#" without the quotes somewhere on it.
 
@@ -1358,40 +1258,22 @@ Public Sub fSendPPEmailDeposit()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    sQueryName = "TRInvoiQPlusCases"
-    'TODO: PATH
-    sExportedTemplatePath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PP-DraftInvoiceEmail.docx"
-    sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-InvoiceInfo.xls"
-    sTemplatePath = "T:\Database\Templates\Stage1s\PP-DraftInvoiceEmail-Template.docx"
-    sOutputPDF = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-" & "PP-DraftInvoiceEmail" & ".html"
 
     Call pfGetOrderingAttorneyInfo               'refreshes some info, not relevant for purposes of this code being on GH
 
-
-
-
-
     'paste PPButton html into mail merged invoice/PQ at both bookmarks "PPButton" bookmark or #PPB1# AND "PPButton2" or #PPB2#
 
-
-    Set qdf = CurrentDb.QueryDefs(sQueryName)
+    Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
 
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
-    sInvoiceNumber = rstQuery.Fields("TRInvoiceCasesQ.InvoiceNo").Value
     sParty1 = rstQuery.Fields("Party1").Value
     sParty2 = rstQuery.Fields("Party2").Value
-    sPPStatus = rstQuery.Fields("TRInv.PPStatus").Value
     vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
     vPPInvoiceNo = Right(vPPInvoiceNo, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
     sName = sFirstName & " " & sLastName
     sToEmail = sNotes
-
-    'TODO: PATH
-    sFile1 = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PPDepositEmail.html"
-    sInvoicePathPDF = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".pdf"
-    sInvoicePathDocX = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".docx"
 
     'create pp invoice link
     vPPLink = "https://www.paypal.com/invoice/p/#" & vPPInvoiceNo
@@ -1402,49 +1284,41 @@ Public Sub fSendPPEmailDeposit()
                                                                              "><img src=" & Chr(34) & "https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-large.png" & _
                                                                              Chr(34) & "alt=" & Chr(34) & "Check out with PayPal" & Chr(34) & "/></a></body></html>"
 
-
-    'TODO: PATH
-    sFilePath = "I:\" & sCourtDatesID & "\WorkingFiles\" & "PPButton.txt"
-    sFilePathHTML = "I:\" & sCourtDatesID & "\WorkingFiles\" & "PPButton.html"
-
-
     'open txt file, save as html file
-    Open sFilePath For Output As #1
-
+    Open cJob.DocPath.PPButtonT For Output As #1
 
     Write #1, sHTMLPPB
     Close #1
 
     sFileNameOut = Replace(sHTMLPPB, Chr(34) & "<html>", "<html>")
     iFileNumOut = FreeFile
-    Open sFilePath For Output As #1
+    Open cJob.DocPath.PPButtonT For Output As #1
     Print #1, sFileNameOut
     Close #1
 
     sFileNameOut = Replace(sHTMLPPB, "</html>" & Chr(34), "</html>")
     iFileNumOut = FreeFile
-    Open sFilePath For Output As #1
+    Open cJob.DocPath.PPButtonT For Output As #1
     Print #1, sFileNameOut
     Close #1
 
     sFileNameOut = Replace(sHTMLPPB, Chr(34) & Chr(34), Chr(34))
     iFileNumOut = FreeFile
-    Open sFilePath For Output As #1
+    Open cJob.DocPath.PPButtonT For Output As #1
     Print #1, sFileNameOut
     Close #1
 
-    Name sFilePath As sFilePathHTML
+    Name cJob.DocPath.PPButtonT As cJob.DocPath.PPButton
 
     Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = False
         
-    Set oWordDoc = oWordApp.Documents.Open(sFilePathHTML) 'open button in word
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton) 'open button in word
     oWordDoc.Content.Copy
     Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = False
         
-    Set oWordDoc1 = oWordApp.Documents.Open(sInvoicePathDocX) 'open invoice docx
-        
+    Set oWordDoc1 = oWordApp.Documents.Open(cJob.DocPath.InvoiceD) 'open invoice docx
 
     With oWordDoc1.Application
 
@@ -1465,9 +1339,6 @@ Public Sub fSendPPEmailDeposit()
             .MatchAllWordForms = False
             .Execute
         
-        
-        
-        
             'enter code here
             If .Forward = True Then
                 .Application.Selection.Collapse Direction:=wdCollapseStart
@@ -1487,8 +1358,6 @@ Public Sub fSendPPEmailDeposit()
         End With
         .Selection.Find.ClearFormatting
         .Selection.Find.Replacement.ClearFormatting
-       
-    
     
         With .Selection.Find
             .Text = "#PPB2#"
@@ -1518,7 +1387,7 @@ Public Sub fSendPPEmailDeposit()
         End With
     
         'save invoice
-        .ActiveDocument.SaveAs2 FileName:=sInvoicePathDocX
+        .ActiveDocument.SaveAs2 FileName:=cJob.DocPath.InvoiceD
     
     End With
 
@@ -1530,7 +1399,7 @@ Public Sub fSendPPEmailDeposit()
     
 
     'prompt to ask when pdf of invoice is made
-    sQuestion = "Click yes after you have created your final invoice PDF at " & sInvoicePathPDF
+    sQuestion = "Click yes after you have created your final invoice PDF at " & cJob.DocPath.InvoiceP
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
     If sAnswer = vbNo Then                       'IF NO THEN THIS HAPPENS
@@ -1542,42 +1411,26 @@ Public Sub fSendPPEmailDeposit()
     Else                                         'if yes then this happens
     
     
-        DoCmd.OutputTo acOutputQuery, sQueryName, acFormatXLS, sExportInfoCSVPath, False
-    
-    
-    
-    
-    'TODO: PATH
-        sTemplatePath = "T:\Database\Templates\Stage4s\PP-DraftInvoiceEmail-Template.docx"
-    
+        DoCmd.OutputTo acOutputQuery, qTRIQPlusCases, acFormatXLS, cJob.DocPath.InvoiceInfo, False
+       
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sTemplatePath)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDIET)
 
         oWordApp.Application.Visible = False
-        oWordDoc.MailMerge.OpenDataSource Name:=sExportInfoCSVPath, ReadOnly:=True
+        oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.InvoiceInfo, ReadOnly:=True
         oWordDoc.MailMerge.Execute
         oWordDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
-        oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=sExportedTemplatePath
+        oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPDraftInvoiceEmail
 
-    
-    
         Set oWordApp = CreateObject("Word.Application")
         oWordApp.Visible = False
     
-        Set oWordDoc = oWordApp.Documents.Open(sFilePathHTML)
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton)
     
         oWordDoc.Content.Copy
     
-    
-    
-    
-    
-    
-    
-    
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath)
-
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDraftInvoiceEmail)
 
         With oWordDoc.Application
 
@@ -1615,16 +1468,13 @@ Public Sub fSendPPEmailDeposit()
                 .Application.Selection.PasteAndFormat (wdFormatOriginalFormatting) 'paste button html file
         
             End With
-    
            
             'save invoice
-            .ActiveDocument.SaveAs2 FileName:=sExportedTemplatePath
+            .ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPDraftInvoiceEmail
     
         End With
         oWordDoc.Close
         oWordApp.Quit
-    
-    
     
         Set oWordApp = Nothing
         Set oWordDoc = Nothing
@@ -1638,7 +1488,7 @@ Public Sub fSendPPEmailDeposit()
         On Error Resume Next
     
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(sExportedTemplatePath) 'invoice email file in docx format
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDraftInvoiceEmail) 'invoice email file in docx format
         oWordDoc.Content.Copy
     
         With oOutlookMail                        'now, you should have an e-mail with a PP button as well as an invoice with two PP buttons on it.
@@ -1649,7 +1499,7 @@ Public Sub fSendPPEmailDeposit()
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
             .Display
-            .Attachments.Add (sInvoicePathPDF)
+            .Attachments.Add (cJob.DocPath.InvoiceP)
         End With
     
     End If
@@ -1684,8 +1534,6 @@ Public Sub fPPGetInvoiceInfo()
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
-    Dim oRequest As Object
-    Dim Json As Object
     Dim sInvoiceNo As String
     Dim sEmail As String
     Dim sFirstName As String
@@ -1718,36 +1566,19 @@ Public Sub fPPGetInvoiceInfo()
     Dim json3 As String
     Dim json4 As String
     Dim json5 As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
     Dim vTermDays As String
     Dim vDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine1 As String
-    Dim sLine2 As String
 
-
+    Dim oRequest As Object
+    Dim Json As Object
+    
+    Dim parsed As Dictionary
 
     Call fPPGenerateJSONInfo
-
-    'TODO: fPPGetInvoiceInfo can delete following lines when known safe come back
-    'sFile1 = "C:\other\1.txt"
-    'sFile2 = "C:\other\2.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-    'sUserName = sLine1
-    'sPassword = sLine2
 
     sURL = "https://api.paypal.com/v1/oauth2/token/"
     sEmail = sCompanyEmail
@@ -1767,12 +1598,12 @@ Public Sub fPPGetInvoiceInfo()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         .abort
         'Debug.Print "--------------------------------------------"
     End With
-    'get info for invoice, call separate function for it maybe 'come back
+    'get info for invoice, call separate function for it maybe ''TODO: What is going on here?
     vInvoiceID = sPPID                           'rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
   
     'Debug.Print "RESPONSETEXT--------------------------------------------"
@@ -1792,19 +1623,19 @@ Public Sub fPPGetInvoiceInfo()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
     'CANCELLED, REFUNDED, PARTIALLY_REFUNDED, MARKED AS REFUNDED
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
-    vDetails = Parsed("details")                 'second level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
+    vDetails = parsed("details")                 'second level array
     'For Each rep In vDetails ' third level objects
-    vErrorIssue = Parsed("field")
-    vErrorDetails = Parsed("issue")
+    vErrorIssue = parsed("field")
+    vErrorDetails = parsed("issue")
     'Next
     Debug.Print "--------------------------------------------"
     Debug.Print "Error Name:  " & vErrorName
@@ -1836,16 +1667,6 @@ Public Sub fPPRefund()
     '============================================================================
     '
     Dim vAmount As String
-    Dim sQueryName As String
-    Dim sExportedTemplatePath As String
-    Dim sExportInfoCSVPath As String
-    Dim sTemplatePath As String
-    Dim qdf As QueryDef
-    Dim rstQuery As DAO.Recordset
-    Dim vPPInvoiceNo As String
-    Dim sFile1 As String
-    Dim sInvoicePathPDF As String
-    Dim sInvoicePathDocX As String
     Dim sURL As String
     Dim sUserName As String
     Dim sPassword As String
@@ -1855,8 +1676,6 @@ Public Sub fPPRefund()
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
-    Dim oRequest As Object
-    Dim Json As Object
     Dim sInvoiceNo As String
     Dim sFirstName As String
     Dim sLastName As String
@@ -1889,33 +1708,34 @@ Public Sub fPPRefund()
     Dim json3 As String
     Dim json4 As String
     Dim json5 As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
     Dim vTermDays As String
     Dim vDetails As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine2 As String
     Dim vPPLink As String
     Dim sQuestion As String
     Dim sAnswer As String
+    Dim vPPInvoiceNo As String
+    
+    Dim oRequest As Object
+    Dim Json As Object
+    
+    Dim qdf As QueryDef
+    Dim rstQuery As DAO.Recordset
+    
+    Dim parsed As Dictionary
+    
+    Dim cJob As New Job
     Call fPPGenerateJSONInfo
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
-    sQueryName = "TRInvoiQPlusCases"
-    'TODO: PATH
-    sExportedTemplatePath = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PP-RefundMadeEmail.docx"
-    sExportInfoCSVPath = "I:\" & sCourtDatesID & "\WorkingFiles\" & sCourtDatesID & "-InvoiceInfo.xls"
-    sTemplatePath = "T:\Database\Templates\Stage4s\PP-RefundMadeEmail.docx"
-
     Call pfGetOrderingAttorneyInfo
     Call pfCurrentCaseInfo
 
-    Set qdf = CurrentDb.QueryDefs(sQueryName)
+    Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
@@ -1926,11 +1746,6 @@ Public Sub fPPRefund()
     sFinalPrice = rstQuery.Fields("TRInv.FinalPrice").Value
     vPPInvoiceNo = Right(vPPInvoiceNo, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
-
-    'TODO: PATH
-    sFile1 = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PP-RefundMadeEmail.html"
-    sInvoicePathPDF = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".pdf"
-    sInvoicePathDocX = "I:\" & sCourtDatesID & "\Generated\" & sInvoiceNumber & ".docx"
 
     'create pp invoice link
     vPPLink = "https://www.paypal.com/invoice/p/#" & vPPInvoiceNo
@@ -1958,22 +1773,6 @@ Public Sub fPPRefund()
     Else                                         'Code for yes
     End If
 
-    'TODO: fPPRefund can delete following lines when known safe come back
-    'sFile1 = "C:\other\1.txt"
-    'sFile2 = "C:\other\2.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sLine1 = ""
-    'sLine2 = ""
-
     sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
     sInvoiceTime = (Format(Now(), "hh:mm:ss"))
     sURL = "https://api.paypal.com/v1/oauth2/token/"
@@ -1997,8 +1796,8 @@ Public Sub fPPRefund()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         sAuth = ""
         .abort
         Debug.Print "--------------------------------------------"
@@ -2030,15 +1829,15 @@ Public Sub fPPRefund()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
-    vDetails = Parsed("details")                 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
+    vDetails = parsed("details")                 'second level array
     'For Each rep In vDetails ' third level objects
     '   vErrorIssue = rep("field")
     '  vErrorDetails = rep("issue")
@@ -2116,16 +1915,12 @@ Public Sub fPPUpdate()
     '============================================================================
 
     Dim sURL As String
-    Dim sUserName As String
-    Dim sPassword As String
     Dim sAuth As String
     Dim stringJSON As String
     Dim sEmail As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
-    Dim oRequest As Object
-    Dim Json As Object
     Dim sInvoiceNo As String
     Dim sFirstName As String
     Dim sLastName As String
@@ -2158,44 +1953,25 @@ Public Sub fPPUpdate()
     Dim json3 As String
     Dim json4 As String
     Dim json5 As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
     Dim vDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine2 As String
 
+    Dim oRequest As Object
+    Dim Json As Object
+    
+    Dim parsed As Dictionary
+    
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     Call fPPGenerateJSONInfo
     Call pfGetOrderingAttorneyInfo
 
-
-    'TODO: fPPUpdate can delete following lines when known safe come back
-    'sFile1 = "C:\other\1.txt"
-    'sFile2 = "C:\other\2.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-
     sURL = "https://api.paypal.com/v1/oauth2/token/"
     sEmail = sCompanyEmail
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sLine1 = ""
-    'sLine2 = ""
-    'sPassword = ""
-    'sUserName = ""
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     
@@ -2214,8 +1990,8 @@ Public Sub fPPUpdate()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         sAuth = ""
         .abort
         Debug.Print "--------------------------------------------"
@@ -2284,14 +2060,14 @@ Public Sub fPPUpdate()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
     'vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
     '    vErrorIssue = rep("field")
@@ -2311,18 +2087,13 @@ Public Sub fPPUpdate()
     'TODO: update PPID & PPStatus
     Dim sUpdatePPStatus As String
     Dim sUpdatePPID As String
-
-
+    
     sUpdatePPStatus = "UPDATE CourtDates SET PPStatus = " & Chr(34) & vStatus & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
 
 
     CurrentDb.Execute sUpdatePPStatus
     sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
     CurrentDb.Execute sUpdatePPID
-
-
-
-
 
 End Sub
 
@@ -2335,7 +2106,7 @@ Public Sub fManualPPPayment()
     ' Description : marks invoice as paid with manual payment, like with check/cash
     '============================================================================
 
-    'curl -v -X POST https://api.sandbox.paypal.com/v1/invoicing/invoices/INV2-T4UQ-VW4W-K7N7-XM2R/record-payment \
+    'curl -v -X POST https://api.sandbox.paypal.com/v1/invoicing/invoices/PPINV#/record-payment \
     '-H "Content-Type: application/json" \
     '-H "Authorization: Bearer Access-Token" \
     '-d '{
@@ -2348,16 +2119,12 @@ Public Sub fManualPPPayment()
     '}
     '}''
     Dim sURL As String
-    Dim sUserName As String
-    Dim sPassword As String
     Dim sAuth As String
     Dim stringJSON As String
     Dim sEmail As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
     Dim sInvoiceTime As String
-    Dim oRequest As Object
-    Dim Json As Object
     Dim sInvoiceNo As String
     Dim sFirstName As String
     Dim sLastName As String
@@ -2390,30 +2157,26 @@ Public Sub fManualPPPayment()
     Dim json3 As String
     Dim json4 As String
     Dim json5 As String
-    Dim Parsed As Dictionary
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
     Dim vTermDays As String
     Dim vDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine2 As String
     Dim vMethod As String
     Dim vAmount As String
-    Dim db As Database
+    
+    Dim oRequest As Object
+    Dim Json As Object
+    
     Dim qdf As QueryDef
     Dim rstQInfoInvNo As DAO.Recordset
 
-
+    Dim parsed As Dictionary
 
     Call fPPGenerateJSONInfo
     Call pfGetOrderingAttorneyInfo
 
-
-    Set db = CurrentDb
     Set qdf = CurrentDb.QueryDefs("QInfobyInvoiceNumber")
     qdf.Parameters(0) = sCourtDatesID
     Set rstQInfoInvNo = qdf.OpenRecordset
@@ -2421,26 +2184,8 @@ Public Sub fManualPPPayment()
     sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
     sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
 
-    'TODO: fManualPPPayment can delete following lines when known safe come back
-    'sFile1 = "C:\other\1.txt"
-    'sFile2 = "C:\other\2.txt"
-
-    'Open sFile1 For Input As #1
-    'Line Input #1, sLine1
-    'Close #1
-
-    'Open sFile2 For Input As #2
-    'Line Input #2, sLine2
-    'Close #2
-
     sURL = "https://api.paypal.com/v1/oauth2/token/"
     sEmail = sCompanyEmail
-    'sUserName = sLine1
-    'sPassword = sLine2
-    'sLine1 = ""
-    'sLine2 = ""
-    'sPassword = ""
-    'sUserName = ""
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     
@@ -2459,8 +2204,8 @@ Public Sub fManualPPPayment()
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
-        Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = Parsed("access_token")          'third level array
+        Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+        sToken = parsed("access_token")          'third level array
         sAuth = ""
         .abort
         Debug.Print "--------------------------------------------"
@@ -2499,14 +2244,14 @@ Public Sub fManualPPPayment()
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
-    Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = Parsed("number")            'third level array
-    vInvoiceID = Parsed("id")                    'third level array
-    vStatus = Parsed("status")                   'third level array
-    vTotal = Parsed("total_amount")("value")     'second level array
-    vErrorName = Parsed("name")                  '("value") 'second level array
-    vErrorMessage = Parsed("message")            '("value") 'second level array
-    vErrorILink = Parsed("information_link")     '("value") 'second level array
+    Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+    sInvoiceNumber = parsed("number")            'third level array
+    vInvoiceID = parsed("id")                    'third level array
+    vStatus = parsed("status")                   'third level array
+    vTotal = parsed("total_amount")("value")     'second level array
+    vErrorName = parsed("name")                  '("value") 'second level array
+    vErrorMessage = parsed("message")            '("value") 'second level array
+    vErrorILink = parsed("information_link")     '("value") 'second level array
     'vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
     '    vErrorIssue = rep("field")

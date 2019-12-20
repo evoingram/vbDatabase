@@ -85,10 +85,10 @@ Private Sub Command68_Click()
     ElseIf Me.cmbListAllDocuments = "Stage 1:  Price Quote/Deposit Invoice" Then
 
         'export xero csv
-        DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
+        DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
     
-        DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
-        'DoCmd.Close ("XeroCSVQuery")
+        DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
+        'DoCmd.Close (qXeroCSVQ)
     
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
@@ -127,9 +127,9 @@ Private Sub Command68_Click()
     ElseIf Me.cmbListAllDocuments = "Stage 4:  Xero invoice CSV" Then
 
         'export xero csv
-        DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
+        DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
         'DoCmd.TransferText acExportDelim, , "XeroInvoiceQuery1Select", cJob.DocPath.XeroCSV, True
-        DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
+        DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
 
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
@@ -147,9 +147,9 @@ Private Sub Command68_Click()
     
         If sFactoringApproved = True Then
     
-            DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acAdd
-            DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", cJob.DocPath.PPCSV, True
-            DoCmd.Close ("FactoringCSVQuery")
+            DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
+            DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True
+            DoCmd.Close (qFCSVQ)
             DoCmd.OpenQuery "PayPalFactoringInvoiceCSVQ", acViewNormal, acAdd
             DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", cJob.DocPath.PPCSV, True
             DoCmd.Close ("PayPalFactoringInvoiceCSVQ")
@@ -189,9 +189,9 @@ Private Sub Command68_Click()
         
             sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
             
-            DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
-            DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
-            DoCmd.Close ("XeroCSVQuery")
+            DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
+            DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
+            DoCmd.Close (qXeroCSVQ)
         
             'TR-Court-Union-AppAddr
             'real factoring csv plus invoice generated FactoringCSVQuery
@@ -204,9 +204,9 @@ Private Sub Command68_Click()
         
             If sFactoringApproved = True Then
         
-                DoCmd.OpenQuery "FactoringCSVQuery", acViewNormal, acAdd
-                DoCmd.TransferText acExportDelim, , "FactoringCSVQuery", cJob.DocPath.PPCSV, True
-                DoCmd.Close ("FactoringCSVQuery")
+                DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
+                DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True
+                DoCmd.Close (qFCSVQ)
                 DoCmd.OpenQuery "PayPalFactoringInvoiceCSVQ", acViewNormal, acAdd
                 DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", cJob.DocPath.PPCSV, True
                 DoCmd.Close ("PayPalFactoringInvoiceCSVQ")
@@ -236,10 +236,10 @@ Private Sub Command68_Click()
         Call pfSendWordDocAsEmail("CIDFinalIncomeReport", "Final Income Notification") 'final income report 'emails adam cid report
         
         'export xero csv
-        DoCmd.OpenQuery "XeroCSVQuery", acViewNormal, acAdd
+        DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
         
-        DoCmd.TransferText acExportDelim, , "SelectXero", cJob.DocPath.XeroCSV, True
-        'DoCmd.Close ("XeroCSVQuery")
+        DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
+        'DoCmd.Close (qXeroCSVQ)
     
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"

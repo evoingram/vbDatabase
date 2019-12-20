@@ -66,21 +66,22 @@ Public Sub test1()
     ' Call command: Call pfTCEntryReplacement
     ' Description : parent function that finds certain entries within a transcript and assigns TC entries to them for indexing purposes
     '============================================================================
-    Dim rstTRCourtQ As DAO.Recordset
-    Dim rstViewJFAppQ As DAO.Recordset
-    Dim sFileName As String
+    
     Dim sMrMs2 As String
     Dim sLastName2 As String
     Dim vSpeakerName As String
+    
     Dim oWordApp As New Word.Application
     Dim oCourtCoverWD As New Word.Document
+    
+    Dim rstTRCourtQ As DAO.Recordset
+    Dim rstViewJFAppQ As DAO.Recordset
     Dim qdf As QueryDef
 
+    Dim cJob As New Job
+    
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly 'open query
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
-    '@Ignore AssignmentNotUsed
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
     '@Ignore AssignmentNotUsed
     Set oWordApp = CreateObject("Word.Application")
 
@@ -91,7 +92,7 @@ Public Sub test1()
     End If
     oWordApp.Visible = False
     
-    Set oCourtCoverWD = oWordApp.Documents.Open(sFileName)
+    Set oCourtCoverWD = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     Call pfFieldTCReplaceAll("(ee1)", "^p" & "DIRECT EXAMINATION" & "^p", Chr(34) & "Direct Examination by " & Chr(34) & " \l 3")
     Call pfFieldTCReplaceAll("(ee2)", "^p" & "CROSS-EXAMINATION" & "^p", Chr(34) & "Cross-Examination by " & Chr(34) & " \l 3")
     Call pfFieldTCReplaceAll("(ee3)", "^p" & "REDIRECT EXAMINATION" & "^p", Chr(34) & "Redirect Examination by " & Chr(34) & " \l 3")
@@ -107,17 +108,14 @@ Public Sub test1()
     'Public Function pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As String, sFieldText As String)
     '.Fields.Add Type:=wdFieldTOCEntry, Text:=sFieldText, PreserveFormatting:=False, Range:=.Range 'sFieldText sample = "TC ""WitnessName"" \l 2-3"
         
-        
-        
     rstViewJFAppQ.Close
     Set rstViewJFAppQ = Nothing
-    oCourtCoverWD.SaveAs2 FileName:=sFileName
+    oCourtCoverWD.SaveAs2 FileName:=cJob.DocPath.CourtCover
     oCourtCoverWD.Close
     oWordApp.Quit
     On Error GoTo 0
     Set oCourtCoverWD = Nothing
     Set oWordApp = Nothing
-            
             
 End Sub
 
@@ -130,11 +128,7 @@ Public Sub pfReplaceBMKWwithBookmark()
     ' Description : replaces #__# notations with bookmarks
     '============================================================================
 
-    Dim sFileName As String
     Dim sBookmarkName As String
-
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 
     ActiveDocument.Application.Selection.Find.ClearFormatting
     ActiveDocument.Application.Selection.Find.Replacement.ClearFormatting
@@ -201,25 +195,20 @@ Public Sub pfCreateBookmarks()
     ' Description : replaces #TOC_# notations in transcript with bookmarks and then places index at bookmarks
     '============================================================================
 
-    Dim sFileName As String
     Dim sBookmarkName As String
     Dim vBookmarkName As String
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
+            Dim sTopLine As String
+    
+    Dim cJob As New Job
 
     'oWordDoc.Activate
-
     On Error Resume Next
-
-
-
     Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
 
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
-
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     On Error GoTo 0
 
 
@@ -349,9 +338,6 @@ Public Sub pfCreateBookmarks()
     End With
     sBookmarkName = "EndTime"
     oWordDoc.bookmarks.Add Name:=sBookmarkName
-
-
-
 
     oWordApp.Application.Selection.Find.ClearFormatting
     oWordApp.Application.Selection.Find.Replacement.ClearFormatting
@@ -678,8 +664,6 @@ Public Sub pfCreateBookmarks()
 
     oWordDoc.bookmarks.Add Name:=vBookmarkName
 
-
-
     With oWordDoc                                'insert topline at TopLine bookmark
 
         If .bookmarks.Exists("TopLine") = True Then
@@ -691,8 +675,7 @@ Public Sub pfCreateBookmarks()
                 sStartTime = Replace(sStartTime, ":00 PM", " p.m.")
         
             End If
-            Dim sTopLine As String
-    
+            
             sTopLine = UCase(sHearingLocation) & ", " & UCase(FormatDateTime(dHearingDate, vbLongDate)) & ", " & UCase(sStartTime)
             'sHearingLocation, sStartTime, sEndTime
             .bookmarks("TopLine").Select
@@ -724,7 +707,7 @@ Public Sub pfCreateBookmarks()
 
     End With
 
-    oWordDoc.SaveAs2 FileName:=sFileName
+    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
     oWordDoc.Close (wdSaveChanges)
 
 
@@ -742,7 +725,7 @@ Public Sub pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacemen
     '============================================================================
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
-
+    
     'Set oWordApp = GetObject(, "Word.Application")
 
     'If Err <> 0 Then
@@ -787,11 +770,11 @@ Public Sub pfCreateIndexesTOAs()
     '============================================================================
         
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
+    
+    Dim cJob As New Job
 
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -801,7 +784,7 @@ Public Sub pfCreateIndexesTOAs()
     End If
     On Error GoTo 0
 
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
 
     With oWordDoc
         .Application.Selection.Goto What:=wdGoToBookmark, Name:="IndexA"
@@ -964,7 +947,7 @@ Public Sub pfCreateIndexesTOAs()
         End With
         oWordDoc.Application.Selection.Find.Execute Replace:=wdReplaceAll
     
-        oWordDoc.SaveAs2 FileName:=sFileName
+        oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
         
         
     End With
@@ -979,27 +962,27 @@ Public Sub pfReplaceFDA()
     ' Description : doctor speaker name find/replaces for FDA transcripts
     '============================================================================
 
-    Dim oWordApp As New Word.Application
-    Dim oWordDoc As New Word.Document
-    Dim sFileName As String
     Dim ReplaceWithName As String
     Dim FindFDA1 As String
     Dim FindFDA3 As String
     Dim QueryName As String
     Dim FindFDA2 As String
     Dim FindFDA4 As String
+    
+    Dim oWordApp As New Word.Application
+    Dim oWordDoc As New Word.Document
+    
     Dim rs As DAO.Recordset
     Dim rs1 As DAO.Recordset
     Dim qdf As QueryDef
-
+    
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     'Set oWordApp = CreateObject("Word.Application")
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
     oWordApp.Visible = False
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     If sJurisdiction = "Food and Drug Administration" Then
         'run a query to pull doctors FDA find
         QueryName = "Q-Doctors"
@@ -1079,23 +1062,25 @@ Public Sub pfDynamicSpeakersFindReplace()
     ' Description : gets speaker names from ViewJobFormAppearancesQ query and find/replaces in transcript as appropriate
     '============================================================================
 
-    Dim x As Long
-    Dim rs As DAO.Recordset
-    Dim sFileName As String
     Dim sMrMs As String
     Dim sLastName As String
     Dim vSpeakerName As String
+    
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
+    
+    Dim x As Long
+    
     Dim qdf As QueryDef
-
+    Dim rs As DAO.Recordset
+    
+    Dim cJob As New Job
+    
     x = 18                                       '18 is number of first dynamic speaker
 
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly 'open query
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
 
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ) 'open query
     qdf.Parameters(0) = sCourtDatesID
@@ -1107,7 +1092,7 @@ Public Sub pfDynamicSpeakersFindReplace()
     End If
     oWordApp.Visible = False
 
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
 
     With oWordDoc
 
@@ -1282,7 +1267,7 @@ Public Sub pfDynamicSpeakersFindReplace()
     
         rs.Close                                 'Close the recordset
         Set rs = Nothing                         'Clean up
-        oWordDoc.SaveAs2 FileName:=sFileName
+        oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
         oWordDoc.Close
         oWordApp.Quit
     
@@ -1305,14 +1290,9 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
     ' Call command: Call pfSingleFindReplace
     ' Description : find and replace one item
     '============================================================================
+    Dim cJob As New Job
 
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-
-    'Set oWordDoc = Documents.Open(sFileName)
-
-
-
+    'Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
 
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -1321,7 +1301,7 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
     End If
     On Error GoTo 0
 
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
 
     oWordApp.Visible = True
     oWordDoc.Application.Selection.HomeKey Unit:=wdStory
@@ -1376,9 +1356,8 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
     ' Call command: Call pfSingleReplaceAll(sTexttoSearch, sReplacementText)
     ' Description : one replace TC entry function for ones with no field entry
     '============================================================================
-
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
+    
+    Dim cJob As New Job
 
     On Error Resume Next
 
@@ -1392,7 +1371,7 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
     On Error GoTo 0
 
     oWordApp.Visible = True
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
 
 
 
@@ -1437,8 +1416,7 @@ Public Sub pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As Stri
     ' Description : one replace TC entry function for ones with field entry
     '============================================================================
 
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
+    Dim cJob As New Job
 
     'wdFieldTOCEntry
     On Error Resume Next
@@ -1449,7 +1427,7 @@ Public Sub pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As Stri
     On Error GoTo 0
     oWordApp.Visible = True
 
-    Set oWordDoc = oWordApp.Documents.Open(sFileName)
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
 
 
     With oWordDoc.Application
@@ -1515,7 +1493,6 @@ Public Sub pfWordIndexer()
     '============================================================================
 
     Dim sInput As String
-    Dim sFileName As String
     Dim sCurrentIndexEntry As String
     Dim sCurrentEntryOriginal As String
     Dim sExclusions As String
@@ -1525,25 +1502,30 @@ Public Sub pfWordIndexer()
     Dim sCurrentEntry4 As String
     Dim sCurrentEntry5 As String
     Dim vBookmarkName As String
+    
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
     Dim oWordApp1 As New Word.Application
     Dim oWordDoc1 As New Word.Document
+    
     Dim w As Long
     Dim x As Long
     Dim y As Long
     Dim z As Long
+    
     Dim Rng As Variant
-
+    
+    Dim cJob As New Job
+    
+    'TODO: Take out duplicate page ##s
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
 
     'Set oWordApp1 = CreateObject(Class:="Word.Application")
     oWordApp1.Visible = True
 
     oWordApp1.AutomationSecurity = msoAutomationSecurityLow
-    Set oWordDoc1 = oWordApp1.Application.Documents.Open(sFileName)
+    Set oWordDoc1 = oWordApp1.Application.Documents.Open(cJob.DocPath.CourtCover)
 
     sExclusions = "a,am,an,and,are,as,at,b,be,but,by,c,can,cm,d,did,case,cases,about,cause,ask,asks,asked,asking," & _
                   "do,does,e,eg,en,eq,etc,f,for,g,get,go,got,h,has,have,correct,conduct,examination,direct,cross," & _
@@ -1656,8 +1638,8 @@ ExitLoop2:
 
     'Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = False
-    'TODO: PATH
-    Set oWordDoc = oWordApp.Documents.Add("T:\Database\Templates\Stage2s\TR-WordIndex.dotm") 'template
+    
+    Set oWordDoc = oWordApp.Documents.Add(cJob.DocPath.WordIndexT) 'template
 
     With oWordDoc
         Set Rng = .Range.Characters.Last
@@ -1744,10 +1726,9 @@ ExitLoop2:
         .Application.Selection.EndKey Unit:=wdStory, Extend:=wdExtend
         .Application.Selection.Font.Size = 10
     
-    'TODO: PATH
-        .SaveAs "I:\" & sCourtDatesID & "\Backups\" & sCourtDatesID & "-WordIndex.docx"
-        .SaveAs "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-WordIndex.docx"
-        .SaveAs "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-WordIndex.pdf"
+        .SaveAs cJob.DocPath.WordIndexDB
+        .SaveAs cJob.DocPath.WordIndexD
+        .SaveAs cJob.DocPath.WordIndexP
         .Close
     End With
 
@@ -1764,28 +1745,26 @@ Public Sub FPJurors()
     ' Description : does find/replacements of prospective jurors in transcript
     '============================================================================
 
-    Dim sRoughDraft As String
-    Dim sFileName As String
     Dim sSpeakerName As String
-    Dim sCourtCover As String
     Dim ssSpeakerFind As String
     Dim sdSpeakerFind As String
     Dim sqSpeakerFind As String
     Dim ssSpeakerName As String
     Dim sdSpeakerName As String
     Dim sqSpeakerName As String
+    
     Dim oCourtCoverWD As New Word.Document
     Dim oWordApp As New Word.Application
+    
     Dim x As Long
     Dim y As Long
 
+    Dim cJob As New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     x = 101                                      '101 is number of first PROSPECTIVE JUROR
-    'TODO: PATH
-    sCourtCover = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find replaces in
     On Error Resume Next
 
     Set oWordApp = GetObject(, "Word.Application")
@@ -1795,7 +1774,7 @@ Public Sub FPJurors()
 
     oWordApp.Visible = False
 
-    Set oCourtCoverWD = oWordApp.Documents.Open(sCourtCover)
+    Set oCourtCoverWD = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
 
 
     With oCourtCoverWD
@@ -1939,18 +1918,22 @@ Public Sub pfTCEntryReplacement()
     ' Call command: Call pfTCEntryReplacement
     ' Description : parent function that finds certain entries within a transcript and assigns TC entries to them for indexing purposes
     '============================================================================
-    Dim rstTRCourtQ As DAO.Recordset
-    Dim rstViewJFAppQ As DAO.Recordset
-    Dim sFileName As String
+    
     Dim sMrMs2 As String
     Dim sLastName2 As String
     Dim vSpeakerName As String
+    
+    Dim rstTRCourtQ As DAO.Recordset
+    Dim rstViewJFAppQ As DAO.Recordset
+    Dim qdf As QueryDef
+    
     Dim oWordApp As New Word.Application
     Dim oCourtCoverWD As New Word.Document
-    Dim qdf As QueryDef
+    
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx" 'file name to do find/replaces in
+    
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
@@ -1959,7 +1942,7 @@ Public Sub pfTCEntryReplacement()
     On Error GoTo 0
     oWordApp.Visible = False
     
-    Set oCourtCoverWD = oWordApp.Documents.Open(sFileName)
+    Set oCourtCoverWD = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     Set qdf = CurrentDb.QueryDefs(qnTRCourtQ)    'open query
     qdf.Parameters(0) = sCourtDatesID
     Set rstTRCourtQ = qdf.OpenRecordset
@@ -2100,7 +2083,7 @@ ParenDone:
 
     rstViewJFAppQ.Close
     Set rstViewJFAppQ = Nothing
-    oCourtCoverWD.SaveAs2 FileName:=sFileName
+    oCourtCoverWD.SaveAs2 FileName:=cJob.DocPath.CourtCover
     oCourtCoverWD.Close
     oWordApp.Quit
     Set oCourtCoverWD = Nothing
@@ -2183,7 +2166,7 @@ Public Sub pfFindRepCitationLinks()
     Dim sOriginalSearchTerm As String
     Dim vBookmarkName As String
     
-    Dim Parsed As Dictionary
+    Dim parsed As Dictionary
     
     Dim x As Integer
     Dim y As Integer
@@ -2206,7 +2189,6 @@ Public Sub pfFindRepCitationLinks()
     Dim oRequest As Object
     Dim vDetails As Object
     
-    
     Dim rCurrentCitation As Range
     Dim rCurrentSearch As Range
     Dim oWordApp As Word.Application
@@ -2215,17 +2197,11 @@ Public Sub pfFindRepCitationLinks()
     Dim rstCurrentHyperlink As DAO.Recordset
     Dim rstCurrentSearchMatching As DAO.Recordset
     
+    Dim cJob As New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
     x = 1
-    
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-    
-    
-    'On Error Resume Next
-    'On Error GoTo 0
-    
     
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
@@ -2233,7 +2209,7 @@ Public Sub pfFindRepCitationLinks()
     
     
     Set oWordApp = CreateObject("Word.Application")
-    Set oWordDoc = oWordApp.Documents.Open(sFileName) 'open word document
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
     y = 1
@@ -2241,7 +2217,7 @@ Public Sub pfFindRepCitationLinks()
     sEndCHT = " |"
     
     ReDim sSearchTermArray(0 To 0)
-    'Get all the document text and store it in a variable. COME BACK
+    'Get all the document text and store it in a variable. 'TODO: What is going on here?
     Set rCurrentSearch = oWordDoc.Range
      
     On Error Resume Next
@@ -2251,7 +2227,7 @@ Public Sub pfFindRepCitationLinks()
         Set oWordApp = CreateObject("Word.Application")
     End If
     On Error GoTo 0
-    Set oWordDoc = oWordApp.Documents.Open(sFileName) 'open word document
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
     y = 1
@@ -2263,7 +2239,7 @@ Public Sub pfFindRepCitationLinks()
     
     Set rCurrentSearch = oWordDoc.Range
     sCurrentSearch = rCurrentSearch.Text
-    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'add usc table come back
+    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'TODO: add usc table
     'Loop sCurrentSearch till you can't find any more matching "terms"
     x = UBound(sSearchTermArray) - LBound(sSearchTermArray) + 1
     Debug.Print x
@@ -2317,7 +2293,7 @@ ExitLoop:
         sInitialSearchSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation] = " & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & ";"
         'look each one up in CitationHyperlinks
         Debug.Print "Initial Search SQL" & sInitialSearchSQL
-        'come back
+        'TODO: What is going on here?
         'GoTo NextSearchTerm
         Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
                 
@@ -2413,10 +2389,10 @@ ExitLoop:
             End With
             x = 1
             y = 1
-            Set Parsed = JsonConverter.ParseJson(apiWaxLRS)
-            Set sID = Parsed.item("results")
+            Set parsed = JsonConverter.ParseJson(apiWaxLRS)
+            Set sID = parsed.item("results")
             
-            'create new table TempCitations come back
+            'create new table TempCitations 'TODO: What is going on here?
                                         
             On Error Resume Next
             CurrentDb.Execute "DROP TABLE TempCitations"
@@ -2484,7 +2460,7 @@ ExitLoop:
                     qReplaceHyperlink = "https://www.courtlistener.com/" & sAbsoluteURL 'format is test#http://www.cnn.com#, can't add hyperlink field to a table in vba
                     iLongCitationLength = 253 - Len(sCitation)
                             
-                    'come back
+                    'TODO: What is going on here?
                     'GoTo NextSearchTerm
                     sQFindCitation = Left(sQFindCitation, iLongCitationLength)
                     sQLongCitation = sQFindCitation & ", " & sCitation
@@ -2500,7 +2476,7 @@ ExitLoop:
                             
                     'add citations to new temporary table TempCitations with field j
                             
-                    'come back
+                    'TODO: What is going on here?
                     'GoTo NextSearchTerm
                     Set rstCurrentHyperlink = CurrentDb.OpenRecordset("TempCitations")
                     rstCurrentHyperlink.AddNew
@@ -2513,7 +2489,6 @@ ExitLoop:
                     rstCurrentHyperlink.Fields("LongCitation").Value = sQLongCitation
                     rstCurrentHyperlink.Fields("WebAddress").Value = sAbsoluteURL
                     rstCurrentHyperlink.Update
-                            
                             
                     y = 1
                             
@@ -2579,14 +2554,11 @@ ExitLoop:
                     
             'Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
             'rstCurrentSearchMatching.MoveFirst
-                
-                    
                     
         End If
                 
 NextSearchTerm:
     Next
-            
             
     'run refreshed sql statement and proceed as normal
             
@@ -2597,12 +2569,10 @@ NextSearchTerm:
     Debug.Print "Current SQL Statement:  " & sCurrentLinkSQL
     If iStartPos = 0 Then GoTo ExitLoop1
             
-            
-    'come back
+    'TODO: What is going on here?
     'GoTo NextSearchTerm
     'GoTo NextSearchTerm
     Set rstCurrentHyperlink = CurrentDb.OpenRecordset(sCurrentLinkSQL)
-                    
                 
     Do While rstCurrentHyperlink.EOF = False
                 
@@ -2629,14 +2599,11 @@ NextSearchTerm:
         'Debug.Print UBound(sSearchTermArray())
         'Debug.Print UBound(sSearchTermArray())
                 
-                
         Debug.Print "----------------------------------------------------------"
-                
-                
             
         'use that info on word document
                 
-        'come back
+        'TODO: What is going on here?
         'GoTo NextSearchTerm
         oWordDoc.Application.Selection.Find.ClearFormatting
         oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
@@ -2675,11 +2642,8 @@ NextSearchTerm:
                                     TextToDisplay:=sQFindCitation
                              
         Loop
-                    
                                  
         'End With
-               
-               
                
         If sQCHCategory = "1" Then
                 
@@ -2705,7 +2669,6 @@ NextSearchTerm:
                 
             'find "\s " & Chr(34) & sQFindCitation & Chr(34)
             'replace "s " & Chr(34) & sQLongCitation & Chr(34)
-                 
                                 
         End If
         sQFindCitation = ""
@@ -2713,17 +2676,12 @@ NextSearchTerm:
         sQLongCitation = ""
         sQCHCategory = ""
         sQWebAddress = ""
-
-        
         
         oWordDoc.Application.Selection.HomeKey Unit:=wdStory
         rstCurrentHyperlink.MoveNext
         x = x + 1
     Loop
     rstCurrentHyperlink.Close
-        
-    
-    
     
 ExitLoop1:
     With oWordDoc.Application.Selection.Find
@@ -2806,18 +2764,11 @@ ExitLoop1:
     
         .Execute Replace:=wdReplaceAll
 
-
-
-
     End With
     
-    
-    
 Done:
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'TODO: job number come back
-    'TODO: PATH
-    sFileName = "I:\" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-CourtCover.docx"
-    oWordDoc.SaveAs2 FileName:=sFileName         'save and close word doc
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'TODO: job number
+    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover         'save and close word doc
     oWordDoc.Close wdDoNotSaveChanges
     oWordApp.Quit
     
@@ -2829,25 +2780,26 @@ End Sub
 
 Public Sub pfTopOfTranscriptBookmark()
 
+    Dim bTitle As String
+    Dim n As String
+    
     Dim AcroApp As Acrobat.CAcroApp
     Dim PDoc As Acrobat.CAcroPDDoc
     Dim PDocCover As Acrobat.CAcroPDDoc
     Dim ADoc As AcroAVDoc
     Dim PDocAll As Acrobat.CAcroPDDoc
-
+    Dim parentBookmark As AcroPDBookmark
     Dim PDBookmark As AcroPDBookmark
     Dim PDFPageView As AcroAVPageView
-    Dim bTitle As String
-    Dim n As String
-    Dim sTranscriptsFolderFinalPDF As String
-    Dim sTranscriptVolumesALLPath As String
-    Dim sVolumesCoverPath As String
-    Dim oPDFBookmarks As Object
-    Dim parentBookmark As AcroPDBookmark
+    
     Dim jso As Object
     Dim BookMarkRoot As Object
+    Dim oPDFBookmarks As Object
+    
     Dim numpages As Variant
 
+    Dim cJob As New Job
+    
     Set AcroApp = CreateObject("AcroExch.App")
     '@Ignore AssignmentNotUsed
     Set PDoc = CreateObject("AcroExch.PDDoc")
@@ -2856,37 +2808,32 @@ Public Sub pfTopOfTranscriptBookmark()
     Set ADoc = CreateObject("AcroExch.AVDoc")
     Set PDBookmark = CreateObject("AcroExch.PDBookmark", "")
 
-    'TODO: PATH
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    sTranscriptsFolderFinalPDF = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL.pdf"
-    sTranscriptVolumesALLPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcripts-All.pdf"
-    sVolumesCoverPath = "I:\" & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Cover.pdf"
 
-    PDocCover.Open (sVolumesCoverPath)
+    PDocCover.Open (cJob.DocPath.WACoverP)
 
-    Set ADoc = PDocCover.OpenAVDoc(sVolumesCoverPath)
-
-
+    Set ADoc = PDocCover.OpenAVDoc(cJob.DocPath.WACoverP)
+    
     'Table of Contents Bookmark
     '@Ignore AssignmentNotUsed
     Set PDFPageView = ADoc.GetAVPageView()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmarks make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmarks make sure this is correc
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDocCover, "Untitled")
     '@Ignore AssignmentNotUsed, AssignmentNotUsed
     bTitle = PDBookmark.SetTitle("Table of Contents")
 
-    n = PDocCover.Save(PDSaveFull, sVolumesCoverPath)
+    n = PDocCover.Save(PDSaveFull, cJob.DocPath.WACoverP)
 
     ' Insert the pages of Part2 after the end of Part1
     numpages = PDocCover.GetNumPages()
     
-    PDoc.Open (sTranscriptsFolderFinalPDF)
+    PDoc.Open (cJob.DocPath.TranscriptFP)
 
-    Set ADoc = PDoc.OpenAVDoc(sTranscriptsFolderFinalPDF)
+    Set ADoc = PDoc.OpenAVDoc(cJob.DocPath.TranscriptFP)
     SendKeys ("^{HOME}")
     Set PDFPageView = ADoc.GetAVPageView()
 
@@ -2896,7 +2843,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2906,7 +2853,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(1)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2916,7 +2863,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2926,7 +2873,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2936,7 +2883,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2946,7 +2893,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2956,7 +2903,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2966,7 +2913,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: pfTopOfTranscriptBookmark Make sure this is correct come back
+    'TODO: pfTopOfTranscriptBookmark Make sure this is correct
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDoc, "Untitled")
     '@Ignore AssignmentNotUsed
@@ -2974,22 +2921,17 @@ Public Sub pfTopOfTranscriptBookmark()
 
     MsgBox ("Hit okay after you've moved all bookmarks to their corresponding headings; General, Witnesses, or Exhibits; and also created the Authorities bookmark structure.")
 
-    n = PDoc.Save(PDSaveFull, sTranscriptsFolderFinalPDF)
-
-
-
+    n = PDoc.Save(PDSaveFull, cJob.DocPath.TranscriptFP)
+    
     'for each -Transcript-FINAL.pdf in \Transcripts\ do the following
 
     If PDocCover.InsertPages(numpages - 1, PDoc, 0, PDoc.GetNumPages(), True) = False Then
         MsgBox "Cannot insert pages"
     End If
 
-    If PDocCover.Save(PDSaveFull, sTranscriptVolumesALLPath) = False Then
+    If PDocCover.Save(PDSaveFull, cJob.DocPath.WAConsolidatedP) = False Then
         MsgBox "Cannot save the modified document"
     End If
-    
-    
-    
     
     PDoc.Close
     PDocCover.Close

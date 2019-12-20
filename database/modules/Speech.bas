@@ -62,21 +62,20 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
     ' Description : copies transcripts from /completed/ folder in T drive to corresponding /prepared/ folder in S drive
     '============================================================================
 
-    Dim sCompletedPath As String
-    Dim sPreparedPath As String
     Dim sFullCompletedDocPath As String
     Dim oCurrentFileString As String
     Dim sFileExtension As String
     Dim sFolderName As String
+    
     Dim oFolderObject As Object
     Dim oRootFolder As Object
     Dim oCurrentFile As Object
     Dim oSubfolder As Object
 
+    Dim cJob As New Job
+    
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
-    sPreparedPath = "S:\UnprocessedAudio\Prepared\" 'Change to identify your main folder
-    sCompletedPath = "T:\Production\3Complete"
-    Set oRootFolder = oFolderObject.GetFolder(sPreparedPath)
+    Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
     For Each oSubfolder In oRootFolder.oSubfolders
         Set oCurrentFile = oSubfolder.Files
         sFolderName = Right(oSubfolder, 3)
@@ -90,7 +89,7 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
         
                 If oCurrentFile Like "*.doc" Or oCurrentFile Like "*.docx" Then
             
-                    sFullCompletedDocPath = sCompletedPath & "\" & sFolderName & "\" & oCurrentFileString
+                    sFullCompletedDocPath = cJob.DocPath.CompleteFolder & "\" & sFolderName & "\" & oCurrentFileString
                 
                     FileCopy sFullCompletedDocPath, oCurrentFile
                 
@@ -161,23 +160,26 @@ Public Sub pfPrepareTranscript()
     ' Description : makes changes to each transcript so it fits into speech recognition requirements
     '============================================================================
 
-    Dim oFolderObject As Scripting.FileSystemObject
-    Dim oRootFolder As Object
-    Dim oSubfolder As Object
-    Dim oPreparedWD As New Word.Document
-    Dim oWordApp As New Word.Application
-    Dim oCurrentFile As Object
-    Dim sPreparedPath As String
     Dim sFileExtension As String
     Dim sCurrentFile As String
     Dim sFolderName As String
     Dim sTextToFind As String
     Dim sReplacementText As String
+    
+    Dim oRootFolder As Object
+    Dim oSubfolder As Object
+    Dim oCurrentFile As Object
+    
+    Dim oPreparedWD As New Word.Document
+    Dim oWordApp As New Word.Application
     Dim wsStyle As Word.Style
     
-    sPreparedPath = "S:\UnprocessedAudio\Prepared\"
+    Dim oFolderObject As Scripting.FileSystemObject
+    
+    Dim cJob As New Job
+    
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
-    Set oRootFolder = oFolderObject.GetFolder(sPreparedPath)
+    Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
 
     For Each oSubfolder In oRootFolder.oSubfolders
         sCourtDatesID = oSubfolder.ParentFolder.Name
@@ -338,7 +340,7 @@ Public Sub pfPrepareTranscript()
                         .Application.Selection.EndKey Unit:=wdStory, Extend:=wdExtend
                         .Application.Selection.delete Unit:=wdCharacter, Count:=1
                         .Save
-                        .SaveAs2 FileName:="S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Transcript.txt", FileFormat:=wdFormatText
+                        .SaveAs2 FileName:=cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Transcript.txt", FileFormat:=wdFormatText
                     
                         sTextToFind = "</s> (wavfilename)"
                         sReplacementText = ""
@@ -375,10 +377,9 @@ Public Sub pfRunCopyTranscTextBAT()
     ' Description : runs batch file CopyTranscriptTXT
     '============================================================================
 
-    Dim PathCrnt As String
+    Dim cJob As New Job
 
-    PathCrnt = "S:\UnprocessedAudio\Unprepared"
-    Call Shell(PathCrnt & "\CopyTranscriptTXT.bat " & PathCrnt)
+    Call Shell(cJob.DocPath.SpeechUP & "\CopyTranscriptTXT.bat " & cJob.DocPath.SpeechUP)
 End Sub
 
 Public Sub pfSRTranscribe()
@@ -389,7 +390,7 @@ Public Sub pfSRTranscribe()
     ' Call command: Call pfSRTranscribe
     ' Description : runs batch file SRTranscribe
     '============================================================================
-
+    'TODO: standardize drives
     'runs batch file SRTranscribe
     'HOW TO TRANSCRIBE FILES AFTER TRAINING
     'Run the following commands in a command window with administrator:
@@ -397,11 +398,9 @@ Public Sub pfSRTranscribe()
     'S:\pocketsphinx\bin\Release\Win32\pocketsphinx_continuous.exe -infile wavfilename.wav -hmm en-us-adapt -lm wavfilename.lm -dict wavfilename.dic >> full-output.txt
     'Check output in full-output.txt in S:\UnprocessedAudio\##
 
-    Dim PathCrnt As String
+    Dim cJob As New Job
 
-    PathCrnt = "S:\UnprocessedAudio\Prepared"
-
-    Call Shell(PathCrnt & "\SRTranscribe.bat " & PathCrnt)
+    Call Shell(cJob.DocPath.SpeechUP & "\SRTranscribe.bat " & cJob.DocPath.SpeechUP)
 
 End Sub
 
@@ -415,9 +414,9 @@ Public Sub pfTrainAudio()
     '============================================================================
 
     '---------------------------------------------------------
-    '
+    'TODO: standardize drives
     'HOW TO TRAIN AUDIO
-    'NOTE: "S:\training BATs\G-runWAlignforAccuracyReport.bat"
+    'note "S:\training BATs\G-runWAlignforAccuracyReport.bat"
     '
     'Change "wavfilename" to your wav file name.
     'Run the following commands in a command window with administrator:
@@ -445,10 +444,9 @@ Public Sub pfTrainAudio()
     '
     '---------------------------------------------------------
     '
-    Dim PathCrnt As String
+    Dim cJob As New Job
 
-    PathCrnt = "S:\UnprocessedAudio\Prepared"
-    Call Shell(PathCrnt & "\audiotrain.bat " & PathCrnt)
+    Call Shell(cJob.DocPath.SpeechUP & "\audiotrain.bat " & cJob.DocPath.SpeechUP)
 
 End Sub
 
@@ -461,10 +459,9 @@ Public Sub pfRenameBaseFiles()
     ' Description : runs batch file FileRename / audioprep1.bat in Prepared folder
     '============================================================================
 
-    Dim PathCrnt As String
-
-    PathCrnt = "S:\UnprocessedAudio\Prepared"
-    Call Shell(PathCrnt & "\FileRename.bat " & PathCrnt)
+    Dim cJob As New Job
+    
+    Call Shell(cJob.DocPath.SpeechUP & "\FileRename.bat " & cJob.DocPath.SpeechUP)
 End Sub
 
 Public Sub pfSplitAudio()
@@ -475,10 +472,9 @@ Public Sub pfSplitAudio()
     ' Call command: Call pfSplitAudio
     ' Description : runs batch file splitaudio / audioprep1.bat in Prepared folder
     '============================================================================
-    Dim PathCrnt As String
-
-    PathCrnt = "S:\UnprocessedAudio\Prepared"
-    Call Shell(PathCrnt & "\splitaudio.bat " & PathCrnt)
+    Dim cJob As New Job
+    
+    Call Shell(cJob.DocPath.SpeechUP & "\splitaudio.bat " & cJob.DocPath.SpeechUP)
 End Sub
 
 Public Sub pfPrepareAudio()
@@ -490,10 +486,9 @@ Public Sub pfPrepareAudio()
     ' Description : runs batch file audioprep / audioprep1.bat in Prepared folder
     '============================================================================
 
-    Dim PathCrnt As String
-
-    PathCrnt = "S:\UnprocessedAudio\Prepared"
-    Call Shell(PathCrnt & "\audioprep.bat " & PathCrnt)
+    Dim cJob As New Job
+    
+    Call Shell(cJob.DocPath.SpeechUP & "\audioprep.bat " & cJob.DocPath.SpeechUP)
 End Sub
 
 '---------------------------------------------------------
@@ -509,7 +504,7 @@ Public Sub pfTrainEngine()
 
 
     'HOW TO PREPARE FILES FOR TRAINING
-    '
+    'TODO: standardize drives
     'You may use other numbers in \\HUBCLOUD\evoingram\speech\UnprocessedAudio\ for samples of other working documents you may want to look at.
     '
     'PREPARING AUDIO:
@@ -633,6 +628,7 @@ Public Sub pfAddSubfolder()
     Dim sConcatenatedAudioPath As String
 
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
+    'TODO: standardize drives
     sUnprocessedAudioPath = "S:\UnprocessedAudio\"
     Set oRootFolder = oFolderObject.GetFolder(sUnprocessedAudioPath)
 
@@ -683,16 +679,15 @@ Public Sub pfCorpusUpload()
     Dim sFieldName As String
     Dim sMainURL As String
     Dim oFolderObject As Scripting.FileSystemObject
-    Dim sPreparedPath As String
+    Dim cJob As New Job
 
     '@Ignore AssignmentNotUsed
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
     sFieldName = "corpus"
-    sPreparedPath = "S:\UnprocessedAudio\Prepared\"
 
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
-    pfDoFolder oFolderObject.GetFolder(sPreparedPath)
+    pfDoFolder oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
 
 End Sub
 
@@ -761,13 +756,15 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     Dim oWebBrowser01 As Object
     Dim oStream As Object
     Dim m_isRedirected As Boolean
+    
+    Dim cJob As New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
-    sCorpusPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base-corpus.txt"
-    sFilePathDIC = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.dic"
-    sFilePathLM = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.lm"
+    sCorpusPath = cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Base-corpus.txt"
+    sFilePathDIC = cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Base.dic"
+    sFilePathLM = cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Base.lm"
 
     Set oWebBrowser = CreateObject("InternetExplorer.Application")
     oWebBrowser.Visible = True
@@ -879,6 +876,7 @@ Public Sub pfDoFolder(Folder As Variant)
     Dim sFileExtension As String
     Dim sFolderName As String
  
+    Dim cJob As New Job
 
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
     sFieldName = "corpus"
@@ -896,12 +894,12 @@ Public Sub pfDoFolder(Folder As Variant)
         Debug.Print sSubfolder
      
         If InStr(1, sSubfolder, "WorkingFiles") Then
-            sCorpusPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base-corpus.txt"
-            sDICPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.dic"
-            sLMPath = "S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\Base.lm"
+            sCorpusPath = cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Base-corpus.txt"
+            sDICPath = cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Base.dic"
+            sLMPath = cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Base.lm"
     
             Set oWordApp = CreateObject("Word.Application")
-            Set oTranscriptionWD = oWordApp.Documents.Open("S:\UnprocessedAudio\Prepared\" & sCourtDatesID & "\WorkingFiles\base.transcription")
+            Set oTranscriptionWD = oWordApp.Documents.Open(cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\base.transcription")
         
             With oTranscriptionWD
                 With .Application.Selection.Find

@@ -280,6 +280,7 @@ Private Property Set RecordsetA8(rData As Recordset)
 End Property
 
 Private Sub Load()
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     With RecordsetA8
         sStatusID = Nz(.Fields("ID").Value)
         sStatusCID = Nz(.Fields("CourtDatesID").Value)
@@ -315,14 +316,17 @@ Private Sub Load()
 End Sub
 
 Public Sub Update()
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     With RecordsetA8
         If mbooLoaded = True Then
             .Edit
         Else
             .AddNew
         End If
+        Nz(.Fields("CourtDatesID").Value) = sCourtDatesID
         sStatusID = Nz(.Fields("ID").Value)
         sStatusCID = Nz(.Fields("CourtDatesID").Value)
+        .Fields("AddRDtoCover").Value = Me.AddRDtoCover
         .Fields("ContactsEntered").Value = Me.ContactsEntered
         .Fields("JobEntered").Value = Me.JobEntered
         .Fields("FixAppears").Value = Me.FixAppears
@@ -333,7 +337,6 @@ Public Sub Update()
         .Fields("Invoice").Value = Me.Invoice
         .Fields("AGShortcuts").Value = Me.AGShortcuts
         .Fields("Transcribe").Value = Me.Transcribe
-        .Fields("AddRDtoCover").Value = Me.AddRDtoCover
         .Fields("FindReplaceRD").Value = Me.FindReplaceRD
         .Fields("HyperlinkTranscripts").Value = Me.HyperlinkTranscripts
         .Fields("SpellingsEmail").Value = Me.SpellingsEmail

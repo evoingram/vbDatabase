@@ -94,15 +94,12 @@ Public Property Get ShippingCOAXML() As String
     ShippingCOAXML = pShippingCOAXML
 End Property
 
-
 Public Property Get ShippingXML4() As String
     ShippingXML4 = pShippingXML4
 End Property
 Public Property Get ShippingCOAXML4() As String
     ShippingCOAXML4 = pShippingCOAXML4
 End Property
-
-
 
 Public Property Get CaseInfo() As String
     CaseInfo = pCaseInfo
@@ -676,7 +673,139 @@ Public Property Let XMLBefore(sInput As String)
     pXMLBefore = XMLBefore
 End Property
 
+Public Property Get PPFactoredInvoiceEmail() As String
+    PPFactoredInvoiceEmail = pPPFactoredInvoiceEmail
+End Property
 
+Public Property Let PPFactoredInvoiceEmail(sInput As String)
+    pPPFactoredInvoiceEmail = PPFactoredInvoiceEmail
+End Property
+
+Public Property Get PPFIET() As String
+    PPFIET = pPPFIET
+End Property
+
+Public Property Let PPFIET(sInput As String)
+    pPPFIET = PPFIET
+End Property
+
+Public Property Get PPFactoredInvoiceH() As String
+    PPFactoredInvoiceH = pPPFactoredInvoiceH
+End Property
+
+Public Property Let PPFactoredInvoiceH(sInput As String)
+    pPPFactoredInvoiceH = PPFactoredInvoiceH
+End Property
+
+Public Property Get PPButtonT() As String
+    PPButtonT = pPPButtonT
+End Property
+
+Public Property Let PPButtonT(sInput As String)
+    pPPButtonT = PPButtonT
+End Property
+
+Public Property Get PPBalanceDue() As String
+    PPBalanceDue = pPPBalanceDue
+End Property
+
+Public Property Let PPBalanceDue(sInput As String)
+    pPPBalanceDue = PPBalanceDue
+End Property
+
+Public Property Get PPBalanceDueT() As String
+    PPBalanceDueT = pPPBalanceDueT
+End Property
+
+Public Property Let PPBalanceDueT(sInput As String)
+    pPPBalanceDueT = PPBalanceDueT
+End Property
+
+Public Property Get PPDraftInvoiceH() As String
+    PPDraftInvoiceH = pPPDraftInvoiceH
+End Property
+
+Public Property Let PPDraftInvoiceH(sInput As String)
+    pPPDraftInvoiceH = PPDraftInvoiceH
+End Property
+
+Public Property Get PPDIET() As String
+    PPDIET = pPPDIET
+End Property
+
+Public Property Let PPDIET(sInput As String)
+    pPPDIET = PPDIET
+End Property
+
+Public Property Get PPDepositE() As String
+    PPDepositE = pPPDepositE
+End Property
+
+Public Property Let PPDepositE(sInput As String)
+    pPPDepositE = PPDepositE
+End Property
+Public Property Get WordIndexT() As String
+    WordIndexT = pWordIndexT
+End Property
+
+Public Property Let WordIndexT(sInput As String)
+    pWordIndexT = WordIndexT
+End Property
+Public Property Get WordIndexDBT() As String
+    WordIndexDBT = pWordIndexDBT
+End Property
+
+Public Property Let WordIndexDBT(sInput As String)
+    pWordIndexDBT = WordIndexDBT
+End Property
+
+Public Property Get WordIndexDB() As String
+    WordIndexDB = pWordIndexDB
+End Property
+
+Public Property Let WordIndexDB(sInput As String)
+    pWordIndexDB = WordIndexDB
+End Property
+
+Public Property Get JurisdictionRefs() As String
+    JurisdictionRefs = pJurisdictionRefs
+End Property
+
+Public Property Let JurisdictionRefs(sInput As String)
+    pJurisdictionRefs = JurisdictionRefs
+End Property
+
+Public Property Get DBScripts() As String
+    DBScripts = pDBScripts
+End Property
+
+Public Property Let DBScripts(sInput As String)
+    pDBScripts = DBScripts
+End Property
+
+Public Property Get SpeechUP() As String
+    SpeechUP = pSpeechUP
+End Property
+
+Public Property Let SpeechUP(sInput As String)
+    pSpeechUP = SpeechUP
+End Property
+
+Public Property Get InProgressFolder() As String
+    InProgressFolder = pInProgressFolder
+End Property
+
+Public Property Let InProgressFolder(sInput As String)
+    pInProgressFolder = InProgressFolder
+End Property
+
+Public Property Get ToBeEnteredFolder() As String
+    ToBeEnteredFolder = pToBeEnteredFolder
+End Property
+
+Public Property Let ToBeEnteredFolder(sInput As String)
+    pToBeEnteredFolder = ToBeEnteredFolder
+End Property
 
 Public Sub Class_Initialize()
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -694,16 +823,19 @@ Public Sub Class_Initialize()
         pShippingCOAXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
         pShippingXML4 = psDrive & ":\Production\4ShippingXMLs\" & sCourtDatesID & "-shipping.xml"
         pShippingCOAXML4 = psDrive & ":/Production/4ShippingXMLs/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
-        pShippingOutputFolder = "T:\Production\4ShippingXMLs\Output\"
+        pShippingOutputFolder = psDrive & ":\Production\4ShippingXMLs\Output\"
         pRoughDraft = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/RoughDraft.docx"
-        pShippingFolder = "T:\Production\4ShippingXMLs\"
-        pCompleteFolder = "T:\Production\3Complete\"
+        pShippingFolder = psDrive & ":\Production\4ShippingXMLs\"
+        pCompleteFolder = psDrive & ":\Production\3Complete\"
+        pInProgressFolder = psDrive & ":/Production/2InProgress/"
+        pToBeEnteredFolder = psDrive & ":/Production/1ToBeEntered/"
         
         pCaseInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CaseInfo.xls"
         pInvoiceInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-InvoiceInfo.xls"
         pXeroCSV = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "--XeroInvoiceCSV.csv"
         pPPCSV = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PayPalInvoiceCSV.csv"
         pPPButton = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PPButton.html"
+        pPPButtonT = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PPButton.txt"
         pCDLabel = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pub"
         pCDLabelP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pdf"
         pT2upPS = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.ps"
@@ -721,6 +853,11 @@ Public Sub Class_Initialize()
         pOrderConfirmationP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-OrderConfirmation.pdf"
         pOrderConfirmationD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-OrderConfirmation.docx"
         pPPDraftInvoiceEmail = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-DraftInvoiceEmail.docx"
+        pPPDraftInvoiceH = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-DraftInvoiceEmail.html"
+        pPPFactoredInvoiceEmail = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-FactoredInvoiceEmail.docx"
+        pPPFactoredInvoiceH = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-FactoredInvoiceEmail.html"
+        pPPBalanceDue = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PP-BalanceDueInvoice.docx"
+        pPPDepositE = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PPDepositEmail.html"
         pTranscriptsReadyP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-TranscriptsReady.pdf"
         pTranscriptsReadyD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-TranscriptsReady.docx"
         pTranscriptsReadyCP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-ContractorTranscriptsReady.pdf"
@@ -777,9 +914,13 @@ Public Sub Class_Initialize()
         pTemplateFolder3 = psDrive & ":/Database/Templates/Stage3s/"
         pTemplateFolder4 = psDrive & ":/Database/Templates/Stage4s/"
         pTempShipOptionsQ1XLSM = psDrive & ":\Database\Scripts\InProgressExcels\TempShippingOptionsQ1.xlsm"
-        
+        pPPFIET = psDrive & ":\Database\Templates\Stage4s\PP-FactoredInvoiceEmail-Template.docx"
+        pPPBalanceDueT = psDrive & ":\Database\Templates\Stage4s\PP-BalanceDueInvoiceEmail.docx"
+        pPPDIET = psDrive & ":\Database\Templates\Stage1s\PP-DraftInvoiceEmail-Template.docx"
+        pWordIndexT = psDrive & ":\Database\Templates\Stage2s\TR-WordIndex.dotm"
         pXMLAfter = psDrive & ":\Database\Scripts\InProgressExcels\AfterXML.xml"
         pXMLBefore = psDrive & ":\Database\Scripts\InProgressExcels\BeforeXML.xml"
+        pDBScripts = psDrive & ":\Database\Scripts\"
         
         pJobDirectory = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/"
         pJobDirectoryG = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/"
@@ -799,7 +940,7 @@ Public Sub Class_Initialize()
         pJobDirectoryNN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/" & sCourtDatesID & "-"
         
         pAPFTR = "C:\Program Files (x86)\FTR\ForTheRecord\TheRecordPlayer.exe"
-        pAPCS = "T:\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
+        pAPCS = psDrive & ":\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
         pAPCV = "C:\Program Files (x86)\JAVS\CaseViewer\CaseViewer3.exe"
         pAPES = "C:\Program Files (x86)\NCH Software\Scribe\scribe.exe"
         
@@ -811,6 +952,9 @@ Public Sub Class_Initialize()
         pDistillerSettings = "C:\Program Files (x86)\Adobe\Acrobat 9.0\Acrobat\Settings\Standard.joboptions"
         pDistillerSettings1 = "C:\users\inqui\Standard1.joboptions"
         
+        pJurisdictionRefs = psDrive & ":\Administration\Jurisdiction References\"
+        
+       pSpeech = "S" & ":\UnprocessedAudio\Prepared\"
 End Sub
 
 

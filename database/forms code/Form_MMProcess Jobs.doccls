@@ -171,11 +171,10 @@ Private Sub TypeBTN_Click()
         Else
         End If
     End If
-
-    'TODO: PATH
+    
     If sJurisdiction = "Massachusetts" Then
         If Not fs.FileExists(cJob.DocPath.JobDirectoryN & "uniformtranscriptformat.pdf") Then
-            FileCopy "T:\Administration\Jurisdiction References\Massachusetts\uniformtranscriptformat.pdf", cJob.DocPath.JobDirectoryN & "uniformtranscriptformat.pdf"
+            FileCopy cJob.DocPath.JurisdictionRefs & "Massachusetts\uniformtranscriptformat.pdf", cJob.DocPath.JobDirectoryN & "uniformtranscriptformat.pdf"
         End If
     End If
 
