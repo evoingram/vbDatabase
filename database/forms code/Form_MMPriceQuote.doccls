@@ -52,7 +52,13 @@ Private Sub btnPriceQuote_Click()
     If sPriceQuote < 50 Then
         sPriceQuote = 50
     End If
+    
+    
     Me.txtAvailabilityYN.ControlSource = "=" & Chr(34) & "$" & sPriceQuote & Chr(34)
+    
+    
+    
+    
 End Sub
 
 Private Sub Command39_Click()
@@ -88,8 +94,8 @@ Private Sub btnCheckAvailability_Click()
     Dim rstTasksB4DdlnQ As DAO.Recordset
 
     iTimeLength = 0
-    iAudioLength = Forms![NewMainMenu]![ProcessJobSubformNMM]![SearchJobsSubform].Form![txtAudioLength].Value
-    dDeadline = Forms![NewMainMenu]![ProcessJobSubformNMM]![SearchJobsSubform].Form![txtDeadline].Value
+    iAudioLength = Me.Form![txtAudioLength].Value
+    dDeadline = Me.Form![txtDeadline].Value
     iCalcJobLength = (55 + (iAudioLength * 3) + (iAudioLength * 1.5))
     dDateDifference = DateDiff("d", Now, dDeadline)
     iWorkTimeAvail = 600 * dDateDifference
@@ -114,11 +120,11 @@ Private Sub btnCheckAvailability_Click()
     iAvailTimePreDeadline = iWorkTimeAvail - iCalcJobLength - iTimeLength
     If iAvailTimePreDeadline >= -30 Then
 
-        Me.txtAvailabilityYN.ControlSource = "=""Yes"""
+        Me.txtAvailabilityYN1.ControlSource = "=""Yes"""
     
     ElseIf iAvailTimePreDeadline < -30 Then
 
-        Me.txtAvailabilityYN.ControlSource = "=""No"""
+        Me.txtAvailabilityYN1.ControlSource = "=""No"""
     
     Else
     End If

@@ -72,7 +72,8 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
     Dim oCurrentFile As Object
     Dim oSubfolder As Object
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
@@ -176,7 +177,8 @@ Public Sub pfPrepareTranscript()
     
     Dim oFolderObject As Scripting.FileSystemObject
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
@@ -377,7 +379,8 @@ Public Sub pfRunCopyTranscTextBAT()
     ' Description : runs batch file CopyTranscriptTXT
     '============================================================================
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call Shell(cJob.DocPath.SpeechUP & "\CopyTranscriptTXT.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -390,15 +393,16 @@ Public Sub pfSRTranscribe()
     ' Call command: Call pfSRTranscribe
     ' Description : runs batch file SRTranscribe
     '============================================================================
-    'TODO: standardize drives
     'runs batch file SRTranscribe
     'HOW TO TRANSCRIBE FILES AFTER TRAINING
     'Run the following commands in a command window with administrator:
-    'cd /D S:\UnprocessedAudio\3 (or number you're using)
-    'S:\pocketsphinx\bin\Release\Win32\pocketsphinx_continuous.exe -infile wavfilename.wav -hmm en-us-adapt -lm wavfilename.lm -dict wavfilename.dic >> full-output.txt
-    'Check output in full-output.txt in S:\UnprocessedAudio\##
+    'cJob.DocPath.SpeechUA / SpeechUP / Speech
+    'cd /D cJob.DocPath.SpeechUA & "\3" (or number you're using)
+    'cJob.DocPath.Speech & "pocketsphinx\bin\Release\Win32\pocketsphinx_continuous.exe -infile wavfilename.wav -hmm en-us-adapt -lm wavfilename.lm -dict wavfilename.dic >> full-output.txt
+    'Check output in full-output.txt in cJob.DocPath.SpeechUA & "\##"
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call Shell(cJob.DocPath.SpeechUP & "\SRTranscribe.bat " & cJob.DocPath.SpeechUP)
 
@@ -414,38 +418,38 @@ Public Sub pfTrainAudio()
     '============================================================================
 
     '---------------------------------------------------------
-    'TODO: standardize drives
     'HOW TO TRAIN AUDIO
-    'note "S:\training BATs\G-runWAlignforAccuracyReport.bat"
+    'note cJob.DocPath.Speech & "training BATs\G-runWAlignforAccuracyReport.bat"
     '
     'Change "wavfilename" to your wav file name.
     'Run the following commands in a command window with administrator:
     '
-    '1. cd /D S:\UnprocessedAudio\3
+    '1. cd /D cJob.DocPath.Speech & UnprocessedAudio\3
     '
-    '2. S:\sphinxtrain\bin\Release\Win32\sphinx_fe.exe -argfile en-us/feat.params -samprate 16000 -c wavfilename.fileids -di . -do . -ei wav -eo mfc -mswav yes -nfft 2048
+    '2. cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\sphinx_fe.exe -argfile en-us/feat.params -samprate 16000 -c wavfilename.fileids -di . -do . -ei wav -eo mfc -mswav yes -nfft 2048
     '
-    '3. S:\sphinxtrain\bin\Release\Win32\pocketsphinx_mdef_convert.exe -text en-us/mdef en-us/mdef.txt
+    '3. cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\pocketsphinx_mdef_convert.exe -text en-us/mdef en-us/mdef.txt
     '
-    '4. S:\sphinxtrain\bin\Release\Win32\bw.exe -hmmdir en-us -moddeffn en-us/mdef.txt -ts2cbfn .ptm. -svspec 0-12/13-25/26-38 -feat 1s_c_d_dd -cmn current -agc none -dictfn wavfilename.dic -ctlfn wavfilename.fileids -lsnfn wavfilename.transcription -accumdir .
+    '4. cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\bw.exe -hmmdir en-us -moddeffn en-us/mdef.txt -ts2cbfn .ptm. -svspec 0-12/13-25/26-38 -feat 1s_c_d_dd -cmn current -agc none -dictfn wavfilename.dic -ctlfn wavfilename.fileids -lsnfn wavfilename.transcription -accumdir .
     '
-    '#### S:\sphinxtrain\bin\Release\Win32\bw.exe -hmmdir en-us -moddeffn en-us/mdef.txt -ts2cbfn .ptm. -svspec 0-12/13-25/26-38 -feat 1s_c_d_dd -cmn current -agc none -dictfn cmudict-en-us.dict -ctlfn wavfilename.fileids -lsnfn wavfilename.transcription -accumdir .
+    '#### cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\bw.exe -hmmdir en-us -moddeffn en-us/mdef.txt -ts2cbfn .ptm. -svspec 0-12/13-25/26-38 -feat 1s_c_d_dd -cmn current -agc none -dictfn cmudict-en-us.dict -ctlfn wavfilename.fileids -lsnfn wavfilename.transcription -accumdir .
     '
-    '5. S:\sphinxtrain\bin\Release\Win32\mllr_solve.exe -meanfn en-us/means -varfn en-us/variances -outmllrfn mllr_matrix -accumdir .
+    '5. cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\mllr_solve.exe -meanfn en-us/means -varfn en-us/variances -outmllrfn mllr_matrix -accumdir .
     '
-    '6. S:\sphinxtrain\bin\Release\Win32\map_adapt.exe -moddeffn en-us/mdef.txt -ts2cbfn .ptm. -meanfn en-us/means -varfn en-us/variances -mixwfn en-us/mixture_weights -tmatfn en-us/transition_matrices -accumdir . -mapmeanfn en-us-adapt/means -mapvarfn en-us-adapt/variances -mapmixwfn en-us-adapt/mixture_weights -maptmatfn en-us-adapt/transition_matrices
+    '6. cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\map_adapt.exe -moddeffn en-us/mdef.txt -ts2cbfn .ptm. -meanfn en-us/means -varfn en-us/variances -mixwfn en-us/mixture_weights -tmatfn en-us/transition_matrices -accumdir . -mapmeanfn en-us-adapt/means -mapvarfn en-us-adapt/variances -mapmixwfn en-us-adapt/mixture_weights -maptmatfn en-us-adapt/transition_matrices
     '
-    '7. S:\sphinxtrain\bin\Release\Win32\pocketsphinx_batch.exe -adcin yes -cepdir wav -cepext .wav -ctl ryan-weed-sample.fileids -lm wavfilename.lm -dict wavfilename.dic -hmm en-us-adapt -hyp wavfilename.hyp
+    '7. cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\pocketsphinx_batch.exe -adcin yes -cepdir wav -cepext .wav -ctl ryan-weed-sample.fileids -lm wavfilename.lm -dict wavfilename.dic -hmm en-us-adapt -hyp wavfilename.hyp
     '
-    '### S:\sphinxtrain\bin\Release\Win32\pocketsphinx_batch.exe -adcin yes -cepdir wav -cepext .wav -ctl wavfilename.fileids -lm wavfilename.lm -dict wavfilename.dic -hmm en-us-adapt -hyp wavfilename.hyp
+    '### cJob.DocPath.Speech & sphinxtrain\bin\Release\Win32\pocketsphinx_batch.exe -adcin yes -cepdir wav -cepext .wav -ctl wavfilename.fileids -lm wavfilename.lm -dict wavfilename.dic -hmm en-us-adapt -hyp wavfilename.hyp
     '
-    '8. S:\sphinxtrain\scripts\decode\word_align.pl wavfilename.transcription wavfilename.hyp >> word_align_output.txt
+    '8. cJob.DocPath.Speech & sphinxtrain\scripts\decode\word_align.pl wavfilename.transcription wavfilename.hyp >> word_align_output.txt
     '
     '
     '---------------------------------------------------------
     '
-    Dim cJob As New Job
-
+    Dim cJob As Job
+    Set cJob = New Job
+    
     Call Shell(cJob.DocPath.SpeechUP & "\audiotrain.bat " & cJob.DocPath.SpeechUP)
 
 End Sub
@@ -459,7 +463,9 @@ Public Sub pfRenameBaseFiles()
     ' Description : runs batch file FileRename / audioprep1.bat in Prepared folder
     '============================================================================
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call Shell(cJob.DocPath.SpeechUP & "\FileRename.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -472,7 +478,9 @@ Public Sub pfSplitAudio()
     ' Call command: Call pfSplitAudio
     ' Description : runs batch file splitaudio / audioprep1.bat in Prepared folder
     '============================================================================
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call Shell(cJob.DocPath.SpeechUP & "\splitaudio.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -486,7 +494,9 @@ Public Sub pfPrepareAudio()
     ' Description : runs batch file audioprep / audioprep1.bat in Prepared folder
     '============================================================================
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call Shell(cJob.DocPath.SpeechUP & "\audioprep.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -504,7 +514,6 @@ Public Sub pfTrainEngine()
 
 
     'HOW TO PREPARE FILES FOR TRAINING
-    'TODO: standardize drives
     'You may use other numbers in \\HUBCLOUD\evoingram\speech\UnprocessedAudio\ for samples of other working documents you may want to look at.
     '
     'PREPARING AUDIO:
@@ -624,13 +633,12 @@ Public Sub pfAddSubfolder()
     Dim oFolderObject As Scripting.FileSystemObject
     Dim oRootFolder As Object
     Dim oSubfolder As Object
-    Dim sUnprocessedAudioPath As String
     Dim sConcatenatedAudioPath As String
-
+    Dim cJob As Job
+    Set cJob = New Job
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
-    'TODO: standardize drives
-    sUnprocessedAudioPath = "S:\UnprocessedAudio\"
-    Set oRootFolder = oFolderObject.GetFolder(sUnprocessedAudioPath)
+    
+    Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUA)
 
     For Each oSubfolder In oRootFolder.SubFolders
 
@@ -679,7 +687,9 @@ Public Sub pfCorpusUpload()
     Dim sFieldName As String
     Dim sMainURL As String
     Dim oFolderObject As Scripting.FileSystemObject
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     '@Ignore AssignmentNotUsed
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
@@ -757,7 +767,9 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     Dim oStream As Object
     Dim m_isRedirected As Boolean
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
@@ -876,7 +888,9 @@ Public Sub pfDoFolder(Folder As Variant)
     Dim sFileExtension As String
     Dim sFolderName As String
  
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
     sFieldName = "corpus"

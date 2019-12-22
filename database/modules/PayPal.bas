@@ -86,8 +86,9 @@ Public Sub fSendPPEmailFactored()
     
     Dim iFileNum As Long
 
-    Dim cJob As New Job
-
+    Dim cJob As Job
+    Set cJob = New Job
+    
     Call fPPGenerateJSONInfo                     'refreshes some necessary info
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -421,10 +422,10 @@ Public Sub fPPDraft()
     
     Dim parsed As Dictionary
     
-    Call fPPGenerateJSONInfo
-    Call pfGetOrderingAttorneyInfo
-
     sIRC = 8
+Beginning:
+    Call pfGetOrderingAttorneyInfo
+    Call fPPGenerateJSONInfo
     Set rstRates = CurrentDb.OpenRecordset("SELECT * FROM Rates WHERE [ID] = " & sIRC & ";")
     vInventoryRateCode = rstRates.Fields("Code").Value
     rstRates.Close
@@ -450,7 +451,7 @@ Public Sub fPPDraft()
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = parsed("access_token")          'third level array
+        sToken = parsed.item("access_token")          'third level array
         .abort
         Debug.Print "--------------------------------------------"
     End With
@@ -514,15 +515,15 @@ Public Sub fPPDraft()
                     "merchant_memo" & Chr(34) & ": " & Chr(34) & vmMemo & "}" & "{" & Chr(34) & _
                     "logo_url" & Chr(34) & ": " & Chr(34) & vlURL & "}" & "{" & Chr(34) & _
                     "template_id" & Chr(34) & ": " & Chr(34) & sTemplateID & "}," & "{" & Chr(34) & "number" & Chr(34) & ": " & Chr(34) & sInvoiceNo & Chr(34) & "}"
-    'Debug.Print "JSON1--------------------------------------------"
-    'Debug.Print json1
-    'Debug.Print "JSON2--------------------------------------------"
-    'Debug.Print json2
-    'Debug.Print "JSON3--------------------------------------------"
-    'Debug.Print json3
-    'Debug.Print "JSON4--------------------------------------------"
-    'Debug.Print json4
-    'Debug.Print "RESPONSETEXT--------------------------------------------"
+    Debug.Print "JSON1--------------------------------------------"
+    Debug.Print json1
+    Debug.Print "JSON2--------------------------------------------"
+    Debug.Print json2
+    Debug.Print "JSON3--------------------------------------------"
+    Debug.Print json3
+    Debug.Print "JSON4--------------------------------------------"
+    Debug.Print json4
+    Debug.Print "RESPONSETEXT--------------------------------------------"
     sURL = "https://api.paypal.com/v1/invoicing/invoices"
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
@@ -532,6 +533,7 @@ Public Sub fPPDraft()
         .setRequestHeader "content-type", "application/json"
         .setRequestHeader "Authorization", "Bearer " & sToken
         json5 = json1 & json2 & json3 & json4
+        Debug.Print json5
         .send json5
         apiWaxLRS = .responseText
         sToken = ""
@@ -540,13 +542,13 @@ Public Sub fPPDraft()
         'Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = parsed("number")            'third level array
-    vInvoiceID = parsed("id")                    'third level array
-    vStatus = parsed("status")                   'third level array
-    vTotal = parsed("total_amount")("value")     'second level array
-    vErrorName = parsed("name")                  '("value") 'second level array
-    vErrorMessage = parsed("message")            '("value") 'second level array
-    vErrorILink = parsed("information_link")     '("value") 'second level array
+    sInvoiceNumber = parsed.item("number")            'third level array
+    vInvoiceID = parsed.item("id")                    'third level array
+    vStatus = parsed.item("status")                   'third level array
+    vTotal = parsed.item("total_amount").item("value")     'second level array
+    vErrorName = parsed.item("name")                  '("value") 'second level array
+    vErrorMessage = parsed.item("message")            '("value") 'second level array
+    vErrorILink = parsed.item("information_link")     '("value") 'second level array
     '
     'Set vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
@@ -565,7 +567,7 @@ Public Sub fPPDraft()
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
 
-    'TODO: update PPID & PPStatus
+    'update PPID & PPStatus
     Dim sUpdatePPStatus As String
     Dim sUpdatePPID As String
     sUpdatePPStatus = "UPDATE CourtDates SET PPStatus = " & Chr(34) & vStatus & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
@@ -791,7 +793,8 @@ Public Sub fSendPPEmailBalanceDue()
     
     Dim iFileNum As Long
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call fPPGenerateJSONInfo
 
@@ -1249,7 +1252,8 @@ Public Sub fSendPPEmailDeposit()
     Dim iFileNumIn As Long
     Dim iFileNumOut As Long
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     'your invoice docx template MUST contain the phrase "#PPB1#" AND "#PPB2#" without the quotes somewhere on it.
     'your e-mail docx template MUST contain the phrase "#PPB1#" without the quotes somewhere on it.
@@ -1470,7 +1474,7 @@ Public Sub fSendPPEmailDeposit()
             End With
            
             'save invoice
-            .ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPDraftInvoiceEmail
+            oWordDoc.Save
     
         End With
         oWordDoc.Close
@@ -1603,8 +1607,7 @@ Public Sub fPPGetInvoiceInfo()
         .abort
         'Debug.Print "--------------------------------------------"
     End With
-    'get info for invoice, call separate function for it maybe ''TODO: What is going on here?
-    vInvoiceID = sPPID                           'rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
+    vInvoiceID = sPPID 'rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
   
     'Debug.Print "RESPONSETEXT--------------------------------------------"
     sURL = "https://api.paypal.com/v1/invoicing/invoices/" & vInvoiceID
@@ -1612,7 +1615,6 @@ Public Sub fPPGetInvoiceInfo()
         '.Visible = True
         .Open "GET", sURL, False
         '.setRequestHeader "Accept", "application/json" 'application/x-www-form-urlencoded
-        '.setRequestHeader "content-type", "application/x-www-form-urlencoded"
         .setRequestHeader "content-type", "application/json"
         .setRequestHeader "Authorization", "Bearer " & sToken
         ' json5 = json1 & json2 & json3
@@ -1727,7 +1729,9 @@ Public Sub fPPRefund()
     
     Dim parsed As Dictionary
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
+    
     Call fPPGenerateJSONInfo
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -2084,13 +2088,11 @@ Public Sub fPPUpdate()
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
 
-    'TODO: update PPID & PPStatus
+    'update PPID & PPStatus
     Dim sUpdatePPStatus As String
     Dim sUpdatePPID As String
     
     sUpdatePPStatus = "UPDATE CourtDates SET PPStatus = " & Chr(34) & vStatus & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
-
-
     CurrentDb.Execute sUpdatePPStatus
     sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
     CurrentDb.Execute sUpdatePPID

@@ -9,7 +9,9 @@ Private Sub btnViewInvoice_Click()
     Dim sInvoiceNumber As String
     Dim wbViewInvoice As Object
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Me.btnVIJobNumberField.Value
     

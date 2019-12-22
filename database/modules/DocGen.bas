@@ -54,7 +54,8 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     Dim oExcelWB As Excel.Workbook
     Dim oExcelApp As Excel.Application
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     If sMerge = "Case" Then
 
@@ -86,7 +87,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     
             Set xlRange = .Worksheets(1).Range("A2").CurrentRegion
             .Names.Add Name:="AAAAADataRange", RefersTo:=xlRange
-            .SaveAs FileName:=sExportInfoCSVPath
+            .Save
             .Saved = True
             .Close
         End With
@@ -101,7 +102,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
 
     sArray = Split(sExportTopic, "\")
 
-    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder & sArray(1) & "-Template.docx", "Word.Document") 'sArray(1)/export topic is folder\subject
+    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder1 & sArray(1) & "-Template.docx", "Word.Document") 'sArray(1)/export topic is folder\subject
     oWordAppDoc.Application.Visible = False
 
     oWordAppDoc.MailMerge.OpenDataSource _
@@ -145,7 +146,8 @@ Public Sub pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
     Dim oWordEditor As Word.editor
     Dim oWordDoc As New Word.Document
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oOutlookApp = CreateObject("Outlook.Application")
     Set oOutlookMail = oOutlookApp.CreateItem(0)
@@ -202,7 +204,8 @@ Public Sub pfCreateCDLabel()
     
     Dim rstCommHistory As DAO.Recordset
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
@@ -326,7 +329,8 @@ Public Sub pfCreateCover(sTemplatePath As String)
     
     Dim rstCommHistory As DAO.Recordset
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     If Len(Dir(cJob.DocPath.CaseInfo)) = 0 Then
 
@@ -447,7 +451,8 @@ Public Sub fCreatePELLetter()
     Dim sQuestion As String
     Dim sAnswer As String
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfGenericExportandMailMerge("Case", "Stage1s\PackageEnclosedLetter")
 
@@ -475,7 +480,6 @@ Public Sub fFactorInvoicEmailF()
 
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim sUnitPrice As String
     Dim sContactName As String
     Dim sPONumber As String
     Dim sUnitPriceSQL As String
@@ -489,7 +493,8 @@ Public Sub fFactorInvoicEmailF()
     Dim oExcelApp As New Excel.Application
     Dim oExcelWB As New Excel.Workbook
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -498,22 +503,7 @@ Public Sub fFactorInvoicEmailF()
     MsgBox "Factoring Invoice Email Created!"
 
     Call pfCommunicationHistoryAdd("FactorInvoiceEmail")
-
-    'TODO: fFactorInvoicEmailF can delete following lines when known safe
-    'sUnitPriceSQL = "SELECT UnitPrice from CourtDates where ID = " & sCourtDatesID & ";" 'get unitprice id
-    'Set db = CurrentDb
-    'Set rstUPCourtDates = CurrentDb.OpenRecordset(sUnitPriceSQL)
-    'sUnitPrice = rstUPCourtDates.Fields("UnitPrice").Value
-    'rstUPCourtDates.Close
-    'Set rstUPCourtDates = Nothing
-
-    'TODO: implement class for rates/unit prices
-    sUnitPriceSQL = "SELECT Rate from UnitPrice where ID = " & sUnitPrice & ";" 'get proper rate
-    Set rstUnitPrice = CurrentDb.OpenRecordset(sUnitPriceSQL)
-        sUnitPrice = rstUnitPrice.Fields("Rate").Value
-    rstUnitPrice.Close
-    Set rstUnitPrice = Nothing
-
+    
     Set qdf = CurrentDb.QueryDefs(qFCSVQ)
         qdf.Parameters(0) = cJob.ActualQuantity
         qdf.Parameters(1) = sCourtDatesID
@@ -537,7 +527,7 @@ Public Sub fFactorInvoicEmailF()
         .Application.ActiveCell.Offset(3, 2).Value = sPONumber
         .Application.ActiveCell.Offset(4, 2).Value = cJob.InvoiceDate
         .Application.ActiveCell.Offset(5, 2).Value = 28 'net terms
-        .Application.ActiveCell.Offset(6, 2).Value = (cJob.ActualQuantity * sUnitPrice)
+        .Application.ActiveCell.Offset(6, 2).Value = (cJob.ActualQuantity * cJob.PageRate)
         .SaveAs FileName:=cJob.DocPath.JobDirectoryW & "Client_Basic_Schedule.xls", FileFormat:=xlExcel8
         .Close
     End With
@@ -574,7 +564,8 @@ Public Sub pfInvoicesCSV()
     ' Description : creates CSVs used for invoicing
     '============================================================================
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     'DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
     DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
@@ -584,6 +575,7 @@ Public Sub pfInvoicesCSV()
 
         DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
         DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.XeroCSV, True
+        DoCmd.Close (qFCSVQ)
     
     Else
     End If
@@ -617,7 +609,8 @@ Public Sub fCreateWorkingCopy()
     Dim wsSections As Word.Sections
     Dim wsSection As Word.Section
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfWordIndexer
 
@@ -716,8 +709,9 @@ Public Sub pfPrepareCover()
     
     Dim rstJobsByCase As DAO.Recordset
     
-    Dim cJob As New Job
-
+    Dim cJob As Job
+    Set cJob = New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     'query for all dates & job numbers for a case

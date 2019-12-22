@@ -56,6 +56,7 @@ Public bCompleted As String
 Public sTitle As String
 Public sWLListID As String
 Private sPPID As String
+Private pPageRate As String
 
 Private mrstRecordset As Recordset
 Private mbooLoaded As Boolean
@@ -252,6 +253,14 @@ Public Property Let PPID(rData As String)
     sPPID = rData
 End Property
 
+Public Property Get PageRate() As String
+    PageRate = pPageRate
+End Property
+
+Public Property Let PageRate(rData As String)
+    pPageRate = rData
+End Property
+
 Public Property Get ID() As Long
     ID = sCourtDatesID
 End Property
@@ -366,6 +375,16 @@ Private Sub Load()
         Me.Location = Nz(.Fields("Location").Value)
         Me.PPID = Nz(.Fields("PPID").Value)
     End With
+    
+    Dim sUnitPriceSQL As String
+    Dim rstUnitPrice As DAO.Recordset
+    sUnitPriceSQL = "SELECT Rate from UnitPrice where [ID]=" & Me.UnitPrice & ";" 'get proper rate
+    Set rstUnitPrice = CurrentDb.OpenRecordset(sUnitPriceSQL)
+        pPageRate = rstUnitPrice.Fields("Rate").Value
+        Me.PageRate = pPageRate
+    rstUnitPrice.Close
+    Set rstUnitPrice = Nothing
+    
     mbooLoaded = True
     mApp0.FindFirst "ID=" & sApp0
     mApp1.FindFirst "ID=" & sApp1
@@ -375,8 +394,8 @@ Private Sub Load()
     mApp5.FindFirst "ID=" & sApp5
     mApp6.FindFirst "ID=" & sApp6
     mCaseInfo.FindFirst "ID=" & sCaseID
-    mStatus.FindFirst "ID=" & sStatusID
-    mDocPath.Class_Initialize
+    mStatus.FindFirstStatus "[CourtDatesID]=" & sCourtDatesID
+    'mDocPath.Class_Initialize
     'mApp1.SetAppValues (sApp1)
 End Sub
 
@@ -422,7 +441,7 @@ Public Sub Update()
         .Fields("HearingDate").Value = Me.HearingDate
         .Update
     End With
-    mDocPath.Class_Initialize
+    'mDocPath.Class_Initialize
     mbooLoaded = True
 End Sub
 

@@ -32,19 +32,15 @@ Private Sub Command68_Click()
     ' Description : generates document specified from combo box selection
     '============================================================================
 
-    'TODO: need other docs in list:
-    'paypal invoice
-    'word index
-    'pp-draft
-    '
-    
     Dim sAnswer As String
     Dim sQuestion As String
     
     Dim qdf As QueryDef
     Dim rstTRCUnionAA As DAO.Recordset
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -86,9 +82,8 @@ Private Sub Command68_Click()
 
         'export xero csv
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
-    
         DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
-        'DoCmd.Close (qXeroCSVQ)
+        DoCmd.Close (qXeroCSVQ)
     
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
@@ -130,7 +125,7 @@ Private Sub Command68_Click()
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
         'DoCmd.TransferText acExportDelim, , "XeroInvoiceQuery1Select", cJob.DocPath.XeroCSV, True
         DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
-
+        DoCmd.Close (qXeroCSVQ)
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
         Application.FollowHyperlink (svURL)
@@ -239,12 +234,92 @@ Private Sub Command68_Click()
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
         
         DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
-        'DoCmd.Close (qXeroCSVQ)
+        DoCmd.Close (qXeroCSVQ)
     
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
         Application.FollowHyperlink (svURL)
         Call pfUpdateCheckboxStatus("InvoiceCompleted")
+    
+    ElseIf Me.cmbListAllDocuments = "Stage 4:  PayPal Invoice" Then
+    
+        Call fIsFactoringApproved
+    
+    ElseIf Me.cmbListAllDocuments = "Stage 4:  Word Index" Then
+    
+        Call pfWordIndexer
+        
+    ElseIf Me.cmbListAllDocuments = "Stage 4:  PP Draft Email" Then
+        
+        Dim oWordApp As Word.Application
+        Dim oWordDoc As Word.Document
+        
+        Set oWordApp = CreateObject("Word.Application")
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDIET)
+
+        oWordApp.Application.Visible = False
+        oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.InvoiceInfo, ReadOnly:=True
+        oWordDoc.MailMerge.Execute
+        oWordDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
+        oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPDraftInvoiceEmail
+
+        Set oWordApp = CreateObject("Word.Application")
+        oWordApp.Visible = False
+    
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton)
+    
+        oWordDoc.Content.Copy
+    
+        Set oWordApp = CreateObject("Word.Application")
+        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDraftInvoiceEmail)
+
+        With oWordDoc.Application
+
+            .Selection.Find.ClearFormatting
+            .Selection.Find.Replacement.ClearFormatting
+    
+            With .Selection.Find
+                .Text = "#PPB1#"
+                .Replacement.Text = ""
+                .Forward = True
+                .Wrap = wdFindContinue
+                .Format = False
+                .MatchCase = False
+                .MatchWholeWord = False
+                .MatchWildcards = False
+                .MatchSoundsLike = False
+                .MatchAllWordForms = False
+                .Execute
+                If .Forward = True Then
+                    .Application.Selection.Collapse Direction:=wdCollapseStart
+                Else
+                    .Application.Selection.Collapse Direction:=wdCollapseEnd
+                End If
+        
+                .Execute Replace:=wdReplaceOne
+        
+                If .Forward = True Then
+                    .Application.Selection.Collapse Direction:=wdCollapseEnd
+                Else
+                    .Application.Selection.Collapse Direction:=wdCollapseStart
+                End If
+        
+                .Execute
+        
+                .Application.Selection.PasteAndFormat (wdFormatOriginalFormatting) 'paste button html file
+        
+            End With
+           
+            'save invoice
+            oWordDoc.Save
+    
+        End With
+        oWordDoc.Close
+        oWordApp.Quit
+    
+        Set oWordApp = Nothing
+        Set oWordDoc = Nothing
+        
     
     Else
     End If

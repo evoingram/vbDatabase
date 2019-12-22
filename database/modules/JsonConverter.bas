@@ -1,5 +1,5 @@
 Attribute VB_Name = "JsonConverter"
-
+'@Folder("Database.Admin.Modules")
 ''
 ' VBA-JSON v2.3.1
 ' (c) Tim Hall - https://github.com/VBA-tools/VBA-JSON
@@ -332,6 +332,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
 
         json_BufferAppend json_Buffer, json_Indentation & "]", json_BufferPosition, json_BufferLength
 
+        '@Ignore UnassignedVariableUsage
         ConvertToJson = json_BufferToString(json_Buffer, json_BufferPosition)
 
     ' Dictionary or Collection
@@ -425,6 +426,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
             json_BufferAppend json_Buffer, json_Indentation & "]", json_BufferPosition, json_BufferLength
         End If
 
+        '@Ignore UnassignedVariableUsage
         ConvertToJson = json_BufferToString(json_Buffer, json_BufferPosition)
     Case VBA.vbInteger, VBA.vbLong, VBA.vbSingle, VBA.vbDouble, VBA.vbCurrency, VBA.vbDecimal
         ' Number (use decimals for numbers)
@@ -571,14 +573,17 @@ Private Function json_ParseString(json_String As String, ByRef json_Index As Lon
                 ' Unicode character escape (e.g. \u00a9 = Copyright)
                 json_Index = json_Index + 1
                 json_Code = VBA.Mid$(json_String, json_Index, 4)
+                '@Ignore UnassignedVariableUsage
                 json_BufferAppend json_Buffer, VBA.ChrW(VBA.Val("&h" + json_Code)), json_BufferPosition, json_BufferLength
                 json_Index = json_Index + 4
             End Select
         Case json_Quote
+            '@Ignore UnassignedVariableUsage
             json_ParseString = json_BufferToString(json_Buffer, json_BufferPosition)
             json_Index = json_Index + 1
             Exit Function
         Case Else
+            '@Ignore UnassignedVariableUsage
             json_BufferAppend json_Buffer, json_Char, json_BufferPosition, json_BufferLength
             json_Index = json_Index + 1
         End Select
@@ -1105,5 +1110,6 @@ Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
 End Function
 
 #End If
+
 
 

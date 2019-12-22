@@ -53,7 +53,8 @@ Public Sub pfStage2Ppwk()
 
     Dim sAnswer As String
     Dim sQuestion As String
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
@@ -148,7 +149,8 @@ Public Sub pfAutoCorrect()
     Dim rstAGShortcuts As DAO.Recordset
     Dim oWordDoc As Word.Document
     Dim oWordApp As Word.Application
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -229,7 +231,8 @@ Public Sub pfRoughDraftToCoverF()
     Dim qdf As QueryDef
     Dim wsyWordStyle As String
     Dim bMatchCase As Boolean
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
 
     Call pfCurrentCaseInfo                       'refresh transcript info
@@ -280,10 +283,6 @@ Public Sub pfRoughDraftToCoverF()
     oWordApp.Visible = True
 
     x = 18  '18 is number of first dynamic speaker
-    
-    '@Ignore UnassignedVariableUsage
-    DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
-    
     
     'file name to do find replaces in
     
@@ -407,9 +406,6 @@ Public Sub pfRoughDraftToCoverF()
         drSpeakerName.Close                      'Close the recordset
         Set drSpeakerName = Nothing              'Clean up
         
-        
-        '@Ignore UnassignedVariableUsage
-        DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         
         
@@ -1318,9 +1314,6 @@ Public Sub pfRoughDraftToCoverF()
             
         x = 18                                   '18 is number of first dynamic speaker
         
-        '@Ignore UnassignedVariableUsage
-        DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
-        
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         
         '@Ignore UnassignedVariableUsage
@@ -1654,9 +1647,9 @@ Public Sub pfStaticSpeakersFindReplace()
     Dim sReplacementText As String
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
-    Dim cJob As New Job
-
-    DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
@@ -1972,9 +1965,10 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     Dim sTextToFind As String
     Dim sReplacementText As String
     Dim wsyWordStyle As Word.Style
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
-    DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     Set oWordApp = GetObject(, "Word.Application")
@@ -2221,7 +2215,9 @@ Public Sub pfTypeRoughDraftF()
     '============================================================================
 
     Dim oRoughDraft As Object
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence
@@ -2349,8 +2345,7 @@ Public Sub pfReplaceAQC()
 
     Call pfRoughDraftToCoverF
     Call FPJurors
-    'Call pfTCEntryReplacement
-    ''TODO: What is going on here?
+    Call pfTCEntryReplacement
     Call pfFindRepCitationLinks
 
 End Sub
@@ -2376,12 +2371,13 @@ Public Sub pfRoughDraftCFMass()
     Dim sReplacementText As String
     Dim wsyWordStyle As String
     
-    'TODO: duplicate
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
     
     Dim x As Long
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef
@@ -2427,12 +2423,7 @@ Public Sub pfRoughDraftCFMass()
 
     x = 18                                       '18 is number of first dynamic speaker
     
-    '@Ignore UnassignedVariableUsage
-    DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
-    
-    
     'file name to do find replaces in
-    
     
     '@Ignore UnassignedVariableUsage
     Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
@@ -2546,17 +2537,11 @@ Public Sub pfRoughDraftCFMass()
             DoEvents
         Loop
     
-    
-    
-    
         'MsgBox "Finished ing through dynamic speakers."
         
         drSpeakerName.Close                      'Close the recordset
         Set drSpeakerName = Nothing              'Clean up
         
-        
-        '@Ignore UnassignedVariableUsage
-        DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         
         
@@ -3571,10 +3556,7 @@ Public Sub pfRoughDraftCFMass()
         Call pfSingleFindReplace(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True)
         
         x = 18                                   '18 is number of first dynamic speaker
-        
-        '@Ignore UnassignedVariableUsage
-        DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
-        
+                
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         
         '@Ignore UnassignedVariableUsage

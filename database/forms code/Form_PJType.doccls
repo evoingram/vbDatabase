@@ -10,7 +10,9 @@ Private Sub Form_Load()
 
     Dim wbViewNotes As String
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
@@ -36,7 +38,9 @@ End Sub
 
 Private Sub Form_Current()
   
-    'Dim cJob As New Job
+    '
+    Dim cJob As Job
+    Set cJob = New Job
     
     'Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
     'Me.oleShowDoc.Requery
@@ -101,7 +105,9 @@ Public Sub pfOpenWork()
     
     Dim oSingleFile As Variant
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     'get courtdatesid
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]

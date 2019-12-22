@@ -170,12 +170,13 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     ' Call command: Call pfDownloadFTPsite(mySession)
     ' Description : downloads files modified today (a.k.a. new files on FTP)
     '============================================================================
-    'TODO: ftp
+    
     Dim seopFTPSettings As New SessionOptions
     Dim tropFTPSettings As New TransferOptions
     Dim transferResult As TransferOperationResult
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     With seopFTPSettings                         ' Setup session options
         .Protocol = Protocol_Ftp
@@ -215,7 +216,8 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
     Dim oOutLookMAPIFolder As Outlook.MAPIFolder
     Dim oOutlookMail As Outlook.MailItem
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oOutlookNamespace = GetNamespace("MAPI")
     Set oOutlookPickedFolder = oOutlookNamespace.PickFolder
@@ -297,7 +299,8 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     
     Dim oAcrobatDoc As Object
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oAcrobatDoc = New AcroPDDoc
 
@@ -358,7 +361,7 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
 
     DoCmd.OpenQuery "FinalUnitPriceQuery"        'PRE-QUERY FOR FINAL SUBTOTAL
     CurrentDb.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
-    CurrentDb.Close
+    DoCmd.Close ("FinalUnitPriceQuery")
 End Sub
 
 Public Sub pfReadXML()
@@ -377,7 +380,8 @@ Public Sub pfReadXML()
     Dim formDOM As DOMDocument60                 'Currently opened xml file
     Dim ixmlRoot As IXMLDOMElement
     Dim Rng As Range
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Do While Len(Dir(cJob.DocPath.ShippingOutputFolder)) > 0
     
@@ -420,7 +424,8 @@ Public Sub pfFileRenamePrompt()
     Dim sUserInput As String
     Dim sChkBxFiledNotFiled As String
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
@@ -499,8 +504,11 @@ Public Sub pfCheckFolderExistence()
     ' Description : checks for Audio, Transcripts, FTP, WorkingFiles, Notes subfolders and RoughDraft and creates if not exists
     '============================================================================
 
-    Dim cJob As New Job
-
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     If Len(Dir(cJob.DocPath.JobDirectory, vbDirectory)) = 0 Then
         MkDir cJob.DocPath.JobDirectory
     End If
@@ -535,6 +543,10 @@ Public Sub pfCheckFolderExistence()
     ElseIf sJurisdiction Like "*NonCourt*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
+            sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+            cJob.FindFirst "ID=" & sCourtDatesID
+            Debug.Print cJob.DocPath.TempShipOptionsQ1XLSM
+            
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
         End If
     
@@ -576,6 +588,7 @@ Public Sub pfCheckFolderExistence()
     
     End If
     Call pfClearGlobals
+    Set cJob = Nothing
 End Sub
 
 Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
@@ -590,7 +603,8 @@ Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
     Dim rstCHAdd As DAO.Recordset
     Dim sCHHyperlink As String
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
@@ -889,7 +903,6 @@ Public Sub pfReformatTable()
     ' Call command: Call pfReformatTable
     ' Description : reformats scraped Bar addresses to useable format for table
     '============================================================================
-    'TODO: pfReformatTable check what's going on here to finish it if necessary
     
     'change all commas to semicolons
     'export to xls
@@ -1102,9 +1115,11 @@ Private Sub AddTaskToTasks(sTaskTitle As String, _
     rstTasks.Fields("TimeLength").Value = iTaskMinuteLength
     rstTasks.Fields("Priority").Value = sPriority
     rstTasks.Fields("Start Date").Value = dStart
-    rstTasks.Fields("Due Date").Value = dDue
     rstTasks.Fields("Category").Value = sTaskCategory
     rstTasks.Fields("Description").Value = sTaskDescription
+        
+    rstTasks.Fields("Due Date").Value = dDue
+    
     rstTasks.Update
     
     rstTasks.Close
@@ -1132,13 +1147,15 @@ Public Sub pfGenerateJobTasks()
     Dim dStart As Date
     Dim dDue As Date
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     sTaskTitle = "(1.1) Enter job & contacts into database:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = Now + 1
+    dDue = Date + 1
     dStart = Date
+    cJob.DueDate = "12/22/2019"
     iTaskMinuteLength = "2"
     sTaskCategory = "production"
     sPriority = "(1) Stage 1"
@@ -1152,12 +1169,12 @@ Public Sub pfGenerateJobTasks()
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(1.2) Payment:  If factored, proceed with set-up.  If not, send invoice & wait for payment :  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = Now + 1
+    dDue = Date + 1
     iTaskMinuteLength = "2"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(1.3) Generate documents: cover, autocorrect, AGshortcuts, Xero CSV, CD label, transcripts ready, package-enclosed letter:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = Now + 1
+    dDue = Date + 1
     iTaskMinuteLength = "2"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
@@ -1165,7 +1182,7 @@ Public Sub pfGenerateJobTasks()
 
     For i = 1 To iTypingTime
         sTaskTitle = "(2.1) Type:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-        dDue = dDueDate - 3
+        dDue = cJob.DueDate - 3
         iTaskMinuteLength = "60"
         sPriority = "(2) Stage 2"
         Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
@@ -1173,18 +1190,18 @@ Public Sub pfGenerateJobTasks()
     Next i
 
     sTaskTitle = "(3.1) Find/replace add to cover page:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 2
+    dDue = cJob.DueDate - 2
     iTaskMinuteLength = "3"
     sPriority = "(3) Stage 3"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(3.2) Hyperlink:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 2
+    dDue = cJob.DueDate - 2
     iTaskMinuteLength = "15"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(3.3) Send email if more info needed and hold transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 2
+    dDue = cJob.DueDate - 2
     iTaskMinuteLength = "2"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
@@ -1193,57 +1210,38 @@ Public Sub pfGenerateJobTasks()
     For i = 1 To iAudioProofTime
     
         sTaskTitle = "(3.4) Audio-proof:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-        dDue = dDueDate - 2
+        dDue = cJob.DueDate - 2
         iTaskMinuteLength = "60"
         Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
         
     Next i
 
     sTaskTitle = "(4.1) Make final transcript docs, pdf, zip, etc:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
+    dDue = cJob.DueDate - 1
     iTaskMinuteLength = "3"
     sPriority = "(4) Stage 4"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
     
     sTaskTitle = "(4.2) Invoice if balance due or factored.  Refund if applicable:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
+    dDue = cJob.DueDate - 1
     iTaskMinuteLength = "1"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(4.3) Deliver as necessary electronically if transcript not held:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
+    dDue = cJob.DueDate - 1
     iTaskMinuteLength = "1"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(4.4) Send invoice to factoring:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
-    iTaskMinuteLength = "1"
-    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
-
-    sTaskTitle = "(4.5) File transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
+    sTaskTitle = "(4.4) File transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    dDue = cJob.DueDate - 1
     iTaskMinuteLength = "3"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(4.6) Burn CD for mailing:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
-    iTaskMinuteLength = "2"
-    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
-
-    sTaskTitle = "(4.7) Generate xmls for shipping:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
-    iTaskMinuteLength = "1"
-    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
-
-    sTaskTitle = "(4.8) Produce & mail transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
-    iTaskMinuteLength = "15"
-    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
-
-    sTaskTitle = "(4.9) Add tracking number and shipping cost to DB.  Notify client:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
-    dDue = dDueDate - 1
-    iTaskMinuteLength = "2"
-    Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
+    'sTaskTitle = "(4.5) Send invoice to factoring:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    'dDue = cJob.DueDate - 1
+    'iTaskMinuteLength = "1"
+    'Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
+    
 
     Call pfClearGlobals
     
@@ -1403,7 +1401,7 @@ Public Sub pfMonthlyTaskAddFunction()
     ' Call command: Call pfMonthlyTaskAddFunction
     ' Description : adds static monthly tasks to Tasks table
     '============================================================================
-    'TODO: pfMonthlyTaskAddFunction can probably break this into separate functions
+    
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
@@ -1464,7 +1462,8 @@ Public Sub pfCommHistoryExportSub()
     
     Dim dEmailReceived As Date
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Set nsOutlookNmSpc = GetNamespace("MAPI")
     Set oOutlookAccessTestFolder = nsOutlookNmSpc.Folders(sCompanyEmail).Folders("Inbox").Folders("AccessTest")
@@ -1666,14 +1665,14 @@ Public Sub pfAskforAudio()
     Dim fs As Object
     Dim fd As FileDialog
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
     'use the standard title and filters, but change the initial folder
-    'TODO: Change drive
-    fd.InitialFileName = "T:\"
+    fd.InitialFileName = sDrive
     fd.InitialView = msoFileDialogViewList
     fd.Title = "Select the audio for this transcript."
     fd.AllowMultiSelect = True                   'allow multiple file selection
@@ -1681,12 +1680,7 @@ Public Sub pfAskforAudio()
     iFileChosen = fd.Show
     If iFileChosen = -1 Then
         For i = 1 To fd.SelectedItems.Count      'open each of the files chosen
-            Debug.Print "i:  " & i
-            Debug.Print fd.InitialFileName
-            Debug.Print fd.InitialFileName & "\" & fd.SelectedItems(i)
-            Debug.Print fd.SelectedItems(i)
             sFileName = Right$(fd.SelectedItems(i), Len(fd.SelectedItems(i)) - InStrRev(fd.SelectedItems(i), "\"))
-            Debug.Print Len(Dir(cJob.DocPath.JobDirectoryA & sFileName, vbDirectory))
         
             If Len(Dir(cJob.DocPath.JobDirectoryA & sFileName, vbDirectory)) = 0 Then
                 FileCopy fd.SelectedItems(i), cJob.DocPath.JobDirectoryA & sFileName
@@ -1727,7 +1721,8 @@ Public Sub pfAskforNotes()
     
     Dim rngStory As Range
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
@@ -1773,7 +1768,6 @@ Public Sub pfAskforNotes()
             
                     Set oWordDoc = GetObject(sOriginalNotesPath, "Word.Document")
                     On Error GoTo 0
-            
                     Set oWordDoc = oWordApp.Documents.Open(FileName:=sOriginalNotesPath)
             
                     oWordDoc.Application.Visible = False
@@ -1790,7 +1784,7 @@ Public Sub pfAskforNotes()
                 Set oWordDoc = Nothing
                 Set oWordApp = Nothing
             
-                FileCopy fd.SelectedItems(i), cJob.DocPath.JobDirectoryA & sFileName
+                FileCopy fd.SelectedItems(i), cJob.DocPath.JobDirectoryN & sFileName
                 FileCopy fd.SelectedItems(i), cJob.DocPath.Notes
             End If
         Next i
@@ -3916,9 +3910,6 @@ EndHere:
         GoTo StartHere
 
     End If
-
-    rstCommHistory.Close
-    Set rstCommHistory = Nothing
 
 End Sub
 

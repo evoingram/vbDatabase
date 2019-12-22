@@ -1,6 +1,7 @@
 Attribute VB_Name = "NewSiteSkeleton"
 '@Folder("Database.General.Modules")
 Option Compare Database
+Option Explicit
 
 'newsite
 

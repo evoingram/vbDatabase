@@ -7,84 +7,151 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Ignore OptionExplicit
 '@Folder("Database.Production.Classes")
 Option Compare Database
 
-Dim pRoughDraft As String
 Dim psDrive As String
 Dim pNetWorkFolder As String
 
-Private pCourtCover As String
+Private pAPCS As String
+Private pAPCV As String
+Private pAPES As String
+Private pAPFTR As String
+Private pAudioFolder As String
 Private pCaseInfo As String
-Private pInvoiceP As String
-Private pInvoiceD As String
-Private pShippingXML As String
-Private pShippingCOAXML As String
-Private pInvoiceInfo As String
-Private pXeroCSV As String
-Private pPPCSV As String
-Private pPPButton As String
-Private pT2upPS As String
-Private pT4upPS As String
-Private pT4upLog As String
-Private pT2upLog As String
-Private pNotes As String
+Private pCDLabel As String
+Private pCDLabelP As String
 Private pCIDIncomeReportD As String
 Private pCIDIncomeReportP As String
-Private pDepositInvoiceP As String
+Private pCompleteFolder As String
+Private pCourtCover As String
+Private pDBScripts As String
 Private pDepositInvoiceD As String
-Private pOrderConfirmationP As String
-Private pOrderConfirmationD As String
-Private pPPDraftInvoiceEmail As String
-Private pTranscriptsReadyP As String
-Private pTranscriptsReadyD As String
-Private pCDLabel As String
-Private pTranscriptsReadyCP As String
-Private pTranscriptsReadyCD As String
+Private pDepositInvoiceP As String
+Private pDistillerSettings As String
+Private pDistillerSettings1 As String
+Private pEmailDirectory As String
+Private pFileInbox As String
+Private pInProgressFolder As String
+Private pInvoiceD As String
+Private pInvoiceInfo As String
+Private pInvoiceP As String
+Private pJobDirectory As String
+Private pJobDirectoryA As String
+Private pJobDirectoryAN As String
+Private pJobDirectoryB As String
+Private pJobDirectoryBN As String
+Private pJobDirectoryF As String
+Private pJobDirectoryFN As String
+Private pJobDirectoryG As String
+Private pJobDirectoryGN As String
+Private pJobDirectoryN As String
+Private pJobDirectoryNN As String
+Private pJobDirectoryT As String
+Private pJobDirectoryTN As String
+Private pJobDirectoryW As String
+Private pJobDirectoryWN As String
+Private pJurisdictionRefs As String
 Private pKCIEmpty As String
-Private pKCIFilled As String
-Private pWACoverP As String
-Private pWACoverD As String
-Private pWAConsolidatedP As String
-Private pWAConsolidatedD As String
-Private pTranscriptFP As String
-Private pTranscriptFD As String
-Private pTranscript2up As String
-Private pTranscript4up As String
-Private pTranscriptWC As String
-Private pWordIndexP As String
-Private pWordIndexD As String
-Private pAudioFolder As String
-Private pZAudioF As String
-Private pZTranscriptsF As String
-Private pZAudioTranscriptsF As String
-Private pZAudioB As String
-Private pZTranscriptsB As String
-Private pZAudioTranscriptsB As String
-Private pTranscriptFPB As String
-Private pTranscriptFDB As String
-Private pTranscript2upB As String
-Private pTranscript4upB As String
-Private pTranscriptWCB As String
-Private pWordIndexPB As String
-Private pWordIndexDB As String
 Private pKCIEnvelope As String
-Private pPQTemplate As String
-Private pPQXLS As String
-Private pPQEmail As String
+Private pKCIFilled As String
+Private pKCITemplate As String
+Private pNotes As String
+Private pOrderConfirmationD As String
+Private pOrderConfirmationP As String
+Private pOrderFormCSV As String
+Private pOrderFormCustomersCSV As String
 Private pOrderFormCustomersXLSM As String
 Private pOrderFormCustomersXLSX As String
-Private pOrderFormCustomersCSV As String
 Private pOrderFormXLSM As String
 Private pOrderFormXLSX As String
-Private pOrderFormCSV As String
-
+Private pPaymentMade As String
+Private pPELD As String
+Private pPELP As String
+Private pPPBalanceDue As String
+Private pPPBalanceDueT As String
+Private pPPButton As String
+Private pPPButtonT As String
+Private pPPCSV As String
+Private pPPDepositE As String
+Private pPPDIET As String
+Private pPPDraftInvoiceEmail As String
+Private pPPDraftInvoiceH As String
+Private pPPFactoredInvoiceEmail As String
+Private pPPFactoredInvoiceH As String
+Private pPPFIET As String
+Private pPQEmail As String
+Private pPQTemplate As String
+Private pPQXLS As String
+Private pRoughDraft As String
+Private pShippingCOAXML As String
+Private pShippingCOAXML4 As String
+Private pShippingFolder As String
+Private pShippingOutputFolder As String
+Private pShippingXML As String
+Private pShippingXML4 As String
+Private pSpeech As String
+Private pSpeechUA As String
+Private pSpeechUP As String
+Private pT2upLog As String
+Private pT2upPS As String
+Private pT4upLog As String
+Private pT4upPS As String
+Private pTemplateFolder As String
+Private pTemplateFolder1 As String
+Private pTemplateFolder2 As String
+Private pTemplateFolder3 As String
+Private pTemplateFolder4 As String
+Private pTempShipOptionsQ1XLSM As String
+Private pToBeEnteredFolder As String
+Private pTranscript2up As String
+Private pTranscript2upB As String
+Private pTranscript4up As String
+Private pTranscript4upB As String
+Private pTranscriptFD As String
+Private pTranscriptFDB As String
+Private pTranscriptFP As String
+Private pTranscriptFPB As String
+Private pTranscriptsReadyCD As String
+Private pTranscriptsReadyCP As String
+Private pTranscriptsReadyD As String
+Private pTranscriptsReadyP As String
+Private pTranscriptWC As String
+Private pTranscriptWCB As String
+Private pUNFileInbox As String
+Private pWAConsolidatedD As String
+Private pWAConsolidatedP As String
+Private pWACoverD As String
+Private pWACoverP As String
+Private pWordIndexD As String
+Private pWordIndexDB As String
+Private pWordIndexP As String
+Private pWordIndexPB As String
+Private pWordIndexT As String
+Private pXeroCSV As String
+Private pXMLAfter As String
+Private pXMLBefore As String
+Private pZAudioB As String
+Private pZAudioF As String
+Private pZAudioTranscriptsB As String
+Private pZAudioTranscriptsF As String
+Private pZTranscriptsB As String
+Private pZTranscriptsF As String
 Public Property Get InvoiceP() As String
     InvoiceP = pInvoiceP
 End Property
 
+Public Property Let InvoiceP(sInput As String)
+    pInvoiceP = InvoiceP
+End Property
+
 Public Property Get InvoiceD() As String
-    InvoiceD = pInvoiceDocx
+    InvoiceD = pInvoiceD
+End Property
+
+Public Property Let InvoiceD(sInput As String)
+    pInvoiceD = InvoiceD
 End Property
 
 Public Property Get ShippingXML() As String
@@ -791,6 +858,15 @@ Public Property Let SpeechUP(sInput As String)
     pSpeechUP = SpeechUP
 End Property
 
+Public Property Get SpeechUA() As String
+    SpeechUA = pSpeechUA
+End Property
+
+Public Property Let SpeechUA(sInput As String)
+    pSpeechUA = SpeechUA
+End Property
+
+
 Public Property Get InProgressFolder() As String
     InProgressFolder = pInProgressFolder
 End Property
@@ -808,95 +884,13 @@ Public Property Let ToBeEnteredFolder(sInput As String)
 End Property
 
 Public Sub Class_Initialize()
-        sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         psDrive = "T"
         pNetWorkFolder = "\\hubcloud\evoingram\"
-        
-    'paths needed: transcribing manuals, samples, jurisdiction references, courtrules
-        'shipping xml templates maybe
-        
-        'TODO: Refresh invoice number on this function
-        pInvoiceP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".pdf"
-        pInvoiceD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".docx"
-        'TODO: Check COA shipping xml file name
-        pShippingXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-Shipping.xml"
-        pShippingCOAXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
-        pShippingXML4 = psDrive & ":\Production\4ShippingXMLs\" & sCourtDatesID & "-shipping.xml"
-        pShippingCOAXML4 = psDrive & ":/Production/4ShippingXMLs/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
         pShippingOutputFolder = psDrive & ":\Production\4ShippingXMLs\Output\"
-        pRoughDraft = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/RoughDraft.docx"
         pShippingFolder = psDrive & ":\Production\4ShippingXMLs\"
         pCompleteFolder = psDrive & ":\Production\3Complete\"
         pInProgressFolder = psDrive & ":/Production/2InProgress/"
         pToBeEnteredFolder = psDrive & ":/Production/1ToBeEntered/"
-        
-        pCaseInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CaseInfo.xls"
-        pInvoiceInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-InvoiceInfo.xls"
-        pXeroCSV = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "--XeroInvoiceCSV.csv"
-        pPPCSV = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PayPalInvoiceCSV.csv"
-        pPPButton = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PPButton.html"
-        pPPButtonT = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PPButton.txt"
-        pCDLabel = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pub"
-        pCDLabelP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pdf"
-        pT2upPS = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.ps"
-        pT4upPS = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-4up.ps"
-        pT2upLog = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.log"
-        pT4upLog = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-4up.log"
-        
-        pNotes = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/" & sCourtDatesID & "-Notes.pdf"
-        
-        pCourtCover = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtCover.docx"
-        pCIDIncomeReportD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CIDIncomeReport.docx"
-        pCIDIncomeReportP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CIDIncomeReport.pdf"
-        pDepositInvoiceP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-DepositInvoice.pdf"
-        pDepositInvoiceD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-DepositInvoice.docx"
-        pOrderConfirmationP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-OrderConfirmation.pdf"
-        pOrderConfirmationD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-OrderConfirmation.docx"
-        pPPDraftInvoiceEmail = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-DraftInvoiceEmail.docx"
-        pPPDraftInvoiceH = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-DraftInvoiceEmail.html"
-        pPPFactoredInvoiceEmail = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-FactoredInvoiceEmail.docx"
-        pPPFactoredInvoiceH = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-FactoredInvoiceEmail.html"
-        pPPBalanceDue = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PP-BalanceDueInvoice.docx"
-        pPPDepositE = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PPDepositEmail.html"
-        pTranscriptsReadyP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-TranscriptsReady.pdf"
-        pTranscriptsReadyD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-TranscriptsReady.docx"
-        pTranscriptsReadyCP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-ContractorTranscriptsReady.pdf"
-        pTranscriptsReadyCD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-ContractorTranscriptsReady.docx"
-        pKCIEmpty = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-KCICompleted.pdf"
-        pKCIFilled = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-KCICompleted1.pdf"
-        pPELP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PackageEnclosedLetter.pdf"
-        pPELD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PackageEnclosedLetter.docx"
-        pPaymentMade = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PaymentMade.docx"
-        
-        pWACoverP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Cover.pdf"
-        pWACoverD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Cover.docx"
-        pWAConsolidatedP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcripts-All.pdf"
-        pWAConsolidatedD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcripts-All.docx"
-        pTranscriptFP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL.pdf"
-        pTranscriptFD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL.docx"
-        pTranscript2up = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
-        pTranscript4up = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
-        pTranscriptWC = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
-        pWordIndexP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-WordIndex.pdf"
-        pWordIndexD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-WordIndex.docx"
-        
-        pAudioFolder = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Audio/"
-        
-        pZAudioF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-Audio.zip"
-        pZTranscriptsF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-Transcripts.zip"
-        pZAudioTranscriptsF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-AudioTranscripts.zip"
-        
-        pZAudioB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Audio.zip"
-        pZTranscriptsB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcripts.zip"
-        pZAudioTranscriptsB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-AudioTranscripts.zip"
-        pTranscriptFPB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL.pdf"
-        pTranscriptFDB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL.docx"
-        pTranscript2upB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
-        pTranscript4upB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
-        pTranscriptWCB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
-        pWordIndexPB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-WordIndex.pdf"
-        pWordIndexDB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-WordIndex.docx"
-        
         pKCIEnvelope = psDrive & ":/Database\Templates\Stage4s\Envelope-KCI.pdf"
         pKCITemplate = psDrive & ":\Database\Templates\Stage4s\KCICompleted.pdf"
         pPQTemplate = psDrive & ":/Database\Templates\Stage1s\PriceQuoteEmail-Template.docx"
@@ -921,26 +915,6 @@ Public Sub Class_Initialize()
         pXMLAfter = psDrive & ":\Database\Scripts\InProgressExcels\AfterXML.xml"
         pXMLBefore = psDrive & ":\Database\Scripts\InProgressExcels\BeforeXML.xml"
         pDBScripts = psDrive & ":\Database\Scripts\"
-        
-        pJobDirectory = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/"
-        pJobDirectoryG = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/"
-        pJobDirectoryW = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles"
-        pJobDirectoryA = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Audio/"
-        pJobDirectoryF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/"
-        pJobDirectoryB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/"
-        pJobDirectoryT = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/"
-        pJobDirectoryN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/"
-        
-        pJobDirectoryGN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-"
-        pJobDirectoryWN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-"
-        pJobDirectoryAN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Audio/" & sCourtDatesID & "-"
-        pJobDirectoryFN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-"
-        pJobDirectoryBN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-"
-        pJobDirectoryTN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-"
-        pJobDirectoryNN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/" & sCourtDatesID & "-"
-        
-        pAPFTR = "C:\Program Files (x86)\FTR\ForTheRecord\TheRecordPlayer.exe"
-        pAPCS = psDrive & ":\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
         pAPCV = "C:\Program Files (x86)\JAVS\CaseViewer\CaseViewer3.exe"
         pAPES = "C:\Program Files (x86)\NCH Software\Scribe\scribe.exe"
         
@@ -954,7 +928,117 @@ Public Sub Class_Initialize()
         
         pJurisdictionRefs = psDrive & ":\Administration\Jurisdiction References\"
         
-       pSpeech = "S" & ":\UnprocessedAudio\Prepared\"
+        pSpeech = pNetWorkFolder & "speech\UnprocessedAudio\Prepared\"
+        pSpeechUA = pNetWorkFolder & "speech\UnprocessedAudio\"
+        
+        pAPFTR = "C:\Program Files (x86)\FTR\ForTheRecord\TheRecordPlayer.exe"
+        
+        If Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] <> "" Then
+            
+            sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+            Dim rstTableName As DAO.Recordset
+            Set rstTableName = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            sInvoiceNumber = rstTableName.Fields("InvoiceNo").Value
+            rstTableName.Close
+            Set rstTableName = Nothing
+            
+        End If
+        
+            pAPCS = psDrive & ":\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
+            
+            'TODO: paths needed: transcribing manuals, samples, jurisdiction references, courtrules
+            pInvoiceP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".pdf"
+            pInvoiceD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".docx"
+            'TODO: Check COA shipping xml file name
+            pShippingXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-Shipping.xml"
+            pShippingCOAXML = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
+            pShippingXML4 = psDrive & ":\Production\4ShippingXMLs\" & sCourtDatesID & "-shipping.xml"
+            pShippingCOAXML4 = psDrive & ":/Production/4ShippingXMLs/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
+            pRoughDraft = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/RoughDraft.docx"
+            
+            pCaseInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CaseInfo.xls"
+            pInvoiceInfo = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-InvoiceInfo.xls"
+            pXeroCSV = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "--XeroInvoiceCSV.csv"
+            pPPCSV = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PayPalInvoiceCSV.csv"
+            pPPButton = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PPButton.html"
+            pPPButtonT = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PPButton.txt"
+            pCDLabel = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pub"
+            pCDLabelP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-CDLabel.pdf"
+            pT2upPS = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.ps"
+            pT4upPS = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-4up.ps"
+            pT2upLog = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-2up.log"
+            pT4upLog = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-Transcript-FINAL-4up.log"
+            
+            pNotes = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/" & sCourtDatesID & "-Notes.pdf"
+            
+            pCourtCover = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtCover.docx"
+            pCIDIncomeReportD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CIDIncomeReport.docx"
+            pCIDIncomeReportP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CIDIncomeReport.pdf"
+            pDepositInvoiceP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-DepositInvoice.pdf"
+            pDepositInvoiceD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-DepositInvoice.docx"
+            pOrderConfirmationP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-OrderConfirmation.pdf"
+            pOrderConfirmationD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-OrderConfirmation.docx"
+            pPPDraftInvoiceEmail = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-DraftInvoiceEmail.docx"
+            pPPDraftInvoiceH = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-DraftInvoiceEmail.html"
+            pPPFactoredInvoiceEmail = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-FactoredInvoiceEmail.docx"
+            pPPFactoredInvoiceH = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PP-FactoredInvoiceEmail.html"
+            pPPBalanceDue = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-PP-BalanceDueInvoice.docx"
+            pPPDepositE = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PPDepositEmail.html"
+            pTranscriptsReadyP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-TranscriptsReady.pdf"
+            pTranscriptsReadyD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-TranscriptsReady.docx"
+            pTranscriptsReadyCP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-ContractorTranscriptsReady.pdf"
+            pTranscriptsReadyCD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-ContractorTranscriptsReady.docx"
+            pKCIEmpty = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-KCICompleted.pdf"
+            pKCIFilled = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-KCICompleted1.pdf"
+            pPELP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PackageEnclosedLetter.pdf"
+            pPELD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-PackageEnclosedLetter.docx"
+            pPaymentMade = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "\Generated\" & sCourtDatesID & "-PaymentMade.docx"
+            
+            pWACoverP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Cover.pdf"
+            pWACoverD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Cover.docx"
+            pWAConsolidatedP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcripts-All.pdf"
+            pWAConsolidatedD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcripts-All.docx"
+            pTranscriptFP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL.pdf"
+            pTranscriptFD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL.docx"
+            pTranscript2up = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
+            pTranscript4up = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
+            pTranscriptWC = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
+            pWordIndexP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-WordIndex.pdf"
+            pWordIndexD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-WordIndex.docx"
+            
+            pAudioFolder = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Audio/"
+            
+            pZAudioF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-Audio.zip"
+            pZTranscriptsF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-Transcripts.zip"
+            pZAudioTranscriptsF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-AudioTranscripts.zip"
+            
+            pZAudioB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Audio.zip"
+            pZTranscriptsB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcripts.zip"
+            pZAudioTranscriptsB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-AudioTranscripts.zip"
+            pTranscriptFPB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL.pdf"
+            pTranscriptFDB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL.docx"
+            pTranscript2upB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL-2up.pdf"
+            pTranscript4upB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-FINAL-4up.pdf"
+            pTranscriptWCB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-Transcript-WorkingCopy.docx"
+            pWordIndexPB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-WordIndex.pdf"
+            pWordIndexDB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-WordIndex.docx"
+            
+            pJobDirectory = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/"
+            pJobDirectoryG = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/"
+            pJobDirectoryW = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles"
+            pJobDirectoryA = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Audio/"
+            pJobDirectoryF = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/"
+            pJobDirectoryB = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/"
+            pJobDirectoryT = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/"
+            pJobDirectoryN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/"
+            
+            pJobDirectoryGN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-"
+            pJobDirectoryWN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/WorkingFiles/" & sCourtDatesID & "-"
+            pJobDirectoryAN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Audio/" & sCourtDatesID & "-"
+            pJobDirectoryFN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/FTP/" & sCourtDatesID & "-"
+            pJobDirectoryBN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Backups/" & sCourtDatesID & "-"
+            pJobDirectoryTN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Transcripts/" & sCourtDatesID & "-"
+            pJobDirectoryNN = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Notes/" & sCourtDatesID & "-"
 End Sub
 
 

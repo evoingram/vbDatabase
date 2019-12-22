@@ -69,7 +69,9 @@ Public Function addRSet(sTableName As String) As String
 
     Dim dInvoiceDate As Date
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Select Case sTableName
 
@@ -96,12 +98,10 @@ Public Function addRSet(sTableName As String) As String
                                FileName:=cJob.DocPath.OrderFormCSV, HasFieldNames:=True
             CurrentDb.TableDefs.Refresh
             
-            'TODO: add if filing/factoring to xlsm
-            sFiled = InputBox("Are we filing this, yes or no?")
-            sFactoring = InputBox("Are we factoring this, yes or no?")
-            
             'generate necessary info
             Set rstTableName = CurrentDb.OpenRecordset("TempCourtDates")
+            sFiled = rstTableName.Fields("Filing").Value
+            sFactoring = rstTableName.Fields("Factoring").Value
             sTurnaround = rstTableName.Fields("TurnaroundTimesCD").Value
             dInvoiceDate = (Date + sTurnaround) - 2
             dDueDate = (Date + sTurnaround) - 2
@@ -210,7 +210,6 @@ Public Function addRSet(sTableName As String) As String
         'delete empty entries from table
         CurrentDb.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] IS NULL;"
         
-        'TODO: is this supposed to return anything?
         Exit Function
 
     Case "Cases"
@@ -343,7 +342,6 @@ Public Function addRSet(sTableName As String) As String
         Set rstTempJob = Nothing
         'Set rstCurrentJob = Nothing
 
-        'TODO: Return anything?
         addRSet = sCourtDatesID
         
 

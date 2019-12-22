@@ -39,7 +39,9 @@ Public Sub pfStage3Ppwk()
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfGetOrderingAttorneyInfo
 
@@ -196,7 +198,9 @@ Public Sub pfBurnCD()
     Dim oShell As Object
     Dim oSource As Object
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -217,9 +221,6 @@ Public Sub pfBurnCD()
         Set oWSHShell = CreateObject("WScript.Shell")
         Set oShell = CreateObject("Shell.Application")
         sBurnDir = oWSHShell.RegRead("HKCU\Software\Microsoft\Windows\CurrentVersion\" & "Explorer\Shell Folders\CD Burning")
-        'TODO: What is going on here?
-        sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    
     
         Set oSource = oShell.Namespace(cJob.DocPath.JobDirectoryF)
         oShell.Namespace(sBurnDir).CopyHere oSource.Items
@@ -249,7 +250,9 @@ Public Sub pfCreateRegularPDF()
     
     Dim rngStory As Range
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     sFinalTranscriptNoExt = cJob.DocPath.InProgressFolder & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
@@ -261,14 +264,17 @@ Public Sub pfCreateRegularPDF()
         MsgBox "No PDF copy will be made."
     
     Else                                         'Code for yes
-    
-        'Set oWordApp = GetObject(, "Word.Application")
+        On Error Resume Next
+        Set oWordApp = GetObject(, "Word.Application")
         
         If Err <> 0 Then
             Set oWordApp = CreateObject("Word.Application")
         End If
         
         Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+        
+        On Error GoTo 0
+        
         oWordDoc.Application.Visible = False
         oWordDoc.Application.DisplayAlerts = False
         'Set oWordDoc = oWordApp.Documents.Open(FileName:=cJob.DocPath.CourtCover)
@@ -318,21 +324,21 @@ Public Sub pfCreateRegularPDF()
             Next rngStory
         
             .RemoveDocumentInformation (wdRDIAll) 'remove vba and document info
-        
-            'For Each oVBComponent In oWordApp.VBProject.oVBComponents
-            ' With oVBComponent
-            'If .Type = 100 Then
-            '.CodeModule.DeleteLines 1, .CodeModule.CountOfLines
-            'Else
-            '.VBProject.oVBComponentonents.Remove oVBComponent
-            ' End If
-            'End With
-            'Next oVBComponent
+            
+            For Each oVBComponent In .VBProject.oVBComponents
+             With oVBComponent
+            If .Type = 100 Then
+            .CodeModule.DeleteLines 1, .CodeModule.CountOfLines
+            Else
+            .VBProject.oVBComponentonents.Remove oVBComponent
+             End If
+            End With
+            Next oVBComponent
         
         End With
     End If
 
-    'TODO: lock document in whole and save as final
+    'lock document in whole and save as final
     oWordDoc.Protect Type:=wdAllowOnlyReading, noReset:=True, password:="wrts0419"
     oWordDoc.SaveAs FileName:=cJob.DocPath.TranscriptFD 'sFinalTranscriptNoExt
     oWordDoc.ExportAsFixedFormat outputFileName:=sFinalTranscriptNoExt, ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
@@ -341,8 +347,6 @@ Public Sub pfCreateRegularPDF()
     Set oWordApp = Nothing
 
     Call pfTopOfTranscriptBookmark
-
-
 
     MsgBox "Created Regular PDF Copy!"
 
@@ -387,7 +391,9 @@ Public Sub fDynamicHeaders()
     
     Dim oRange As Range
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     'Call pfCurrentCaseInfo
@@ -563,7 +569,9 @@ Public Sub pfHeaders()
     Dim iSectionNumber As Long
     Dim iSectionIndex As Long
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     bFound = True
     
@@ -797,7 +805,9 @@ Public Sub pfTopOfTranscriptBookmark()
     Dim numpages As Variant
     Dim n As Variant
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Set AcroApp = CreateObject("AcroExch.App")
 
@@ -937,7 +947,9 @@ Public Sub fPDFBookmarks()
     Dim pdTranscriptFinalDistiller As PdfDistiller
     Dim aaAFormApp As AFORMAUTLib.AFormApp
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -967,9 +979,8 @@ Public Sub fPDFBookmarks()
         aaAFormApp.Fields.ExecuteThisJavascript sJavascriptPrint
     
         aaAcroPDDoc.Save PDSaveFull, cJob.DocPath.TranscriptFP
-        'TODO: Why is this commented off?
-        'aaAcroPDDoc.Close
-        'aaAcroApp.CloseAllDocs
+        aaAcroPDDoc.Close
+        aaAcroApp.CloseAllDocs
     
     End If
 

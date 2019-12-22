@@ -4,16 +4,9 @@ Attribute VB_Name = "~AScratchPad"
 
 'TODO: fix PP/invoicing functions
 'TODO: invoice # Word doc doesn't save properly w/ PP button
-'TODO: fix stage 3 status checkmarks
-'TODO: reread getting things done
-'TODO: software process
 'TODO: python speech recognition
 'TODO: get permissions and hook into various case mgmt software to get orders
-'TODO: mobile app
-
-
-                
-
+'TODO: add date/case info to footer
 
 '*****Medium Priority*****
 
@@ -102,6 +95,9 @@ Private Sub testClassesInfo()
     Debug.Print cJob.InventoryRateCode
     cJob.Status.AddRDtoCover = True
     Debug.Print cJob.Status.AddRDtoCover
+    Debug.Print "Template Folder = " & cJob.DocPath.TemplateFolder2
+    Debug.Print "Template Folder = " & cJob.DocPath.OrderConfirmationD
+    Debug.Print "Page Rate = " & cJob.PageRate
     'cJob.Update
     'On Error GoTo 0
 End Sub
@@ -110,13 +106,28 @@ End Sub
 '@Ignore EmptyMethod
 '@Ignore ProcedureNotUsed
 Private Sub emptyFunction()
-
-    Dim cJob As New Job
-    
-    Debug.Print cJob.DocPath.CaseInfo
-    
-    Debug.Print "test"
-    
+    Dim cJob As Job
+    Set cJob = New Job
+        
+    'To Fix Bookmarks:
+    'Final Transcript Outline:
+        'Cover All
+        'General Index
+            'Date
+                'General Events
+        'Witness Index
+            'normal
+        'Exhibit Index
+            'normal
+        'Cover Date
+            'Transcript Body
+        'Cover Date
+            'Transcript Body
+        'Certificate
+        'Table of Authorities
+        
+    'Debug.Print cJob.DocPath.CaseInfo
+    'Debug.Print "test"
     'Call pfSendWordDocAsEmail("PP-FactoredInvoiceEmail", "Transcript Delivery & Invoice", cJob.DocPath.InvoiceP)
     'On Error Resume Next
 
