@@ -44,7 +44,9 @@ Private Sub Command68_Click()
     Dim qdf As QueryDef
     Dim rstTRCUnionAA As DAO.Recordset
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 

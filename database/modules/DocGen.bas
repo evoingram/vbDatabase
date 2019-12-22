@@ -54,7 +54,8 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     Dim oExcelWB As Excel.Workbook
     Dim oExcelApp As Excel.Application
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     If sMerge = "Case" Then
 
@@ -86,7 +87,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     
             Set xlRange = .Worksheets(1).Range("A2").CurrentRegion
             .Names.Add Name:="AAAAADataRange", RefersTo:=xlRange
-            .SaveAs FileName:=sExportInfoCSVPath
+            .Save
             .Saved = True
             .Close
         End With
@@ -101,7 +102,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
 
     sArray = Split(sExportTopic, "\")
 
-    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder & sArray(1) & "-Template.docx", "Word.Document") 'sArray(1)/export topic is folder\subject
+    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder1 & sArray(1) & "-Template.docx", "Word.Document") 'sArray(1)/export topic is folder\subject
     oWordAppDoc.Application.Visible = False
 
     oWordAppDoc.MailMerge.OpenDataSource _
@@ -145,7 +146,8 @@ Public Sub pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
     Dim oWordEditor As Word.editor
     Dim oWordDoc As New Word.Document
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oOutlookApp = CreateObject("Outlook.Application")
     Set oOutlookMail = oOutlookApp.CreateItem(0)
@@ -202,7 +204,8 @@ Public Sub pfCreateCDLabel()
     
     Dim rstCommHistory As DAO.Recordset
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
@@ -326,7 +329,8 @@ Public Sub pfCreateCover(sTemplatePath As String)
     
     Dim rstCommHistory As DAO.Recordset
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     If Len(Dir(cJob.DocPath.CaseInfo)) = 0 Then
 
@@ -447,7 +451,8 @@ Public Sub fCreatePELLetter()
     Dim sQuestion As String
     Dim sAnswer As String
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfGenericExportandMailMerge("Case", "Stage1s\PackageEnclosedLetter")
 
@@ -489,7 +494,8 @@ Public Sub fFactorInvoicEmailF()
     Dim oExcelApp As New Excel.Application
     Dim oExcelWB As New Excel.Workbook
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -574,7 +580,8 @@ Public Sub pfInvoicesCSV()
     ' Description : creates CSVs used for invoicing
     '============================================================================
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     'DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
     DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
@@ -617,7 +624,8 @@ Public Sub fCreateWorkingCopy()
     Dim wsSections As Word.Sections
     Dim wsSection As Word.Section
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfWordIndexer
 
@@ -716,8 +724,9 @@ Public Sub pfPrepareCover()
     
     Dim rstJobsByCase As DAO.Recordset
     
-    Dim cJob As New Job
-
+    Dim cJob As Job
+    Set cJob = New Job
+    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     'query for all dates & job numbers for a case

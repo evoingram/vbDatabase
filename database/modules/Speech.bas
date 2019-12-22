@@ -72,7 +72,8 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
     Dim oCurrentFile As Object
     Dim oSubfolder As Object
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
@@ -176,7 +177,8 @@ Public Sub pfPrepareTranscript()
     
     Dim oFolderObject As Scripting.FileSystemObject
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
@@ -377,7 +379,8 @@ Public Sub pfRunCopyTranscTextBAT()
     ' Description : runs batch file CopyTranscriptTXT
     '============================================================================
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call Shell(cJob.DocPath.SpeechUP & "\CopyTranscriptTXT.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -398,7 +401,8 @@ Public Sub pfSRTranscribe()
     'S:\pocketsphinx\bin\Release\Win32\pocketsphinx_continuous.exe -infile wavfilename.wav -hmm en-us-adapt -lm wavfilename.lm -dict wavfilename.dic >> full-output.txt
     'Check output in full-output.txt in S:\UnprocessedAudio\##
 
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call Shell(cJob.DocPath.SpeechUP & "\SRTranscribe.bat " & cJob.DocPath.SpeechUP)
 
@@ -444,8 +448,9 @@ Public Sub pfTrainAudio()
     '
     '---------------------------------------------------------
     '
-    Dim cJob As New Job
-
+    Dim cJob As Job
+    Set cJob = New Job
+    
     Call Shell(cJob.DocPath.SpeechUP & "\audiotrain.bat " & cJob.DocPath.SpeechUP)
 
 End Sub
@@ -459,7 +464,9 @@ Public Sub pfRenameBaseFiles()
     ' Description : runs batch file FileRename / audioprep1.bat in Prepared folder
     '============================================================================
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call Shell(cJob.DocPath.SpeechUP & "\FileRename.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -472,7 +479,9 @@ Public Sub pfSplitAudio()
     ' Call command: Call pfSplitAudio
     ' Description : runs batch file splitaudio / audioprep1.bat in Prepared folder
     '============================================================================
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call Shell(cJob.DocPath.SpeechUP & "\splitaudio.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -486,7 +495,9 @@ Public Sub pfPrepareAudio()
     ' Description : runs batch file audioprep / audioprep1.bat in Prepared folder
     '============================================================================
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call Shell(cJob.DocPath.SpeechUP & "\audioprep.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -679,7 +690,9 @@ Public Sub pfCorpusUpload()
     Dim sFieldName As String
     Dim sMainURL As String
     Dim oFolderObject As Scripting.FileSystemObject
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     '@Ignore AssignmentNotUsed
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
@@ -757,7 +770,9 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     Dim oStream As Object
     Dim m_isRedirected As Boolean
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
@@ -876,7 +891,9 @@ Public Sub pfDoFolder(Folder As Variant)
     Dim sFileExtension As String
     Dim sFolderName As String
  
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
     sFieldName = "corpus"

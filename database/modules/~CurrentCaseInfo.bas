@@ -199,6 +199,8 @@ Public Sub pfCurrentCaseInfo()
     sFactoringApproved = cJob.App0.FactoringApproved
     dExpectedAdvanceDate = Format(cJob.ExpectedAdvanceDate, "mm-dd-yyyy")
     dExpectedRebateDate = Format(cJob.ExpectedRebateDate, "mm-dd-yyyy")
+    sInvoiceDate = Format(cJob.InvoiceDate, "mm-dd-yyyy")
+    dInvoiceDate = Format(cJob.InvoiceDate, "mm-dd-yyyy")
     dDueDate = Format(cJob.DueDate, "mm-dd-yyyy")
     sSubtotal = cJob.Subtotal
     sPaymentSum = Nz(cJob.PaymentSum, 0)

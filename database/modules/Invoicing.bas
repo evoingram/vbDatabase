@@ -271,7 +271,7 @@ Public Sub fIsFactoringApproved()
     Call pfGetOrderingAttorneyInfo
 
     svURL = "https://www.paypal.com"
-
+    'TODO: fix these queries and all docmd.openquery's
     DoCmd.OpenQuery "UnitPriceQuery", acViewNormal, acReadOnly
     DoCmd.OpenQuery "INVUpdateUnitPriceQuery", acViewNormal, acEdit
 
@@ -474,7 +474,9 @@ Public Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
     
     Dim rstPaymentAdd As DAO.Recordset
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -517,7 +519,9 @@ Public Sub fUpdateFactoringDates()
 
     Dim rstUnitPriceRate As DAO.Recordset
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 

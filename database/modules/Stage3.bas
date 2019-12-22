@@ -39,7 +39,9 @@ Public Sub pfStage3Ppwk()
     Dim oOutlookApp As Outlook.Application
     Dim oOutlookMail As Outlook.MailItem
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfGetOrderingAttorneyInfo
 
@@ -196,7 +198,9 @@ Public Sub pfBurnCD()
     Dim oShell As Object
     Dim oSource As Object
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -249,7 +253,9 @@ Public Sub pfCreateRegularPDF()
     
     Dim rngStory As Range
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     sFinalTranscriptNoExt = cJob.DocPath.InProgressFolder & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
@@ -387,7 +393,9 @@ Public Sub fDynamicHeaders()
     
     Dim oRange As Range
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     'Call pfCurrentCaseInfo
@@ -563,7 +571,9 @@ Public Sub pfHeaders()
     Dim iSectionNumber As Long
     Dim iSectionIndex As Long
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     bFound = True
     
@@ -797,7 +807,9 @@ Public Sub pfTopOfTranscriptBookmark()
     Dim numpages As Variant
     Dim n As Variant
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Set AcroApp = CreateObject("AcroExch.App")
 
@@ -937,7 +949,9 @@ Public Sub fPDFBookmarks()
     Dim pdTranscriptFinalDistiller As PdfDistiller
     Dim aaAFormApp As AFORMAUTLib.AFormApp
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 

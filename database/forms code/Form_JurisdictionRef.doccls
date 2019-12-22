@@ -7,7 +7,9 @@ Private Sub WBCViewJobFolder_OnUpdated()
     Dim sJobNumberDirectory As String
     Dim sAppName As String
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Call pfCurrentCaseInfo
@@ -54,7 +56,9 @@ Private Sub Command5_Click()
     Dim sTranscriptDir As String
     Dim sJobNumberDirectory As String
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Call pfCurrentCaseInfo

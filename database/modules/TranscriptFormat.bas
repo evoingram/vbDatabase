@@ -78,7 +78,9 @@ Public Sub test1()
     Dim rstViewJFAppQ As DAO.Recordset
     Dim qdf As QueryDef
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly 'open query
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
@@ -199,7 +201,9 @@ Public Sub pfCreateBookmarks()
     Dim vBookmarkName As String
             Dim sTopLine As String
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     'oWordDoc.Activate
     On Error Resume Next
@@ -774,7 +778,9 @@ Public Sub pfCreateIndexesTOAs()
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -976,7 +982,9 @@ Public Sub pfReplaceFDA()
     Dim rs1 As DAO.Recordset
     Dim qdf As QueryDef
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1074,7 +1082,9 @@ Public Sub pfDynamicSpeakersFindReplace()
     Dim qdf As QueryDef
     Dim rs As DAO.Recordset
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     x = 18                                       '18 is number of first dynamic speaker
 
@@ -1290,7 +1300,9 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
     ' Call command: Call pfSingleFindReplace
     ' Description : find and replace one item
     '============================================================================
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     'Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
 
@@ -1357,7 +1369,9 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
     ' Description : one replace TC entry function for ones with no field entry
     '============================================================================
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     On Error Resume Next
 
@@ -1416,7 +1430,9 @@ Public Sub pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As Stri
     ' Description : one replace TC entry function for ones with field entry
     '============================================================================
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     'wdFieldTOCEntry
     On Error Resume Next
@@ -1515,7 +1531,9 @@ Public Sub pfWordIndexer()
     
     Dim Rng As Variant
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     'TODO: Take out duplicate page ##s
     
@@ -1759,7 +1777,9 @@ Public Sub FPJurors()
     Dim x As Long
     Dim y As Long
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1930,7 +1950,9 @@ Public Sub pfTCEntryReplacement()
     Dim oWordApp As New Word.Application
     Dim oCourtCoverWD As New Word.Document
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
@@ -2197,7 +2219,9 @@ Public Sub pfFindRepCitationLinks()
     Dim rstCurrentHyperlink As DAO.Recordset
     Dim rstCurrentSearchMatching As DAO.Recordset
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
@@ -2798,7 +2822,9 @@ Public Sub pfTopOfTranscriptBookmark()
     
     Dim numpages As Variant
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set AcroApp = CreateObject("AcroExch.App")
     '@Ignore AssignmentNotUsed

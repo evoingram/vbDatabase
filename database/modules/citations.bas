@@ -108,7 +108,9 @@ Public Sub pfFindRepCitationLinks3()
     Dim rstCurrentHyperlink As DAO.Recordset
     Dim rstCurrentSearchMatching As DAO.Recordset
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     

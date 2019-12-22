@@ -3,7 +3,9 @@ Option Compare Database
 Option Explicit
 
 Private Sub WBCViewJobFolder_OnUpdated()
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
 
     Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JobDirectory
@@ -12,7 +14,9 @@ End Sub
 
 Private Sub Command5_Click()
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
 
     Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JobDirectory

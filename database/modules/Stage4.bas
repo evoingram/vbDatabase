@@ -77,7 +77,9 @@ Public Sub pfStage4Ppwk()
     Dim sBillingURL As String
     Dim sPaymentDueDate As Date
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -505,7 +507,9 @@ Public Sub fTranscriptDeliveryF()
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -722,7 +726,9 @@ Public Sub fGenerateZIPsF()
     
     Dim filecopied As Object
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -852,7 +858,9 @@ Public Sub fZIPAudio()
     Dim filecopied As Object
     Dim oApp As Object
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     'TODO: Universal change database/other db names to proper name
     Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
@@ -909,7 +917,9 @@ Public Sub fZIPAudioTranscripts()
     Dim filecopied As Object
     Dim oApp As Object
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -982,7 +992,9 @@ Public Sub fZIPTranscripts()
     Dim filecopied As Object
     Dim oApp As Object
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1038,7 +1050,7 @@ Public Sub fRunXLSMacro(sFile As String, sMacroName As String)
  
     'Set oExcelApp = CreateObject("Excel.Application")
     Set oExcelWkbk = oExcelApp.Workbooks.Open(sFile, True)
-    oExcelApp.Visible = True
+    oExcelApp.Visible = False
 
     sFileName = Right(sFile, Len(sFile) - InStrRev(sFile, "\"))
 
@@ -1145,7 +1157,9 @@ Public Sub fAudioDone()
     ' Call command: Call fAudioDone
     ' Description : completes audio in express scribe
     '============================================================================
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -1201,7 +1215,9 @@ Public Sub fPrint2upPDF()
     
     Dim pp As Object
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
@@ -1283,7 +1299,9 @@ Public Sub fPrint4upPDF()
     Dim aaAFormApp As AFORMAUTLib.AFormApp
     Dim oPDFPrintSettings As Object
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -1355,7 +1373,9 @@ Public Sub fPrintKCIEnvelope()
     Dim sQuestion As String
     Dim sAnswer As String
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sQuestion = "Print KCI envelope? (MAKE SURE ENVELOPE IS PRINT SIDE UP, ADHESIVE ON THE RIGHT INSIDE PRINTER TRAY)"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???") '
@@ -1393,7 +1413,9 @@ Public Sub fAcrobatKCIInvoice()
     Dim aaFoFiGroup As AFORMAUTLib.Fields
     Dim aaFormField As AFORMAUTLib.Field
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -1458,7 +1480,9 @@ Public Sub pfUpload(ByRef mySession As Session)
 
     Dim mySessionOptions As New SessionOptions
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     
@@ -1512,7 +1536,9 @@ Public Sub fPrivatePrint()
     Dim sQuestion As String
     Dim sAnswer As String
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         
@@ -1589,7 +1615,9 @@ Public Sub fExportRecsToXML()
     Dim rstMailC As DAO.Recordset
     Dim rs1 As DAO.Recordset
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
     Set rs1 = CurrentDb.OpenRecordset(SQLString)
@@ -1681,7 +1709,9 @@ Public Sub fAppendXMLFiles()
     Dim appendNode As MSXML2.IXMLDOMNode
     Dim FSO As New Scripting.FileSystemObject
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     ' Load your xml files in to a DOM document
     file1.Load cJob.DocPath.XMLBefore
@@ -1744,7 +1774,9 @@ Public Sub fCourtofAppealsIXML()
     Dim oExcelSheet As New Excel.Worksheet
     Dim oExcelWkbk2 As New Excel.Workbook
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 

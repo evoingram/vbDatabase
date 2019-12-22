@@ -69,7 +69,9 @@ Public Function addRSet(sTableName As String) As String
 
     Dim dInvoiceDate As Date
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Select Case sTableName
 

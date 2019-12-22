@@ -102,6 +102,8 @@ Private Sub testClassesInfo()
     Debug.Print cJob.InventoryRateCode
     cJob.Status.AddRDtoCover = True
     Debug.Print cJob.Status.AddRDtoCover
+    Debug.Print "Template Folder = " & cJob.DocPath.TemplateFolder2
+    Debug.Print "Template Folder = " & cJob.DocPath.OrderConfirmationD
     'cJob.Update
     'On Error GoTo 0
 End Sub
@@ -111,7 +113,9 @@ End Sub
 '@Ignore ProcedureNotUsed
 Private Sub emptyFunction()
 
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
     
     Debug.Print cJob.DocPath.CaseInfo
     

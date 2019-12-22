@@ -43,7 +43,8 @@ Private Sub Command78_Click()
     Dim rstTempShippingOptionsQ As DAO.Recordset
     Dim prm As DAO.Parameter
     
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
         

@@ -71,7 +71,9 @@ Private Sub TypeBTN_Click()
     Me.ProcessJobSubform.Requery
     Dim fs As Object
     
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 

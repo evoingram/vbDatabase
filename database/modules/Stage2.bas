@@ -53,7 +53,8 @@ Public Sub pfStage2Ppwk()
 
     Dim sAnswer As String
     Dim sQuestion As String
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
@@ -148,7 +149,8 @@ Public Sub pfAutoCorrect()
     Dim rstAGShortcuts As DAO.Recordset
     Dim oWordDoc As Word.Document
     Dim oWordApp As Word.Application
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
@@ -229,7 +231,8 @@ Public Sub pfRoughDraftToCoverF()
     Dim qdf As QueryDef
     Dim wsyWordStyle As String
     Dim bMatchCase As Boolean
-    Dim cJob As New Job
+    Dim cJob As Job
+    Set cJob = New Job
 
 
     Call pfCurrentCaseInfo                       'refresh transcript info
@@ -1654,7 +1657,9 @@ Public Sub pfStaticSpeakersFindReplace()
     Dim sReplacementText As String
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
 
@@ -1972,7 +1977,9 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     Dim sTextToFind As String
     Dim sReplacementText As String
     Dim wsyWordStyle As Word.Style
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     DoCmd.OpenQuery qnViewJobFormAppearancesQ, acViewNormal, acReadOnly
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -2221,7 +2228,9 @@ Public Sub pfTypeRoughDraftF()
     '============================================================================
 
     Dim oRoughDraft As Object
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence
@@ -2381,7 +2390,9 @@ Public Sub pfRoughDraftCFMass()
     Dim oWordApp As New Word.Application
     
     Dim x As Long
-    Dim cJob As New Job
+    
+    Dim cJob As Job
+    Set cJob = New Job
 
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef
