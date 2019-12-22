@@ -7,6 +7,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'@Ignore OptionExplicit
 '@Folder("Database.Production.Classes")
 Option Compare Database
 
@@ -55,6 +56,7 @@ Private pJurisdictionRefs As String
 Private pKCIEmpty As String
 Private pKCIEnvelope As String
 Private pKCIFilled As String
+Private pKCITemplate As String
 Private pNotes As String
 Private pOrderConfirmationD As String
 Private pOrderConfirmationP As String
@@ -90,6 +92,8 @@ Private pShippingOutputFolder As String
 Private pShippingXML As String
 Private pShippingXML4 As String
 Private pSpeech As String
+Private pSpeechUA As String
+Private pSpeechUP As String
 Private pT2upLog As String
 Private pT2upPS As String
 Private pT4upLog As String
@@ -854,6 +858,15 @@ Public Property Let SpeechUP(sInput As String)
     pSpeechUP = SpeechUP
 End Property
 
+Public Property Get SpeechUA() As String
+    SpeechUA = pSpeechUA
+End Property
+
+Public Property Let SpeechUA(sInput As String)
+    pSpeechUA = SpeechUA
+End Property
+
+
 Public Property Get InProgressFolder() As String
     InProgressFolder = pInProgressFolder
 End Property
@@ -915,21 +928,25 @@ Public Sub Class_Initialize()
         
         pJurisdictionRefs = psDrive & ":\Administration\Jurisdiction References\"
         
-        pSpeech = "S" & ":\UnprocessedAudio\Prepared\"
+        pSpeech = pNetWorkFolder & "speech\UnprocessedAudio\Prepared\"
+        pSpeechUA = pNetWorkFolder & "speech\UnprocessedAudio\"
+        
         pAPFTR = "C:\Program Files (x86)\FTR\ForTheRecord\TheRecordPlayer.exe"
         
         If Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] <> "" Then
             
             sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+            Dim rstTableName As DAO.Recordset
+            Set rstTableName = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
+            sInvoiceNumber = rstTableName.Fields("InvoiceNo").Value
+            rstTableName.Close
+            Set rstTableName = Nothing
             
         End If
         
             pAPCS = psDrive & ":\Production\2InProgress\" & sCourtDatesID & "\Audio\bin\cplayer.exe"
             
-        'paths needed: transcribing manuals, samples, jurisdiction references, courtrules
-            'shipping xml templates maybe
-            
-            'TODO: Refresh invoice number on this function
+            'TODO: paths needed: transcribing manuals, samples, jurisdiction references, courtrules
             pInvoiceP = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".pdf"
             pInvoiceD = psDrive & ":/Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".docx"
             'TODO: Check COA shipping xml file name

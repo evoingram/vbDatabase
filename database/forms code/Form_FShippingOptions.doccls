@@ -86,10 +86,8 @@ Private Sub Command78_Click()
     oExcelWksht.Range("S2").CopyFromRecordset rstTempShippingOptionsQ
        
     'For Each oExcelWorkbk2 In oExcelApp.Workbooks
-    
-    oExcelWorkbk.Save
-    oExcelWorkbk.Close SaveChanges:=True
-    
+        oExcelWorkbk.Save
+        oExcelWorkbk.Close SaveChanges:=True
     'Next oExcelWorkbk2
 
     rstTempShippingOptionsQ.Close

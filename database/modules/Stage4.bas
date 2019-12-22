@@ -768,7 +768,6 @@ Line2:
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
 
     If sAnswer = vbNo Then                        'Code for No
-        'TODO: standardize drive
         MsgBox "Go to " & cJob.DocPath.InProgressFolder & " to open the job folder."
     
     Else                                         'Code for yes
@@ -862,7 +861,6 @@ Public Sub fZIPAudio()
     Dim cJob As Job
     Set cJob = New Job
     
-    'TODO: Universal change database/other db names to proper name
     Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     defpath = CurrentProject.Path
@@ -871,32 +869,27 @@ Public Sub fZIPAudio()
         defpath = defpath & "\"
     End If
 
-    '@Ignore AssignmentNotUsed, AssignmentNotUsed
-    
+    '@Ignore AssignmentNotUsed
     strDate = Format(Now, " dd-mmm-yy h-mm-ss")
 
-    Call pfNewZip(cJob.DocPath.ZAudioB)                  'create empty zip file
-    Call pfNewZip(cJob.DocPath.ZAudioF)             'create empty zip file
+    Call pfNewZip(cJob.DocPath.ZAudioB) 'create empty zip file
+    Call pfNewZip(cJob.DocPath.ZAudioF)
 
     Set oApp = CreateObject("Shell.Application")
 
     'Copy the files to the compressed folder
     oApp.Namespace(cJob.DocPath.ZAudioB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
 
-    
     oApp.Namespace(cJob.DocPath.ZAudioF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
 
-    While oApp.Namespace(cJob.DocPath.ZAudioB).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count
+    While oApp.Namespace(cJob.DocPath.ZAudioF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryF).Items.Count
 
         DoEvents
     Wend
 
-    'While oApp.Namespace(cJob.DocPath.ZAudioF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count
-    'DoEvents
-    
-    'Wend
-    
-    'TODO: What is going on here?
+    While oApp.Namespace(cJob.DocPath.ZAudioF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count
+        DoEvents
+    Wend
     
     MsgBox "Find the ZIP file here: " & cJob.DocPath.ZAudioB
 End Sub
@@ -1095,19 +1088,16 @@ Public Sub pfSendTrackingEmail()
 
     Dim Rng As Range
     
+    Dim cJob As Job
+    Set cJob = New Job
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     deliverySQLstring = "SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";"
-    'TODO: pfSendTrackingEmail get current values and delete following
     Set rs = CurrentDb.OpenRecordset(deliverySQLstring)
     vTrackingNumber = rs.Fields("TrackingNumber").Value
-    sParty1 = rs.Fields("Party1").Value
-    sParty2 = rs.Fields("Party2").Value
-    sCaseNumber1 = rs.Fields("CaseNumber1").Value
-    dHearingDate = rs.Fields("HearingDate").Value
-    sAudioLength = rs.Fields("AudioLength").Value
-
+    rs.Close
     Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
     Call fWunderlistAdd(sCourtDatesID & ":  Package to Ship", Format(Now + 1, "yyyy-mm-dd"))
     Call pfClearGlobals
@@ -1873,6 +1863,8 @@ Public Sub fCourtofAppealsIXML()
     Call fTranscriptExpensesBeginning
     Call fTranscriptExpensesAfter
 
+    DoCmd.Close (qnShippingOptionsQ)
+    
     MsgBox "Exported COA XML and added entry to CommHistory table."
     Call pfClearGlobals
 End Sub

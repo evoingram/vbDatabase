@@ -73,6 +73,8 @@ Public Sub fApplyShipDateTrackingNumber()
     
         Do Until rstCourtDates.EOF = True
     
+                        
+            'get tracking number and ship date
             rstCourtDates.Fields("ShipDate").Value = vShipDate
             rstCourtDates.Fields("ID").Value = sCourtDatesID
       
@@ -88,10 +90,9 @@ Public Sub fApplyShipDateTrackingNumber()
                     If x > 0 Then
                     
                         Call pfCommunicationHistoryAdd("TrackingNumber") 'comms history entry for paypal email
-                        'get tracking number and ship date
-                    
-                        'update courtdates shipdate and tracking number 'TODO: What is going on here?
-                    
+                        
+                        'TODO: paste in code to update courtdates shipdate and tracking number
+                        
                     Else
                     End If
                   
@@ -263,23 +264,19 @@ Public Sub fIsFactoringApproved()
     '============================================================================
 
 
-
-
-
     Dim vFA As String
 
     Call pfGetOrderingAttorneyInfo
 
     svURL = "https://www.paypal.com"
-    'TODO: fix these queries and all docmd.openquery's
-    DoCmd.OpenQuery "UnitPriceQuery", acViewNormal, acReadOnly
+    DoCmd.OpenQuery qUPQ, acViewNormal, acReadOnly
     DoCmd.OpenQuery "INVUpdateUnitPriceQuery", acViewNormal, acEdit
-
+    DoCmd.Close (qUPQ)
+    DoCmd.Close ("InvUpdateUnitPriceQuery")
 
     'check if approved for factoring
     vFA = sFactoringApproved
-
-
+    
     If vFA = "True" Then                         'if box checked, then do this
 
         'send price quote
@@ -510,7 +507,6 @@ Public Sub fUpdateFactoringDates()
 
     Dim sExpectedAdvanceAmount As String
     Dim sExpectedRebateAmount As String
-    Dim sUnitPrice As String
     Dim sUnitPriceRateSQL As String
     Dim sCDCalcUpdateSQL As String
     
@@ -617,17 +613,9 @@ Public Sub fUpdateFactoringDates()
     'if non-court, use audio length as page count for rate calculation
     If iUnitPriceID Like "49" And sTurnaroundTime <> "1" Then sEstimatedPageCount = sAudioLength
 
-    'get proper rate
-    sUnitPriceRateSQL = "SELECT Rate from UnitPrice where ID = " & iUnitPriceID & ";"
-
-    Set rstUnitPriceRate = CurrentDb.OpenRecordset(sUnitPriceRateSQL)
-    sUnitPrice = rstUnitPriceRate.Fields("Rate").Value
-    rstUnitPriceRate.Close
-
     If iUnitPriceID = 49 Then sEstimatedPageCount = sAudioLength
 
-    sSubtotal = sEstimatedPageCount * sUnitPrice 'calculate total price estimate
-
+    sSubtotal = sEstimatedPageCount * cJob.PageRate 'calculate total price estimate
 
     If sSubtotal < 50 Then                       'set minimum charge
         iUnitPriceID = 48
@@ -931,10 +919,14 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     Dim rstExpenses As DAO.Recordset
     Dim rstShippingExpenseEntry As DAO.Recordset
 
-
+    Dim formDOM As DOMDocument60                 'Currently opened xml file
+    Dim ixmlRoot As IXMLDOMElement
+    
+    Dim cJob As Job
+    Set cJob = New Job
+    
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    'TODO: need query for shipping iExpenseAmount + info from CourtDates and Customers
     Set qdf1 = CurrentDb.QueryDefs(qnTRCourtQ)
     qdf1.Parameters(0) = sCourtDatesID
     Set rstShippingExpenseEntry = qdf1.OpenRecordset
@@ -943,9 +935,22 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     sVendorName = rstShippingExpenseEntry.Fields("OrderingID").Value
     sInvoiceNumber = rstShippingExpenseEntry.Fields("InvoiceNo").Value
 
-
     dExpenseIncurred = Date
-    iExpenseAmount = 0
+    
+    Do While Len(Dir(cJob.DocPath.ShippingOutputFolder)) > 0
+    
+        Set formDOM = New DOMDocument60          'Open the xml file
+        formDOM.resolveExternals = False         'using schema yes/no true/false
+        formDOM.validateOnParse = False          'Parser validate document?  Still parses well-formed XML
+        formDOM.Load (cJob.DocPath.ShippingOutputFolder & Dir(cJob.DocPath.ShippingOutputFolder))
+        Set ixmlRoot = formDOM.DocumentElement   'Get document reference
+        iExpenseAmount = ixmlRoot.SelectSingleNode("//DAZzle/Package/FinalPostage").Text
+        sTrackingNumber = ixmlRoot.SelectSingleNode("//DAZzle/Package/PIC").Text
+        Set formDOM = Nothing
+        Set ixmlRoot = Nothing
+        
+    Loop
+    
     sExpenseMemo = "Shipping Job No. " & sCourtDatesID & " Invoice " & sInvoiceNumber & " Tracking " & sTrackingNumber
 
     'generates new entry for shipping XML in expenses table
@@ -962,5 +967,3 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     
     Call pfClearGlobals
 End Sub
-
-

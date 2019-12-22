@@ -117,10 +117,10 @@ Public Sub pfEnterNewJob()
     Dim rstCurrentStatusesEntry As DAO.Recordset
     Dim rstMaxCasesID As DAO.Recordset
     Dim rstCourtDatesID As DAO.Recordset
+    Dim rstTableName As DAO.Recordset
     
     Dim oExcelWB As Excel.Workbook
     Dim oExcelMacroWB As Excel.Workbook
-
     
     Dim cJob As Job
     Set cJob = New Job
@@ -226,32 +226,30 @@ Public Sub pfEnterNewJob()
         sUnitPrice = 40
         sIRC = 56
     End Select
-
-    'TODO: insert filed/factoring boxes in xlsm/csv
-    sFiled = InputBox("Are we filing this, yes or no?")
-    sFactoring = InputBox("Are we factoring this, yes or no?")
-
+    
+    Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
+    rstTempCourtDates.MoveFirst
+    sFiled = rstTempCourtDates.Fields("Filing").Value
+    sFactoring = rstTempCourtDates.Fields("Factoring").Value
+    rstTempCourtDates.Close
+    
     Select Case sFiled
     
-    Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", "Y", "y", _
-         "yep", "Yep", "YEP", "YA", "Ya", "ya"   'filed
+    Case "true", "TRUE", "True"   'filed
                 
         Select Case sFactoring
-        Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
-             "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
+        Case "true", "TRUE", "True"  'no deposit
             sFactoring = True
             sBrandingTheme = 6
-        Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "Nope", _
-             "NOPE", "N", "n"                    'with deposit
+        Case "false", "FALSE", "False" 'with deposit
             sFactoring = False
             sBrandingTheme = 8
         End Select
         
-    Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "NOPE", "Nope", "N", "n" 'not filed
+    Case "false", "FALSE", "False"  'not filed
         
         Select Case sFactoring
-        Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
-             "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
+        Case "true", "TRUE", "True"  'no deposit
             sFactoring = True
             Select Case sJurisdiction
             Case "J&J", "J&J Court Transcribers", "J&J Court"
@@ -266,8 +264,7 @@ Public Sub pfEnterNewJob()
             Case Else
                 sBrandingTheme = 7
             End Select
-        Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "Nope", _
-             "NOPE", "n", "N"                    'with deposit
+        Case "false", "FALSE", "False"  'with deposit
             sFactoring = False
             Select Case sJurisdiction
             Case "NonCourt", "Non-Court", "Noncourt", "NONCOURT"
@@ -456,15 +453,16 @@ Public Sub pfEnterNewJob()
     Call fProcessAudioParent                     'process audio in audio folder
 
     'Close all open files/quit Word
-    With Application
+    Dim oWordApp As Word.Application
+    Set oWordApp = CreateObject("Word.Application")
+    With oWordApp.Application
         .ScreenUpdating = False
-         
         Do Until .Documents.Count = 0
             .Documents(1).Close SaveChanges:=wdDoNotSaveChanges
         Loop
-        
         .Quit SaveChanges:=wdDoNotSaveChanges
     End With
+    Set oWordApp = Nothing
     
     CurrentDb.Execute "DELETE FROM TempCourtDates", dbFailOnError
     CurrentDb.Execute "DELETE FROM TempCustomers", dbFailOnError
@@ -794,7 +792,6 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     Dim dExpectedBalanceDate As Date
     Dim dExpectedAdvanceDate As Date
     Dim dExpectedRebateDate As Date
-    Dim cUnitPrice As Currency
     Dim sJurisdiction As String
     Dim sUnitPriceRateSrchSQL As String
     Dim InsertCustomersTempCourtDatesSQLstring As String
@@ -802,7 +799,9 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     Dim rs2 As DAO.Recordset
     Dim rstTempCourtDates As DAO.Recordset
 
-
+    Dim cJob As Job
+    Set cJob = New Job
+    
     'calculate fields
     Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
     iTurnaroundTimesCD = rstTempCourtDates.Fields("TurnaroundTimesCD").Value
@@ -877,14 +876,8 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
         
     End Select
 
-    'get proper rate now that we have UnitPrice ID
-    sUnitPriceRateSrchSQL = "SELECT Rate from UnitPrice where ID = " & iUnitPriceID & ";"
-    Set rs2 = CurrentDb.OpenRecordset(sUnitPriceRateSrchSQL)
-    cUnitPrice = rs2.Fields("Rate").Value
-    rs2.Close
-
     'calculate total price estimate
-    sSubtotal = iEstimatedPageCount * cUnitPrice
+    sSubtotal = iEstimatedPageCount * cJob.PageRate
 
     'set minimum charge
     If sSubtotal < 50 Then
@@ -902,7 +895,7 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     MsgBox "Transcript Income Info:  " & Chr(13) & "Turnaround:  " & iTurnaroundTimesCD & " calendar days" _
                                                & Chr(13) & "Audio Length:  " & iAudioLength & " minutes" _
                                                & Chr(13) & "Estimated Page Count:  " & iEstimatedPageCount & " pages" _
-                                               & Chr(13) & "Unit Price:  $" & cUnitPrice _
+                                               & Chr(13) & "Unit Price:  $" & cJob.PageRate _
                                                & Chr(13) & "Expected Balance Payment Date:  " & dExpectedBalanceDate _
                                                & Chr(13) & "Expected Rebate Advance Date:  " & dExpectedAdvanceDate _
                                                & Chr(13) & "Expected Rebate Payment Date:  " & dExpectedRebateDate _
@@ -1459,7 +1452,7 @@ Line2:                                           'every jurisdiction converges h
     sURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
     Application.FollowHyperlink (sURL)           'open xero website
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
-
+    
 
     Call pfInvoicesCSV                           'invoice creation prompt
 
@@ -1495,7 +1488,9 @@ Line2:                                           'every jurisdiction converges h
     
     End If
 
-
+    
+    DoCmd.Close (qXeroCSVQ)
+    
     MsgBox "Stage 1 complete."
     Call pfTypeRoughDraftF                       'type rough draft prompt
     Call pfClearGlobals
@@ -1817,7 +1812,6 @@ Public Sub fWunderlistAddNewJob()
 End Sub
 
 Public Sub autointake()
-    'TODO: autointake what's going on here
     'autoread email form into access db
     Dim sSubmissionDate As String
     Dim sEmailText As String
@@ -1904,13 +1898,13 @@ Public Sub autointake()
     Dim rstTempCourtDates As DAO.Recordset
     Dim rstTempCases As DAO.Recordset
     Dim rstTempCustomers As DAO.Recordset
+    Dim rstTableName As DAO.Recordset
     
     Dim oExcelWB As Excel.Workbook
     Dim oExcelMacroWB As Excel.Workbook
     
     Dim x As Long
     Dim y As Long
-    
     
     Dim cJob As Job
     Set cJob = New Job
@@ -2025,91 +2019,31 @@ Public Sub autointake()
             sIRC = 56
         
         End Select
-        'calculate unitprice, inventoryratecode
-        '        If sAudioLength >= 885 Then
-        '            If sTurnaround = 30 Then sUnitPrice = 39
-        '            If sTurnaround = 30 Then sIRC = 17
-        '            If sTurnaround = 14 Then sUnitPrice = 41
-        '            If sTurnaround = 14 Then sIRC = 19
-        '            If sTurnaround = 7 Then sUnitPrice = 62
-        '            If sTurnaround = 7 Then sIRC = 20
-        '            If sTurnaround = 3 Then sUnitPrice = 50
-        '            If sTurnaround = 3 Then sIRC = 84
-        '            If sTurnaround = 1 Then sUnitPrice = 61
-        '            If sTurnaround = 1 Then sIRC = 14
-        '
-        '        Else
-        '            If sTurnaround = 30 Then sUnitPrice = 58
-        '            If sTurnaround = 30 Then sIRC = 78
-        '            If sTurnaround = 14 Then sUnitPrice = 59
-        '            If sTurnaround = 14 Then sIRC = 7
-        '            If sTurnaround = 7 Then sUnitPrice = 60
-        '            If sTurnaround = 7 Then sIRC = 8
-        '            If sTurnaround = 3 Then sUnitPrice = 42
-        '            If sTurnaround = 3 Then sIRC = 90
-        '            If sTurnaround = 1 Then sUnitPrice = 61
-        '            If sTurnaround = 1 Then sIRC = 14
-        '
-        '            If sJurisdiction Like "*eScribers*" Then
-        '                sUnitPrice = 33
-        '                sIRC = 95
-        '            End If
-        '            If sJurisdiction = "FDA" Then
-        '                sUnitPrice = 37
-        '                sIRC = 41
-        '            End If
-        '            If sJurisdiction = "Food and Drug Administration" Then
-        '                sUnitPrice = 37
-        '                sIRC = 41
-        '            End If
-        '            If sJurisdiction Like "*Weber*" Then
-        '                sUnitPrice = 36
-        '                sIRC = 65
-        '            End If
-        '            If sJurisdiction Like "*J&J*" Then
-        '                sUnitPrice = 36
-        '                sIRC = 43
-        '            End If
-        '            If sJurisdiction = "Non-Court" Then
-        '                sUnitPrice = 49
-        '                sIRC = 86
-        '            End If
-        '            If sJurisdiction = "NonCourt" Then
-        '                sUnitPrice = 49
-        '                sIRC = 86
-        '            End If
-        '            If sJurisdiction Like "*KCI*" Then
-        '                sUnitPrice = 40
-        '                sIRC = 56
-        '            End If
-        '
-        '        End If
+            
         
-        'TODO: What is going on here?
-        sFiled = InputBox("Are we filing this, yes or no?")
-        sFactoring = InputBox("Are we factoring this, yes or no?")
+        Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
+        rstTempCourtDates.MoveFirst
+        sFiled = rstTempCourtDates.Fields("Filing").Value
+        sFactoring = rstTempCourtDates.Fields("Factoring").Value
+        rstTempCourtDates.Close
         
         Select Case sFiled
     
-        Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", "Y", "y", _
-             "yep", "Yep", "YEP", "YA", "Ya", "ya" 'filed
+        Case "true", "TRUE", "True" 'filed
                 
             Select Case sFactoring
-            Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
-                 "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
+            Case "true", "TRUE", "True" 'no deposit
                 sFactoring = True
                 sBrandingTheme = 6
-            Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "Nope", _
-                 "NOPE", "N", "n"                'with deposit
+            Case "false", "FALSE", "False"  'with deposit
                 sFactoring = False
                 sBrandingTheme = 8
             End Select
         
-        Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "NOPE", "Nope", "N", "n" 'not filed
+        Case "false", "FALSE", "False"
         
             Select Case sFactoring
-            Case "yes", "Yes", "YES", "Yeah", "yeah", "yea", "YEAH", "YEA", _
-                 "Y", "y", "yep", "Yep", "YEP", "YA", "Ya", "ya" 'no deposit
+            Case "true", "TRUE", "True" 'no deposit
                 sFactoring = True
                 Select Case sJurisdiction
                 Case "J&J", "J&J Court Transcribers", "J&J Court"
@@ -2124,8 +2058,7 @@ Public Sub autointake()
                 Case Else
                     sBrandingTheme = 7
                 End Select
-            Case "no", "NO", "No", "nah", "Nah", "NAH", "nope", "Nope", _
-                 "NOPE", "n", "N"                'with deposit
+            Case "false", "FALSE", "False"   'with deposit
                 sFactoring = False
                 Select Case sJurisdiction
                 Case "NonCourt", "Non-Court", "Noncourt", "NONCOURT"
@@ -2135,39 +2068,6 @@ Public Sub autointake()
                 End Select
             End Select
         End Select
-        '
-        '        If sFiled = "yes" Or sFiled = "Yes" Or sFiled = "Y" Or sFiled = "y" Then
-        '
-        '            If sFactoring = "yes" Or sFactoring = "Yes" Or sFactoring = "Y" Or sFactoring = "y" Then
-        '                sFactoring = True
-        '                sBrandingTheme = 6
-        '            Else 'with deposit
-        '                sFactoring = False
-        '                sBrandingTheme = 8
-        '            End If
-        '
-        '        Else 'not filed
-        '
-        '            If sFactoring = "yes" Or sFactoring = "Yes" Or sFactoring = "Y" Or sFactoring = "y" Then
-        '                sFactoring = True
-        '                If sJurisdiction Like "*J&J*" Then
-        '                    sBrandingTheme = 10
-        '                ElseIf sJurisdiction Like "*eScribers*" Then sBrandingTheme = 11
-        '                ElseIf sJurisdiction Like "*FDA*" Or sJurisdiction Like "*Food and Drug Administration*" Then sBrandingTheme = 12
-        '                ElseIf sJurisdiction Like "*Weber*" Then sBrandingTheme = 12
-        '                ElseIf sJurisdiction Like "*NonCourt*" Or sJurisdiction Like "*Non-Court*" Then sBrandingTheme = 1
-        '                Else: sBrandingTheme = 7
-        '                End If
-        '            Else 'with deposit
-        '                sFactoring = False
-        '                If sJurisdiction Like "*NonCourt*" Or sJurisdiction Like "*Non-Court*" Then
-        '                    sBrandingTheme = 2
-        '                Else: sBrandingTheme = 9
-        '                End If
-        '            End If
-        '
-        '
-        '        End If
                 
         'place info into tempcourtdates and tempcases
         Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
@@ -2187,71 +2087,7 @@ Public Sub autointake()
                    sParty2 & ", " & sCaseNumber1 & ", " & sCaseNumber2 & ", " & sJudge & ", " & sJurisdiction & ", " & sHearingDate & ", " & sParty1Name & ", " & sParty2Name & ", " & _
                    sJudgeTitle & ", " & sHearingTitle & ", " & sHEnd & ", " & sHStart & ", " & sLocation & ", " & dInvoiceDate & ", " & dDueDate & ", " & sAccountCode & ", " & sUnitPrice & ", " & _
                    sIRC & ", " & sBrandingTheme & ");"
-        '
-        '        'place info into tempcourtdates and tempcases
-        '            Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
-        '                rstTempCourtDates.AddNew
-        '                rstTempCourtDates.Fields("SubmissionDate").Value = sSubmissionDate
-        '                rstTempCourtDates.Fields("FirstName").Value = sFirstName
-        '                rstTempCourtDates.Fields("LastName").Value = sLastName
-        '                rstTempCourtDates.Fields("MrMs").Value = "Mrs"
-        '                rstTempCourtDates.Fields("AFirstName").Value = sFirstA
-        '                rstTempCourtDates.Fields("ALastName").Value = sLastA
-        '                rstTempCourtDates.Fields("Company").Value = sCompany
-        '                rstTempCourtDates.Fields("Notes").Value = sEmail
-        '                rstTempCourtDates.Fields("EmailAddress").Value = sCompanyEmail
-        '                rstTempCourtDates.Fields("HardCopy").Value = sHardCopy
-        '                rstTempCourtDates.Fields("Address1").Value = sAddress1
-        '                rstTempCourtDates.Fields("Address2").Value = sAddress2
-        '                rstTempCourtDates.Fields("City").Value = sCity
-        '                rstTempCourtDates.Fields("State").Value = sState
-        '                rstTempCourtDates.Fields("ZIP").Value = sZIP
-        '                rstTempCourtDates.Fields("TurnaroundTimesCD").Value = sTurnaround
-        '                rstTempCourtDates.Fields("AudioLength").Value = sAudioLength
-        '                rstTempCourtDates.Fields("Address1").Value = sAddress1
-        '                rstTempCourtDates.Fields("Address2").Value = sAddress2
-        '                rstTempCourtDates.Fields("Party1").Value = sParty1
-        '                rstTempCourtDates.Fields("Party2").Value = sParty2
-        '                rstTempCourtDates.Fields("CaseNumber1").Value = sCaseNumber1
-        '                rstTempCourtDates.Fields("CaseNumber2").Value = sCaseNumber2
-        '                rstTempCourtDates.Fields("Judge").Value = sJudge
-        '                rstTempCourtDates.Fields("Jurisdiction").Value = sJurisdiction
-        '                rstTempCourtDates.Fields("HearingDate").Value = sHearingDate
-        '                rstTempCourtDates.Fields("Party1Name").Value = sParty1Name
-        '                rstTempCourtDates.Fields("Party2Name").Value = sParty2Name
-        '                rstTempCourtDates.Fields("JudgeTitle").Value = sJudgeTitle
-        '                rstTempCourtDates.Fields("HearingTitle").Value = sHearingTitle
-        '                rstTempCourtDates.Fields("HearingEndTime").Value = sHEnd
-        '                rstTempCourtDates.Fields("HearingStartTime").Value = sHStart
-        '                rstTempCourtDates.Fields("Location").Value = sLocation
-        '                rstTempCourtDates.Fields("InvoiceDate").Value = dInvoiceDate
-        '                rstTempCourtDates.Fields("DueDate").Value = dDueDate
-        '                rstTempCourtDates.Fields("AccountCode").Value = sAccountCode
-        '                rstTempCourtDates.Fields("UnitPrice").Value = sUnitPrice
-        '                rstTempCourtDates.Fields("InventoryRateCode").Value = sIRC
-        '                rstTempCourtDates.Fields("BrandingTheme").Value = sBrandingTheme
-        '                rstTempCourtDates.Update
-        '    '           'SELECT FROM COURTDATES HearingDate, HearingStartTime, HearingEndTime, AudioLength, Location, TurnaroundTimesCD, InvoiceNo, DueDate, UnitPrice, InvoiceDate, InventoryRateCode, AccountCode, BrandingTheme FROM [TempCourtDates];"
-        '
-        'add to tempcases
-        '                Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
-        '
-        '                rstTempCases.AddNew
-        '                rstTempCases.Fields("HearingTitle").Value = sHearingTitle
-        '                rstTempCases.Fields("Party1").Value = sParty1
-        '                rstTempCases.Fields("Party1Name").Value = sParty1Name
-        '                rstTempCases.Fields("Party2").Value = sParty2
-        '                rstTempCases.Fields("Party2Name").Value = sParty2Name
-        '                rstTempCases.Fields("CaseNumber1").Value = sCaseNumber1
-        '                rstTempCases.Fields("CaseNumber2").Value = sCaseNumber2
-        '                rstTempCases.Fields("Jurisdiction").Value = sJurisdiction
-        '                rstTempCases.Fields("Judge").Value = sJudge
-        '                rstTempCases.Fields("JudgeTitle").Value = sJudgeTitle
-        '                rstTempCases.Fields("Notes").Value = sEmail
-        '                rstTempCases.Update
-        '                rstTempCases.Close
-        '                rstTempCourtDates.Close
-                
+    
         sNewCourtDatesRowSQL = "INSERT INTO TempCases (HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
                                "Jurisdiction, Judge, JudgeTitle, Notes) VALUES HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
                                "Jurisdiction, Judge, JudgeTitle, Notes FROM [TempCourtDates];"
@@ -2292,29 +2128,6 @@ Public Sub autointake()
             sJurisdiction = sCurrentAppString(15)
             sHearingDate = sCurrentAppString(16)
                                                 
-                
-            'enter into tempcustomers and tempcourtdates the appid after all questions answered
-        
-                
-            'enter into tempcustomers
-            '                Set rstTempCustomers = CurrentDb.OpenRecordset("TempCustomers")
-            '                rstTempCustomers.AddNew
-            '                rstTempCustomers.Fields("LastName").Value = sLastA
-            '                rstTempCustomers.Fields("FirstName").Value = sFirstA
-            '                rstTempCustomers.Fields("Company").Value = sCompany
-            '                rstTempCustomers.Fields("MrMs").Value = sMrMs
-            '                rstTempCustomers.Fields("JobTitle").Value = sJobTitle
-            '                rstTempCustomers.Fields("BusinessPhone").Value = sBusinessPhone
-            '                rstTempCustomers.Fields("Address").Value = sAddress1 & " " & sAddress2
-            '                rstTempCustomers.Fields("City").Value = sCity
-            '                rstTempCustomers.Fields("State").Value = sState
-            '                rstTempCustomers.Fields("ZIP").Value = sZIP
-            '                rstTempCustomers.Fields("Notes").Value = sEmail
-            '                rstTempCustomers.Fields("FactoringApproved").Value = sFactoring
-            '                tcCID = rstTempCustomers.Fields("ID").Value
-            '                rstTempCustomers.Update
-            '
-                
             CurrentDb.Execute "INSERT INTO TempCourtDates (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, " & _
                        "ZIP, Notes, FactoringApproved) VALUES (" & _
                        sLastName & ", " & sFirstName & ", " & sLastName & ", " & sCompany & ", " & sMrMs & ", " & "" & ", " & "" & ", " & sAddress1 & " " & sAddress2 & ", " & _
@@ -2325,7 +2138,6 @@ Public Sub autointake()
         'run everything else like normal
         'delete blank lines
         CurrentDb.Execute "DELETE FROM TempCustomers WHERE [Company] = " & Chr(34) & Chr(34) & ";"
-        'CurrentDb.Execute "DELETE FROM TempCourtDates WHERE [AudioLength] = " & Chr(34) & Chr(34) & ";"
         CurrentDb.Execute "DELETE FROM TempCases WHERE [Party1] = " & Chr(34) & Chr(34) & ";"
             
         'Perform the import
@@ -2385,103 +2197,17 @@ Public Sub autointake()
                 
                             
             CurrentDb.Execute "UPDATE TempCourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDatesID] = " & sCourtDatesID & ";"
-            'rstTempJob.Edit
-            'rstTempJob.Fields("CasesID") = sCasesID
-            'rstTempJob.Update
-            'sCasesID = rstTempJob.Fields("CasesID")
                 
             CurrentDb.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [InvoiceNo] = " & sInvoiceNumber & ";"
-            '"SELECT * FROM TempCourtDates WHERE [InvoiceNo]=" & sInvoiceNumber & ";"
-            'Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
-            'rstTempCDs.Edit
-            'rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
-            'rstTempCDs.Update
-            'rstTempCDs.Close
-            'Set rstTempCDs = Nothing
-            'CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 
             CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = CurrentDb.OpenRecordset("TempCustomers")
-            'rstTempCDs.Edit
-            'rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
-            'rstTempCDs.Update
-            'rstTempCDs.Close
-            'Set rstTempCDs = Nothing
-                
+            
             CurrentDb.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [ID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-            'rstTempCDs.Edit
-            'If sCasesID <> "" Then rstTempCDs.Fields("CasesID").Value = sCasesID
-            'rstTempCDs.Update
-            'rstTempCDs.Close
-            'Set rstTempCDs = Nothing
                 
             CurrentDb.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [ID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-            'rstTempCDs.Edit
-            'rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
-            'rstTempCDs.Update
-            'rstTempCDs.Close
-            'Set rstTempCDs = Nothing
                 
             CurrentDb.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [ID] = " & sCourtDatesID & ";"
-            'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-            'rstTempCDs.Edit
-            'rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
-            'rstTempCDs.Update
-            'rstTempCDs.Close
-            'Set rstTempCDs = Nothing
-                
-            'CurrentDb.Execute "UPDATE TempCourtDates SET [CourtDatesID] = " & sCourtDatesID & " WHERE [TempCourtDates].[InvoiceNo] = " & sInvoiceNumber & ";"
-            '"SELECT * FROM TempCourtDates WHERE [InvoiceNo]=" & sInvoiceNumber & ";"
-            '                Set rstTempCDs = CurrentDb.OpenRecordset("TempCourtDates")
-            '                rstTempCDs.Edit
-            '                rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
-            '                rstTempCDs.Update
-            '                rstTempCDs.Close
-            '                Set rstTempCDs = Nothing
-            'CurrentDb.Execute "UPDATE TempCustomers SET [CourtDatesID] = " & sCourtDatesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-            '
-            '                Set rstTempCDs = CurrentDb.OpenRecordset("TempCustomers")
-            '                rstTempCDs.Edit
-            '                rstTempCDs.Fields("CourtDatesID").Value = sCourtDatesID
-            '                rstTempCDs.Update
-            '                rstTempCDs.Close
-            '                Set rstTempCDs = Nothing
-            '
-            '
-            '                'CurrentDb.Execute "UPDATE CourtDates SET [CasesID] = " & sCasesID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-            '
-            '                Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-            '                rstTempCDs.Edit
-            '                rstTempCDs.Fields("CasesID").Value = sCasesID
-            '                rstTempCDs.Update
-            '                rstTempCDs.Close
-            '                Set rstTempCDs = Nothing
-            '
-                
-            'CurrentDb.Execute "UPDATE CourtDates SET [TurnaroundTimesCD] = " & sTurnaroundTimesCD & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-            '
-            '
-            '                Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-            '                rstTempCDs.Edit
-            '                rstTempCDs.Fields("TurnaroundTimesCD").Value = sTurnaroundTimesCD
-            '                rstTempCDs.Update
-            '                rstTempCDs.Close
-            '                Set rstTempCDs = Nothing
-            '
-                
-            'CurrentDb.Execute "UPDATE CourtDates SET [InvoiceNo] = " & sInvoiceNumber & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-            '
-            '                Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-            '                rstTempCDs.Edit
-            '                rstTempCDs.Fields("InvoiceNo").Value = sInvoiceNumber
-            '                rstTempCDs.Update
-            '                rstTempCDs.Close
-            '                Set rstTempCDs = Nothing
-            '
-            '
-                
+            
                 
             If IsNull(rstCurrentJob!StatusesID) Then
                 
@@ -2524,60 +2250,12 @@ Public Sub autointake()
                 Case Else
                     Exit Do
                 End Select
-                    
-                'Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
-                'rstTempCDs.Edit
-                'If sAppNumber = "App7" Then
-                '    rstTempCDs.Update
-                '    rstTempCDs.Close
-                '    Set rstTempCDs = Nothing
-                '    GoTo ExitLoop
-                'Else
-                '    rstTempCDs.Fields(sAppNumber).Value = sCurrentTempApp
-                '    rstTempCDs.Update
-                '    rstTempCDs.Close
-                '    Set rstTempCDs = Nothing
-                'End If
-                'rstTempJob.MoveNext
-                    
             Else:
                 Exit Do
             End If
             x = x + 1
         Loop
 
-        '            Do Until rstTempJob.EOF
-        '
-        '                sCurrentTempApp = rstTempJob.Fields("AppID").Value
-        '                sAppNumber = "App" & x
-        '
-        '                If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
-        '
-        '
-        '                    'CurrentDb.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
-        '
-        '                    Set rstTempCDs = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
-        '                    rstTempCDs.Edit
-        '                    rstTempCDs.Fields(sAppNumber).Value = sCurrentTempApp
-        '                    rstTempCDs.Update
-        '                    rstTempCDs.Close
-        '                    Set rstTempCDs = Nothing
-        '
-        '
-        '                    rstTempJob.MoveNext
-        '                Else:
-        '                    Exit Do
-        '                End If
-        '
-        '
-        '                x = x + 1
-        '                rstTempJob.MoveNext
-        '
-        '
-        '            Loop
-        '
-        'rstCurrentJob.Close
-        'rstTempJob.Close
         'create new agshortcuts entry
         CurrentDb.Execute "INSERT INTO AGShortcuts (CourtDatesID, CasesID) SELECT CourtDatesID, CasesID FROM TempCourtDates;"
             

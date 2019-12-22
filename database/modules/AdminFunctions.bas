@@ -170,7 +170,7 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     ' Call command: Call pfDownloadFTPsite(mySession)
     ' Description : downloads files modified today (a.k.a. new files on FTP)
     '============================================================================
-    'TODO: ftp
+    
     Dim seopFTPSettings As New SessionOptions
     Dim tropFTPSettings As New TransferOptions
     Dim transferResult As TransferOperationResult
@@ -361,7 +361,7 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
 
     DoCmd.OpenQuery "FinalUnitPriceQuery"        'PRE-QUERY FOR FINAL SUBTOTAL
     CurrentDb.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
-    CurrentDb.Close
+    DoCmd.Close ("FinalUnitPriceQuery")
 End Sub
 
 Public Sub pfReadXML()
@@ -903,7 +903,6 @@ Public Sub pfReformatTable()
     ' Call command: Call pfReformatTable
     ' Description : reformats scraped Bar addresses to useable format for table
     '============================================================================
-    'TODO: pfReformatTable check what's going on here to finish it if necessary
     
     'change all commas to semicolons
     'export to xls
@@ -1402,7 +1401,7 @@ Public Sub pfMonthlyTaskAddFunction()
     ' Call command: Call pfMonthlyTaskAddFunction
     ' Description : adds static monthly tasks to Tasks table
     '============================================================================
-    'TODO: pfMonthlyTaskAddFunction can probably break this into separate functions
+    
     Dim sTaskTitle As String
     Dim sTaskCategory As String
     Dim sPriority As String
@@ -1673,8 +1672,7 @@ Public Sub pfAskforAudio()
     
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
     'use the standard title and filters, but change the initial folder
-    'TODO: Change drive
-    fd.InitialFileName = "T:\"
+    fd.InitialFileName = sDrive
     fd.InitialView = msoFileDialogViewList
     fd.Title = "Select the audio for this transcript."
     fd.AllowMultiSelect = True                   'allow multiple file selection

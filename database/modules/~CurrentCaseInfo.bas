@@ -137,7 +137,7 @@ Public Const qTRIQPlusCases As String = "TRInvoiQPlusCases"
 Public Const qFCSVQ As String = "FactoringCSVQuery"
 Public Const qSelectXero As String = "SelectXero"
 Public Const qXeroCSVQ As String = "XeroCSVQuery"
-
+Public Const qUPQ As String = "UnitPriceQuery"
 Public Const sCompanyEmail As String = "inquiries@aquoco.co"
 Public Const sCompanyFirstName As String = "Erica"
 Public Const sCompanyLastName As String = "Ingram"
@@ -149,8 +149,9 @@ Public Const sCompanyCity As String = "Seattle"
 Public Const sCompanyState As String = "WA"
 Public Const sCompanyZIP As String = "98119"
 Public Const sZCountryCode As String = "US"
+Public Const sDrive As String = "T:\"
 
-'TODO: CurrentCaseInfo module, why isn't this used?
+'TODO: find where this picture should be used
 '@Ignore ConstantNotUsed
 Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
 '@Ignore ConstantNotUsed
@@ -249,11 +250,7 @@ Public Sub pfGetOrderingAttorneyInfo()
     sOrderingID = cJob.sApp0
     sCompany = cJob.App0.Company
     sMrMs = cJob.App0.MrMs
-    Set rstOrderingAttyInfo = CurrentDb.OpenRecordset("SELECT Rate FROM UnitPrice WHERE ID=" & sUnitPrice & ";")
-    sUnitPrice = rstOrderingAttyInfo("Rate").Value
-    rstOrderingAttyInfo.Close
-    Debug.Print sMrMs
-    Debug.Print sCompany
+    sUnitPrice = cJob.PageRate
     
 End Sub
 
@@ -660,17 +657,8 @@ Public Sub pfGetOrderingAttorneyInfo1()
             
         End If
 
-
         rstOrderingAttyInfo.Close
         Set qdf = Nothing
-
-        Set rstOrderingAttyInfo = CurrentDb.OpenRecordset("SELECT Rate FROM UnitPrice WHERE ID=" & sUnitPrice & ";")
-        sUnitPrice = rstOrderingAttyInfo("Rate").Value
-
-        rstOrderingAttyInfo.Close
-
-        db.Close
-
     End If
     
 End Sub

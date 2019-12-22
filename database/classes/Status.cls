@@ -44,7 +44,7 @@ Private mAddTrackingNumber As Boolean
 Public sStatusCID As Long
 Private sStatusID As Long
 
-Private mrstRecordset8 As Recordset
+Private mrstRecordset85 As Recordset
 Private mbooLoaded As Boolean
 
 Public Property Get ContactsEntered() As Boolean
@@ -271,19 +271,18 @@ Public Property Get CID() As Long
     CID = sStatusCID
 End Property
 
-Private Property Get RecordsetA8() As Recordset
-    Set RecordsetA8 = mrstRecordset8
+Private Property Get RecordsetA85() As Recordset
+    Set RecordsetA85 = mrstRecordset85
 End Property
 
-Private Property Set RecordsetA8(rData As Recordset)
-    Set mrstRecordset8 = rData
+Private Property Set RecordsetA85(rData As Recordset)
+    Set mrstRecordset85 = rData
 End Property
 
 Private Sub Load()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    With RecordsetA8
+    With RecordsetA85
         sStatusID = Nz(.Fields("ID").Value)
-        sStatusCID = Nz(.Fields("CourtDatesID").Value)
         Me.ContactsEntered = Nz(.Fields("ContactsEntered").Value)
         Me.JobEntered = Nz(.Fields("JobEntered").Value)
         Me.FixAppears = Nz(.Fields("FixAppears").Value)
@@ -317,7 +316,7 @@ End Sub
 
 Public Sub Update()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    With RecordsetA8
+    With RecordsetA85
         If mbooLoaded = True Then
             .Edit
         Else
@@ -363,25 +362,24 @@ Public Sub AddNew()
 End Sub
 
 '@Ignore FunctionReturnValueNotUsed
-Public Function FindFirst(Optional Criteria As Variant) As Boolean
+Public Function FindFirstStatus(Optional Criteria As Variant) As Boolean
     If IsMissing(Criteria) Then
-        RecordsetA8.MoveFirst
-        FindFirst = Not RecordsetA8.EOF
+        RecordsetA85.MoveFirst
+        FindFirstStatus = Not RecordsetA85.EOF
     Else
-        RecordsetA8.FindFirst Criteria
-        FindFirst = Not RecordsetA8.NoMatch
+        RecordsetA85.FindFirst Criteria
+        FindFirstStatus = Not RecordsetA85.NoMatch
     End If
-    If FindFirst Then Load
+    If FindFirstStatus Then Load
 End Function
 
 Private Sub Class_Initialize()
-    Set RecordsetA8 = CurrentDb.OpenRecordset("Statuses", dbOpenDynaset)
-    
+    Set RecordsetA85 = CurrentDb.OpenRecordset("Statuses", dbOpenDynaset)
 End Sub
 
 Private Sub Class_Terminate()
-    RecordsetA8.Close
-    Set RecordsetA8 = Nothing
+    RecordsetA85.Close
+    Set RecordsetA85 = Nothing
 End Sub
 
 Private Function NullIfEmptyString(str As String) As Variant
