@@ -711,7 +711,7 @@ Public Sub pfCreateBookmarks()
 
     End With
 
-    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
+    oWordDoc.Save
     oWordDoc.Close (wdSaveChanges)
 
 
@@ -953,7 +953,9 @@ Public Sub pfCreateIndexesTOAs()
         End With
         oWordDoc.Application.Selection.Find.Execute Replace:=wdReplaceAll
     
-        oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
+        oWordDoc.Save
+        oWordDoc.Close
+        oWordApp.Quit
         
         
     End With
@@ -1299,23 +1301,15 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
     ' Description : find and replace one item
     '============================================================================
     
+    Dim oWordDoc As Word.Document
+    Dim oWordApp As Word.Application
+    
     Dim cJob As Job
     Set cJob = New Job
-
-    'Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
-
-    On Error Resume Next
-    Set oWordApp = GetObject(, "Word.Application")
-    If Err <> 0 Then
-        Set oWordApp = CreateObject("Word.Application")
-    End If
-    On Error GoTo 0
-
-    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
-
-    oWordApp.Visible = True
+    
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
+    oWordDoc.Application.Visible = False
     oWordDoc.Application.Selection.HomeKey Unit:=wdStory
-
     oWordDoc.Application.Selection.Find.ClearFormatting
     oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
    
@@ -1327,7 +1321,6 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
         Else
         End If
         .Forward = bForward
-        '.Wrap = bWrap
         .Format = bFormat
         .MatchCase = bMatchCase
         .MatchWholeWord = bMatchWholeWord
@@ -1352,7 +1345,6 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
         .Find.Execute
     End With
     oWordDoc.Save
-    'Debug.Print "no"
 End Sub
 
 Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
@@ -1367,25 +1359,14 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
     ' Description : one replace TC entry function for ones with no field entry
     '============================================================================
     
-    
+    Dim oWordDoc As Word.Document
     Dim cJob As Job
     Set cJob = New Job
 
     On Error Resume Next
-
-    Set oWordApp = GetObject(, "Word.Application")
-
-    If Err <> 0 Then
-        Set oWordApp = CreateObject("Word.Application")
     
-    End If
-
-    On Error GoTo 0
-
-    oWordApp.Visible = True
-    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
-
-
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
+    oWordDoc.Visible = False
 
     With oWordDoc.Application
 
@@ -1399,7 +1380,6 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
             Else
             End If
             .Forward = True
-            .Wrap = wdFindContinue
             .Format = bFormat
             .MatchCase = False
             If bMatchCase <> Empty Then
@@ -1429,19 +1409,19 @@ Public Sub pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As Stri
     '============================================================================
 
     
+    Dim oWordDoc As Word.Document
     Dim cJob As Job
     Set cJob = New Job
 
     'wdFieldTOCEntry
-    On Error Resume Next
-    Set oWordApp = GetObject(, "Word.Application")
-    If Err <> 0 Then
-        Set oWordApp = CreateObject("Word.Application")
-    End If
-    On Error GoTo 0
-    oWordApp.Visible = True
+    
 
-    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
+    oWordDoc.Application.Visible = False
+    
+    oWordDoc.Application.Selection.HomeKey Unit:=wdStory
+    oWordDoc.Application.Selection.Find.ClearFormatting
+    oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
 
 
     With oWordDoc.Application
@@ -1451,8 +1431,7 @@ Public Sub pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As Stri
             .Text = sTexttoSearch
             .Replacement.Text = sReplacementText
             .Forward = True
-            .Wrap = wdFindContinue
-            .Format = False
+            '.Wrap = wdFindContinue
             .MatchCase = False
             .MatchWholeWord = False
             .MatchWildcards = False
@@ -1954,13 +1933,13 @@ Public Sub pfTCEntryReplacement()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
     
     On Error Resume Next
+    
     Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
     On Error GoTo 0
     oWordApp.Visible = False
-    
     Set oCourtCoverWD = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
     Set qdf = CurrentDb.QueryDefs(qnTRCourtQ)    'open query
     qdf.Parameters(0) = sCourtDatesID
@@ -1985,58 +1964,110 @@ Public Sub pfTCEntryReplacement()
         With oCourtCoverWD.Application           'beginning of file do these replacements
             .Selection.Find.ClearFormatting
             Call pfFieldTCReplaceAll("(nnn)", "^p ", Chr(34) & "TC" & Chr(34) & " " & Chr(34) & "WitnessName" & Chr(34) & " " & "\l 2")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ema)", "^p(Exhibit ## marked and admitted.)^p", Chr(34) & "TC" & Chr(34) & " " & Chr(34) & "Exhibit  marked and admitted" & Chr(34) & " " & "\f cd")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(emm)", "^p(Exhibit ## marked.)^p", Chr(34) & "TC" & Chr(34) & " " & Chr(34) & "Exhibit  marked" & Chr(34) & " " & "\f cd")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(eaa)", "^p(Exhibit ## admitted.)^p", Chr(34) & "TC" & Chr(34) & " " & Chr(34) & "Exhibit  admitted" & Chr(34) & " " & "\f cd")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(exa)", "^p(Exhibit ## admitted.)^p", Chr(34) & "TC" & Chr(34) & " " & Chr(34) & "Exhibit  admitted" & Chr(34) & " " & "\f cd")
+            pfDelay 1
         
             Call pfFieldTCReplaceAll("(ee1)", "^pDIRECT EXAMINATION^p", Chr(34) & "Direct Examination by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ee2)", "^pCROSS-EXAMINATION^p", Chr(34) & "Cross-Examination by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ee3)", "^pREDIRECT EXAMINATION^p", Chr(34) & "Redirect Examination by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ee4)", "^pRECROSS-EXAMINATION^p", Chr(34) & "Recross-Examination by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ee5)", "^pFURTHER REDIRECT EXAMINATION^p", Chr(34) & "Further Redirect Examination by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ee6)", "^pFURTHER RECROSS-EXAMINATION^p", Chr(34) & "Further Recross-Examination by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(e1c)", "^pDIRECT EXAMINATION CONTINUED^p", Chr(34) & "Direct Examination Continued by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(e2c)", "^pCROSS-EXAMINATION CONTINUED^p", Chr(34) & "Cross-Examination Continued by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(e3c)", "^pREDIRECT EXAMINATION CONTINUED^p", Chr(34) & "Redirect Examination Continued by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(e4c)", "^pRECROSS-EXAMINATION CONTINUED^p", Chr(34) & "Recross-Examination Continued by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(e5c)", "^pFURTHER REDIRECT EXAMINATION CONTINUED^p", Chr(34) & "Further Redirect Examination Continued by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(e6c)", "^pFURTHER RECROSS-EXAMINATION CONTINUED^p", Chr(34) & "Further Recross-Examination Continued by " & Chr(34) & " \l 3")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(crr)", "^pCOURT'S RULING" & "^p", Chr(34) & "TC" & Chr(34) & " " & Chr(34) & "Court's Ruling" & Chr(34) & " " & "\f e")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(aa1)", "^pARGUMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ar1)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ao1)", "^pOPENING STATEMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            pfDelay 1
             Call pfFieldTCReplaceAll("(ac1)", "^pCLOSING ARGUMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(sbb)", "^p(Sidebar begins at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(sbe)", "^p(Sidebar ends at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(rrr)", "^p(Recess taken from ##:## ap.m. to ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(sbn)", "^p(Sidebar taken from ##:## ap.m. to ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(jen)", "^p(Jury panel enters at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(jex)", "^p(Jury panel exits at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(pjn)", "^p(Prospective jury panel enters at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(pjx)", "^p(Prospective jury panel exits at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(wsu)", "^p(Witness summoned.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(wsw)", "^p(The witness was sworn.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(vub)", "^p(Video played at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(vue)", "^p(Video ends at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(vup)", "^p(Video played from ##:## ap.m. to ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(aup)", "^p(Audio played from ##:## ap.m. to ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(aue)", "^p(Audio ends at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(aub)", "^p(Audio begins at ##:## ap.m.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(ccc)", "^p(Counsel confer.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(pcc)", "^p(Parties confer.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(ppr)", "^p(The witness paused to review the document.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(nrp)", "^p(No response.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(rrr)", "^p(Whereupon, at ##:## ap.m., a recess was taken.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(rrl)", "^p(Whereupon, at ##:## ap.m., a luncheon recess was taken.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(ppp)", "^p(Pause.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(otr)", "^p(Off the record.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(dtr)", "^p(Discussion held off the record.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(wxu)", "^p(Witness excused.)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(cco)", "^p(Whereupon, the following proceedings were held in open court outside the presence of the jury:)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("(cci)", "^p(Whereupon, the following proceedings were held in open court in the presence of the jury:)^p")
+            pfDelay 1
             Call pfSingleTCReplaceAll("Uh-huh.", "Uh-huh.")
+            pfDelay 1
             Call pfSingleTCReplaceAll("Huh-uh.", "Huh-uh.")
+            pfDelay 1
             'Call pfFieldTCReplaceAll(, , )
         
             If Not rstViewJFAppQ.EOF Then rstViewJFAppQ.MoveNext
@@ -2102,9 +2133,6 @@ ParenDone:
 
     rstViewJFAppQ.Close
     Set rstViewJFAppQ = Nothing
-    oCourtCoverWD.SaveAs2 FileName:=cJob.DocPath.CourtCover
-    oCourtCoverWD.Close
-    oWordApp.Quit
     Set oCourtCoverWD = Nothing
     Set oWordApp = Nothing
 End Sub

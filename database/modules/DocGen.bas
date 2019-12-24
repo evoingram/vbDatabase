@@ -377,16 +377,15 @@ Public Sub pfCreateCover(sTemplatePath As String)
 
     With oWordDoc
         .MailMerge.OpenDataSource _
-        Name:=cJob.DocPath.CaseInfo, ReadOnly:=False, _
-        ConfirmConversions:=False, LinkToSource:=True, _
-        AddToRecentFiles:=False, PasswordDocument:="", PasswordTemplate:="", _
-        WritePasswordDocument:="", WritePasswordTemplate:="", Revert:=False, _
+        Name:=cJob.DocPath.CaseInfo, _
+        LinkToSource:=True, _
+ _
         Format:=wdOpenFormatAuto, Connection:= _
         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & cJob.DocPath.CourtCover & ";Mode=Read;Extended Properties=" & Chr(34) & Chr(34) & "HDR=YES;IMEX=1;" _
-                                                                                                                                   & Chr(34) & Chr(34) & ";Jet OLEDB:System database=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & ";Jet OLEDB:Registry Path=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & _
-                                                                                                                                     ";Jet OLEDB:Engine Type=34;Jet OLEDB;" _
-                                                                                                                                     , SQLStatement:="SELECT * FROM `AAAAADataRange`", SQLStatement1:="", _
-                                                                                                                                     SubType:=wdMergeSubTypeAccess
+            & Chr(34) & Chr(34) & ";Jet OLEDB:System database=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & ";Jet OLEDB:Registry Path=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & _
+            ";Jet OLEDB:Engine Type=34;Jet OLEDB;" _
+            , SQLStatement:="SELECT * FROM `AAAAADataRange`", SQLStatement1:="", _
+            SubType:=wdMergeSubTypeAccess
         .MailMerge.DataSource.FirstRecord = wdDefaultFirstRecord
         .MailMerge.DataSource.LastRecord = wdDefaultLastRecord
         .MailMerge.Execute

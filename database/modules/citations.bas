@@ -116,16 +116,17 @@ Public Sub pfFindRepCitationLinks()
     x = 1
     
     
-    'On Error Resume Next
-    'On Error GoTo 0
+    '
+    '
     
     
+    On Error Resume Next
+    Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
     
-    
-    Set oWordApp = CreateObject("Word.Application")
+    On Error GoTo 0
     Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
@@ -137,13 +138,15 @@ Public Sub pfFindRepCitationLinks()
     'Get all the document text and store it in a variable.
     Set rCurrentSearch = oWordDoc.Range
      
-    On Error Resume Next
+    
      
+    On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
     On Error GoTo 0
+    
     Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover) 'open word document
     oWordApp.Visible = True
     
@@ -156,7 +159,7 @@ Public Sub pfFindRepCitationLinks()
     
     Set rCurrentSearch = oWordDoc.Range
     sCurrentSearch = rCurrentSearch.Text
-    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'TODO: add usc table
+    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'TODO: add rules/regs tables
     'Loop sCurrentSearch till you can't find any more matching "terms"
     'x = UBound(sSearchTermArray) - LBound(sSearchTermArray) + 1
     Debug.Print x
@@ -617,7 +620,7 @@ ExitLoop1:
     
     
 Done:
-    oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover         'save and close word doc
+    oWordDoc.Save 'save and close word doc
     oWordDoc.Close wdDoNotSaveChanges
     oWordApp.Quit
     
@@ -711,9 +714,6 @@ Dim parsed As Dictionary
                 'Debug.Print apiWaxLRS
                 'Debug.Print "--------------------------------------------"
             End With
-            'TODO: Figure out if you can delete this or if it should go in parent function
-            'x = 1
-            'y = 1
             Set parsed = JsonConverter.ParseJson(apiWaxLRS)
             Set apiCourtListener = parsed.item("results")
     

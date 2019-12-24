@@ -2,6 +2,7 @@ Attribute VB_Name = "PayPal"
 '@Folder("Database.Admin.Modules")
 Option Explicit
 
+
 '============================================================================
 'class module cmPayPal
 
@@ -61,6 +62,9 @@ Option Explicit
 
 Private x As String
 Private sTemp As String
+
+'TODO: fix PP/invoicing functions
+'TODO: invoice # Word doc doesn't save properly w/ PP button
 
 Public Sub fSendPPEmailFactored()
     'generates factored invoice email for pp

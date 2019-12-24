@@ -419,7 +419,7 @@ Public Sub pfTrainAudio()
 
     '---------------------------------------------------------
     'HOW TO TRAIN AUDIO
-    'note cJob.DocPath.Speech & "training BATs\G-runWAlignforAccuracyReport.bat"
+    'cJob.DocPath.Speech & "training BATs\G-runWAlignforAccuracyReport.bat"
     '
     'Change "wavfilename" to your wav file name.
     'Run the following commands in a command window with administrator:
@@ -588,7 +588,7 @@ Public Sub pfTrainEngine()
     '   Copy again and open Visual studio or other programming software that shows you lines
     '       Visual basic component in office also does this.
     '   Paste your transcription file in there.
-    '   Note number of lines.
+    '   Notice the number of lines.
     '   Save and close.
     '   Open wavfilename.fileids from your folder.
     '   Put wavfilename on each line for the EXACT SAME number of lines in your wavfilename.transcription.
@@ -599,7 +599,7 @@ Public Sub pfTrainEngine()
     '   "save link as" *.dic as wavfilename.dic
     '   "save link as" *.lm as wavfilename.lm
     '   Now, open up the word document, wavfilename.docx, again and load up each wav file in a player.
-    '   Note first and last line of words of the wav file.
+    '   Notice the first and last line of words of the wav file.
     '   Search for them in the wavfilename.docx so that you select everything that's on the audio you just played.
     '   In each selected line, ensure the 'wavfilename' matches each of the wav files it belongs in.
     '       You want to make sure the wavfilename includes the "-##of##" part.
