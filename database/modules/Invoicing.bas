@@ -90,8 +90,24 @@ Public Sub fApplyShipDateTrackingNumber()
                     If x > 0 Then
                     
                         Call pfCommunicationHistoryAdd("TrackingNumber") 'comms history entry for paypal email
+                                            
+                        Call pfCurrentCaseInfo                       'refresh transcript info
                         
-                        'TODO: paste in code to update courtdates shipdate and tracking number
+                        Do While Len(Dir(cJob.DocPath.ShippingOutputFolder)) > 0
+                        
+                            Set formDOM = New DOMDocument60          'Open the xml file
+                            formDOM.resolveExternals = False         'using schema yes/no true/false
+                            formDOM.validateOnParse = False          'Parser validate document?  Still parses well-formed XML
+                            formDOM.Load (cJob.DocPath.ShippingOutputFolder & Dir(cJob.DocPath.ShippingOutputFolder))
+                            Set ixmlRoot = formDOM.DocumentElement   'Get document reference
+                            sTrackingNumber = ixmlRoot.SelectSingleNode("//DAZzle/Package/PIC").Text
+                            Set formDOM = Nothing
+                            Set ixmlRoot = Nothing
+                            rstCourtDates.Fields("ShipDate").Value = Format(Now, "mm-dd-yyyy")
+                            rstCourtDates.Fields("TrackingNumber").Value = sTrackingNumber
+                            
+                        Loop
+                        
                         
                     Else
                     End If
@@ -103,6 +119,7 @@ Public Sub fApplyShipDateTrackingNumber()
                 vShipDate = ""
                 sCourtDatesID = ""
                 vTrackingNumber = ""
+                sTrackingNumber = ""
                 
                 rstCourtDates.MoveNext
                 
@@ -474,6 +491,8 @@ Public Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -518,6 +537,8 @@ Public Sub fUpdateFactoringDates()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -924,6 +945,8 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 

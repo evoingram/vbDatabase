@@ -56,6 +56,8 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     If sMerge = "Case" Then
 
@@ -331,6 +333,8 @@ Public Sub pfCreateCover(sTemplatePath As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     If Len(Dir(cJob.DocPath.CaseInfo)) = 0 Then
 
@@ -452,6 +456,8 @@ Public Sub fCreatePELLetter()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfGenericExportandMailMerge("Case", "Stage1s\PackageEnclosedLetter")
 
@@ -494,6 +500,8 @@ Public Sub fFactorInvoicEmailF()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -565,6 +573,8 @@ Public Sub pfInvoicesCSV()
 
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     'DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
     DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
@@ -574,7 +584,7 @@ Public Sub pfInvoicesCSV()
 
         DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
         DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.XeroCSV, True
-        DoCmd.Close (qFCSVQ)
+        DoCmd.Close acQuery, qFCSVQ
     
     Else
     End If
@@ -610,6 +620,8 @@ Public Sub fCreateWorkingCopy()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfWordIndexer
 
@@ -710,8 +722,8 @@ Public Sub pfPrepareCover()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     'query for all dates & job numbers for a case
     Set rstJobsByCase = CurrentDb.OpenRecordset("SELECT * FROM Courtdates WHERE CasesID = " & cJob.CaseInfo.ID & ";")

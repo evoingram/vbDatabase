@@ -90,11 +90,10 @@ Public Sub fSendPPEmailFactored()
 
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fPPGenerateJSONInfo                     'refreshes some necessary info
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-
     Call pfGetOrderingAttorneyInfo               'refreshes some necessary info
     Call pfCurrentCaseInfo                       'refreshes some necessary info
 
@@ -1253,13 +1252,13 @@ Public Sub fSendPPEmailDeposit()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     'your invoice docx template MUST contain the phrase "#PPB1#" AND "#PPB2#" without the quotes somewhere on it.
     'your e-mail docx template MUST contain the phrase "#PPB1#" without the quotes somewhere on it.
 
     Call fPPGenerateJSONInfo                     'refreshes some info, not relevant for purposes of this code being on GH
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
 
     'paste PPButton html into mail merged invoice/PQ at both bookmarks "PPButton" bookmark or #PPB1# AND "PPButton2" or #PPB2#
@@ -1728,11 +1727,10 @@ Public Sub fPPRefund()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fPPGenerateJSONInfo
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-
     Call pfGetOrderingAttorneyInfo
     Call pfCurrentCaseInfo
 

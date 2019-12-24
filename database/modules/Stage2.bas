@@ -149,8 +149,8 @@ Public Sub pfAutoCorrect()
     Dim oWordApp As Word.Application
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     sACShortcutsSQL = "SELECT * FROM AGShortcuts WHERE [CourtDatesID] = " & sCourtDatesID & ";"
 
@@ -231,6 +231,8 @@ Public Sub pfRoughDraftToCoverF()
     Dim bMatchCase As Boolean
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
 
     Call pfCurrentCaseInfo                       'refresh transcript info
@@ -1614,8 +1616,8 @@ Public Sub pfStaticSpeakersFindReplace()
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set oWordApp = GetObject(, "Word.Application")
     If oWordApp Is Nothing Then
@@ -1913,7 +1915,7 @@ Public Sub pfStaticSpeakersFindReplace()
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
 
-    DoCmd.Close (qnViewJobFormAppearancesQ)
+    DoCmd.Close acQuery, qnViewJobFormAppearancesQ
 End Sub
 
 Public Sub pfReplaceColonUndercasewithColonUppercase()
@@ -1934,6 +1936,7 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Set oWordApp = GetObject(, "Word.Application")
 
@@ -2166,7 +2169,7 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
 
-    DoCmd.Close (qnViewJobFormAppearancesQ)
+    DoCmd.Close acQuery, qnViewJobFormAppearancesQ
 End Sub
 
 Public Sub pfTypeRoughDraftF()
@@ -2182,6 +2185,8 @@ Public Sub pfTypeRoughDraftF()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -2345,6 +2350,8 @@ Public Sub pfRoughDraftCFMass()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef

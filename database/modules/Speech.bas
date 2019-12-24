@@ -74,6 +74,8 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
 
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
@@ -179,6 +181,8 @@ Public Sub pfPrepareTranscript()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
@@ -381,6 +385,8 @@ Public Sub pfRunCopyTranscTextBAT()
 
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call Shell(cJob.DocPath.SpeechUP & "\CopyTranscriptTXT.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -403,6 +409,8 @@ Public Sub pfSRTranscribe()
 
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call Shell(cJob.DocPath.SpeechUP & "\SRTranscribe.bat " & cJob.DocPath.SpeechUP)
 
@@ -449,6 +457,8 @@ Public Sub pfTrainAudio()
     '
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\audiotrain.bat " & cJob.DocPath.SpeechUP)
 
@@ -466,6 +476,8 @@ Public Sub pfRenameBaseFiles()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\FileRename.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -481,6 +493,8 @@ Public Sub pfSplitAudio()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\splitaudio.bat " & cJob.DocPath.SpeechUP)
 End Sub
@@ -636,6 +650,8 @@ Public Sub pfAddSubfolder()
     Dim sConcatenatedAudioPath As String
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     
     Set oRootFolder = oFolderObject.GetFolder(cJob.DocPath.SpeechUA)
@@ -690,6 +706,8 @@ Public Sub pfCorpusUpload()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     '@Ignore AssignmentNotUsed
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
@@ -770,8 +788,9 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     sMainURL = "http://www.speech.cs.cmu.edu/tools/lmtool-new.html"
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
     sCorpusPath = cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Base-corpus.txt"
@@ -891,6 +910,8 @@ Public Sub pfDoFolder(Folder As Variant)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     sDestinationURL = "http://www.speech.cs.cmu.edu/cgi-bin/tools/lmtool/run"
     sFieldName = "corpus"

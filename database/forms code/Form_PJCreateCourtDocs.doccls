@@ -41,6 +41,8 @@ Private Sub Command68_Click()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -83,7 +85,7 @@ Private Sub Command68_Click()
         'export xero csv
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
         DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
-        DoCmd.Close (qXeroCSVQ)
+        DoCmd.Close acQuery, qXeroCSVQ
     
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
@@ -125,7 +127,7 @@ Private Sub Command68_Click()
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
         'DoCmd.TransferText acExportDelim, , "XeroInvoiceQuery1Select", cJob.DocPath.XeroCSV, True
         DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
-        DoCmd.Close (qXeroCSVQ)
+        DoCmd.Close acQuery, qXeroCSVQ
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
         Application.FollowHyperlink (svURL)
@@ -144,16 +146,16 @@ Private Sub Command68_Click()
     
             DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
             DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True
-            DoCmd.Close (qFCSVQ)
+            DoCmd.Close acQuery, qFCSVQ
             DoCmd.OpenQuery "PayPalFactoringInvoiceCSVQ", acViewNormal, acAdd
             DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", cJob.DocPath.PPCSV, True
-            DoCmd.Close ("PayPalFactoringInvoiceCSVQ")
+            DoCmd.Close acQuery, "PayPalFactoringInvoiceCSVQ"
         
         Else
     
             DoCmd.OpenQuery "PayPalDepositInvoiceCSVQ", acViewNormal, acAdd
             DoCmd.TransferText acExportDelim, , "PayPalDepositInvoiceCSVQ", cJob.DocPath.PPCSV, True
-            DoCmd.Close ("PayPalDepositInvoiceCSVQ")
+            DoCmd.Close acQuery, "PayPalDepositInvoiceCSVQ"
         
         End If
     
@@ -186,7 +188,7 @@ Private Sub Command68_Click()
             
             DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
             DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
-            DoCmd.Close (qXeroCSVQ)
+            DoCmd.Close acQuery, qXeroCSVQ
         
             'TR-Court-Union-AppAddr
             'real factoring csv plus invoice generated FactoringCSVQuery
@@ -201,16 +203,16 @@ Private Sub Command68_Click()
         
                 DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
                 DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True
-                DoCmd.Close (qFCSVQ)
+                DoCmd.Close acQuery, qFCSVQ
                 DoCmd.OpenQuery "PayPalFactoringInvoiceCSVQ", acViewNormal, acAdd
                 DoCmd.TransferText acExportDelim, , "PayPalFactoringInvoiceCSVQ", cJob.DocPath.PPCSV, True
-                DoCmd.Close ("PayPalFactoringInvoiceCSVQ")
+                DoCmd.Close acQuery, "PayPalFactoringInvoiceCSVQ"
             
             Else
         
                 DoCmd.OpenQuery "PayPalDepositInvoiceCSVQ", acViewNormal, acAdd
                 DoCmd.TransferText acExportDelim, , "PayPalDepositInvoiceCSVQ", cJob.DocPath.PPCSV, True
-                DoCmd.Close ("PayPalDepositInvoiceCSVQ")
+                DoCmd.Close acQuery, "PayPalDepositInvoiceCSVQ"
             
             End If
     
@@ -234,7 +236,7 @@ Private Sub Command68_Click()
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
         
         DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
-        DoCmd.Close (qXeroCSVQ)
+        DoCmd.Close acQuery, qXeroCSVQ
     
         'open xero website
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"

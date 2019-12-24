@@ -13,8 +13,8 @@ Private Sub Form_Load()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     wbViewNotes = "Me.Parent.wbNotes"
     
@@ -41,6 +41,8 @@ Private Sub Form_Current()
     '
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     'Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
     'Me.oleShowDoc.Requery
@@ -108,9 +110,8 @@ Public Sub pfOpenWork()
     
     Dim cJob As Job
     Set cJob = New Job
-    
-    'get courtdatesid
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Set oFSO = CreateObject("Scripting.FileSystemObject")
     Set oFolder = oFSO.GetFolder(cJob.DocPath.AudioFolder)

@@ -14,6 +14,7 @@ Private Sub btnViewInvoice_Click()
     Set cJob = New Job
 
     sCourtDatesID = Me.btnVIJobNumberField.Value
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set rstCourtDates = CurrentDb.OpenRecordset("SELECT * FROM COURTDATES WHERE ID = " & sCourtDatesID & ";")
         sInvoiceNumber = rstCourtDates.Fields("InvoiceNo").Value

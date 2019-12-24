@@ -110,8 +110,8 @@ Public Sub pfFindRepCitationLinks()
     
     Dim cJob As Job
     Set cJob = New Job
-    
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     Forms![NewMainMenu].Form!lblFlash.Caption = "Step 10 of 10:  Processing citations found..."
     
     x = 1
@@ -830,7 +830,8 @@ Public Sub pfFindRepCitationLinksOLD()
     Dim cJob As Job
     Set cJob = New Job
     
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     x = 1
     
@@ -1420,6 +1421,8 @@ Public Sub pfTopOfTranscriptBookmark()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set AcroApp = CreateObject("AcroExch.App")
     '@Ignore AssignmentNotUsed

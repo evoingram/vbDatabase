@@ -42,6 +42,8 @@ Public Sub pfStage3Ppwk()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfGetOrderingAttorneyInfo
 
@@ -201,8 +203,8 @@ Public Sub pfBurnCD()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     sQuestion = "Is there a blank CD in the D drive?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -253,8 +255,8 @@ Public Sub pfCreateRegularPDF()
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     sFinalTranscriptNoExt = cJob.DocPath.InProgressFolder & sCourtDatesID & "\Transcripts\" & sCourtDatesID & "-Transcript-FINAL"
     
     sMakePDFPrompt = "Next we will make a PDF copy.  Click yes when ready."
@@ -393,8 +395,8 @@ Public Sub fDynamicHeaders()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     'Call pfCurrentCaseInfo
     
     On Error Resume Next
@@ -826,6 +828,8 @@ Public Sub pfTopOfTranscriptBookmark()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Set AcroApp = CreateObject("AcroExch.App")
 
@@ -968,8 +972,8 @@ Public Sub fPDFBookmarks()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")

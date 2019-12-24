@@ -104,6 +104,8 @@ End Sub
 Private Sub emptyFunction()
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
     Dim oWordDoc1 As New Word.Document
