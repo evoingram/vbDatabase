@@ -1,12 +1,7 @@
 Attribute VB_Name = "~AScratchPad"
 '@Folder("Database.General.Modules")
 
-
-'TODO: fix PP/invoicing functions
-'TODO: invoice # Word doc doesn't save properly w/ PP button
-'TODO: python speech recognition
 'TODO: get permissions and hook into various case mgmt software to get orders
-'TODO: add date/case info to footer
 
 '*****Medium Priority*****
 

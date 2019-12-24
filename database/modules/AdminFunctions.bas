@@ -534,13 +534,13 @@ Public Sub pfCheckFolderExistence()
         MkDir cJob.DocPath.JobDirectoryB
     End If
     
-    If sJurisdiction Like "*Food and Drug Administration*" Then
+    If cJob.CaseInfo.Jurisdiction Like "*Food and Drug Administration*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-FDA.docx", cJob.DocPath.RoughDraft
         End If
     
-    ElseIf sJurisdiction Like "*NonCourt*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*NonCourt*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
             sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -550,31 +550,31 @@ Public Sub pfCheckFolderExistence()
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
         End If
     
-    ElseIf sJurisdiction Like "*FDA*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*FDA*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-FDA.docx", cJob.DocPath.RoughDraft
         End If
     
-    ElseIf sJurisdiction Like "*Weber Oregon*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*Weber Oregon*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberOR.docx", cJob.DocPath.RoughDraft
         End If
     
-    ElseIf sJurisdiction Like "*Weber Nevada*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*Weber Nevada*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberNV.docx", cJob.DocPath.RoughDraft
         End If
     
-    ElseIf sJurisdiction Like "*Weber Bankruptcy*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*Weber Bankruptcy*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
         End If
     
-    ElseIf sJurisdiction Like "*AVT*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*AVT*" Then
 
         If Len(Dir(cJob.DocPath.RoughDraft)) = 0 Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft.docx", cJob.DocPath.RoughDraft
@@ -1000,7 +1000,9 @@ Public Sub pfDelay(lSeconds As Long)
     dEndTime = DateAdd("s", lSeconds, Now())
     Do While Now() < dEndTime
         DoEvents
+        'GoTo ExitSub
     Loop
+ExitSub:
 End Sub
 
 Public Sub pfPriorityPointsAlgorithm()

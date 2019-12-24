@@ -55,50 +55,48 @@ Public Sub pfStage2Ppwk()
     Dim sQuestion As String
     Dim cJob As Job
     Set cJob = New Job
-
+    cJob.FindFirst "ID=" & Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    'sCaseID
     'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
-    Call pfTypeRoughDraftF                       'Add RD template to job folder
     Call pfUpdateCheckboxStatus("AddRDtoCover")
     Call pfUpdateCheckboxStatus("FindReplaceRD")
     Call pfUpdateCheckboxStatus("Transcribe")
 
-    Call pfCurrentCaseInfo
-
-    If sJurisdiction = "*AVT*" Then
+    If cJob.CaseInfo.Jurisdiction = "*AVT*" Then
 
         Call pfReplaceAVT
         MsgBox "Stage 2 complete."
         Application.FollowHyperlink cJob.DocPath.CourtCover
     
-    ElseIf sJurisdiction Like "FDA" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "FDA" Then
 
         Call pfReplaceFDA
         Application.FollowHyperlink cJob.DocPath.CourtCover
         
-    ElseIf sJurisdiction Like "Food and Drug Administration" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Food and Drug Administration" Then
 
         Call pfReplaceFDA
         Application.FollowHyperlink cJob.DocPath.CourtCover
 
-    ElseIf sJurisdiction Like "Weber Oregon" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Weber Oregon" Then
 
         Call wwReplaceWeberOR
         Call FPJurors
         MsgBox "Stage 2 complete."
         Application.FollowHyperlink cJob.DocPath.RoughDraft
 
-    ElseIf sJurisdiction Like "Weber Bankruptcy" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Weber Bankruptcy" Then
 
         Call wwReplaceWeberBR
         Application.FollowHyperlink cJob.DocPath.RoughDraft
 
-    ElseIf sJurisdiction Like "Weber Nevada" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Weber Nevada" Then
 
         Call wwReplaceWeberNV
         Application.FollowHyperlink cJob.DocPath.RoughDraft
  
-    ElseIf sJurisdiction Like "Massachusetts" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Massachusetts" Then
 
         Call pfReplaceMass
         Application.FollowHyperlink cJob.DocPath.RoughDraft
@@ -262,24 +260,20 @@ Public Sub pfRoughDraftToCoverF()
             MsgBox "Bookmark ""RoughBKMK"" does not exist!"
         End If
         .MailMerge.MainDocumentType = wdNotAMergeDocument
-        .SaveAs2 FileName:=cJob.DocPath.CourtCover
+        .Save
         .Close
     End With
 
     'Documents("RoughDraft.docx").Close wdDoNotSaveChanges
     
-    'Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
-    
     On Error Resume Next
-    Set oWordApp = GetObject(, "Word.Application")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
+        Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
     End If
     On Error GoTo 0
-
-    Set oWordApp = CreateObject("Word.Application")
-
-    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+    
     oWordApp.Visible = True
 
     x = 18  '18 is number of first dynamic speaker
@@ -397,9 +391,6 @@ Public Sub pfRoughDraftToCoverF()
             'back up to the top
             DoEvents
         Loop
-    
-    
-    
     
         'MsgBox "Finished ing through dynamic speakers."
         
@@ -1309,14 +1300,12 @@ Public Sub pfRoughDraftToCoverF()
         sReplacementText = " :  Z"
         Call pfSingleFindReplace(sTextToFind, sReplacementText)
                                                      
-        
         pfDelay 1
             
         x = 18                                   '18 is number of first dynamic speaker
         
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
         
-        '@Ignore UnassignedVariableUsage
         Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
         qdf.Parameters(0) = sCourtDatesID
         Set drSpeakerName = qdf.OpenRecordset
@@ -1380,8 +1369,6 @@ Public Sub pfRoughDraftToCoverF()
             MsgBox "There are no records in the recordset."
         End If
         
-        
-        
         'MsgBox "Finished looping through A: to Z:."
         
         '********************************** various style-related F/Rs
@@ -1408,8 +1395,8 @@ Public Sub pfRoughDraftToCoverF()
             wsyWordStyle = "ESColloquy"
             Call pfSingleFindReplace(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True)
             
-            sTextToFind = "^p("
-            sReplacementText = "^p("
+            sTextToFind = vbCrLf & "("
+            sReplacementText = vbCrLf & "("
             wsyWordStyle = "ESParen"
             Call pfSingleFindReplace(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True)
             
@@ -1475,33 +1462,31 @@ Public Sub pfRoughDraftToCoverF()
                 
         Else
         End If
-        
+    
         Call pfTCEntryReplacement
         
         sTextToFind = "^^p"
-        sReplacementText = "^p"
+        sReplacementText = vbCrLf
         wsyWordStyle = ""
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "Q.  "
         sReplacementText = "Q.  "
         wsyWordStyle = "AQC-QA"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
+        
         sTextToFind = "A.  "
         sReplacementText = "A.  "
         wsyWordStyle = "AQC-QA"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = ":  "
         sReplacementText = ":  "
         wsyWordStyle = "AQC-Colloquy"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True)
         
-        sTextToFind = "^p("
-        sReplacementText = "^p("
+        sTextToFind = vbCrLf & "("
+        sReplacementText = vbCrLf & "("
         wsyWordStyle = "AQC-Parenthesis"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True)
         
@@ -1524,91 +1509,76 @@ Public Sub pfRoughDraftToCoverF()
         sReplacementText = "SWORN"
         wsyWordStyle = "Heading 1"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "DIRECT EXAMINATION"
         sReplacementText = "DIRECT EXAMINATION"
         wsyWordStyle = "Heading 2"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "CROSS-EXAMINATION"
         sReplacementText = "CROSS-EXAMINATION"
         wsyWordStyle = "Heading 2"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "REDIRECT EXAMINATION"
         sReplacementText = "REDIRECT EXAMINATION"
         wsyWordStyle = "Heading 2"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "RECROSS-EXAMINATION"
         sReplacementText = "RECROSS-EXAMINATION"
         wsyWordStyle = "Heading 2"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "FURTHER REDIRECT EXAMINATION"
         sReplacementText = "FURTHER REDIRECT EXAMINATION"
         wsyWordStyle = "Heading 2"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "FURTHER RECROSS-EXAMINATION"
         sReplacementText = "FURTHER RECROSS-EXAMINATION"
         wsyWordStyle = "Heading 2"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "OPENING STATEMENT"
         sReplacementText = "OPENING STATEMENT"
         wsyWordStyle = "Heading 1"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "CLOSING ARGUMENT"
         sReplacementText = "CLOSING ARGUMENT"
         wsyWordStyle = "Heading 1"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "VERDICT"
         sReplacementText = "VERDICT"
         wsyWordStyle = "Heading 1"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "SENTENCING"
         sReplacementText = "SENTENCING"
         wsyWordStyle = "Heading 1"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "COURT'S RULING"
         sReplacementText = "COURT'S RULING"
         wsyWordStyle = "Heading 1"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "ARGUMENT"
         sReplacementText = "ARGUMENT"
         wsyWordStyle = "Heading 1"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "BY M"
         sReplacementText = "BY M"
         wsyWordStyle = "Normal"
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, wsyWordStyle, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         sTextToFind = "TC " & Chr(34) & "TC" & Chr(34) & " "
         sReplacementText = "TC "
         wsyWordStyle = ""
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, bFormat:=True, bMatchCase:=True)
-        bMatchCase = ""
         
         
     End If
@@ -2220,11 +2190,10 @@ Public Sub pfTypeRoughDraftF()
     Set cJob = New Job
 
     Call pfCurrentCaseInfo                       'refresh transcript info
-    Call pfCheckFolderExistence
 
     Set oRoughDraft = CreateObject("Scripting.FileSystemObject")
 
-    If sJurisdiction = "Weber Nevada" Then
+    If cJob.CaseInfo.Jurisdiction = "Weber Nevada" Then
     
         If Not oRoughDraft.FileExists(cJob.DocPath.RoughDraft) Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberNV.docx", cJob.DocPath.RoughDraft
@@ -2241,14 +2210,14 @@ Public Sub pfTypeRoughDraftF()
     Else
     End If
 
-    If sJurisdiction = "Weber Bankruptcy" Then
+    If cJob.CaseInfo.Jurisdiction = "Weber Bankruptcy" Then
         If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "WeberBKSample.docx") Then
             FileCopy cJob.DocPath.TemplateFolder2 & "WeberNVSample.docx", cJob.DocPath.JobDirectoryN & "WeberNVSample.docx"
         End If
     Else
     End If
 
-    If sJurisdiction = "Weber Oregon" Then
+    If cJob.CaseInfo.Jurisdiction = "Weber Oregon" Then
         If Not oRoughDraft.FileExists(cJob.DocPath.RoughDraft) Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberOR.docx", cJob.DocPath.RoughDraft
         End If
@@ -2267,28 +2236,28 @@ Public Sub pfTypeRoughDraftF()
     Else
     End If
 
-    If sJurisdiction = "USBC Western Washington" Then
+    If cJob.CaseInfo.Jurisdiction = "USBC Western Washington" Then
         If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "BankruptcyWAGuide.pdf") Then
             FileCopy cJob.DocPath.TemplateFolder1 & "BankruptcyWAGuide.pdf", cJob.DocPath.JobDirectoryN & "BankruptcyWAGuide.pdf"
         End If
     Else
     End If
 
-    If sJurisdiction = "Food and Drug Administration" Then
+    If cJob.CaseInfo.Jurisdiction = "Food and Drug Administration" Then
         If Not oRoughDraft.FileExists(cJob.DocPath.RoughDraft) Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-FDA.docx", cJob.DocPath.RoughDraft
         End If
     Else
     End If
 
-    If sJurisdiction = "*Superior Court*" Then
+    If cJob.CaseInfo.Jurisdiction = "*Superior Court*" Then
         If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf") Then
             FileCopy cJob.DocPath.TemplateFolder1 & "CourtRules-WACounties.pdf", cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf"
         End If
     Else
     End If
     
-    If sJurisdiction = "*USBC*" Then
+    If cJob.CaseInfo.Jurisdiction = "*USBC*" Then
         If Not oRoughDraft.FileExists(cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf") Then
             FileCopy cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf", cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
         End If
@@ -2345,7 +2314,6 @@ Public Sub pfReplaceAQC()
 
     Call pfRoughDraftToCoverF
     Call FPJurors
-    Call pfTCEntryReplacement
     Call pfFindRepCitationLinks
 
 End Sub

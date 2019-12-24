@@ -12,43 +12,49 @@ Private Sub btnPriceQuote_Click()
     '============================================================================
 
     Dim iAudioLength As Long
+    Dim iDateDifference As Long
     Dim vWorkTimeAvailable As Long
     Dim sPageRate As String
     Dim dDeadline As Date
     Dim dDateDiff As Date
     Dim sPriceQuote As String
+    Dim sPageRate8 As String
+    Dim sPageRate7 As String
+    Dim sPageRate6 As String
+    Dim sPageRate5 As String
+    Dim sPageRate9 As String
+    Dim sPageRate10 As String
 
     iAudioLength = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtAudioLength].Value
 
     dDeadline = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtDeadline].Value
     dDateDiff = DateDiff("d", Now, dDeadline)
 
-    If iAudioLength > 865 Then
-        If dDateDiff > 29 Then
-            sPageRate = "2.65"
-        ElseIf dDateDiff < 30 And dDateDiff > 13 Then
-            sPageRate = "3.25"
-        ElseIf dDateDiff < 14 And dDateDiff > 6 Then
-            sPageRate = "3.75"
-        ElseIf dDateDiff < 7 Then
-            sPageRate = "4.25"
-        Else
-        End If
-    Else
-        If dDateDiff > 29 Then
-            sPageRate = "3.00"
-        ElseIf dDateDiff < 30 And dDateDiff > 13 Then
-            sPageRate = "3.50"
-        ElseIf dDateDiff < 14 And dDateDiff > 6 Then
-            sPageRate = "4.00"
-        ElseIf dDateDiff < 7 And dDateDiff > 2 Then
-            sPageRate = "4.75"
-        ElseIf dDateDiff < 3 Then
-            sPageRate = "5.25"
-        Else
-        End If
+    iDateDifference = Int(dDateDiff)
+
+    sPageRate10 = "2.50"
+    sPageRate6 = "2.65"
+    sPageRate7 = "3.25"
+    sPageRate8 = "3.75"
+    sPageRate9 = "4.25"
+    sPageRate5 = "5.25"
+    
+    If iDateDifference < 4 And iDateDifference > 0 Then
+        sPageRate = sPageRate5
+    ElseIf iDateDifference < 8 And iDateDifference > 2 Then
+        sPageRate = sPageRate9
+    ElseIf iDateDifference < 15 And iDateDifference > 6 Then
+        sPageRate = sPageRate8
+    ElseIf iDateDifference < 31 And iDateDifference > 13 Then
+        sPageRate = sPageRate7
+    ElseIf iDateDifference > 30 And iDateDifference < 45 Then
+        sPageRate = sPageRate6
+    ElseIf iDateDifference > 44 Then
+        sPageRate = sPageRate10
     End If
+    
     sPriceQuote = (((iAudioLength / 60) * 45) * sPageRate)
+    
     If sPriceQuote < 50 Then
         sPriceQuote = 50
     End If

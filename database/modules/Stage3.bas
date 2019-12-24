@@ -391,7 +391,7 @@ Public Sub fDynamicHeaders()
     
     Dim oRange As Range
     
-    
+    'TODO: Probably doesn't work properly, actual headings might need adjustment
     Dim cJob As Job
     Set cJob = New Job
     
@@ -416,19 +416,18 @@ Public Sub fDynamicHeaders()
 
     'set find style, not necessary for now
     'oWordDoc.Application.Selection.Find.Style = ActiveDocument.Styles("Heading 1")
-    Debug.Print oWordDoc.Fields.Count & " headings"
+    'Debug.Print oWordDoc.Fields.Count & " headings"
     x = 1
     y = 1
 
     ' Loop through fields/cross-references in transcript
-    Debug.Print UBound(sHeadings) & " headings in document"
+    'Debug.Print UBound(sHeadings) & " headings in document"
     sHeading = sHeadings(x)
-    Debug.Print "Current Heading: " & sHeading
+    'Debug.Print "Current Heading: " & sHeading
 
 
     'go to first heading
     oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToFirst, Count:=1, Name:=""
-        
         
     For x = 1 To UBound(sHeadings)
     
@@ -467,8 +466,8 @@ Public Sub fDynamicHeaders()
     x = 1
     y = 1
     ' Loop through fields/cross-references in transcript
-    Debug.Print UBound(sHeadings) & " headings in document"
-    Debug.Print "next field:  " & x & sHeadings(x)
+    'Debug.Print UBound(sHeadings) & " headings in document"
+    'Debug.Print "next field:  " & x & sHeadings(x)
 
     'go to first heading
     oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToFirst, Count:=1, Name:=""
@@ -476,7 +475,7 @@ Public Sub fDynamicHeaders()
     For x = 1 To UBound(sHeadings)
         sHeading = sHeadings(x)
     
-        Debug.Print "Current Heading: " & sHeading
+        'Debug.Print "Current Heading: " & sHeading
         
         
         'edit header for this section
@@ -487,15 +486,21 @@ Public Sub fDynamicHeaders()
         oWordDoc.Application.Selection.Font.Underline = wdUnderlineNone
         oWordDoc.Application.Selection.ParagraphFormat.LineSpacing = LinesToPoints(32888)
         
+        Dim sHeader1 As String
+        Dim sHeader2 As String
+        sHeader1 = "***WORKING COPY***" & Chr(10)
+        sHeader2 = " -- WITNESSNAME"
+        
         'go to first heading
         '***WORKING COPY***
-        oWordDoc.Application.Selection.TypeText Text:="***WORKING COPY***" & Chr(10)
+        oWordDoc.Application.Selection.TypeText Text:=sHeader1 & vbCr
         
         'insert heading and " -- "
         oWordDoc.Application.Selection.InsertCrossReference ReferenceType:="Heading", ReferenceKind:= _
                                                             wdContentText, ReferenceItem:=x, InsertAsHyperlink:=True, _
                                                             IncludePosition:=False, SeparateNumbers:=False, SeparatorString:=" "
-        oWordDoc.Application.Selection.TypeText Text:=" -- WITNESSNAME"
+                                                            
+        oWordDoc.Application.Selection.TypeText Text:=sHeader2
         
         'exit header
         oWordDoc.Application.Selection.EscapeKey
@@ -504,7 +509,7 @@ Public Sub fDynamicHeaders()
         
         oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1, Name:=""
         
-        Debug.Print "next field:  " & x + 1 & sHeadings(x + 1)
+        'Debug.Print "next field:  " & x + 1 & sHeadings(x + 1)
     Next
 
     x = 1
@@ -576,7 +581,7 @@ Public Sub pfHeaders()
     bFound = True
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    Debug.Print ("---------------------------------------------")
+    'Debug.Print ("---------------------------------------------")
     
 
     On Error Resume Next
@@ -603,7 +608,7 @@ Public Sub pfHeaders()
         
             sStyleName = "Heading " & intLevel
         
-            Debug.Print ("Heading Level:  " & intLevel & ", " & sCurrentHeading)
+            'Debug.Print ("Heading Level:  " & intLevel & ", " & sCurrentHeading)
         
             .Selection.Find.ClearFormatting
             .Selection.Find.Replacement.ClearFormatting
@@ -615,10 +620,15 @@ Public Sub pfHeaders()
             aStyleList(intItem) = sStyleName
             sStyleName = "Heading " & intLevel
             For Each StyleName In aStyleList
-                Debug.Print StyleName
+                'Debug.Print StyleName
             Next
         
             ReDim Preserve aStyleList(1 To UBound(aStyleList) + 1) As String
+        
+            'remove extra consecutive section breaks
+            Call pfSingleFindReplace("^b^b", "^b")
+            Call pfSingleFindReplace("^b^b", "^b")
+            Call pfSingleFindReplace("^b^b", "^b")
         
             With .Selection.Find
                 .Text = ""
@@ -666,7 +676,7 @@ Public Sub pfHeaders()
                 .MatchSoundsLike = False
                 .MatchAllWordForms = False
             End With
-            Debug.Print ("---------------------------------------------")
+            'Debug.Print ("---------------------------------------------")
         Next
     
         intItem = 1
@@ -718,7 +728,7 @@ Public Sub pfHeaders()
                 sStyleName = "Heading " & intLevel
                                         
                 iSectionIndex = sec.Index
-                Debug.Print ("Section Number:  " & iSectionIndex & "   |   " & "Headings Number:  " & iHeadingsNumber)
+                'Debug.Print ("Section Number:  " & iSectionIndex & "   |   " & "Headings Number:  " & iHeadingsNumber)
                 If iSectionNumber = 1 Then GoTo SkipFrontPage
                                                                  
                 If ActiveWindow.View.SplitSpecial <> wdPaneNone Then
@@ -765,7 +775,10 @@ Public Sub pfHeaders()
 SkipFrontPage:
             With sec
                 
-                .Footers(wdHeaderFooterPrimary).Range.Text = "www.aquoco.co   |   inquiries@aquoco.co"
+                .Footers(wdHeaderFooterPrimary).Range.Text = "www.aquoco.co   |   inquiries@aquoco.co" & vbCr & _
+                                                             cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2 & vbCr & _
+                                                             cJob.CaseInfo.CaseNumber1 & "   |   " & cJob.CaseInfo.CaseNumber2 & vbCr _
+                                                             & Format(cJob.HearingDate, "dddd, mmmm d, yyyy")
                 .Footers(wdHeaderFooterPrimary).Range.ParagraphFormat.Alignment = wdAlignParagraphCenter
             End With
                 

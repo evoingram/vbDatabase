@@ -1204,24 +1204,6 @@ Public Sub pfPriceQuoteEmail()
     ElseIf iDateDifference > 44 Then
         sPageRate = sPageRate10
     End If
-    '
-    'Else
-    '
-    '        If iDateDifference < 4 And iDateDifference > 0 Then
-    '            sPageRate = sPageRate5
-    '        ElseIf iDateDifference < 8 And iDateDifference > 3 Then
-    '            sPageRate = sPageRate4
-    '        ElseIf iDateDifference < 15 And iDateDifference > 7 Then
-    '            sPageRate = sPageRate3
-    '        ElseIf iDateDifference < 31 And iDateDifference > 14 Then
-    '            sPageRate = sPageRate2
-    '        ElseIf iDateDifference < 30 Then
-    '            sPageRate = sPageRate1
-    '        Else
-    '        End If
-    '
-    'End If
-
 
     iPageCount = Int((iAudioLength / 60) * 45)   'calculate PageCount
 
@@ -1233,17 +1215,7 @@ Public Sub pfPriceQuoteEmail()
     sSubtotal2 = sPageRate7 * iPageCount
     sSubtotal1 = sPageRate6 * iPageCount
     sSubtotal5 = sPageRate10 * iPageCount
-    '
-    'Else
-    '
-    '    'calculate Subtotal1, Subtotal2, Subtotal3, Subtotal4
-    '    sSubtotal1 = sPageRate1 * iPageCount
-    '    sSubtotal2 = sPageRate2 * iPageCount
-    '    sSubtotal3 = sPageRate3 * iPageCount
-    '    sSubtotal4 = sPageRate4 * iPageCount
-    '
-    'End If
-
+    
     sQueryName = "SELECT #" & dDeadline & "# AS Deadline, " & iAudioLength & " AS AudioLength, " & iPageCount & " AS PageCount, " _
                & sSubtotal1 & " AS Subtotal1, " & sSubtotal2 & " AS Subtotal2, " & _
                  sSubtotal3 & " AS Subtotal3, " & sSubtotal4 & " AS Subtotal4, " & sSubtotal5 & " AS Subtotal5;"

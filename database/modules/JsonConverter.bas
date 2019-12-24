@@ -836,7 +836,7 @@ Private Sub json_BufferAppend(ByRef json_Buffer As String, _
         json_BufferLength = json_BufferLength + json_AddedLength
     End If
 
-    ' Note: Namespacing with VBA.Mid$ doesn't work properly here, throwing compile error:
+    ' Namespacing with VBA.Mid$ doesn't work properly here, throwing compile error:
     ' Function call on left-hand side of assignment must return Variant or Object
     Mid$(json_Buffer, json_BufferPosition + 1, json_AppendLength) = CStr(json_Append)
     json_BufferPosition = json_BufferPosition + json_AppendLength
