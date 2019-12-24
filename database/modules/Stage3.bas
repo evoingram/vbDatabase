@@ -271,7 +271,7 @@ Public Sub pfCreateRegularPDF()
             Set oWordApp = CreateObject("Word.Application")
         End If
         
-        Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+        Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
         
         On Error GoTo 0
         
@@ -391,7 +391,6 @@ Public Sub fDynamicHeaders()
     
     Dim oRange As Range
     
-    'TODO: Probably doesn't work properly, actual headings might need adjustment
     Dim cJob As Job
     Set cJob = New Job
     
@@ -542,13 +541,14 @@ Public Sub pfHeaders()
     ' Call command: Call pfHeaders
     ' Description : add sections and headers programmatically
     '============================================================================
-
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Step 8 of 10:  Processing headers..."
     Dim sCurrentSection As String
     Dim sCurrentHeading As String
     Dim aStyleList() As String
     Dim sStyleName As String
     ReDim aStyleList(1 To 1) As String
     Dim sListStyle As String
+    Dim nSectionNum As Integer
     
     Dim astrHeadings As Variant
     Dim StyleName As Variant
@@ -577,34 +577,53 @@ Public Sub pfHeaders()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     bFound = True
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     'Debug.Print ("---------------------------------------------")
     
-
-    On Error Resume Next
-    Set oWordApp = GetObject(, "Word.Application")
-
-    If Err <> 0 Then
-        Set oWordApp = CreateObject("Word.Application")
-    End If
-
-    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
 
     oWordDoc.Application.Visible = True
 
+    'remove extra consecutive section breaks
+    Call pfSingleTCReplaceAll("^b^b^b^b^b^b^b^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b^b^b^b^b^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b^b^b^b^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b^b^b^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b^b^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b^b", "^m")
+    Call pfSingleTCReplaceAll("^b^b", "^m")
+    
+    With oWordDoc
+            
+        nSectionNum = .Sections.Count
+        
+          For nSectionNum = nSectionNum To 1 Step -1
+            With .Sections(nSectionNum).Range.PageSetup
+              If .SectionStart = wdSectionNewPage Then
+                .SectionStart = wdSectionContinuous
+              End If
+            End With
+          Next nSectionNum
+         
+          .Application.ScreenUpdating = False
+
+    End With
+    
 
     With oWordDoc.Application
-
-
+        .ScreenUpdating = True
+        
+        Dim indexHeading As Long
         astrHeadings = oWordDoc.GetCrossReferenceItems(wdRefTypeHeading)
+        For indexHeading = LBound(astrHeadings) To UBound(astrHeadings)
     
-        For intItem = LBound(astrHeadings) To UBound(astrHeadings)
-    
-            sCurrentHeading = astrHeadings(intItem)
-            intLevel = GetLevel(CStr(astrHeadings(intItem)))
+            sCurrentHeading = astrHeadings(indexHeading)
+            intLevel = GetLevel(CStr(astrHeadings(indexHeading)))
         
             sStyleName = "Heading " & intLevel
         
@@ -617,7 +636,7 @@ Public Sub pfHeaders()
             sStyleName = "Heading " & intLevel
             'aStyleList(intLevel) = sStyleName
     
-            aStyleList(intItem) = sStyleName
+            aStyleList(indexHeading) = sStyleName
             sStyleName = "Heading " & intLevel
             For Each StyleName In aStyleList
                 'Debug.Print StyleName
@@ -625,10 +644,6 @@ Public Sub pfHeaders()
         
             ReDim Preserve aStyleList(1 To UBound(aStyleList) + 1) As String
         
-            'remove extra consecutive section breaks
-            Call pfSingleFindReplace("^b^b", "^b")
-            Call pfSingleFindReplace("^b^b", "^b")
-            Call pfSingleFindReplace("^b^b", "^b")
         
             With .Selection.Find
                 .Text = ""
@@ -653,7 +668,6 @@ Public Sub pfHeaders()
             .Selection.HomeKey Unit:=wdLine
         
             'insert continuous section break
-            'Selection.InsertBreak Type:=wdSectionBreakContinuous
             .Selection.Paragraphs(1).Range.InsertBreak Type:=wdSectionBreakContinuous
         
             '.Selection.HeaderFooter.LinkToPrevious = False
@@ -662,6 +676,7 @@ Public Sub pfHeaders()
             .Selection.Find.Replacement.ClearFormatting
         
             .Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1
+            
             sStyleName = "Heading " & intLevel
         
             With .Selection.Find
@@ -676,58 +691,40 @@ Public Sub pfHeaders()
                 .MatchSoundsLike = False
                 .MatchAllWordForms = False
             End With
+            
+            .Selection.GoToNext wdGoToPage
+            
             'Debug.Print ("---------------------------------------------")
-        Next
     
-        intItem = 1
-    
-        For intItem = 1 To oWordDoc.Sections.Count
-            'add headers to each section
-            SendKeys "^{HOME}"
-        
-        
-            For Each StyleName In aStyleList
-                For Each sec In oWordDoc.Sections
-                    With sec.Headers(wdHeaderFooterPrimary)
-                        'header formatting
-                        '.Selection.HeaderFooter.LinkToPrevious = False
-                        .LinkToPrevious = False
-                    End With
-                Next sec
-            Next StyleName
-        Next
-        
-        oWordDoc.Application.Selection.HomeKey Unit:=wdStory
+            With oWordDoc.Sections(indexHeading)
             
-        intItem = 2
-    
-        oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1
-    
-        'For intItem = 2 To oWordDoc.Sections.Count + 1
-        astrHeadings = oWordDoc.GetCrossReferenceItems(wdRefTypeHeading)
-        
-        For Each sec In oWordDoc.Sections
-            
-            iSectionIndex = sec.Index
+                With .Range.PageSetup
+                  If .SectionStart = wdSectionNewPage Then
+                    .SectionStart = wdSectionContinuous
+                  End If
+                End With
+                'header formatting
+            'Debug.Print astrHeadings(indexHeading)
+                
+            iSectionIndex = indexHeading
             iHeadingsNumber = iSectionIndex - 1
             iSectionNumber = iSectionIndex
                         
             If iHeadingsNumber > UBound(astrHeadings) Then GoTo NextItem
-            If iHeadingsNumber = 0 Then iHeadingsNumber = 1
             If UBound(astrHeadings) = 0 Then GoTo NextItem
+            If iHeadingsNumber = 0 Then iHeadingsNumber = 1
             sCurrentHeading = astrHeadings(iHeadingsNumber)
             intLevel = GetLevel(CStr(astrHeadings(iHeadingsNumber)))
             sStyleName = "Heading " & intLevel
-            iMaxHeadingsCount = UBound(astrHeadings)
-                
+            iMaxHeadingsCount = UBound(astrHeadings) - 1
             'add headers to each section
-            If iSectionNumber <= iMaxHeadingsCount + 1 Then
+            If iSectionNumber <= iMaxHeadingsCount Then
                 sCurrentHeading = astrHeadings(iHeadingsNumber)
                 intLevel = GetLevel(CStr(astrHeadings(iHeadingsNumber)))
                     
                 sStyleName = "Heading " & intLevel
                                         
-                iSectionIndex = sec.Index
+                iSectionIndex = intItem
                 'Debug.Print ("Section Number:  " & iSectionIndex & "   |   " & "Headings Number:  " & iHeadingsNumber)
                 If iSectionNumber = 1 Then GoTo SkipFrontPage
                                                                  
@@ -741,13 +738,17 @@ Public Sub pfHeaders()
                 ActiveWindow.ActivePane.View.SeekView = wdSeekCurrentPageHeader
                     
                 With oWordDoc.Application
+                    Selection.HeaderFooter.LinkToPrevious = False
                     Selection.TypeText Text:="***WORKING COPY***"
                     Selection.Collapse Direction:=wdCollapseEnd
                     Selection.TypeParagraph
+                    
+                    On Error Resume Next
                     Selection.InsertCrossReference ReferenceType:="Heading", ReferenceKind:= _
                                                    wdContentText, ReferenceItem:=iHeadingsNumber, InsertAsHyperlink:=True, _
                                                    IncludePosition:=False, SeparateNumbers:=False, SeparatorString:=" "
-                        
+                    On Error GoTo 0
+                    
                     If sStyleName = "Heading 2" Then Selection.TypeText Text:=" -- WITNESSNAME"
                         
                     Selection.MoveUp Unit:=wdLine, Count:=1, Extend:=wdExtend
@@ -765,28 +766,32 @@ Public Sub pfHeaders()
                         .MatchSoundsLike = False
                         .MatchAllWordForms = False
                     End With
-                    Selection.Style = ActiveDocument.Styles("AQC-Header")
+                    Selection.Style = oWordDoc.Styles("AQC-Working")
                     
                 End With
                     
-                oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=2
-                    
             End If
 SkipFrontPage:
-            With sec
-                
+
+
                 .Footers(wdHeaderFooterPrimary).Range.Text = "www.aquoco.co   |   inquiries@aquoco.co" & vbCr & _
                                                              cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2 & vbCr & _
                                                              cJob.CaseInfo.CaseNumber1 & "   |   " & cJob.CaseInfo.CaseNumber2 & vbCr _
                                                              & Format(cJob.HearingDate, "dddd, mmmm d, yyyy")
                 .Footers(wdHeaderFooterPrimary).Range.ParagraphFormat.Alignment = wdAlignParagraphCenter
-            End With
+                .Footers(wdHeaderFooterPrimary).Range.Style = "AQC-Working"
                 
-        Next sec
-NextItem:
-        'Next intItem
+            End With
             
+            oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1
+            oWordDoc.Application.Selection.Goto What:=wdGoToPage, which:=wdGoToNext, Count:=1
+            
+        Next indexHeading
+
+    
     End With
+        
+NextItem:
 
     oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
     oWordDoc.Close

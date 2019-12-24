@@ -102,7 +102,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
 
     sArray = Split(sExportTopic, "\")
 
-    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder1 & sArray(1) & "-Template.docx", "Word.Document") 'sArray(1)/export topic is folder\subject
+    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder1 & sArray(1) & "-Template.docx") 'sArray(1)/export topic is folder\subject
     oWordAppDoc.Application.Visible = False
 
     oWordAppDoc.MailMerge.OpenDataSource _
@@ -119,7 +119,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
         
     oWordAppDoc.MailMerge.Execute
     oWordAppDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
-    oWordAppDoc.Application.ActiveDocument.ExportAsFixedFormat outputFileName:=cJob.DocPath.JobDirectoryGN & sArray(1) & ".pdf", ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
+    'oWordAppDoc.Application.ActiveDocument.ExportAsFixedFormat outputFileName:=cJob.DocPath.JobDirectoryGN & sArray(1) & ".pdf", ExportFormat:=wdExportFormatPDF, CreateBookmarks:=wdExportCreateHeadingBookmarks
     oWordAppDoc.Application.ActiveDocument.SaveAs FileName:=cJob.DocPath.JobDirectoryGN & sArray(1) & ".docx"
     oWordAppDoc.Application.ActiveDocument.Close
     Set oWordAppDoc = Nothing

@@ -112,6 +112,7 @@ Public Sub pfFindRepCitationLinks()
     Set cJob = New Job
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] 'job number
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Step 10 of 10:  Processing citations found..."
     
     x = 1
     
@@ -176,7 +177,7 @@ Public Sub pfFindRepCitationLinks()
         If iStopPos = 0 Then GoTo ExitLoop
         sCurrentTerm = Mid$(sCurrentSearch, iStartPos + Len(sBeginCHT), iStopPos - iStartPos - Len(sEndCHT))
         x = InStr(iStopPos, sCurrentSearch, sBeginCHT, vbTextCompare)
-        Debug.Print x
+        'Debug.Print x
         sCurrentTerm = Left(sCurrentTerm, Len(sCurrentTerm) - 4)
         
         'add term to array which we will use to search document again later
@@ -184,10 +185,10 @@ Public Sub pfFindRepCitationLinks()
         sSearchTermArray(UBound(sSearchTermArray)) = sCurrentTerm
         'construct sql statement from this
         sCurrentLinkSQL = sCurrentLinkSQL & sCurrentTerm & Chr(34)
-        Debug.Print "Current Search Term:  " & sCurrentTerm
-        Debug.Print "Current Search Array:  " & Join(sSearchTermArray, ", ")
-        Debug.Print "SQL Statement:  " & sCurrentLinkSQL
-        Debug.Print "----------------------------------------------------------"
+        'Debug.Print "Current Search Term:  " & sCurrentTerm
+        'Debug.Print "Current Search Array:  " & Join(sSearchTermArray, ", ")
+        'Debug.Print "SQL Statement:  " & sCurrentLinkSQL
+        'Debug.Print "----------------------------------------------------------"
         
         sOriginalSearchTerm = ""
         
@@ -199,9 +200,9 @@ Public Sub pfFindRepCitationLinks()
     
 ExitLoop:
     sCurrentLinkSQL = sCurrentLinkSQL & ";"
-    Debug.Print "Final Search Array:  " & Join(sSearchTermArray, ", ")
-    Debug.Print "Final SQL Statement:  " & sCurrentLinkSQL
-    Debug.Print "----------------------------------------------------------"
+    'Debug.Print "Final Search Array:  " & Join(sSearchTermArray, ", ")
+    'Debug.Print "Final SQL Statement:  " & sCurrentLinkSQL
+    'Debug.Print "----------------------------------------------------------"
     'MsgBox "I'm done"
     
         
@@ -213,11 +214,11 @@ ExitLoop:
             
     sInputState = InputBox("Enter name of state here.  Will also search federal and special court jurisdictions.")
     For x = 1 To (UBound(sSearchTermArray) - 1)
-        Debug.Print UBound(sSearchTermArray) - 1
-        Debug.Print x
+        'Debug.Print UBound(sSearchTermArray) - 1
+        'Debug.Print x
         sInitialSearchSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation] = " & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & ";"
         'look each one up in CitationHyperlinks
-        Debug.Print "Initial Search SQL = " & sInitialSearchSQL
+        'Debug.Print "Initial Search SQL = " & sInitialSearchSQL
         Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
                 
         On Error Resume Next

@@ -242,7 +242,7 @@ Public Sub pfRoughDraftToCoverF()
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
-    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
 
     oWordApp.Visible = True
     On Error GoTo 0
@@ -267,7 +267,7 @@ Public Sub pfRoughDraftToCoverF()
     'Documents("RoughDraft.docx").Close wdDoNotSaveChanges
     
     On Error Resume Next
-    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
         Set oWordDoc = Documents.Open(cJob.DocPath.CourtCover)
@@ -285,6 +285,8 @@ Public Sub pfRoughDraftToCoverF()
     qdf.Parameters(0) = sCourtDatesID
     Set drSpeakerName = qdf.OpenRecordset
     
+    'Forms![NewMainMenu].Form!lblFlash.Value = ""
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Step 1 of 10:  Processing speakers..."
     If Not (drSpeakerName.EOF And drSpeakerName.BOF) Then
         drSpeakerName.MoveFirst
         Do Until drSpeakerName.EOF = True
@@ -391,7 +393,7 @@ Public Sub pfRoughDraftToCoverF()
             'back up to the top
             DoEvents
         Loop
-    
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Step 2 of 10:  Processing random bad characters..."
         'MsgBox "Finished ing through dynamic speakers."
         
         drSpeakerName.Close                      'Close the recordset
@@ -435,7 +437,7 @@ Public Sub pfRoughDraftToCoverF()
         pfDelay 1
             
         
-    
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Step 3 of 10:  Processing Q/A..."
         '**********************************Question and Answer / Q&A
         
         sTextToFind = " snlq "
@@ -494,7 +496,7 @@ Public Sub pfRoughDraftToCoverF()
         pfDelay 1
             
         
-    
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Step 4 of 10:  Processing static speakers..."
         
         '**********************************THE COURT 1
         sTextToFind = " snl1 "
@@ -1036,7 +1038,7 @@ Public Sub pfRoughDraftToCoverF()
         
         pfDelay 1
             
-        
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Step 5 of 10:  Processing speaker starting uppercases..."
     
         
         '**********************************
@@ -1305,7 +1307,7 @@ Public Sub pfRoughDraftToCoverF()
         x = 18                                   '18 is number of first dynamic speaker
         
         sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-        
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Step 6 of 10:  Processing BY speakers..."
         Set qdf = CurrentDb.QueryDefs(qnViewJobFormAppearancesQ)
         qdf.Parameters(0) = sCourtDatesID
         Set drSpeakerName = qdf.OpenRecordset
@@ -1372,7 +1374,7 @@ Public Sub pfRoughDraftToCoverF()
         'MsgBox "Finished looping through A: to Z:."
         
         '********************************** various style-related F/Rs
-        
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Step 7 of 10:  Processing headings..."
         If InStr(sJurisdiction, "AVT") > 0 Or InStr(sJurisdiction, "eScribers") > 0 Then
         
             sTextToFind = "Q.  "
@@ -1583,23 +1585,15 @@ Public Sub pfRoughDraftToCoverF()
         
     End If
     
-    drSpeakerName.Close                          'close the recordset
-    Set drSpeakerName = Nothing                  'clean up
-
-
-
-    On Error Resume Next
-    oWordDoc.Close (wdSaveChanges)
-    oWordApp.Quit
+    drSpeakerName.Close
+    Set drSpeakerName = Nothing
 
     qdf.Close
 
     If sJurisdiction <> "FDA" And sJurisdiction <> "Food and Drug Administration" And sJurisdiction <> "eScribers NH" And sJurisdiction <> "eScribers Bankruptcy" And sJurisdiction <> "eScribers New Jersey" Then
         Call pfHeaders
-        Call fDynamicHeaders
+        'Call fDynamicHeaders
     End If
-
-    On Error GoTo 0
 
     Call pfClearGlobals
 End Sub
@@ -2311,11 +2305,16 @@ Public Sub pfReplaceAVT()
 End Sub
 
 Public Sub pfReplaceAQC()
-
+    Dim cJob As Job
+    Set cJob = New Job
+    cJob.FindFirst "ID=" & Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    'Debug.Print "---------------"
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Creating transcript for Job. No:  " & sCourtDatesID
     Call pfRoughDraftToCoverF
     Call FPJurors
     Call pfFindRepCitationLinks
-
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    'Debug.Print "---------------"
 End Sub
 
 Public Sub pfReplaceMass()
@@ -2360,7 +2359,7 @@ Public Sub pfRoughDraftCFMass()
     On Error GoTo 0
     oWordApp.Visible = True
 
-    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
     With oWordDoc                                'insert rough draft at RoughBKMK bookmark
 
         If .bookmarks.Exists("RoughBKMK") = True Then
@@ -2387,7 +2386,7 @@ Public Sub pfRoughDraftCFMass()
     On Error GoTo 0
     oWordApp.Visible = True
 
-    Set oWordDoc = GetObject(cJob.DocPath.CourtCover, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
 
     x = 18                                       '18 is number of first dynamic speaker
     

@@ -193,7 +193,7 @@ Public Sub fApplyPayPalPayment()
     
     End If
 
-    MsgBox "Finished looping through PayPal Payments."
+    Debug.Print "Finished looping through PayPal Payments."
 
     rstOLPayPalPmt.Close
     Set rstOLPayPalPmt = Nothing
@@ -271,8 +271,8 @@ Public Sub fIsFactoringApproved()
     svURL = "https://www.paypal.com"
     DoCmd.OpenQuery qUPQ, acViewNormal, acReadOnly
     DoCmd.OpenQuery "INVUpdateUnitPriceQuery", acViewNormal, acEdit
-    DoCmd.Close (qUPQ)
-    DoCmd.Close ("InvUpdateUnitPriceQuery")
+    DoCmd.Close acQuery, qUPQ
+    DoCmd.Close acQuery, "InvUpdateUnitPriceQuery"
 
     'check if approved for factoring
     vFA = sFactoringApproved

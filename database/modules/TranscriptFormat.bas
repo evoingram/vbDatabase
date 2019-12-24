@@ -1367,6 +1367,7 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
     
     Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
     oWordDoc.Visible = False
+    oWordDoc.Application.Selection.HomeKey Unit:=wdStory
 
     With oWordDoc.Application
 
@@ -1762,7 +1763,7 @@ Public Sub FPJurors()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     x = 101                                      '101 is number of first PROSPECTIVE JUROR
     On Error Resume Next
-
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Step 9 of 10:  Processing prospective juror replacements..."
     Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
@@ -2129,7 +2130,7 @@ Public Sub pfTCEntryReplacement()
         End With
     End If
 ParenDone:
-    MsgBox "Finished looping through TC entries for the various parties."
+    'Debug.Print "Finished looping through TC entries for the various parties."
 
     rstViewJFAppQ.Close
     Set rstViewJFAppQ = Nothing
