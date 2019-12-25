@@ -73,7 +73,6 @@ Public Sub fApplyShipDateTrackingNumber()
     
         Do Until rstCourtDates.EOF = True
     
-                        
             'get tracking number and ship date
             rstCourtDates.Fields("ShipDate").Value = vShipDate
             rstCourtDates.Fields("ID").Value = sCourtDatesID

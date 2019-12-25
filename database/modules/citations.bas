@@ -160,7 +160,8 @@ Public Sub pfFindRepCitationLinks()
     
     Set rCurrentSearch = oWordDoc.Range
     sCurrentSearch = rCurrentSearch.Text
-    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) 'TODO: add rules/regs tables
+    sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34)
+    'SELECT * FROM CitationHyperlinks WHERE [CitationHyperlinks].[FindCitation]="Miranda" UNION SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]="Miranda";
     'Loop sCurrentSearch till you can't find any more matching "terms"
     'x = UBound(sSearchTermArray) - LBound(sSearchTermArray) + 1
     Debug.Print x
@@ -184,7 +185,7 @@ Public Sub pfFindRepCitationLinks()
         ReDim Preserve sSearchTermArray(UBound(sSearchTermArray) + 1)
         sSearchTermArray(UBound(sSearchTermArray)) = sCurrentTerm
         'construct sql statement from this
-        sCurrentLinkSQL = sCurrentLinkSQL & sCurrentTerm & Chr(34)
+        sCurrentLinkSQL = sCurrentLinkSQL & sCurrentTerm & Chr(34) & " UNION SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]=" & sCurrentTerm & Chr(34)
         'Debug.Print "Current Search Term:  " & sCurrentTerm
         'Debug.Print "Current Search Array:  " & Join(sSearchTermArray, ", ")
         'Debug.Print "SQL Statement:  " & sCurrentLinkSQL
@@ -216,7 +217,10 @@ ExitLoop:
     For x = 1 To (UBound(sSearchTermArray) - 1)
         'Debug.Print UBound(sSearchTermArray) - 1
         'Debug.Print x
-        sInitialSearchSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation] = " & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & ";"
+        'SELECT * FROM CitationHyperlinks WHERE [CitationHyperlinks].[FindCitation]="Miranda" UNION SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]="Miranda";
+        sInitialSearchSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & _
+                            " UNION " & _
+                            "SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]=" & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & ";"
         'look each one up in CitationHyperlinks
         'Debug.Print "Initial Search SQL = " & sInitialSearchSQL
         Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
@@ -371,7 +375,7 @@ ExitLoop:
                                 
                 Case Else
                     'enter choice into database
-                    Set rstCurrentHyperlink = CurrentDb.OpenRecordset("CitationHyperlinks")
+                    Set rstCurrentHyperlink = CurrentDb.OpenRecordset("CitationHyperlinks1")
                     rstCurrentHyperlink.AddNew
                     rstCurrentHyperlink.Fields("FindCitation").Value = sOriginalSearchTerm 'sQFindCitation
                                 
