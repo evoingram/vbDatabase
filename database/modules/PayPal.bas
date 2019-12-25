@@ -66,7 +66,7 @@ Private sTemp As String
 
 Public Sub fSendPPEmailFactored()
     'generates factored invoice email for pp
-    Dim sInvoiceNumber As String
+    'Dim sInvoiceNumber As String
     Dim sName As String
     Dim vPPInvoiceNo As String
     Dim sHTMLPPB As String
@@ -82,6 +82,7 @@ Public Sub fSendPPEmailFactored()
     Dim oWordEditor As Word.editor
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
+    Dim oWordDoc1 As New Word.Document
 
     Dim qdf As QueryDef
     Dim rstQuery As DAO.Recordset
@@ -94,17 +95,17 @@ Public Sub fSendPPEmailFactored()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fPPGenerateJSONInfo                     'refreshes some necessary info
-    Call pfGetOrderingAttorneyInfo               'refreshes some necessary info
-    Call pfCurrentCaseInfo                       'refreshes some necessary info
+    'Call pfGetOrderingAttorneyInfo               'refreshes some necessary info
+    'Call pfCurrentCaseInfo                       'refreshes some necessary info
 
     Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
-    sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
-    sParty1 = rstQuery.Fields("Party1").Value
-    sParty2 = rstQuery.Fields("Party2").Value
-    sName = sFirstName & " " & sLastName
+    'sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
+    'sParty1 = rstQuery.Fields("Party1").Value
+    'sParty2 = rstQuery.Fields("Party2").Value
+    sName = cJob.App0.FirstName & " " & cJob.App0.LastName
 
     If IsNull(rstQuery.Fields("TRinv.PPID").Value) Then
         Call fPPDraft
@@ -348,9 +349,8 @@ Public Sub fSendPPEmailFactored()
         With oOutlookMail                        'email that will also include pp button
             '@Ignore UnassignedVariableUsage
             .To = sToEmail
-            .CC = sCompanyEmail
-            .Subject = "Transcript Delivery & Invoice for " & sName & ", " & sParty1 & " v. " & sParty2
-            .BodyFormat = olFormatRichText
+            .CC = cJob.App0.EmailAddress
+            .Subject = "Transcript Delivery & Invoice for " & sName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
             .Display
@@ -449,11 +449,11 @@ Beginning:
         '.setRequestHeader "Authorization", "Bearer " & sAuth
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
-        Debug.Print apiWaxLRS
+        'Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
         sToken = parsed.item("access_token")          'third level array
         .abort
-        Debug.Print "--------------------------------------------"
+        'Debug.Print "--------------------------------------------"
     End With
       
     '@Ignore UnassignedVariableUsage
@@ -476,7 +476,7 @@ Beginning:
                                                                   "first_name" & Chr(34) & ": " & Chr(34) & cJob.App0.FirstName & Chr(34) & "," & Chr(34) & _
                                                                   "last_name" & Chr(34) & ": " & Chr(34) & cJob.App0.LastName & Chr(34) & "}]," & Chr(34) & _
                                                                   "shipping_info" & Chr(34) & ": {" & Chr(34) & _
-                                                                  "first_name" & Chr(34) & ": " & Chr(34) & cJob.App0.FirstName & CBhr(34) & "," & Chr(34) & _
+                                                                  "first_name" & Chr(34) & ": " & Chr(34) & cJob.App0.FirstName & Chr(34) & "," & Chr(34) & _
                                                                   "last_name" & Chr(34) & ": " & Chr(34) & cJob.App0.LastName & Chr(34) & "," & Chr(34) & _
                                                                   "address" & Chr(34) & ": {" & Chr(34) & "line1" & Chr(34) & ": " & Chr(34) & sAddress2 & Chr(34) & "," & Chr(34) & _
                                                                   "city" & Chr(34) & ": " & Chr(34) & cJob.App0.City & Chr(34) & "," & Chr(34) & _
@@ -533,12 +533,12 @@ Beginning:
         .setRequestHeader "content-type", "application/json"
         .setRequestHeader "Authorization", "Bearer " & sToken
         json5 = json1 & json2 & json3 & json4
-        Debug.Print json5
+        'Debug.Print json5
         .send json5
         apiWaxLRS = .responseText
         sToken = ""
         .abort
-        Debug.Print apiWaxLRS
+        'Debug.Print apiWaxLRS
         'Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
@@ -555,13 +555,13 @@ Beginning:
     '    vErrorIssue = rep("field")
     '    vErrorDetails = rep("issue")
     'Next
-    Debug.Print "--------------------------------------------"
-    Debug.Print "Error Name:  " & vErrorName
-    Debug.Print "Error Message:  " & vErrorMessage
-    Debug.Print "Error Info Link:  " & vErrorILink
+    'Debug.Print "--------------------------------------------"
+    'Debug.Print "Error Name:  " & vErrorName
+    'Debug.Print "Error Message:  " & vErrorMessage
+    'Debug.Print "Error Info Link:  " & vErrorILink
     'Debug.Print "Error Field:  " & vErrorIssue
     'Debug.Print "Error Details:  " & vErrorDetails
-    Debug.Print "--------------------------------------------"
+    'Debug.Print "--------------------------------------------"
     'Next
     Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & vInvoiceID
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
@@ -651,6 +651,13 @@ Public Sub fPayPalUpdateCheck()
     
     Dim parsed As Dictionary
     
+    
+    Dim cJob As Job
+    Set cJob = New Job
+    
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     Call fPPGetInvoiceInfo
 
     sQueryName = "QPPStatus"
@@ -682,7 +689,7 @@ Public Sub fPayPalUpdateCheck()
                 vInvoiceID = Replace(Replace(vInvoiceID, " ", ""), "-", "")
             
                 sURL = "https://api.paypal.com/v1/oauth2/token/"
-                sEmail = sCompanyEmail
+                sEmail = cJob.App0.EmailAddress
                 '  https://api.paypal.com/v1/oauth2/token \
                 'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
                 sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
@@ -698,7 +705,7 @@ Public Sub fPayPalUpdateCheck()
                     '.setRequestHeader "Authorization", "Bearer " & sAuth
                     .send ("grant_type=client_credentials")
                     apiWaxLRS = .responseText
-                    Debug.Print apiWaxLRS
+                    'Debug.Print apiWaxLRS
                     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
                     sToken = parsed("access_token") 'third level array
                     .abort
@@ -720,8 +727,8 @@ Public Sub fPayPalUpdateCheck()
                     apiWaxLRS = .responseText
                     sToken = ""
                     .abort
-                    Debug.Print apiWaxLRS
-                    Debug.Print "--------------------------------------------"
+                    'Debug.Print apiWaxLRS
+                    'Debug.Print "--------------------------------------------"
                 End With
                 Set parsed = JsonConverter.ParseJson(apiWaxLRS)
                 sInvoiceNumber = parsed("number") 'third level array
@@ -772,7 +779,7 @@ Public Sub fSendPPEmailBalanceDue()
     ' Description : sends PayPal email for balance due
     '============================================================================
     
-    Dim sName As String
+    'Dim sName As String
     Dim vPPInvoiceNo As String
     Dim sHTMLPPB As String
     Dim vPPLink As String
@@ -801,20 +808,16 @@ Public Sub fSendPPEmailBalanceDue()
     cJob.FindFirst "ID=" & sCourtDatesID
     Call fPPGenerateJSONInfo
 
-
-
-    Call pfGetOrderingAttorneyInfo
-    Call pfCurrentCaseInfo
+    'Call pfGetOrderingAttorneyInfo
+    'Call pfCurrentCaseInfo
 
     Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
-    sParty1 = rstQuery.Fields("Party1").Value
-    sParty2 = rstQuery.Fields("Party2").Value
-    sName = sFirstName & " " & sLastName
-    vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
-    vPPInvoiceNo = Right(vPPInvoiceNo, 20)
+    'sName = cJob.App0.FirstName & " " & cJob.App0.LastName
+    'vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
+    vPPInvoiceNo = Right(cJob.PPID, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
 
     'create pp invoice link
@@ -1055,8 +1058,8 @@ Public Sub fSendPPEmailBalanceDue()
         With oOutlookMail
             '@Ignore UnassignedVariableUsage
             .To = sToEmail
-            .CC = sCompanyEmail
-            .Subject = "Balance Due for " & sName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
+            .CC = cJob.App0.EmailAddress
+            .Subject = "Balance Due for " & cJob.App0.FirstName & " " & cJob.App0.LastName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             .BodyFormat = olFormatRichText
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
@@ -1199,8 +1202,8 @@ Public Sub fSendPPEmailBalanceDue()
         With oOutlookMail
             '@Ignore UnassignedVariableUsage
             .To = sToEmail
-            .CC = sCompanyEmail
-            .Subject = "Balance Due for " & sName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
+            .CC = cJob.App0.EmailAddress
+            .Subject = "Balance Due for " & cJob.App0.FirstName & " " & cJob.App0.LastName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             .BodyFormat = olFormatRichText
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
@@ -1229,7 +1232,7 @@ Public Sub fSendPPEmailDeposit()
     ' Description : generates PayPal email for deposit
     '============================================================================
     
-    Dim sName As String
+    'Dim sName As String
     Dim vPPInvoiceNo As String
     Dim sHTMLPPB As String
     Dim vPPLink As String
@@ -1246,7 +1249,7 @@ Public Sub fSendPPEmailDeposit()
     Dim oWordDoc1 As New Word.Document
 
     Dim qdf As QueryDef
-    Dim rstQuery As DAO.Recordset
+    'Dim rstQuery As DAO.Recordset
     Dim iFileNumIn As Long
     Dim iFileNumOut As Long
     
@@ -1260,17 +1263,16 @@ Public Sub fSendPPEmailDeposit()
 
     Call fPPGenerateJSONInfo                     'refreshes some info, not relevant for purposes of this code being on GH
 
-
     'paste PPButton html into mail merged invoice/PQ at both bookmarks "PPButton" bookmark or #PPB1# AND "PPButton2" or #PPB2#
 
-    Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
+    'Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
 
-    qdf.Parameters(0) = sCourtDatesID
-    Set rstQuery = qdf.OpenRecordset
-    vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
-    vPPInvoiceNo = Right(vPPInvoiceNo, 20)
+    'qdf.Parameters(0) = sCourtDatesID
+    'Set rstQuery = qdf.OpenRecordset
+    'vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
+    vPPInvoiceNo = Right(cJob.PPID, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
-    sName = sFirstName & " " & sLastName
+    'sName = cJob.App0.FirstName & " " & cJob.App0.LastName
     sToEmail = sNotes
 
     'create pp invoice link
@@ -1479,10 +1481,10 @@ Public Sub fSendPPEmailDeposit()
         Set oWordApp = Nothing
         Set oWordDoc = Nothing
         
-        rstQuery.Close
-        Set rstQuery = Nothing
-        qdf.Close
-        Set qdf = Nothing
+        'rstQuery.Close
+        'Set rstQuery = Nothing
+        'qdf.Close
+        'Set qdf = Nothing
         Set oOutlookApp = CreateObject("Outlook.Application")
         Set oOutlookMail = oOutlookApp.CreateItem(0)
         On Error Resume Next
@@ -1494,7 +1496,7 @@ Public Sub fSendPPEmailDeposit()
         With oOutlookMail                        'now, you should have an e-mail with a PP button as well as an invoice with two PP buttons on it.
             .To = sToEmail
             .CC = sCompanyEmail
-            .Subject = "Deposit Invoice for " & sName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
+            .Subject = "Deposit Invoice for " & cJob.App0.FirstName & " " & cJob.App0.LastName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             .BodyFormat = olFormatRichText
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
@@ -1738,19 +1740,19 @@ Public Sub fPPRefund()
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
-    sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
+    'sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
     'get pp invoice ID
-    vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
-    sPaymentSum = rstQuery.Fields("TRInv.PaymentSum").Value
-    sFinalPrice = rstQuery.Fields("TRInv.FinalPrice").Value
-    vPPInvoiceNo = Right(vPPInvoiceNo, 20)
-    vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
+    'vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
+    'sPaymentSum = rstQuery.Fields("TRInv.PaymentSum").Value
+    'sFinalPrice = rstQuery.Fields("TRInv.FinalPrice").Value
+    'vPPInvoiceNo = Right(cJob.PPID, 20)
+    vPPInvoiceNo = Replace(Replace(Right(cJob.PPID, 20), " ", ""), "-", "")
 
     'create pp invoice link
     vPPLink = "https://www.paypal.com/invoice/p/#" & vPPInvoiceNo
 
     'calculate refund
-    vAmount = InputBox("How much do you want to refund?  Their payments total up to " & sPaymentSum & " their final bill came to " & sFinalPrice & ".  This leaves a difference of " & (sPaymentSum - sFinalPrice) & " left owing to them.")
+    vAmount = InputBox("How much do you want to refund?  Their payments total up to " & cJob.PaymentSum & " their final bill came to " & cJob.FinalPrice & ".  This leaves a difference of " & (cJob.PaymentSum - cJob.FinalPrice) & " left owing to them.")
     
     sQuestion = "Are you sure that's correct?  You want to refund $" & vAmount & "?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -1765,7 +1767,7 @@ Public Sub fPPRefund()
             GoTo Exitif
         Else
 
-            vAmount = InputBox("How much do you want to refund?  Their payments total up to " & sPaymentSum & " their final bill came to " & sFinalPrice & ".  This leaves a difference of " & (sPaymentSum - sFinalPrice) & " left owing to them.")
+            vAmount = InputBox("How much do you want to refund?  Their payments total up to " & cJob.PaymentSum & " their final bill came to " & cJob.FinalPrice & ".  This leaves a difference of " & (cJob.PaymentSum - cJob.FinalPrice) & " left owing to them.")
     
         End If
     
@@ -1775,7 +1777,7 @@ Public Sub fPPRefund()
     sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
     sInvoiceTime = (Format(Now(), "hh:mm:ss"))
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = sCompanyEmail
+    sEmail = cJob.App0.EmailAddress
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
 
@@ -1804,8 +1806,8 @@ Public Sub fPPRefund()
        
        
     json1 = "{" & _
-            Chr(34) & "date" & Chr(34) & ": " & Chr(34) & sInvoiceDate & " " & sInvoiceTime & Chr(34) & ",{" & Chr(34) & _
-            "note" & Chr(34) & ": " & Chr(34) & "Refund as described for Invoice" & sInvoiceNumber & Chr(34) & "," & Chr(34) & _
+            Chr(34) & "date" & Chr(34) & ": " & Chr(34) & cJob.InvoiceDate & " " & sInvoiceTime & Chr(34) & ",{" & Chr(34) & _
+            "note" & Chr(34) & ": " & Chr(34) & "Refund as described for Invoice" & cJob.InvoiceNo & Chr(34) & "," & Chr(34) & _
             "amount" & Chr(34) & ": {" & Chr(34) & _
             "currency" & Chr(34) & ": " & Chr(34) & "USD" & Chr(34) & "," & Chr(34) & _
             "value" & Chr(34) & ": " & Chr(34) & vAmount & Chr(34) & "}}"
@@ -1853,7 +1855,7 @@ Public Sub fPPRefund()
     '"status":"DRAFT"
     '"total_amount":{"currency":"USD","value":"3.00"},
     'Next
-    Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & vInvoiceID
+    Debug.Print "Invoice No.:  " & cJob.InvoiceNo & "   |   Invoice ID:  " & vInvoiceID
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
 
@@ -1962,9 +1964,11 @@ Public Sub fPPUpdate()
     Dim Json As Object
     
     Dim parsed As Dictionary
-    
 
+    Dim cJob As Job
+    Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call fPPGenerateJSONInfo
     Call pfGetOrderingAttorneyInfo
@@ -2118,42 +2122,22 @@ Public Sub fManualPPPayment()
     Dim sURL As String
     Dim sAuth As String
     Dim stringJSON As String
-    Dim sEmail As String
+    'Dim sEmail As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
-    Dim sInvoiceNo As String
-    Dim sFirstName As String
-    Dim sLastName As String
+    'Dim sInvoiceTime As String
+    'Dim sInvoiceNo As String
     Dim sDescription As String
-    Dim sInvoiceDate As String
-    Dim sPaymentTerms As String
-    Dim sCourtDatesID As String
-    Dim sNote As String
-    Dim sTerms As String
-    Dim sMinimumAmount As String
-    Dim vmMemo As String
-    Dim vlURL As String
-    Dim sTemplateID As String
+    'Dim sInvoiceDate As String
+    'Dim sPaymentTerms As String
     Dim vTotal As String
-    Dim sLine1 As String
-    Dim sCity As String
-    Dim sState As String
-    Dim sZIP As String
-    Dim sQuantity As String
-    Dim sValue As String
     Dim vInvoiceID As String
-    Dim sInvoiceNumber As String
+    'Dim sInvoiceNumber As String
     Dim vStatus As String
-    Dim resp As Variant
-    Dim response As Variant
-    Dim rep As Variant
     Dim sToken As String
     Dim json1 As String
-    Dim json2 As String
-    Dim json3 As String
-    Dim json4 As String
-    Dim json5 As String
+    'Dim json2 As String
+    'Dim json3 As String
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
@@ -2163,6 +2147,10 @@ Public Sub fManualPPPayment()
     Dim vMethod As String
     Dim vAmount As String
     
+    Dim resp As Variant
+    Dim response As Variant
+    Dim rep As Variant
+    
     Dim oRequest As Object
     Dim Json As Object
     
@@ -2171,18 +2159,23 @@ Public Sub fManualPPPayment()
 
     Dim parsed As Dictionary
 
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     Call fPPGenerateJSONInfo
-    Call pfGetOrderingAttorneyInfo
+    'Call pfGetOrderingAttorneyInfo
 
     Set qdf = CurrentDb.QueryDefs("QInfobyInvoiceNumber")
     qdf.Parameters(0) = sCourtDatesID
     Set rstQInfoInvNo = qdf.OpenRecordset
 
-    sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
-    sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
+    'sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
+    'sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
 
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = sCompanyEmail
+    sEmail = cJob.App0.EmailAddress
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     
@@ -2200,23 +2193,23 @@ Public Sub fManualPPPayment()
         '.setRequestHeader "Authorization", "Bearer " & sAuth
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
-        Debug.Print apiWaxLRS
+        'Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
         sToken = parsed("access_token")          'third level array
         sAuth = ""
         .abort
-        Debug.Print "--------------------------------------------"
+        'Debug.Print "--------------------------------------------"
     End With
     vMethod = InputBox("What method was used to pay?  Select/type in either BANK_TRANSFER, CASH, CHECK, CREDIT_CARD, DEBIT_CARD, PAYPAL, WIRE_TRANSFER, or OTHER.")
-    sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
-    sInvoiceTime = (Format(Now(), "hh:mm:ss"))
-    vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & sFinalPrice & ".")
+    'sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
+    'sInvoiceTime = (Format(Now(), "hh:mm:ss"))
+    vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & cJob.FinalPrice & ".")
 
     '@Ignore UnassignedVariableUsage
     json1 = "{" & _
             Chr(34) & "method" & Chr(34) & ": " & Chr(34) & vMethod & Chr(34) & "," & Chr(34) & _
-            "date" & Chr(34) & ": " & Chr(34) & sInvoiceDate & " " & sInvoiceTime & Chr(34) & "," & Chr(34) & _
-            "note" & Chr(34) & ": " & Chr(34) & sCourtDatesID & " " & sInvoiceNumber & Chr(34) & "," & Chr(34) & _
+            "date" & Chr(34) & ": " & Chr(34) & (Format((Date + 28), "yyyy-mm-dd")) & " PST" & " " & (Format(Now(), "hh:mm:ss")) & Chr(34) & "," & Chr(34) & _
+            "note" & Chr(34) & ": " & Chr(34) & sCourtDatesID & " " & cJob.InvoiceNo & Chr(34) & "," & Chr(34) & _
             "amount" & Chr(34) & ": {" & Chr(34) & _
             "currency" & Chr(34) & ": " & Chr(34) & "USD" & Chr(34) & "," & Chr(34) & _
             "value" & Chr(34) & ": " & Chr(34) & vAmount & Chr(34) & "}}"
@@ -2233,16 +2226,16 @@ Public Sub fManualPPPayment()
         .setRequestHeader "content-type", "application/json"
         .setRequestHeader "Authorization", "Bearer " & sToken
         '@Ignore UnassignedVariableUsage
-        json5 = json1 & json2 & json3
-        .send json5
+        'json5 = json1 & json2 & json3
+        .send json1
         apiWaxLRS = .responseText
         sToken = ""
         .abort
-        Debug.Print apiWaxLRS
-        Debug.Print "--------------------------------------------"
+        'Debug.Print apiWaxLRS
+        'Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = parsed("number")            'third level array
+    'sInvoiceNumber = parsed("number")            'third level array
     vInvoiceID = parsed("id")                    'third level array
     vStatus = parsed("status")                   'third level array
     vTotal = parsed("total_amount")("value")     'second level array
@@ -2261,7 +2254,7 @@ Public Sub fManualPPPayment()
     'Debug.Print "Error Field:  " & vErrorIssue
     'Debug.Print "Error Details:  " & vErrorDetails
     Debug.Print "--------------------------------------------"
-    Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & vInvoiceID
+    Debug.Print "Invoice No.:  " & cJob.InvoiceNo & "   |   Invoice ID:  " & vInvoiceID
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
 

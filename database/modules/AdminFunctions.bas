@@ -1167,17 +1167,16 @@ Public Sub pfGenerateJobTasks()
     sTaskTitle = "(1.1) Enter job & contacts into database:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = Date + 1
     dStart = Date
-    cJob.DueDate = "12/22/2019"
     iTaskMinuteLength = "2"
     sTaskCategory = "production"
     sPriority = "(1) Stage 1"
-    sTaskDescription = "|Case Name:  " & sParty1 & " v. " & sParty2 & "   |" & Chr(13) & _
-                       "|Case Nos.:  " & sCaseNumber1 & "   |   " & sCaseNumber2 & "   |" & Chr(13) & _
-                       "|Due Date:  " & dDue & "   |   Turnaround:  " & sTurnaroundTime & " calendar days   |" & _
-                       "|Client:   " & sCompany & "   |   Folder:   " & cJob.DocPath.JobDirectory & "   |" & Chr(13) & _
-                       "|Exp. Advance/Deposit Date:  " & dExpectedAdvanceDate & "   |" & Chr(13) & _
-                       "|Exp. Rebate Date:  " & dExpectedRebateDate & "   |" & Chr(13) & _
-                       "|Estimate:  " & sSubtotal & "   |"
+    sTaskDescription = "|Case Name:  " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2 & "   |" & Chr(13) & _
+                       "|Case Nos.:  " & cJob.CaseInfo.CaseNumber1 & "   |   " & cJob.CaseInfo.CaseNumber2 & "   |" & Chr(13) & _
+                       "|Due Date:  " & dDue & "   |   Turnaround:  " & cJob.TurnaroundTime & " calendar days   |" & _
+                       "|Client:   " & cJob.App0.Company & "   |   Folder:   " & cJob.DocPath.JobDirectory & "   |" & Chr(13) & _
+                       "|Exp. Advance/Deposit Date:  " & cJob.ExpectedAdvanceDate & "   |" & Chr(13) & _
+                       "|Exp. Rebate Date:  " & cJob.ExpectedRebateDate & "   |" & Chr(13) & _
+                       "|Estimate:  " & cJob.Subtotal & "   |"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(1.2) Payment:  If factored, proceed with set-up.  If not, send invoice & wait for payment :  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
