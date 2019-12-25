@@ -946,9 +946,8 @@ Public Sub Class_Initialize()
         
             pAPCS = pNetWorkFolder & "Production/2InProgress/" & sCourtDatesID & "/Audio/bin/cplayer.exe"
             
-            'TODO: paths needed: transcribing manuals, samples, jurisdiction references, courtrules
-            pInvoiceP = pNetWorkFolder & "Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".pdf"
-            pInvoiceD = pNetWorkFolder & "Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & sInvoiceNumber & ".docx"
+            pInvoiceP = pNetWorkFolder & "Production/2InProgress/" & sCourtDatesID & "/Generated/" & sInvoiceNumber & ".pdf"
+            pInvoiceD = pNetWorkFolder & "Production/2InProgress/" & sCourtDatesID & "/Generated/" & sInvoiceNumber & ".docx"
             pShippingXML = pNetWorkFolder & "Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-Shipping.xml"
             pShippingCOAXML = pNetWorkFolder & "Production/2InProgress/" & sCourtDatesID & "/Generated/" & sCourtDatesID & "-CourtofAppealsDivI-Shipping.xml"
             pShippingXML4 = pNetWorkFolder & "Production/4ShippingXMLs/" & sCourtDatesID & "-shipping.xml"

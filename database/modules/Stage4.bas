@@ -80,6 +80,8 @@ Public Sub pfStage4Ppwk()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -510,6 +512,8 @@ Public Sub fTranscriptDeliveryF()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -729,6 +733,8 @@ Public Sub fGenerateZIPsF()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -860,9 +866,10 @@ Public Sub fZIPAudio()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     defpath = CurrentProject.Path
 
     If Right(defpath, 1) <> "\" Then
@@ -913,8 +920,8 @@ Public Sub fZIPAudioTranscripts()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     defpath = CurrentProject.Path
     If Right(defpath, 1) <> "\" Then
@@ -988,9 +995,10 @@ Public Sub fZIPTranscripts()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     defpath = CurrentProject.Path
     If Right(defpath, 1) <> "\" Then
@@ -1090,10 +1098,11 @@ Public Sub pfSendTrackingEmail()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    
     deliverySQLstring = "SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";"
     Set rs = CurrentDb.OpenRecordset(deliverySQLstring)
     vTrackingNumber = rs.Fields("TrackingNumber").Value
@@ -1150,8 +1159,8 @@ Public Sub fAudioDone()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     'If FSO Is Nothing Then Set FSO = New Scripting.FileSystemObject
     ' Set hFolder = FSO.GetFolder(HostFolder)
@@ -1208,8 +1217,8 @@ Public Sub fPrint2upPDF()
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
@@ -1292,8 +1301,8 @@ Public Sub fPrint4upPDF()
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
@@ -1366,6 +1375,8 @@ Public Sub fPrintKCIEnvelope()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     sQuestion = "Print KCI envelope? (MAKE SURE ENVELOPE IS PRINT SIDE UP, ADHESIVE ON THE RIGHT INSIDE PRINTER TRAY)"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???") '
@@ -1406,8 +1417,8 @@ Public Sub fAcrobatKCIInvoice()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     FileCopy cJob.DocPath.KCITemplate, cJob.DocPath.KCIEmpty
 
@@ -1473,6 +1484,8 @@ Public Sub pfUpload(ByRef mySession As Session)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     
@@ -1529,8 +1542,8 @@ Public Sub fPrivatePrint()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
         
     'print 2-up (no without sfc intns)
     sQuestion = "Print 2-up transcript?  Do not do so unless specifically requested."
@@ -1608,6 +1621,8 @@ Public Sub fExportRecsToXML()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
     Set rs1 = CurrentDb.OpenRecordset(SQLString)
@@ -1702,6 +1717,8 @@ Public Sub fAppendXMLFiles()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     ' Load your xml files in to a DOM document
     file1.Load cJob.DocPath.XMLBefore
@@ -1767,12 +1784,10 @@ Public Sub fCourtofAppealsIXML()
     
     Dim cJob As Job
     Set cJob = New Job
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     DoCmd.OpenQuery qnShippingOptionsQ, acViewNormal, acNormal 'pull up shipping query
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     Call pfCurrentCaseInfo                       'refresh transcript info
         
@@ -1863,7 +1878,7 @@ Public Sub fCourtofAppealsIXML()
     Call fTranscriptExpensesBeginning
     Call fTranscriptExpensesAfter
 
-    DoCmd.Close (qnShippingOptionsQ)
+    DoCmd.Close acQuery, qnShippingOptionsQ
     
     MsgBox "Exported COA XML and added entry to CommHistory table."
     Call pfClearGlobals

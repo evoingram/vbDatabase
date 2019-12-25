@@ -89,7 +89,7 @@ Private Sub List66_AfterUpdate()
     
     End If
 
-    MsgBox "Finished looping through records."
+    Debug.Print "Finished looping through records."
 
     rstGroupTasksICPQ.Close
     Set rstGroupTasksICPQ = Nothing

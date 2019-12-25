@@ -12,6 +12,7 @@ Private Sub WBCViewJobFolder_OnUpdated()
     Set cJob = New Job
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     Call pfCurrentCaseInfo
 
     If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then
@@ -59,8 +60,8 @@ Private Sub Command5_Click()
     
     Dim cJob As Job
     Set cJob = New Job
-    
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     Call pfCurrentCaseInfo
 
     If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then

@@ -133,6 +133,10 @@ Private Sub Load()
         sCaseID = Nz(.Fields("ID").Value)
         Me.Party1 = Nz(.Fields("Party1").Value)
         Me.Party2 = Nz(.Fields("Party2").Value)
+        mParty1 = Nz(.Fields("Party1").Value)
+        mParty2 = Nz(.Fields("Party2").Value)
+        Me.Party1 = mParty1
+        Me.Party2 = mParty2
         Me.Party1Name = Nz(.Fields("Party1Name").Value)
         Me.Party2Name = Nz(.Fields("Party2Name").Value)
         Me.CaseNumber1 = Nz(.Fields("CaseNumber1").Value)

@@ -86,7 +86,8 @@ Private Sub testClassesInfo()
     Debug.Print cJob.App0.Company
     Debug.Print cJob.App0.FactoringApproved
     Debug.Print cJob.CaseInfo.Party1
-    Debug.Print cJob.UnitPrice
+    Debug.Print "Page Rate = " & cJob.UnitPrice
+    Debug.Print cJob.PageRate
     Debug.Print cJob.InventoryRateCode
     cJob.Status.AddRDtoCover = True
     Debug.Print cJob.Status.AddRDtoCover
@@ -103,6 +104,11 @@ End Sub
 Private Sub emptyFunction()
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    Dim oWordDoc As New Word.Document
+    Dim oWordApp As New Word.Application
+    Dim oWordDoc1 As New Word.Document
         
     'To Fix Bookmarks:
     'Final Transcript Outline:
@@ -125,6 +131,98 @@ Private Sub emptyFunction()
     'Debug.Print "test"
     'Call pfSendWordDocAsEmail("PP-FactoredInvoiceEmail", "Transcript Delivery & Invoice", cJob.DocPath.InvoiceP)
     'On Error Resume Next
+    
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    'Debug.Print ("---------------------------------------------")
+    
+    Set oWordApp = CreateObject("Word.Application")
+    oWordApp.Visible = False
+        
+    Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPButton) 'open button in word
+    oWordDoc.Content.Copy
+    Set oWordApp = CreateObject("Word.Application")
+    oWordApp.Visible = False
+        
+    Set oWordDoc1 = oWordApp.Documents.Open(cJob.DocPath.InvoiceD) 'open invoice docx
 
+    With oWordDoc1.Application
+
+        .Selection.Find.ClearFormatting
+        .Selection.Find.Replacement.ClearFormatting
+    
+        With .Selection.Find
+        
+            .Text = "#PPB1#"
+            .Replacement.Text = ""
+            .Forward = True
+            .Wrap = wdFindContinue
+            .Format = False
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+            .Execute
+        
+            'enter code here
+            If .Forward = True Then
+                .Application.Selection.Collapse Direction:=wdCollapseStart
+            Else
+                .Application.Selection.Collapse Direction:=wdCollapseEnd
+            End If
+        
+            .Execute Replace:=wdReplaceOne
+            If .Forward = True Then
+                .Application.Selection.Collapse Direction:=wdCollapseEnd
+            Else
+                .Application.Selection.Collapse Direction:=wdCollapseStart
+            End If
+            .Execute
+            .Application.Selection.PasteAndFormat (wdFormatOriginalFormatting) 'paste button
+        
+        End With
+        .Selection.Find.ClearFormatting
+        .Selection.Find.Replacement.ClearFormatting
+    
+        With .Selection.Find
+            .Text = "#PPB2#"
+            .Replacement.Text = ""
+            .Forward = True
+            .Wrap = wdFindContinue
+            .Format = False
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+            .Execute
+            If .Forward = True Then
+                .Application.Selection.Collapse Direction:=wdCollapseStart
+            Else
+                .Application.Selection.Collapse Direction:=wdCollapseEnd
+            End If
+            .Execute Replace:=wdReplaceOne
+            If .Forward = True Then
+                .Application.Selection.Collapse Direction:=wdCollapseEnd
+            Else
+                .Application.Selection.Collapse Direction:=wdCollapseStart
+            End If
+            .Execute
+            .Application.Selection.PasteAndFormat (wdFormatOriginalFormatting) 'paste button
+        End With
+    
+        'save invoice
+        oWordDoc1.Save
+    
+    End With
+
+    oWordDoc1.Close
+    oWordDoc.Close
+    oWordApp.Quit
+    
+    Set oWordApp = Nothing
+    Set oWordDoc = Nothing
+    Set oWordDoc1 = Nothing
 End Sub
 

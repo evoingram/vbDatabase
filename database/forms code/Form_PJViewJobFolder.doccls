@@ -6,6 +6,8 @@ Private Sub WBCViewJobFolder_OnUpdated()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
 
     Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JobDirectory
@@ -17,6 +19,8 @@ Private Sub Command5_Click()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
 
     Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JobDirectory

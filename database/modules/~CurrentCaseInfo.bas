@@ -151,7 +151,6 @@ Public Const sCompanyZIP As String = "98119"
 Public Const sZCountryCode As String = "US"
 Public Const sDrive As String = "T:\"
 
-'TODO: find where this picture should be used
 '@Ignore ConstantNotUsed
 Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
 '@Ignore ConstantNotUsed
@@ -283,7 +282,7 @@ Public Sub fPPGenerateJSONInfo()
         sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                         "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                         "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("").value
     
         sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
                 "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("").value
@@ -291,11 +290,11 @@ Public Sub fPPGenerateJSONInfo()
         sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                  "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                  "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("").value
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("").value
 
     ElseIf sBrandingTheme = "2" Then             'WRTS NC 100 Deposit
         sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
-                        "The turnaround as described above will begin once this invoice is paid.  Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+                        "The turnaround as described above will begin once this invoice is paid.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'."
         'rstTRQPlusCases.Fields("")value
     
         sNote = "After completion, the transcript will be e-mailed to you in Word and PDF versions.  We will upload it to our online repository for your 24/7 access." & _
@@ -344,14 +343,14 @@ Public Sub fPPGenerateJSONInfo()
                 "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
         'rstTRQPlusCases.Fields("")value
     
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+        sTerms = "Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'."
     
 
     ElseIf sBrandingTheme = "6" Then             'WRTS C Factoring Filed
         sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                         "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                         "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
     
         sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
                 "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
@@ -359,14 +358,14 @@ Public Sub fPPGenerateJSONInfo()
         sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                  "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                  "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
         
 
     ElseIf sBrandingTheme = "7" Then             'WRTS C Factoring Not Filed
         sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                         "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                         "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
     
         sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
                 "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
@@ -374,7 +373,7 @@ Public Sub fPPGenerateJSONInfo()
         sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                  "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                  "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
         
 
     ElseIf sBrandingTheme = "8" Then             'WRTS C 100 Deposit Filed
@@ -387,7 +386,7 @@ Public Sub fPPGenerateJSONInfo()
                 "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
         'rstTRQPlusCases.Fields("")value
     
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+        sTerms = "Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'."
     
     ElseIf sBrandingTheme = "9" Then             'WRTS C 100 Deposit Not Filed
         sPaymentTerms = "This is an invoice for deposit.  The deposit amount has been calculated as 100 percent of the estimated cost of the transcript." & "  " & _
@@ -399,14 +398,14 @@ Public Sub fPPGenerateJSONInfo()
                 "If I have any spellings questions or things like that (hopefully not), I will let you know.  Thank you for your business."
         'rstTRQPlusCases.Fields("")value
     
-        sTerms = "Full terms of service listed at https://www.aquoco.co/ServiceA.html."
+        sTerms = "Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'."
     
 
     ElseIf sBrandingTheme = "10" Then            'WRTS JJ Factoring
         sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                         "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                         "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
     
         sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
                 "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
@@ -414,7 +413,7 @@ Public Sub fPPGenerateJSONInfo()
         sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                  "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                  "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
         
 
     ElseIf sBrandingTheme = "11" Then            'WRTS Tabula Not Factored/Filed
@@ -426,7 +425,7 @@ Public Sub fPPGenerateJSONInfo()
         sPaymentTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                         "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                         "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                        "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
     
         sNote = "Your transcript is attached to this invoice.  We will upload this transcript to our repository for your 24/7 access and " & _
                 "mail out and/or file as appropriate.  Thank you for your business." 'rstTRQPlusCases.Fields("")value
@@ -434,7 +433,7 @@ Public Sub fPPGenerateJSONInfo()
         sTerms = "Please submit payment to A Quo Co., c/o American Funding Solutions, PO Box 572, Blue Springs, MO 64013.  " & _
                  "Please pay within 28 days. 5% interest if payment received after 28 calendar days of" & _
                  "invoice date, additional 1% interest added every 7th calendar day after day 28 up " & _
-                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/ServiceA.html." 'rstTRQPlusCases.Fields("")value
+                 "to a maximum of 12%.  Full terms of service listed at https://www.aquoco.co/.  Click on 'Rates', then 'Terms of Service'." 'rstTRQPlusCases.Fields("")value
         
     End If
     vmMemo = sCourtDatesID & " " & sInvoiceNo

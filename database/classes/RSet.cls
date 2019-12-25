@@ -72,6 +72,8 @@ Public Function addRSet(sTableName As String) As String
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Select Case sTableName
 

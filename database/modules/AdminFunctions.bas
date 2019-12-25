@@ -177,6 +177,8 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     With seopFTPSettings                         ' Setup session options
         .Protocol = Protocol_Ftp
@@ -218,6 +220,8 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set oOutlookNamespace = GetNamespace("MAPI")
     Set oOutlookPickedFolder = oOutlookNamespace.PickFolder
@@ -301,6 +305,8 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set oAcrobatDoc = New AcroPDDoc
 
@@ -361,7 +367,7 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
 
     DoCmd.OpenQuery "FinalUnitPriceQuery"        'PRE-QUERY FOR FINAL SUBTOTAL
     CurrentDb.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
-    DoCmd.Close ("FinalUnitPriceQuery")
+    DoCmd.Close acQuery, "FinalUnitPriceQuery"
 End Sub
 
 Public Sub pfReadXML()
@@ -382,6 +388,8 @@ Public Sub pfReadXML()
     Dim Rng As Range
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Do While Len(Dir(cJob.DocPath.ShippingOutputFolder)) > 0
     
@@ -426,8 +434,8 @@ Public Sub pfFileRenamePrompt()
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     sUserInput = InputBox("Enter the desired document name without the extension" & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & _
     "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Rename your document." & Chr(13) & "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" _
@@ -1151,23 +1159,24 @@ Public Sub pfGenerateJobTasks()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     sTaskTitle = "(1.1) Enter job & contacts into database:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
     dDue = Date + 1
     dStart = Date
-    cJob.DueDate = "12/22/2019"
     iTaskMinuteLength = "2"
     sTaskCategory = "production"
     sPriority = "(1) Stage 1"
-    sTaskDescription = "|Case Name:  " & sParty1 & " v. " & sParty2 & "   |" & Chr(13) & _
-                       "|Case Nos.:  " & sCaseNumber1 & "   |   " & sCaseNumber2 & "   |" & Chr(13) & _
-                       "|Due Date:  " & dDue & "   |   Turnaround:  " & sTurnaroundTime & " calendar days   |" & _
-                       "|Client:   " & sCompany & "   |   Folder:   " & cJob.DocPath.JobDirectory & "   |" & Chr(13) & _
-                       "|Exp. Advance/Deposit Date:  " & dExpectedAdvanceDate & "   |" & Chr(13) & _
-                       "|Exp. Rebate Date:  " & dExpectedRebateDate & "   |" & Chr(13) & _
-                       "|Estimate:  " & sSubtotal & "   |"
+    sTaskDescription = "|Case Name:  " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2 & "   |" & Chr(13) & _
+                       "|Case Nos.:  " & cJob.CaseInfo.CaseNumber1 & "   |   " & cJob.CaseInfo.CaseNumber2 & "   |" & Chr(13) & _
+                       "|Due Date:  " & dDue & "   |   Turnaround:  " & cJob.TurnaroundTime & " calendar days   |" & _
+                       "|Client:   " & cJob.App0.Company & "   |   Folder:   " & cJob.DocPath.JobDirectory & "   |" & Chr(13) & _
+                       "|Exp. Advance/Deposit Date:  " & cJob.ExpectedAdvanceDate & "   |" & Chr(13) & _
+                       "|Exp. Rebate Date:  " & cJob.ExpectedRebateDate & "   |" & Chr(13) & _
+                       "|Estimate:  " & cJob.Subtotal & "   |"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
     sTaskTitle = "(1.2) Payment:  If factored, proceed with set-up.  If not, send invoice & wait for payment :  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
@@ -1466,6 +1475,8 @@ Public Sub pfCommHistoryExportSub()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Set nsOutlookNmSpc = GetNamespace("MAPI")
     Set oOutlookAccessTestFolder = nsOutlookNmSpc.Folders(sCompanyEmail).Folders("Inbox").Folders("AccessTest")
@@ -1669,8 +1680,8 @@ Public Sub pfAskforAudio()
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
     'use the standard title and filters, but change the initial folder
@@ -1725,8 +1736,9 @@ Public Sub pfAskforNotes()
     
     Dim cJob As Job
     Set cJob = New Job
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     Set fd = Application.FileDialog(msoFileDialogFilePicker)
     
     'use the standard title and filters, but change the initial folder

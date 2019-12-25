@@ -124,6 +124,8 @@ Public Sub pfEnterNewJob()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Set oExcelApp = CreateObject("Excel.Application")
 
@@ -801,6 +803,8 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
 
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     'calculate fields
     Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
@@ -939,6 +943,8 @@ Public Sub fProcessAudioParent()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fProcessAudioFolder(cJob.DocPath.JobDirectoryA)
 
@@ -956,6 +962,8 @@ Public Sub fPlayAudioParent()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA)
 
@@ -987,6 +995,8 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -1074,6 +1084,8 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     sQuestion = "Would you like to process the audio for job number " & sCourtDatesID & "?  Make sure the audio is in the \Audio\folder before proceeding."
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -1173,7 +1185,9 @@ Public Sub pfPriceQuoteEmail()
     
     Dim cJob As Job
     Set cJob = New Job
-
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     dDeadline = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtDeadline]
     iAudioLength = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![txtAudioLength]
 
@@ -1313,11 +1327,11 @@ Public Sub pfStage1Ppwk()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
-
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
 
     sCourtRulesPath1 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-Rates.pdf"
     sCourtRulesPath2 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-SafeguardingElectronicTranscripts.pdf"
@@ -1461,7 +1475,7 @@ Line2:                                           'every jurisdiction converges h
     End If
 
     
-    DoCmd.Close (qXeroCSVQ)
+    DoCmd.Close acQuery, qXeroCSVQ
     
     MsgBox "Stage 1 complete."
     Call pfTypeRoughDraftF                       'type rough draft prompt
@@ -1880,6 +1894,8 @@ Public Sub autointake()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
 
     Set rstOLP = CurrentDb.OpenRecordset("OLPaypalPayments")

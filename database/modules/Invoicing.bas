@@ -61,7 +61,14 @@ Public Sub fApplyShipDateTrackingNumber()
     Dim rstOLPayPalPmt As DAO.Recordset
     Dim x As Long
     Dim vShipDate As String
-    Dim vTrackingNumber As String
+    Dim sTrackingNumber As String
+    Dim formDOM As DOMDocument60                 'Currently opened xml file
+    Dim ixmlRoot As IXMLDOMElement
+    
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
 
     Set rstCourtDates = CurrentDb.OpenRecordset("SELECT ID, ShipDate, TrackingNumber FROM CourtDates")
@@ -72,10 +79,8 @@ Public Sub fApplyShipDateTrackingNumber()
         rstCourtDates.MoveFirst
     
         Do Until rstCourtDates.EOF = True
-    
-                        
+        
             'get tracking number and ship date
-            rstCourtDates.Fields("ShipDate").Value = vShipDate
             rstCourtDates.Fields("ID").Value = sCourtDatesID
       
             If Not (rstOLPayPalPmt.EOF And rstOLPayPalPmt.BOF) Then 'For each row in OLPayPalPayments
@@ -90,8 +95,24 @@ Public Sub fApplyShipDateTrackingNumber()
                     If x > 0 Then
                     
                         Call pfCommunicationHistoryAdd("TrackingNumber") 'comms history entry for paypal email
+                                            
+                        Call pfCurrentCaseInfo                       'refresh transcript info
                         
-                        'TODO: paste in code to update courtdates shipdate and tracking number
+                        Do While Len(Dir(cJob.DocPath.ShippingOutputFolder)) > 0
+                        
+                            Set formDOM = New DOMDocument60          'Open the xml file
+                            formDOM.resolveExternals = False         'using schema yes/no true/false
+                            formDOM.validateOnParse = False          'Parser validate document?  Still parses well-formed XML
+                            formDOM.Load (cJob.DocPath.ShippingOutputFolder & Dir(cJob.DocPath.ShippingOutputFolder))
+                            Set ixmlRoot = formDOM.DocumentElement   'Get document reference
+                            sTrackingNumber = ixmlRoot.SelectSingleNode("//DAZzle/Package/PIC").Text
+                            Set formDOM = Nothing
+                            Set ixmlRoot = Nothing
+                            rstCourtDates.Fields("ShipDate").Value = Format(Now, "mm-dd-yyyy")
+                            rstCourtDates.Fields("TrackingNumber").Value = sTrackingNumber
+                            
+                        Loop
+                        
                         
                     Else
                     End If
@@ -102,7 +123,7 @@ Public Sub fApplyShipDateTrackingNumber()
             
                 vShipDate = ""
                 sCourtDatesID = ""
-                vTrackingNumber = ""
+                sTrackingNumber = ""
                 
                 rstCourtDates.MoveNext
                 
@@ -193,7 +214,7 @@ Public Sub fApplyPayPalPayment()
     
     End If
 
-    MsgBox "Finished looping through PayPal Payments."
+    Debug.Print "Finished looping through PayPal Payments."
 
     rstOLPayPalPmt.Close
     Set rstOLPayPalPmt = Nothing
@@ -271,8 +292,8 @@ Public Sub fIsFactoringApproved()
     svURL = "https://www.paypal.com"
     DoCmd.OpenQuery qUPQ, acViewNormal, acReadOnly
     DoCmd.OpenQuery "INVUpdateUnitPriceQuery", acViewNormal, acEdit
-    DoCmd.Close (qUPQ)
-    DoCmd.Close ("InvUpdateUnitPriceQuery")
+    DoCmd.Close acQuery, qUPQ
+    DoCmd.Close acQuery, "InvUpdateUnitPriceQuery"
 
     'check if approved for factoring
     vFA = sFactoringApproved
@@ -319,27 +340,28 @@ Public Sub fDepositPaymentReceived()
     '============================================================================
 
     Dim rstQInfoInvNo As DAO.Recordset
-    Dim db As Database
     Dim qdf As QueryDef
-
-
 
     Dim vAmount As String
     Dim sQuestion As String
     Dim sAnswer As String
 
+    
+    Dim cJob As Job
+    Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
+    'Set qdf = CurrentDb.QueryDefs("QInfobyInvoiceNumber")
+    'qdf.Parameters(0) = sCourtDatesID
+    'Set rstQInfoInvNo = qdf.OpenRecordset
 
-    Set db = CurrentDb
-    Set qdf = db.QueryDefs("QInfobyInvoiceNumber")
-    qdf.Parameters(0) = sCourtDatesID
-    Set rstQInfoInvNo = qdf.OpenRecordset
-
-    sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
-    sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
+    'sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
+    'sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
+    
 
     'calculate refund
-    vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & sFinalPrice & ".")
+    vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & cJob.FinalPrice & ".")
     
     sQuestion = "Are you sure that's correct?  The payment was in the amount of $" & vAmount & "?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
@@ -355,8 +377,8 @@ Public Sub fDepositPaymentReceived()
         
         Else                                     'Code for Yes
 
-            vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & sFinalPrice & ".")
-            Call fPaymentAdd(sInvoiceNumber, vAmount)
+            vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & cJob.FinalPrice & ".")
+            Call fPaymentAdd(cJob.InvoiceNo, vAmount)
             Call pfGenericExportandMailMerge("Invoice", "Stage1s\DepositPaid")
             Call pfCommunicationHistoryAdd("DepositPaid")
         
@@ -364,8 +386,8 @@ Public Sub fDepositPaymentReceived()
     
     Else                                         'Code for Yes
 
-        vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & sFinalPrice & ".")
-        Call fPaymentAdd(sInvoiceNumber, vAmount)
+        vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & cJob.FinalPrice & ".")
+        Call fPaymentAdd(cJob.InvoiceNo, vAmount)
         Call pfGenericExportandMailMerge("Invoice", "Stage1s\DepositPaid")
         Call pfCommunicationHistoryAdd("DepositPaid")
 
@@ -474,9 +496,8 @@ Public Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
     
     Dim cJob As Job
     Set cJob = New Job
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     '@Ignore AssignmentNotUsed
     sTableHyperlink = sCourtDatesID & "-PaymentMade" & "#" & cJob.DocPath.PaymentMade & "#"
@@ -518,8 +539,8 @@ Public Sub fUpdateFactoringDates()
     
     Dim cJob As Job
     Set cJob = New Job
-    
-    Call pfCurrentCaseInfo                       'refresh transcript info
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     sExpectedRebateAmount = (sFinalPrice * 0.18)
     sExpectedAdvanceAmount = (sFinalPrice * 0.8)
@@ -648,22 +669,17 @@ Public Sub fTranscriptExpensesBeginning()
     '               Vendor, ExpensesDate, Amount, Memo
     '============================================================================
         
-    Dim vEPC As String
-    
     Dim rstExpensesAdd As DAO.Recordset
     Dim rstCourtDatesSet As DAO.Recordset
     
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
-    Set rstExpensesAdd = CurrentDb.OpenRecordset("Expenses")
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
-    '@Ignore AssignmentNotUsed
-    vEPC = sEstimatedPageCount
-    '@Ignore AssignmentNotUsed
-    vEPC = Int(vEPC)
+    Set rstExpensesAdd = CurrentDb.OpenRecordset("Expenses")
 
-    If vEPC > 200 Then
+    If Int(cJob.EstimatedPageCount) > 200 Then
  
         rstExpensesAdd.AddNew                    'back cover
             rstExpensesAdd("Vendor").Value = "Got Print"
@@ -671,7 +687,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.6
             rstExpensesAdd("Memo").Value = "Back Cover"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'back cover
@@ -680,7 +696,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.6
             rstExpensesAdd("Memo").Value = "Back Cover"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'front cover
@@ -689,7 +705,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.22
             rstExpensesAdd("Memo").Value = "front cover"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'front cover
@@ -698,7 +714,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.22
             rstExpensesAdd("Memo").Value = "front cover"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'CD
@@ -707,7 +723,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.18
             rstExpensesAdd("Memo").Value = "CD"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'CD sleeve
@@ -716,7 +732,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.09
             rstExpensesAdd("Memo").Value = "CD Sleeve"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'shipping envelope
@@ -725,7 +741,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.32
             rstExpensesAdd("Memo").Value = "Shipping Envelope"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'Velobind
@@ -734,7 +750,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.72
             rstExpensesAdd("Memo").Value = "Velobind"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'Velobind
@@ -743,7 +759,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.72
             rstExpensesAdd("Memo").Value = "Velobind"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'business card
@@ -752,7 +768,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.05
             rstExpensesAdd("Memo").Value = "Business Card"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
  
         rstExpensesAdd.AddNew                    'shipping label
@@ -761,7 +777,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.15
             rstExpensesAdd("Memo").Value = "Shipping Label"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
     Else
  
@@ -771,7 +787,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.6
             rstExpensesAdd("Memo").Value = "Back Cover"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'front cover
@@ -780,7 +796,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.22
             rstExpensesAdd("Memo").Value = "front cover"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'CD
@@ -789,7 +805,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.18
             rstExpensesAdd("Memo").Value = "CD"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'CD sleeve
@@ -798,7 +814,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.09
             rstExpensesAdd("Memo").Value = "CD Sleeve"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'shipping envelope
@@ -807,7 +823,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.32
             rstExpensesAdd("Memo").Value = "Shipping Envelope"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'Velobind
@@ -816,7 +832,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.72
             rstExpensesAdd("Memo").Value = "Velobind"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
 
         rstExpensesAdd.AddNew                    'business card
@@ -825,7 +841,7 @@ Public Sub fTranscriptExpensesBeginning()
             rstExpensesAdd("Amount").Value = 0.05
             rstExpensesAdd("Memo").Value = "Business Card"
             rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-            rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+            rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
         rstExpensesAdd.Update
     
     End If
@@ -836,7 +852,7 @@ Public Sub fTranscriptExpensesBeginning()
         rstExpensesAdd("Amount").Value = 0.15
         rstExpensesAdd("Memo").Value = "Shipping Label"
         rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
     rstExpensesAdd.Update
     
     rstExpensesAdd.Close
@@ -924,16 +940,17 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
-    Set qdf1 = CurrentDb.QueryDefs(qnTRCourtQ)
-    qdf1.Parameters(0) = sCourtDatesID
-    Set rstShippingExpenseEntry = qdf1.OpenRecordset
+    'Set qdf1 = CurrentDb.QueryDefs(qnTRCourtQ)
+    'qdf1.Parameters(0) = sCourtDatesID
+    'Set rstShippingExpenseEntry = qdf1.OpenRecordset
 
 
-    sVendorName = rstShippingExpenseEntry.Fields("OrderingID").Value
-    sInvoiceNumber = rstShippingExpenseEntry.Fields("InvoiceNo").Value
+    'sVendorName = rstShippingExpenseEntry.Fields("OrderingID").Value
 
     dExpenseIncurred = Date
     
@@ -951,13 +968,13 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
         
     Loop
     
-    sExpenseMemo = "Shipping Job No. " & sCourtDatesID & " Invoice " & sInvoiceNumber & " Tracking " & sTrackingNumber
+    sExpenseMemo = "Shipping Job No. " & sCourtDatesID & " Invoice " & cJob.InvoiceNo & " Tracking " & sTrackingNumber
 
     'generates new entry for shipping XML in expenses table
     Set rstExpenses = CurrentDb.OpenRecordset("Expenses")
 
     rstExpenses.AddNew
-        rstExpenses("sVendorName").Value = sVendorName
+        rstExpenses("sVendorName").Value = cJob.App0.ID
         rstExpenses("dExpenseIncurred").Value = dExpenseIncurred
         rstExpenses("iExpenseAmount").Value = iExpenseAmount
         rstExpenses("sExpenseMemo").Value = sExpenseMemo
