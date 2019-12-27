@@ -910,7 +910,7 @@ Public Sub Class_Initialize()
         pTempShipOptionsQ1XLSM = pNetWorkFolder & "Database/Scripts/InProgressExcels/TempShippingOptionsQ1.xlsm"
         pPPFIET = pNetWorkFolder & "Database/Templates/Stage4s/PP-FactoredInvoiceEmail-Template.docx"
         pPPBalanceDueT = pNetWorkFolder & "Database/Templates/Stage4s/PP-BalanceDueInvoiceEmail.docx"
-        pPPDIET = pNetWorkFolder & "Database/Templates/Stage1s/PP-DraftInvoiceEmail-Template.htm"
+        pPPDIET = pNetWorkFolder & "Database/Templates/Stage1s/PP-DraftInvoiceEmail.htm"
         pWordIndexT = pNetWorkFolder & "Database/Templates/Stage2s/TR-WordIndex.dotm"
         pXMLAfter = pNetWorkFolder & "Database/Scripts/InProgressExcels/AfterXML.xml"
         pXMLBefore = pNetWorkFolder & "Database/Scripts/InProgressExcels/BeforeXML.xml"

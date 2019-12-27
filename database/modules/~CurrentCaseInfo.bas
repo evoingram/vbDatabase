@@ -138,6 +138,7 @@ Public Const qFCSVQ As String = "FactoringCSVQuery"
 Public Const qSelectXero As String = "SelectXero"
 Public Const qXeroCSVQ As String = "XeroCSVQuery"
 Public Const qUPQ As String = "UnitPriceQuery"
+
 Public Const sCompanyEmail As String = "inquiries@aquoco.co"
 Public Const sCompanyFirstName As String = "Erica"
 Public Const sCompanyLastName As String = "Ingram"
