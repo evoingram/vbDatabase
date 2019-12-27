@@ -82,6 +82,7 @@ Public Sub pfStage4Ppwk()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 4 for job " & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
 
@@ -469,8 +470,9 @@ Public Sub pfStage4Ppwk()
         MsgBox "Job " & sCourtDatesID & " has been moved to /3Complete/ and document history hyperlinks have been updated."
     End If
 
-    MsgBox "Stage 4 complete."
+    Debug.Print "Stage 4 complete."
     Call pfClearGlobals
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 End Sub
 
 Public Sub pfNewZip(sPath As String)
@@ -761,9 +763,45 @@ Line2:
 
     MsgBox "Thank you.  Next, we will ZIP your files."
 
-    Call fZIPAudio                               'zip audio folder
-    Call fZIPTranscripts                         'zip transcripts folder
-    Call fZIPAudioTranscripts                    'zip audio and transcripts folders together
+    
+    'source cJob.DocPath.JobDirectoryA
+    'destination cJob.DocPath.ZAudioF
+    
+    'source cJob.DocPath.JobDirectoryA
+    'destination cJob.DocPath.ZAudioB
+    
+    Call fZIPAudio(cJob.DocPath.JobDirectoryA, cJob.DocPath.ZAudioF)   'FTP ZIP audio folder
+    Call fZIPAudio(cJob.DocPath.JobDirectoryA, cJob.DocPath.ZAudioB)   'backup ZIP audio folder
+    
+    
+    'source cJob.DocPath.JobDirectoryT
+    'destination cJob.DocPath.ZTranscriptsB
+    
+    'source cJob.DocPath.JobDirectoryT
+    'destination cJob.DocPath.ZTranscriptsF
+    
+    Call fZIPTranscripts(cJob.DocPath.JobDirectoryT, cJob.DocPath.ZTranscriptsF)  'FTP ZIP transcripts folder
+    Call fZIPTranscripts(cJob.DocPath.JobDirectoryT, cJob.DocPath.ZTranscriptsB)  'backup ZIP transcripts folder
+    
+    
+    'source cJob.DocPath.JobDirectoryT
+    'destination cJob.DocPath.ZAudioTranscriptsB
+    
+    'source cJob.DocPath.JobDirectoryA
+    'destination cJob.DocPath.ZAudioTranscriptsB
+    
+    'source cJob.DocPath.JobDirectoryT
+    'destination cJob.DocPath.ZAudioTranscriptsF
+    
+    'source cJob.DocPath.JobDirectoryA
+    'destination cJob.DocPath.ZAudioTranscriptsF
+    
+    Call fZIPAudioTranscripts(cJob.DocPath.JobDirectoryT, cJob.DocPath.ZAudioTranscriptsB) 'zip audio and transcripts folders together
+    Call fZIPAudioTranscripts(cJob.DocPath.JobDirectoryA, cJob.DocPath.ZAudioTranscriptsB) 'zip audio and transcripts folders together
+    Call fZIPAudioTranscripts(cJob.DocPath.JobDirectoryT, cJob.DocPath.ZAudioTranscriptsF) 'zip audio and transcripts folders together
+    Call fZIPAudioTranscripts(cJob.DocPath.JobDirectoryA, cJob.DocPath.ZAudioTranscriptsF) 'zip audio and transcripts folders together
+    
+    
 
     MsgBox "Files Zipped.  Next, we will upload the ZIPs via FTP."
 
@@ -845,7 +883,7 @@ Public Sub fUploadZIPsPrompt()
 
 End Sub
 
-Public Sub fZIPAudio()
+Public Sub fZIPAudio(sSource As String, sDestination As String)
     '============================================================================
     ' Name        : fZIPAudio
     ' Author      : Erica L Ingram
@@ -877,31 +915,30 @@ Public Sub fZIPAudio()
     End If
 
     '@Ignore AssignmentNotUsed
-    strDate = Format(Now, " dd-mmm-yy h-mm-ss")
+    'strDate = Format(Now, " dd-mmm-yy h-mm-ss")
 
-    Call pfNewZip(cJob.DocPath.ZAudioB) 'create empty zip file
-    Call pfNewZip(cJob.DocPath.ZAudioF)
+    If sDestination = cJob.DocPath.ZAudioB Then
+        Call pfNewZip(cJob.DocPath.ZAudioB)
+    Else
+        Call pfNewZip(cJob.DocPath.ZAudioF)
+    End If
 
     Set oApp = CreateObject("Shell.Application")
-
+    
     'Copy the files to the compressed folder
-    oApp.Namespace(cJob.DocPath.ZAudioB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
+    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
+    
+    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
 
-    oApp.Namespace(cJob.DocPath.ZAudioF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
-
-    While oApp.Namespace(cJob.DocPath.ZAudioF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryF).Items.Count
-
-        DoEvents
-    Wend
-
-    While oApp.Namespace(cJob.DocPath.ZAudioF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count
         DoEvents
     Wend
     
-    MsgBox "Find the ZIP file here: " & cJob.DocPath.ZAudioB
+    
+    Debug.Print "Find the ZIP file here: " & sDestination
+    
 End Sub
 
-Public Sub fZIPAudioTranscripts()
+Public Sub fZIPAudioTranscripts(sSource As String, sDestination As String)
     '============================================================================
     ' Name        : fZIPAudioTranscripts
     ' Author      : Erica L Ingram
@@ -916,8 +953,7 @@ Public Sub fZIPAudioTranscripts()
     
     Dim filecopied As Object
     Dim oApp As Object
-    
-    
+        
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -928,53 +964,27 @@ Public Sub fZIPAudioTranscripts()
         defpath = defpath & "\"
     End If
     
-    strDate = Format(Now, " dd-mmm-yy h-mm-ss")
-    
-    Call pfNewZip(cJob.DocPath.ZAudioTranscriptsB)               'create empty zip files
-    Call pfNewZip(cJob.DocPath.ZAudioTranscriptsF)
+    If sDestination = cJob.DocPath.ZAudioTranscriptsB Then
+        Call pfNewZip(cJob.DocPath.ZAudioTranscriptsB)
+    Else
+        Call pfNewZip(cJob.DocPath.ZAudioTranscriptsF)
+    End If
 
     Set oApp = CreateObject("Shell.Application")
-
-    FolderName2 = (oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count) + (oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count)
-
-    'Copy the files to the compressed folder
-    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
-
-    While oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
-    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
-
-    While oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
-    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryA).Items
-
-    While oApp.Namespace(cJob.DocPath.JobDirectoryA).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
-    oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
-
-    On Error Resume Next
-    While oApp.Namespace(cJob.DocPath.ZAudioTranscriptsB).Items.Count <> oApp.Namespace(cJob.DocPath.ZAudioTranscriptsF).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
-
-
-
-
-
     
+    'Copy the files to the compressed folder
+    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
 
-    MsgBox "You find the zipfile here: " & cJob.DocPath.ZAudioTranscriptsB
+    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
+        DoEvents
+    Wend
+    On Error GoTo 0
+    
+    Debug.Print "You find the ZIP file here: " & sDestination
 
 End Sub
 
-Public Sub fZIPTranscripts()
+Public Sub fZIPTranscripts(sSource As String, sDestination As String)
     '============================================================================
     ' Name        : fZIPTranscripts
     ' Author      : Erica L Ingram
@@ -984,8 +994,6 @@ Public Sub fZIPTranscripts()
     '============================================================================
 
     Dim defpath As String
-    
-    Dim strDate As Date
     
     Dim rstCourtDates As DAO.Recordset
     
@@ -1005,32 +1013,23 @@ Public Sub fZIPTranscripts()
         defpath = defpath & "\"
     End If
 
-    strDate = Format(Now, " dd-mmm-yy h-mm-ss")
-
     'Create empty Zip File
-    Call pfNewZip(cJob.DocPath.ZTranscriptsB)
-    Call pfNewZip(cJob.DocPath.ZTranscriptsF)
+    If sDestination = cJob.DocPath.ZTranscriptsB Then
+        Call pfNewZip(cJob.DocPath.ZTranscriptsB)
+    Else
+        Call pfNewZip(cJob.DocPath.ZTranscriptsF)
+    End If
 
     Set oApp = CreateObject("Shell.Application")
-
     'Copy the files to the compressed folder
-    oApp.Namespace(cJob.DocPath.ZTranscriptsB).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
+    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
 
-    oApp.Namespace(cJob.DocPath.ZTranscriptsF).CopyHere oApp.Namespace(cJob.DocPath.JobDirectoryT).Items
-
-    On Error Resume Next
-    While oApp.Namespace(cJob.DocPath.ZTranscriptsB).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count
+    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
         DoEvents
     Wend
     On Error GoTo 0
-
-    On Error Resume Next
-    While oApp.Namespace(cJob.DocPath.ZTranscriptsF).Items.Count <> oApp.Namespace(cJob.DocPath.JobDirectoryT).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
-
-    MsgBox "You find the ZIP file here: " & cJob.DocPath.ZTranscriptsB
+    
+    Debug.Print "You find the ZIP file here: " & sDestination
 
 End Sub
 
@@ -1275,8 +1274,8 @@ eHandlerX:
 
 eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
-    GoTo eHandlerX
-    Resume
+    'GoTo eHandlerX
+    'Resume
 End Sub
 
 Public Sub fPrint4upPDF()

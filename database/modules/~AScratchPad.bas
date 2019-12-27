@@ -99,33 +99,290 @@ Private Sub testClassesInfo()
 End Sub
 
 
-'@Ignore EmptyMethod
-'@Ignore ProcedureNotUsed
-Private Sub emptyFunction()
+Private Sub pfWashingtonTranscriptCompiler()
+    '============================================================================
+    ' Name        : pfWashingtonTranscriptCompiler
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfWashingtonTranscriptCompiler()
+    ' Description:  compiles transcripts to file with COA
+    '============================================================================
+    
+    'TODO: meet 2020 Washington transcript requirements
+    
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    
+    Dim sAllTranscriptDates As String
+    Dim sSource As String
+    Dim sCurrentOtherCourtDatesID As String
+    Dim sFinalTranscripts As String
+    Dim OK As String
+    
+    Dim oDocuments As Object
+    
+    Dim x As Integer
+    Dim primaryPageCount As Integer
+    Dim sourcePageCount As Integer
+    
+    Dim rstAllTranscriptsInCase As DAO.Recordset
+    Dim rstCommHistory As DAO.Recordset
+    
+    Dim oWordDoc As New Word.Document
+    Dim oWordApp As New Word.Application
+    Dim oWordDoc1 As New Word.Document
+    
+    Dim xlRange As Excel.Range
+    Dim oExcelWB As Excel.Workbook
+    Dim oExcelApp As Excel.Application
+    
+    Dim aeAcroExchange As Acrobat.CAcroApp
+    Dim aePrimaryDoc As Acrobat.CAcroPDDoc
+    Dim aeSourceDoc As Acrobat.CAcroPDDoc
+    
+    'To Fix Bookmarks:
+    'Final Transcript Outline:
+        'Cover All
+        'Cover Date
+            'General Index
+                'normal
+            'Witness Index
+                'normal
+            'Exhibit Index
+                'normal
+            'Transcript Body
+            'Certificate
+            'Table of Authorities
+        'Cover Date
+            'General Index
+                'normal
+            'Witness Index
+                'normal
+            'Exhibit Index
+                'normal
+            'Transcript Body
+            'Certificate
+            'Table of Authorities
+        
+        
+        
+        'does this transcript need to be compiled
+            'if not, do like normal
+            'if yes, do following
+                'select query to get all transcript dates of current caseID
+                'export to csv in /workingfiles/
+                sAllTranscriptDates = "SELECT * FROM CourtDates WHERE [CasesID]=" & cJob.CaseID & ";"
+                If IsNull(DLookup("name", "msysobjects", "name='qAllTranscriptDates'")) Then
+                    CurrentDb.CreateQueryDef "qAllTranscriptDates", sAllTranscriptDates
+                Else
+                    CurrentDb.QueryDefs("qAllTranscriptDates").Sql = sAllTranscriptDates
+                End If
+                
+                DoCmd.OutputTo acOutputQuery, "qAllTranscriptDates", acFormatXLS, cJob.DocPath.JobDirectoryW & "CompiledTranscripts.xls", False
+                
+                'get xls content into range
+                Set oExcelApp = CreateObject("Excel.Application")
+                oExcelApp.Application.Visible = False
+                oExcelApp.Application.DisplayAlerts = False
+            
+                Set oExcelWB = oExcelApp.Workbooks.Open(cJob.DocPath.JobDirectoryW & "CompiledTranscripts.xls")
+                oExcelWB.Application.DisplayAlerts = False
+                oExcelWB.Application.Visible = False
+            
+                With oExcelWB
+            
+                    Set xlRange = .Worksheets(1).Range("A2").CurrentRegion
+                    .Names.Add Name:="AAAAADataRange", RefersTo:=xlRange
+                    .Save
+                    .Saved = True
+                    .Close
+                End With
+            
+                oExcelApp.Quit
+
+                'generate cover all
+                Set oWordDoc = GetObject(cJob.DocPath.TemplateFolder1 & "TR-AllCover.dotm", "Word.Document")
+                oWordDoc.Application.Visible = False
+        
+                On Error GoTo 0
+                             
+                 With oWordDoc
+                     .MailMerge.OpenDataSource _
+                     Name:=cJob.DocPath.JobDirectoryW & "CompiledTranscripts.xls", _
+                     LinkToSource:=True, _
+ _
+                     Format:=wdOpenFormatAuto, Connection:= _
+                     "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & cJob.DocPath.WAConsolidatedD & ";Mode=Read;Extended Properties=" & Chr(34) & Chr(34) & "HDR=YES;IMEX=1;" _
+                         & Chr(34) & Chr(34) & ";Jet OLEDB:System database=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & ";Jet OLEDB:Registry Path=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & _
+                         ";Jet OLEDB:Engine Type=34;Jet OLEDB;" _
+                         , SQLStatement:="SELECT * FROM `AAAAADataRange`", SQLStatement1:="", _
+                         SubType:=wdMergeSubTypeAccess
+                     .MailMerge.DataSource.FirstRecord = wdDefaultFirstRecord
+                     .MailMerge.DataSource.LastRecord = wdDefaultLastRecord
+                     .MailMerge.Execute
+                     .MailMerge.MainDocumentType = wdNotAMergeDocument
+                 
+                 End With
+             
+                 Set oDocuments = Documents
+                 For x = oDocuments.Count To 1 Step -1
+                     'Debug.Print x
+                     sSource = ActiveWindow.Caption
+                 
+                     If sSource <> "Form Letters1" Then
+                 
+                         If sSource <> sCourtDatesID & "-Cover.docx" Then
+                             sSource = Left(sSource, Len(sSource) - 27)
+                             sSource = Trim(sSource)
+                         End If
+                     End If
+                 
+                     'Debug.Print sSource
+                     If sSource = "Form Letters1" Then
+                         Documents("Form Letters1").Activate
+                         Documents("Form Letters1").SaveAs FileName:=cJob.DocPath.WAConsolidatedD
+                'make pdf
+                         Documents(cJob.DocPath.WAConsolidatedD).SaveAs cJob.DocPath.WAConsolidatedP
+                     Else
+                         Documents(sSource).Activate
+                         Documents(sSource).Close SaveChanges:=wdDoNotSaveChanges
+                     End If
+                 
+                 Next x
+             
+                 Set oExcelWB = Nothing
+                 Set oWordApp = Nothing
+                 Set oExcelApp = Nothing
+             
+                 Set rstCommHistory = CurrentDb.OpenRecordset("CommunicationHistory")
+                 rstCommHistory.AddNew
+                     rstCommHistory.Fields("FileHyperlink").Value = sCourtDatesID & "#" & cJob.DocPath.WAConsolidatedD
+                     rstCommHistory.Fields("CourtDatesID").Value = sCourtDatesID
+                     rstCommHistory.Fields("DateCreated").Value = Now
+                 rstCommHistory.Update
+                 
+                 rstCommHistory.Close
+                 Set rstCommHistory = Nothing
+                 
+                 Call pfClearGlobals
+                                
+                'select query to get all transcript dates of current caseID
+                Set rstAllTranscriptsInCase = CurrentDb.OpenRecordset(sAllTranscriptDates)
+                'FileCopy cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFPB
+                
+                If Not (rstAllTranscriptsInCase.EOF And rstAllTranscriptsInCase.BOF) Then
+            
+                    rstAllTranscriptsInCase.MoveFirst
+                
+                    Do Until rstAllTranscriptsInCase.EOF = True
+                    
+                'copy in other transcripts for same case
+                        sCurrentOtherCourtDatesID = rstAllTranscriptsInCase.Fields("ID").Value
+                        FileCopy cJob.DocPath.WAConsolidatedD, cJob.DocPath.InProgressFolder & sCurrentOtherCourtDatesID & "/Generated/" & sCurrentOtherCourtDatesID & "-Cover.docx"
+                        FileCopy cJob.DocPath.WAConsolidatedP, cJob.DocPath.InProgressFolder & sCurrentOtherCourtDatesID & "/Generated/" & sCurrentOtherCourtDatesID & "-Cover.pdf"
+                        rstAllTranscriptsInCase.MoveNext
+                    
+                    Loop
+                
+                Else
+            
+                    MsgBox "There are no records in the recordset."
+                
+                End If
+
+                'branch to complete other transcript dates if not done already
+                
+                Set rstAllTranscriptsInCase = CurrentDb.OpenRecordset(sAllTranscriptDates)
+                
+                If Not (rstAllTranscriptsInCase.EOF And rstAllTranscriptsInCase.BOF) Then
+            
+                    rstAllTranscriptsInCase.MoveFirst
+                
+                    Do Until rstAllTranscriptsInCase.EOF = True
+                    
+                'copy into first compiled ID# the other transcripts for same case
+                        sCurrentOtherCourtDatesID = rstAllTranscriptsInCase.Fields("ID").Value
+                        FileCopy cJob.DocPath.InProgressFolder & sCurrentOtherCourtDatesID & "/Transcripts/" & sCurrentOtherCourtDatesID & "-Transcript-FINAL.pdf", _
+                                 cJob.DocPath.InProgressFolder & sCourtDatesID & "/Transcripts/" & sCurrentOtherCourtDatesID & "-Transcript-FINAL.pdf"
+                        rstAllTranscriptsInCase.MoveNext
+                    
+                    Loop
+                
+                Else
+            
+                    Debug.Print "There are no records in the recordset."
+                
+                End If
+
+            
+                'get all to-be-compiled files
+                sFinalTranscripts = Dir(cJob.DocPath.JobDirectoryG & "\*" & "-Transcript-FINAL.PDF")
+                
+                Set aeAcroExchange = CreateObject("Acroexch.app")
+                Set aePrimaryDoc = CreateObject("AcroExch.PDDoc")
+                OK = aePrimaryDoc.Open("CoverName.pdf")
+                Debug.Print "PRIMARY DOC OPENED & PDDOC SET: " & OK
+                
+                'compile all final transcript PDFs for a case
+                Do While Len(sFinalTranscripts) > 0
+                    'add current pdf to end of original pdf
+                    primaryPageCount = aePrimaryDoc.GetNumPages() - 1
+            
+                    Set aeSourceDoc = CreateObject("AcroExch.PDDoc")
+                    OK = aeSourceDoc.Open("ToBeInsertedTranscriptName.pdf")
+                    Debug.Print "SOURCE DOC OPENED & PDDOC SET: " & OK
+            
+                    sourcePageCount = aeSourceDoc.GetNumPages
+            
+                    OK = aePrimaryDoc.InsertPages(primaryPageCount, aeSourceDoc, 0, sourcePageCount, False)
+                    Debug.Print "PAGES INSERTED SUCCESSFULLY: " & OK
+            
+                    OK = aePrimaryDoc.Save(PDSaveFull, "FinalCompiledPDFName")
+                    Debug.Print "PRIMARYDOC SAVED PROPERLY: " & OK
+            
+                    Set aeSourceDoc = Nothing
+                    
+                Loop
+                
+                Set aeSourceDoc = Nothing
+                Set aePrimaryDoc = Nothing
+                aeAcroExchange.Exit
+                Set aeAcroExchange = Nothing
+                MsgBox "Compilation complete.  Make sure your COA transcript looks fine, including bookmarks."
+
+End Sub
+
+
+
+'@Ignore EmptyMethod
+'@Ignore ProcedureNotUsed
+Private Sub emptyFunction()
+        
+        
+    '============================================================================
+    ' Name        : pfWashingtonTranscriptCompiler
+    ' Author      : Erica L Ingram
+    ' Copyright   : 2019, A Quo Co.
+    ' Call command: Call pfWashingtonTranscriptCompiler()
+    ' Description:  compiles transcripts to file with COA
+    '============================================================================
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
+    
+    
+    
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
     Dim oWordDoc1 As New Word.Document
         
-    'To Fix Bookmarks:
-    'Final Transcript Outline:
-        'Cover All
-        'General Index
-            'Date
-                'General Events
-        'Witness Index
-            'normal
-        'Exhibit Index
-            'normal
-        'Cover Date
-            'Transcript Body
-        'Cover Date
-            'Transcript Body
-        'Certificate
-        'Table of Authorities
+        
+        
+        
         
     'Debug.Print cJob.DocPath.CaseInfo
     'Debug.Print "test"
@@ -225,4 +482,6 @@ Private Sub emptyFunction()
     Set oWordDoc = Nothing
     Set oWordDoc1 = Nothing
 End Sub
+
+
 

@@ -349,7 +349,7 @@ Public Sub fSendPPEmailFactored()
         With oOutlookMail                        'email that will also include pp button
             '@Ignore UnassignedVariableUsage
             .To = sToEmail
-            .CC = cJob.App0.EmailAddress
+            .CC = sCompanyEmail
             .Subject = "Transcript Delivery & Invoice for " & sName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
@@ -449,27 +449,28 @@ Beginning:
         '.setRequestHeader "Authorization", "Bearer " & sAuth
         .send ("grant_type=client_credentials")
         apiWaxLRS = .responseText
-        'Debug.Print apiWaxLRS
+        Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
         sToken = parsed.item("access_token")          'third level array
         .abort
-        'Debug.Print "--------------------------------------------"
+        Debug.Print "--------------------------------------------"
     End With
       
     '@Ignore UnassignedVariableUsage
+    
     json1 = "{" & Chr(34) & "merchant_info" & Chr(34) & ": {" & Chr(34) & _
-                                                                        "email" & Chr(34) & ": " & Chr(34) & cJob.App0.EmailAddress & Chr(34) & "," & Chr(34) & _
-                                                                        "first_name" & Chr(34) & ": " & Chr(34) & cJob.App0.FirstName & Chr(34) & "," & Chr(34) & _
-                                                                        "last_name" & Chr(34) & ": " & Chr(34) & cJob.App0.LastName & Chr(34) & "," & Chr(34) & _
-                                                                        "business_name" & Chr(34) & ": " & Chr(34) & cJob.App0.Company & Chr(34) & "," & Chr(34) & _
+                                                                        "email" & Chr(34) & ": " & Chr(34) & sCompanyEmail & Chr(34) & "," & Chr(34) & _
+                                                                        "first_name" & Chr(34) & ": " & Chr(34) & sCompanyFirstName & Chr(34) & "," & Chr(34) & _
+                                                                        "last_name" & Chr(34) & ": " & Chr(34) & sCompanyLastName & Chr(34) & "," & Chr(34) & _
+                                                                        "business_name" & Chr(34) & ": " & Chr(34) & sCompanyName & Chr(34) & "," & Chr(34) & _
                                                                         "phone" & Chr(34) & ": {" & Chr(34) & _
                                                                         "country_code" & Chr(34) & ": " & Chr(34) & sPCountryCode & Chr(34) & "," & Chr(34) & _
                                                                         "national_number" & Chr(34) & ": " & Chr(34) & sCompanyNationalNumber & Chr(34) & "}," & Chr(34) & _
                                                                         "address" & Chr(34) & ": {" & Chr(34) & _
-                                                                        "line1" & Chr(34) & ": " & Chr(34) & cJob.App0.Address & Chr(34) & "," & Chr(34) & _
-                                                                        "city" & Chr(34) & ": " & Chr(34) & cJob.App0.City & Chr(34) & "," & Chr(34) & _
-                                                                        "state" & Chr(34) & ": " & Chr(34) & cJob.App0.State & Chr(34) & "," & Chr(34) & _
-                                                                        "postal_code" & Chr(34) & ": " & Chr(34) & cJob.App0.ZIP & Chr(34) & "," & Chr(34) & _
+                                                                        "line1" & Chr(34) & ": " & Chr(34) & sCompanyAddress & Chr(34) & "," & Chr(34) & _
+                                                                        "city" & Chr(34) & ": " & Chr(34) & sCompanyCity & Chr(34) & "," & Chr(34) & _
+                                                                        "state" & Chr(34) & ": " & Chr(34) & sCompanyState & Chr(34) & "," & Chr(34) & _
+                                                                        "postal_code" & Chr(34) & ": " & Chr(34) & sCompanyZIP & Chr(34) & "," & Chr(34) & _
                                                                         "country_code" & Chr(34) & ": " & Chr(34) & sZCountryCode & Chr(34) & "}},"
     json2 = Chr(34) & "billing_info" & Chr(34) & ": [{" & Chr(34) & _
                                                                   "email" & Chr(34) & ": " & Chr(34) & cJob.App0.EmailAddress & Chr(34) & "," & Chr(34) & _
@@ -538,9 +539,11 @@ Beginning:
         apiWaxLRS = .responseText
         sToken = ""
         .abort
-        'Debug.Print apiWaxLRS
-        'Debug.Print "--------------------------------------------"
+        Debug.Print apiWaxLRS
+        Debug.Print "--------------------------------------------"
     End With
+    
+    
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     sInvoiceNumber = parsed.item("number")            'third level array
     vInvoiceID = parsed.item("id")                    'third level array
@@ -689,7 +692,7 @@ Public Sub fPayPalUpdateCheck()
                 vInvoiceID = Replace(Replace(vInvoiceID, " ", ""), "-", "")
             
                 sURL = "https://api.paypal.com/v1/oauth2/token/"
-                sEmail = cJob.App0.EmailAddress
+                sEmail = sCompanyEmail
                 '  https://api.paypal.com/v1/oauth2/token \
                 'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
                 sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
@@ -1058,7 +1061,7 @@ Public Sub fSendPPEmailBalanceDue()
         With oOutlookMail
             '@Ignore UnassignedVariableUsage
             .To = sToEmail
-            .CC = cJob.App0.EmailAddress
+            .CC = sCompanyEmail
             .Subject = "Balance Due for " & cJob.App0.FirstName & " " & cJob.App0.LastName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             .BodyFormat = olFormatRichText
             Set oWordEditor = .GetInspector.WordEditor
@@ -1202,7 +1205,7 @@ Public Sub fSendPPEmailBalanceDue()
         With oOutlookMail
             '@Ignore UnassignedVariableUsage
             .To = sToEmail
-            .CC = cJob.App0.EmailAddress
+            .CC = sCompanyEmail
             .Subject = "Balance Due for " & cJob.App0.FirstName & " " & cJob.App0.LastName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             .BodyFormat = olFormatRichText
             Set oWordEditor = .GetInspector.WordEditor
@@ -1317,8 +1320,9 @@ Public Sub fSendPPEmailDeposit()
     oWordDoc.Content.Copy
     Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = False
-        
-    Set oWordDoc1 = oWordApp.Documents.Open(cJob.DocPath.InvoiceD) 'open invoice docx
+        'DepositInvoiceD
+    
+    Set oWordDoc1 = oWordApp.Documents.Open(cJob.DocPath.DepositInvoiceD) 'open invoice docx
 
     With oWordDoc1.Application
 
@@ -1387,8 +1391,9 @@ Public Sub fSendPPEmailDeposit()
         End With
     
         'save invoice
-        oWordDoc1.Save
-    
+        oWordDoc.Save
+        oWordDoc.SaveAs2 FileName:=cJob.DocPath.InvoiceD, FileFormat:=16
+        
     End With
 
     oWordDoc1.Close
@@ -1416,8 +1421,7 @@ Public Sub fSendPPEmailDeposit()
         DoCmd.OutputTo acOutputQuery, qTRIQPlusCases, acFormatXLS, cJob.DocPath.InvoiceInfo, False
        
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDIET)
-
+        Set oWordDoc = oWordApp.Documents.Open("E:\P\Database\Templates\Stage1s\PP-DraftInvoiceEmail.htm")
         oWordApp.Application.Visible = False
         oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.InvoiceInfo, ReadOnly:=True
         oWordDoc.MailMerge.Execute
@@ -1432,7 +1436,8 @@ Public Sub fSendPPEmailDeposit()
         oWordDoc.Content.Copy
     
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDraftInvoiceEmail)
+        
+        Set oWordDoc = Documents.Open(cJob.DocPath.PPDraftInvoiceEmail)
 
         With oWordDoc.Application
 
@@ -1777,7 +1782,7 @@ Public Sub fPPRefund()
     sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
     sInvoiceTime = (Format(Now(), "hh:mm:ss"))
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = cJob.App0.EmailAddress
+    sEmail = sCompanyEmail
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
 
@@ -2175,7 +2180,7 @@ Public Sub fManualPPPayment()
     'sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
 
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = cJob.App0.EmailAddress
+    sEmail = sCompanyEmail
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     

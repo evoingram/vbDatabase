@@ -56,6 +56,7 @@ Public Sub pfStage2Ppwk()
     Dim cJob As Job
     Set cJob = New Job
     cJob.FindFirst "ID=" & Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 2 for job " & sCourtDatesID
     'sCaseID
     'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
@@ -123,11 +124,12 @@ Public Sub pfStage2Ppwk()
 EndIf1:
     End If
 
-    MsgBox "Stage 2 complete."
+    Debug.Print "Stage 2 complete."
 
     Call pfCurrentCaseInfo                       'refresh transcript info
     Application.FollowHyperlink cJob.DocPath.CourtCover
     Call pfClearGlobals
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 End Sub
 
 Public Sub pfAutoCorrect()

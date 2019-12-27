@@ -179,6 +179,7 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Downloading files uploaded today."
 
     With seopFTPSettings                         ' Setup session options
         .Protocol = Protocol_Ftp
@@ -194,7 +195,9 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     Set transferResult = mySession.GetFiles("/public_html/ProjectSend/upload/files/", cJob.DocPath.UNFileInbox, False, tropFTPSettings)
     transferResult.Check                         ' Throw on any error
 
-    MsgBox "You may now find any files downloaded today in" & cJob.DocPath.FileInbox & "."
+    Forms![NewMainMenu].Form!lblFlash.Caption = "You may now find any files downloaded today in" & cJob.DocPath.FileInbox & "."
+    pfDelay (5)
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 
 End Sub
 

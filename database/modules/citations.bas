@@ -76,15 +76,18 @@ Public Sub pfFindRepCitationLinks()
     Dim sInitialSearchSQL As String
     Dim sOriginalSearchTerm As String
     Dim vBookmarkName As String
+    Dim sCHSQLstm1 As String
+    Dim sUSCSQLstm2 As String
+    Dim sCH1SQLstm3 As String
     
-    Dim x As Integer
-    Dim y As Integer
-    Dim z As Integer
-    Dim j As Integer
-    Dim iLongCitationLength As Integer
-    Dim iStartPos As Integer
-    Dim iStopPos As Integer
-    Dim i As Integer
+    Dim x As Long
+    Dim y As Long
+    Dim z As Long
+    Dim j As Long
+    Dim iLongCitationLength As Long
+    Dim iStartPos As Long
+    Dim iStopPos As Long
+    Dim i As Long
     
     Dim letter As Variant
     Dim sSearchTermArray() As Variant
@@ -119,7 +122,6 @@ Public Sub pfFindRepCitationLinks()
     
     '
     '
-    
     
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -161,6 +163,11 @@ Public Sub pfFindRepCitationLinks()
     Set rCurrentSearch = oWordDoc.Range
     sCurrentSearch = rCurrentSearch.Text
     sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34)
+    sCHSQLstm1 = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34)
+    sUSCSQLstm2 = " UNION " & _
+                  "SELECT * FROM USC WHERE [USC].[FindCitation]=" & Chr(34)
+    sCH1SQLstm3 = " UNION " & _
+                  "SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]=" & Chr(34)
     'SELECT * FROM CitationHyperlinks WHERE [CitationHyperlinks].[FindCitation]="Miranda" UNION SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]="Miranda";
     'Loop sCurrentSearch till you can't find any more matching "terms"
     'x = UBound(sSearchTermArray) - LBound(sSearchTermArray) + 1
@@ -169,7 +176,10 @@ Public Sub pfFindRepCitationLinks()
     'this loop adds to the search array everything marked found in the document
     Do Until x = 0
         If y > 1 Then
-            sCurrentLinkSQL = sCurrentLinkSQL & " OR [FindCitation]=" & Chr(34)
+            sCurrentLinkSQL = sCurrentLinkSQL & " OR [CitationHyperlinks1].[FindCitation]=" & Chr(34)
+            sCHSQLstm1 = sCHSQLstm1 & " OR [CitationHyperlinks].[FindCitation]=" & Chr(34)
+            sUSCSQLstm2 = sUSCSQLstm2 & " OR [USC].[FindCitation]=" & Chr(34)
+            sCH1SQLstm3 = sCH1SQLstm3 & " OR [CitationHyperlinks1].[FindCitation]=" & Chr(34)
         End If
         If x = 0 Then GoTo Done
         iStartPos = InStr(x, sCurrentSearch, sBeginCHT, vbTextCompare)
@@ -185,7 +195,15 @@ Public Sub pfFindRepCitationLinks()
         ReDim Preserve sSearchTermArray(UBound(sSearchTermArray) + 1)
         sSearchTermArray(UBound(sSearchTermArray)) = sCurrentTerm
         'construct sql statement from this
-        sCurrentLinkSQL = sCurrentLinkSQL & sCurrentTerm & Chr(34) & " UNION SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]=" & sCurrentTerm & Chr(34)
+        sCurrentLinkSQL = sCurrentLinkSQL & sCurrentTerm & Chr(34) & _
+                            " UNION " & _
+                            "SELECT * FROM USC WHERE [USC].[FindCitation]=" & Chr(34) & "*" & sCurrentTerm & "*" & Chr(34) & _
+                            " UNION " & _
+                            "SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]=" & Chr(34) & sCurrentTerm & Chr(34)
+        sCHSQLstm1 = sCHSQLstm1 & sCurrentTerm & Chr(34)
+        sUSCSQLstm2 = sUSCSQLstm2 & sCurrentTerm & Chr(34)
+        sCH1SQLstm3 = sCH1SQLstm3 & sCurrentTerm & Chr(34)
+        
         'Debug.Print "Current Search Term:  " & sCurrentTerm
         'Debug.Print "Current Search Array:  " & Join(sSearchTermArray, ", ")
         'Debug.Print "SQL Statement:  " & sCurrentLinkSQL
@@ -201,8 +219,18 @@ Public Sub pfFindRepCitationLinks()
     
 ExitLoop:
     sCurrentLinkSQL = sCurrentLinkSQL & ";"
+    
+    sInitialSearchSQL = sCHSQLstm1 & _
+                        sUSCSQLstm2 & _
+                        sCH1SQLstm3 & ";"
+                            
+                            'sCHSQLstm1 OR currentterm etc
+                            'sUSCSQLstm2 OR currentterm etc
+                            'sCH1SQLstm3 OR currentterm etc
+                            
     'Debug.Print "Final Search Array:  " & Join(sSearchTermArray, ", ")
-    'Debug.Print "Final SQL Statement:  " & sCurrentLinkSQL
+    Debug.Print "Original Final SQL Statement:  " & sCurrentLinkSQL
+    Debug.Print "New Final SQL Statement:  " & sInitialSearchSQL
     'Debug.Print "----------------------------------------------------------"
     'MsgBox "I'm done"
     
@@ -218,9 +246,18 @@ ExitLoop:
         'Debug.Print UBound(sSearchTermArray) - 1
         'Debug.Print x
         'SELECT * FROM CitationHyperlinks WHERE [CitationHyperlinks].[FindCitation]="Miranda" UNION SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]="Miranda";
-        sInitialSearchSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & _
-                            " UNION " & _
-                            "SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]=" & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34) & ";"
+        sCHSQLstm1 = "SELECT * FROM CitationHyperlinks WHERE [FindCitation]=" & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34)
+        sUSCSQLstm2 = " UNION " & _
+                      "SELECT * FROM USC WHERE [USC].[FindCitation]=" & Chr(34) & "*" & sSearchTermArray(x) & "*" & Chr(34)
+        sCH1SQLstm3 = " UNION " & _
+                      "SELECT * FROM CitationHyperlinks1 WHERE [CitationHyperlinks1].[FindCitation]=" & Chr(34) & sCurrentTerm & Chr(34) & ";"
+                      
+        sInitialSearchSQL = sCHSQLstm1 & _
+                            sUSCSQLstm2 & _
+                            sCH1SQLstm3
+                            'sCHSQLstm1 OR currentterm etc
+                            'sUSCSQLstm2 OR currentterm etc
+                            'sCH1SQLstm3 OR currentterm etc
         'look each one up in CitationHyperlinks
         'Debug.Print "Initial Search SQL = " & sInitialSearchSQL
         Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
@@ -242,17 +279,19 @@ ExitLoop:
             
             'create new table TempCitations
                                         
-            On Error Resume Next
-            CurrentDb.Execute "DROP TABLE TempCitations"
-            On Error GoTo 0
-            CurrentDb.Execute "CREATE TABLE TempCitations (ID COUNTER(1, 1) PRIMARY KEY, " & _
-                              "j NUMBER, " & _
-                              "OriginalTerm TEXT, " & _
-                              "FindCitation TEXT, " & _
-                              "ReplaceHyperlink TEXT, " & _
-                              "LongCitation TEXT, " & _
-                              "WebAddress TEXT );"
+            'On Error Resume Next
+            CurrentDb.Execute "DELETE FROM TempCitations"
+            'On Error GoTo 0
+            'CurrentDb.Execute "CREATE TABLE TempCitations (ID COUNTER(1, 1) PRIMARY KEY, " & _
+            '                  "j NUMBER, " & _
+            '                  "OriginalTerm TEXT, " & _
+            '                  "FindCitation TEXT, " & _
+            '                  "ReplaceHyperlink TEXT, " & _
+            '                  "LongCitation TEXT, " & _
+            '                  "WebAddress TEXT );"
+            
             j = 1
+            
             sCLChoiceList = "Current Transcript Term:  " & sOriginalSearchTerm & Chr(10) & Chr(10) & "Choices:  " & Chr(10)
             'list first 15 results only
             For j = 1 To 15
@@ -350,7 +389,7 @@ ExitLoop:
             z = InputBox("Enter your choice from 0 to 15 for which result to use, " & _
                          "0 being none and 1-15 being a choice of result from CourtListener.")
                     
-            'If z = 0 Then GoTo NextSearchTerm
+            If z = 0 Then GoTo NextSearchTerm
             
             'put choice into proper variables
             Set rstCurrentHyperlink = CurrentDb.OpenRecordset("SELECT * FROM TempCitations WHERE j =" & z & ";")
@@ -361,10 +400,8 @@ ExitLoop:
             sAbsoluteURL = "https://www.courtlistener.com" & rstCurrentHyperlink.Fields("WebAddress").Value
             rstCurrentHyperlink.Close
                     
-            'after choice made and stored, delete temporary table TempCitations
-            DoCmd.SetWarnings False
-            DoCmd.DeleteObject acTable = acDefault, "TempCitations"
-            DoCmd.SetWarnings True
+            'after choice made and stored, delete contents of TempCitations
+            CurrentDb.Execute "DELETE FROM TempCitations"
                             
             'do something with your choice
             Select Case z
@@ -397,9 +434,7 @@ ExitLoop:
                     
             'Set rstCurrentSearchMatching = CurrentDb.OpenRecordset(sInitialSearchSQL)
             'rstCurrentSearchMatching.MoveFirst
-                
-                    
-                    
+            
         End If
                 
 NextSearchTerm:
@@ -415,11 +450,11 @@ NextSearchTerm:
             
     'this is the original sql statement constructed, which is what we want
     'format sCurrentLinkSQL = "SELECT * FROM CitationHyperlinks WHERE [FindCitation] = " & Chr(34) & "*" & sCitationList(x) & "*" & Chr(34)
-    Debug.Print "Current SQL Statement:  " & sCurrentLinkSQL
+    Debug.Print "Current SQL Statement:  " & sInitialSearchSQL
     If iStartPos = 0 Then GoTo ExitLoop1
             
         
-    Set rstCurrentHyperlink = CurrentDb.OpenRecordset(sCurrentLinkSQL)
+    Set rstCurrentHyperlink = CurrentDb.OpenRecordset(sInitialSearchSQL)
                     
                 
     Do While rstCurrentHyperlink.EOF = False
@@ -622,6 +657,7 @@ ExitLoop1:
 
     End With
     
+    CurrentDb.Execute "DELETE FROM TempCitations"
     
     
 Done:
@@ -1448,7 +1484,6 @@ Public Sub pfTopOfTranscriptBookmark()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 
-    'TODO: meet 2020 Washington transcript requirements
     
     '@Ignore AssignmentNotUsed
     bTitle = PDBookmark.GetByTitle(PDocCover, "Untitled")
@@ -1561,6 +1596,8 @@ Public Sub pfTopOfTranscriptBookmark()
     Set PDoc = Nothing
     Set ADoc = Nothing
 
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    
 End Sub
 
 

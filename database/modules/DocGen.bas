@@ -58,6 +58,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Creating a document, one moment..."
 
     If sMerge = "Case" Then
 
@@ -125,6 +126,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     oWordAppDoc.Application.ActiveDocument.SaveAs FileName:=cJob.DocPath.JobDirectoryGN & sArray(1) & ".docx"
     oWordAppDoc.Application.ActiveDocument.Close
     Set oWordAppDoc = Nothing
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 
 End Sub
 
