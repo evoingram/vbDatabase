@@ -44,6 +44,7 @@ Public Sub pfStage3Ppwk()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 3 for job " & sCourtDatesID
 
     Call pfGetOrderingAttorneyInfo
 
@@ -177,8 +178,9 @@ Public Sub pfStage3Ppwk()
     
     End If
 
-    MsgBox "Stage 3 complete."
+    Debug.Print "Stage 3 complete."
     Call pfClearGlobals
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 End Sub
 
 Public Sub pfBurnCD()
@@ -327,15 +329,15 @@ Public Sub pfCreateRegularPDF()
         
             .RemoveDocumentInformation (wdRDIAll) 'remove vba and document info
             
-            For Each oVBComponent In .VBProject.oVBComponents
+            'For Each oVBComponent In .VBProject.oVBComponents
              With oVBComponent
-            If .Type = 100 Then
-            .CodeModule.DeleteLines 1, .CodeModule.CountOfLines
-            Else
-            .VBProject.oVBComponentonents.Remove oVBComponent
-             End If
+            'If .Type = 100 Then
+            '.CodeModule.DeleteLines 1, .CodeModule.CountOfLines
+            'Else
+            '.VBProject.oVBComponentonents.Remove oVBComponent
+             'End If
             End With
-            Next oVBComponent
+            'Next oVBComponent
         
         End With
     End If
@@ -730,33 +732,33 @@ Public Sub pfHeaders()
                 'Debug.Print ("Section Number:  " & iSectionIndex & "   |   " & "Headings Number:  " & iHeadingsNumber)
                 If iSectionNumber = 1 Then GoTo SkipFrontPage
                                                                  
-                If ActiveWindow.View.SplitSpecial <> wdPaneNone Then
+                If oWordDoc.ActiveWindow.View.SplitSpecial <> wdPaneNone Then
                     ActiveWindow.Panes(2).Close
                 End If
-                If ActiveWindow.ActivePane.View.Type = wdNormalView Or ActiveWindow. _
+                If oWordDoc.ActiveWindow.ActivePane.View.Type = wdNormalView Or oWordDoc.ActiveWindow. _
                    ActivePane.View.Type = wdOutlineView Then
-                    ActiveWindow.ActivePane.View.Type = wdPrintView
+                    oWordDoc.ActiveWindow.ActivePane.View.Type = wdPrintView
                 End If
-                ActiveWindow.ActivePane.View.SeekView = wdSeekCurrentPageHeader
+                oWordDoc.ActiveWindow.ActivePane.View.SeekView = wdSeekCurrentPageHeader
                     
                 With oWordDoc.Application
-                    Selection.HeaderFooter.LinkToPrevious = False
-                    Selection.TypeText Text:="***WORKING COPY***"
-                    Selection.Collapse Direction:=wdCollapseEnd
-                    Selection.TypeParagraph
+                    oWordDoc.Application.Selection.HeaderFooter.LinkToPrevious = False
+                    oWordDoc.Application.Selection.TypeText Text:="***WORKING COPY***"
+                    oWordDoc.Application.Selection.Collapse Direction:=wdCollapseEnd
+                    oWordDoc.Application.Selection.TypeParagraph
                     
                     On Error Resume Next
-                    Selection.InsertCrossReference ReferenceType:="Heading", ReferenceKind:= _
+                    oWordDoc.Application.Selection.InsertCrossReference ReferenceType:="Heading", ReferenceKind:= _
                                                    wdContentText, ReferenceItem:=iHeadingsNumber, InsertAsHyperlink:=True, _
                                                    IncludePosition:=False, SeparateNumbers:=False, SeparatorString:=" "
                     On Error GoTo 0
                     
                     If sStyleName = "Heading 2" Then Selection.TypeText Text:=" -- WITNESSNAME"
                         
-                    Selection.MoveUp Unit:=wdLine, Count:=1, Extend:=wdExtend
-                    Selection.HomeKey Unit:=wdLine, Extend:=wdExtend
-                    Selection.Find.ClearFormatting
-                    With Selection.Find
+                    oWordDoc.Application.Selection.MoveUp Unit:=wdLine, Count:=1, Extend:=wdExtend
+                    oWordDoc.Application.Selection.HomeKey Unit:=wdLine, Extend:=wdExtend
+                    oWordDoc.Application.Selection.Find.ClearFormatting
+                    With oWordDoc.Application.Selection.Find
                         .Text = ""
                         .Replacement.Text = ""
                         .Forward = True
@@ -768,7 +770,7 @@ Public Sub pfHeaders()
                         .MatchSoundsLike = False
                         .MatchAllWordForms = False
                     End With
-                    Selection.Style = oWordDoc.Styles("AQC-Working")
+                    oWordDoc.Application.Selection.Style = oWordDoc.Styles("AQC-Working")
                     
                 End With
                     
@@ -830,9 +832,16 @@ Public Sub pfTopOfTranscriptBookmark()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
+    
+    
+    'Top of Transcript Bookmark
+    
+    
+    
+    
     Set AcroApp = CreateObject("AcroExch.App")
-
+    
+    
     Set PDoc = CreateObject("AcroExch.PDDoc")
     Set PDocAll = CreateObject("AcroExch.PDDoc")
     Set PDocCover = CreateObject("AcroExch.PDDoc")
@@ -843,8 +852,12 @@ Public Sub pfTopOfTranscriptBookmark()
     
     'Table of Contents Bookmark
     PDocCover.Open (cJob.DocPath.WACoverP)
-
+    
+    
+    Debug.Print cJob.DocPath.WACoverP
+    
     Set ADoc = PDocCover.OpenAVDoc(cJob.DocPath.WACoverP)
+    
     Set PDFPageView = ADoc.GetAVPageView()
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
@@ -858,14 +871,14 @@ Public Sub pfTopOfTranscriptBookmark()
     numpages = PDocCover.GetNumPages()
     
     PDoc.Open (cJob.DocPath.TranscriptFP)
+    
 
     Set ADoc = PDoc.OpenAVDoc(cJob.DocPath.TranscriptFP)
     SendKeys ("^{HOME}")
     Set PDFPageView = ADoc.GetAVPageView()
-
+    Set PDFPageView = ADoc.GetAVPageView()
     AppActivate "Adobe Acrobat Pro Extended"
-
-    'Top of Transcript Bookmark
+    
     Call PDFPageView.Goto(0)
     AcroApp.MenuItemExecute ("NewBookmark")
 

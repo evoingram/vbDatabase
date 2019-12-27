@@ -81,6 +81,7 @@ Public Sub pfEnterNewJob()
     ' Description : import job info to db from xlsm file
     '============================================================================
 
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Entering new job into database."
     Dim sTurnaroundTimesCD As String
     Dim sInvoiceNumber As String
     Dim sNewCourtDatesRowSQL As String
@@ -124,25 +125,22 @@ Public Sub pfEnterNewJob()
     
     Dim cJob As Job
     Set cJob = New Job
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    cJob.FindFirst "ID=" & sCourtDatesID
+    'sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    'cJob.FindFirst "ID=" & sCourtDatesID
 
     Set oExcelApp = CreateObject("Excel.Application")
-
-    Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(cJob.DocPath.OrderFormCustomersXLSM)
+    Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(cJob.DocPath.OrderFormCustomersXLSM, Local:=True)
     oExcelMacroWB.Application.DisplayAlerts = False
-    oExcelMacroWB.Application.Visible = False
-    oExcelMacroWB.SaveAs Replace(cJob.DocPath.OrderFormCustomersXLSM, ".xlsm", ".xlsx"), FileFormat:=xlWorkbookDefault
+    oExcelMacroWB.Application.Visible = True
+    Debug.Print cJob.DocPath.OrderFormCustomersXLSX
+    'oExcelMacroWB.SaveAs FileFormat:=6
+    Dim sXLSMPath As String
+
+    Debug.Print oExcelMacroWB.Path
+    
+    oExcelMacroWB.SaveAs FileName:=oExcelMacroWB.Path & "\OrderFormCustomers", FileFormat:=6
     oExcelMacroWB.Close True
     Set oExcelMacroWB = Nothing
-
-    Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormCustomersXLSX, Local:=True)
-    oExcelWB.Application.DisplayAlerts = False
-    oExcelWB.Application.Visible = False
-    oExcelWB.SaveAs Replace(cJob.DocPath.OrderFormCustomersXLSX, ".xlsx", ".csv"), FileFormat:=6
-
-    oExcelWB.Close True
-    Set oExcelWB = Nothing
     
     On Error Resume Next:   On Error GoTo 0
     CurrentDb.TableDefs.Refresh
@@ -150,17 +148,9 @@ Public Sub pfEnterNewJob()
     Set oExcelMacroWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormXLSM, Local:=True)
     oExcelMacroWB.Application.DisplayAlerts = False
     oExcelMacroWB.Application.Visible = False
-    oExcelMacroWB.SaveAs Replace(cJob.DocPath.OrderFormXLSM, ".xlsm", ".xlsx"), FileFormat:=xlWorkbookDefault
+    oExcelMacroWB.SaveAs FileName:=oExcelMacroWB.Path & "\OrderForm", FileFormat:=6
     oExcelMacroWB.Close True
     Set oExcelMacroWB = Nothing
-
-    Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=cJob.DocPath.OrderFormXLSX, Local:=True)
-    oExcelWB.Application.DisplayAlerts = False
-    oExcelWB.Application.Visible = False
-    oExcelWB.SaveAs Replace(cJob.DocPath.OrderFormXLSX, ".xlsx", ".csv"), FileFormat:=6
-    oExcelWB.Close True
-    Set oExcelWB = Nothing
-
  
     On Error Resume Next:   On Error GoTo 0
     CurrentDb.TableDefs.Refresh
@@ -325,6 +315,7 @@ Public Sub pfEnterNewJob()
     sCourtDatesID = rstCourtDatesID.Fields("IDNo").Value
         
     rstCourtDatesID.Close
+    
     Set rstCourtDatesID = CurrentDb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";")
     rstCourtDatesID.Edit
     rstCourtDatesID.Fields("DueDate").Value = dDueDate
@@ -501,10 +492,10 @@ Public Sub pfEnterNewJob()
 
     Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA) 'code for processing audio
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    MsgBox "Thanks, job entered!  Job number is " & sCourtDatesID & " if you want to process it!"
-
-
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Job " & sCourtDatesID & " entered."
     Call pfClearGlobals
+    pfDelay (5)
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 End Sub
 
 Public Sub fCheckTempCustomersCustomers()
@@ -800,11 +791,12 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     
     Dim rs2 As DAO.Recordset
     Dim rstTempCourtDates As DAO.Recordset
-
+    Dim rstRates As DAO.Recordset
+    
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    cJob.FindFirst "ID=" & sCourtDatesID
+    'cJob.FindFirst "ID=" & sCourtDatesID
     
     'calculate fields
     Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
@@ -879,8 +871,15 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
         iUnitPriceID = 33
         
     End Select
-
+    
+    
     'calculate total price estimate
+    
+    
+    Set rstRates = CurrentDb.OpenRecordset("SELECT ID, Rate FROM UnitPrice WHERE [ID] = " & iUnitPriceID & ";")
+    cJob.PageRate = rstRates.Fields("Rate").Value
+    rstRates.Close
+    
     sSubtotal = iEstimatedPageCount * cJob.PageRate
 
     'set minimum charge
@@ -1329,6 +1328,7 @@ Public Sub pfStage1Ppwk()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 1 for job " & sCourtDatesID
     
     Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
@@ -1434,7 +1434,6 @@ Line2:                                           'every jurisdiction converges h
 
     DoCmd.TransferText acExportDelim, , qSelectXero, cJob.DocPath.XeroCSV, True
 
-    'TODO: xero api
     sURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
     Application.FollowHyperlink (sURL)           'open xero website
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
@@ -1477,7 +1476,9 @@ Line2:                                           'every jurisdiction converges h
     
     DoCmd.Close acQuery, qXeroCSVQ
     
-    MsgBox "Stage 1 complete."
+    Debug.Print "Stage 1 complete."
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    
     Call pfTypeRoughDraftF                       'type rough draft prompt
     Call pfClearGlobals
 End Sub
@@ -1798,6 +1799,7 @@ Public Sub fWunderlistAddNewJob()
 End Sub
 
 Public Sub autointake()
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Entering new job into database."
     'autoread email form into access db
     Dim sSubmissionDate As String
     Dim sEmailText As String
@@ -2331,6 +2333,13 @@ Public Sub autointake()
         Call pfSendWordDocAsEmail("OrderConfirmation", "Transcript Order Confirmation") 'Order Confrmation Email
     
     End If
+    
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Job " & sCourtDatesID & " entered."
+    Call pfClearGlobals
+    pfDelay (5)
+    Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    
 End Sub
 
 Public Sub NewOLEntry()

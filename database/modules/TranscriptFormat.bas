@@ -1526,8 +1526,6 @@ Public Sub pfWordIndexer()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    
-    'TODO: Take out duplicate page ##s
 
     'Set oWordApp1 = CreateObject(Class:="Word.Application")
     oWordApp1.Visible = True
@@ -1569,7 +1567,7 @@ Public Sub pfWordIndexer()
                 sInput = Replace(sInput, Chr(w), " ")
             End Select
         Next
-    
+        'TODO: word index -- insert somewhere an if statement:  if current entry to add is identical to previous, go to next page number
         sInput = Replace(Replace(Replace(Replace(sInput, Chr(44) & Chr(32), " "), Chr(44) & vbCr, " "), Chr(46) & Chr(32), " "), Chr(46) & vbCr, " ")
         sInput = Replace(Replace(Replace(Replace(sInput, Chr(145), "'"), Chr(146), "'"), "' ", " "), " '", " ")
         sInput = " " & LCase(Trim(sInput)) & " "

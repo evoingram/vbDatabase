@@ -47,40 +47,55 @@ Private Sub Command68_Click()
     Call pfCurrentCaseInfo                       'refresh transcript info
 
     If Me.cmbListAllDocuments = "Stage 1:  Deposit Received paperwork" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating deposit-received document."
     
         Call fDepositPaymentReceived
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     ElseIf Me.cmbListAllDocuments = "Stage 1:  Order Confirmation" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating order-confirmation document."
 
         Call pfGenericExportandMailMerge("Case", "Stage1s\OrderConfirmation")
         Call pfSendWordDocAsEmail("OrderConfirmation", "Transcript Order Confirmation") 'Order Confrmation Email
 
     
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     ElseIf Me.cmbListAllDocuments = "Stage 1:  Cover Page" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating transcript cover document."
     
         Call pfSelectCoverTemplate               'Cover Page
         Call pfUpdateCheckboxStatus("CoverPage")
 
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     ElseIf Me.cmbListAllDocuments = "Stage 1:  Create Tasks" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating tasks."
     
         Call pfGenerateJobTasks
         Call pfUpdateCheckboxStatus("Schedule")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 1:  CD Label" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating CD label document."
 
         'Call pfCreateCDLabel
         Call pfUpdateCheckboxStatus("CDLabel")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 1:  package-enclosed letter" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating PEL document."
 
         'Call fCreatePELLetter
         Call pfUpdateCheckboxStatus("PackageEnclosedLetter")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 1:  transcripts-ready email" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating TRE document."
 
         Call fTranscriptDeliveryF
         Call pfUpdateCheckboxStatus("TranscriptsReady")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 1:  Price Quote/Deposit Invoice" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating PQ/DI document."
 
         'export xero csv
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
@@ -92,36 +107,50 @@ Private Sub Command68_Click()
         Application.FollowHyperlink (svURL)
         Call fIsFactoringApproved
         Call pfUpdateCheckboxStatus("InvoiceCompleted")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
   
     ElseIf Me.cmbListAllDocuments = "Stage 1:  KCI Invoice" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating KCI invoice."
   
         Call fAcrobatKCIInvoice
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     
     ElseIf Me.cmbListAllDocuments = "Stage 2:  Type rough draft" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Processing rough draft."
 
         Call pfRoughDraftToCoverF
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 3:  Find/replace" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Processing rough draft."
 
         Call pfTypeRoughDraftF
         Call pfUpdateCheckboxStatus("AddRDtoCover")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 3:  Audio proof" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Beginning audio proofing."
 
         Application.FollowHyperlink cJob.DocPath.CourtCover
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 
     ElseIf Me.cmbListAllDocuments = "Stage 3:  Volumes Cover" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating volumes compilation cover document."
     
         Call pfCreateCover("Stage3s\TR-AllCover.dotm") 'cover for all volumes in one pdf
         Call pfPrepareCover
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 4:  Shipping XMLs" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating shipping XML document."
 
         DoCmd.OpenForm FormName:="FShippingOptions"
         Call pfUpdateCheckboxStatus("ShippingXMLs")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 4:  Xero invoice CSV" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating Xero CSV document."
 
         'export xero csv
         DoCmd.OpenQuery qXeroCSVQ, acViewNormal, acAdd
@@ -132,8 +161,10 @@ Private Sub Command68_Click()
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
         Application.FollowHyperlink (svURL)
         Call pfUpdateCheckboxStatus("InvoiceCompleted")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 4:  PayPal invoice CSV" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating PayPal CSV document."
 
     
         'real factoring csv plus invoice generated FactoringCSVQuery
@@ -141,7 +172,7 @@ Private Sub Command68_Click()
     
         
         Call pfGetOrderingAttorneyInfo
-    
+        
         If sFactoringApproved = True Then
     
             DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
@@ -168,7 +199,9 @@ Private Sub Command68_Click()
         Application.FollowHyperlink (svURL)
         Call pfUpdateCheckboxStatus("InvoiceCompleted")
 
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     ElseIf Me.cmbListAllDocuments = "Stage 4:  Factoring invoice CSV" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating factoring CSV document."
 
         'factor email prompt
         'need to add other real factoring csv plus invoice generated
@@ -226,8 +259,10 @@ Private Sub Command68_Click()
             Call pfUpdateCheckboxStatus("InvoiceCompleted")
         
         End If
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 4:  Invoice / Balance Due" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating Invoice/Balance due document."
 
         Call fSendPPEmailFactored
         Call pfSendWordDocAsEmail("CIDFinalIncomeReport", "Final Income Notification") 'final income report 'emails adam cid report
@@ -242,29 +277,37 @@ Private Sub Command68_Click()
         svURL = "https://go.xero.com/Import/Import.aspx?type=IMPORTTYPE/ARINVOICES"
         Application.FollowHyperlink (svURL)
         Call pfUpdateCheckboxStatus("InvoiceCompleted")
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 4:  PayPal Invoice" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating PP invoice document."
     
         Call fIsFactoringApproved
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     ElseIf Me.cmbListAllDocuments = "Stage 4:  Word Index" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating word index document."
     
         Call pfWordIndexer
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
         
     ElseIf Me.cmbListAllDocuments = "Stage 4:  PP Draft Email" Then
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Generating PP draft email document."
         
         Dim oWordApp As Word.Application
         Dim oWordDoc As Word.Document
         
         Set oWordApp = CreateObject("Word.Application")
-        Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.PPDIET)
+        Set oWordDoc = Documents.Open(cJob.DocPath.PPDIET)
 
         oWordApp.Application.Visible = False
         oWordDoc.MailMerge.OpenDataSource Name:=cJob.DocPath.InvoiceInfo, ReadOnly:=True
         oWordDoc.MailMerge.Execute
         oWordDoc.MailMerge.MainDocumentType = wdNotAMergeDocument
         oWordDoc.Application.ActiveDocument.SaveAs2 FileName:=cJob.DocPath.PPDraftInvoiceEmail
-
+        oWordDoc.Close
+        oWordApp.Quit
+        
         Set oWordApp = CreateObject("Word.Application")
         oWordApp.Visible = False
     
@@ -326,4 +369,5 @@ Private Sub Command68_Click()
     Else
     End If
     Call pfClearGlobals
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 End Sub
