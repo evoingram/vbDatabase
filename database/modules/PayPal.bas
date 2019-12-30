@@ -355,7 +355,7 @@ Public Sub fSendPPEmailFactored()
     End If
     On Error GoTo 0
     Call pfCommunicationHistoryAdd("PP Invoice Sent")
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -731,7 +731,7 @@ NextJob:
     rstQuery1.Close
     Set rstQuery1 = Nothing
 
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -1476,7 +1476,7 @@ Public Sub fSendPPEmailDeposit()
     Set oWordDoc = Nothing
 
     Call pfCommunicationHistoryAdd("PP Invoice Sent") 'record entry in comm history table for logs
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 

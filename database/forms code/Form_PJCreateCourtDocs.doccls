@@ -363,7 +363,7 @@ Private Sub Command68_Click()
     
     Else
     End If
-    Call pfClearGlobals
+    
         Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     sCourtDatesID = ""
 End Sub

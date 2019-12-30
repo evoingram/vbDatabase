@@ -11,6 +11,8 @@ Option Explicit
 ' Description : get info for invoice
 '============================================================================
 
+'TODO: make sure cJob cleared/cleaned up properly
+
 'TODO: Make a class
 'payment related globals
 Public sCourtDatesID As String
@@ -40,6 +42,7 @@ Public i As Long
 'Public SharedRecognizer As SpSharedRecognizer
 'Public theRecognizers As ISpeechObjectTokens
 
+'TODO: Make sure all oWordApps and oWordDocs are closed/cleared properly & get rid of global variables
 Public oWordApp As Word.Document
 Public oWordDoc As Word.Application
 
@@ -275,18 +278,4 @@ Public Sub fPPGenerateJSONInfo()
     End If
     vmMemo = sCourtDatesID & " " & cJob.InvoiceNo
 
-End Sub
-
-Public Sub pfClearGlobals()
-
-    '============================================================================
-    ' Name        : pfClearGlobals
-    ' Author      : Erica L Ingram
-    ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call pfClearGlobals
-    ' Description : clears all global variables
-    '============================================================================
-    
-    Set oWordApp = Nothing
-    Set oWordDoc = Nothing
 End Sub

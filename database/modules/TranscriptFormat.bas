@@ -1062,7 +1062,7 @@ Public Sub pfReplaceFDA()
     Set rs = Nothing
     Set rs1 = Nothing
     Set oWordApp = Nothing
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -1915,7 +1915,7 @@ Public Sub FPJurors()
     oCourtCoverWD.Close
     On Error GoTo 0
     oWordApp.Quit
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 

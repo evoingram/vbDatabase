@@ -380,7 +380,6 @@ Public Sub pfStage4Ppwk()
     End If
 
     Debug.Print "Stage 4 complete."
-    Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     sCourtDatesID = ""
 End Sub
@@ -624,7 +623,6 @@ ContractorFile:
         CurrentDb.Execute sFiledNotFiledSQL
         MsgBox "Transcript has been marked filed."
     End If
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -729,7 +727,6 @@ Line2:
     End If
 
     Call fAssignPS
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -1019,7 +1016,6 @@ Public Sub pfSendTrackingEmail()
     rs.Close
     Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
     Call fWunderlistAdd(sCourtDatesID & ":  Package to Ship", Format(Now + 1, "yyyy-mm-dd"))
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -1379,7 +1375,6 @@ eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Details"
     GoTo eHandlerX
     Resume
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -1435,7 +1430,6 @@ Public Sub pfUpload(ByRef mySession As Session)
         MsgBox "Upload of " & transfer.FileName & " succeeded"
     Next
     
-    Call pfClearGlobals
     sCourtDatesID = ""
     
 End Sub
@@ -1795,7 +1789,6 @@ Public Sub fCourtofAppealsIXML()
     DoCmd.Close acQuery, qnShippingOptionsQ
     
     MsgBox "Exported COA XML and added entry to CommHistory table."
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 

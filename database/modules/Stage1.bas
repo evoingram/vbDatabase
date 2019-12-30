@@ -493,7 +493,7 @@ Public Sub pfEnterNewJob()
     Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA) 'code for processing audio
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Forms![NewMainMenu].Form!lblFlash.Caption = "Job " & sCourtDatesID & " entered."
-    Call pfClearGlobals
+    
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     sCourtDatesID = ""
@@ -1056,7 +1056,7 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
     
 Line2:
     End If
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -1450,7 +1450,7 @@ Line2:                                           'every jurisdiction converges h
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     
     Call pfTypeRoughDraftF                       'type rough draft prompt
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -2270,7 +2270,7 @@ Public Sub autointake()
             
             
         MsgBox "Thanks, job entered!  Job number is " & sCourtDatesID & " if you want to process it!"
-        Call pfClearGlobals
+        
                 
         rstOLP.MoveNext
     
@@ -2301,7 +2301,7 @@ Public Sub autointake()
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     Forms![NewMainMenu].Form!lblFlash.Caption = "Job " & sCourtDatesID & " entered."
-    Call pfClearGlobals
+    
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 

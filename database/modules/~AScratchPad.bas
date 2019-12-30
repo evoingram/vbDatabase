@@ -266,7 +266,7 @@ Private Sub pfWashingtonTranscriptCompiler()
                  rstCommHistory.Close
                  Set rstCommHistory = Nothing
                  
-                 Call pfClearGlobals
+                 
                                 
                 'select query to get all transcript dates of current caseID
                 Set rstAllTranscriptsInCase = CurrentDb.OpenRecordset(sAllTranscriptDates)

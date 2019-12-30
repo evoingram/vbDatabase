@@ -602,7 +602,6 @@ Public Sub pfCheckFolderExistence()
         End If
     
     End If
-    Call pfClearGlobals
     Set cJob = Nothing
     sCourtDatesID = ""
 End Sub
@@ -1261,7 +1260,6 @@ Public Sub pfGenerateJobTasks()
     'Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
     
 
-    Call pfClearGlobals
     sCourtDatesID = ""
     
 End Sub

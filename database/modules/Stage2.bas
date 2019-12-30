@@ -127,7 +127,6 @@ EndIf1:
     Debug.Print "Stage 2 complete."
 
     Application.FollowHyperlink cJob.DocPath.CourtCover
-    Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     sCourtDatesID = ""
 End Sub
@@ -1603,7 +1602,6 @@ Public Sub pfRoughDraftToCoverF()
         'Call fDynamicHeaders
     End If
 
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -2276,7 +2274,6 @@ Public Sub pfTypeRoughDraftF()
     DoCmd.OpenForm FormName:="PJType"            'open window with AGShortcuts, SpeakerList, and jurisdiction notes
 
     Shell "winword " + cJob.DocPath.RoughDraft 'open file
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -3621,7 +3618,6 @@ Public Sub pfRoughDraftCFMass()
     End If
 
 
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 

@@ -524,7 +524,7 @@ Public Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
     rstPaymentAdd.Close
 
     Call fManualPPPayment
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -589,7 +589,7 @@ Public Sub fUpdateFactoringDates()
     CurrentDb.Execute sCDCalcUpdateSQL
     CurrentDb.Close
     
-    Call pfClearGlobals
+    
 
     sCourtDatesID = ""
 End Sub
@@ -800,7 +800,7 @@ Public Sub fTranscriptExpensesBeginning()
         
     MsgBox "Static Expenses Added!"
     
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -858,7 +858,7 @@ Public Sub fTranscriptExpensesAfter()
     rstExpensesAdd.Close
 
     MsgBox "Dynamic Expenses Added!"
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
@@ -928,6 +928,6 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     
     rstExpenses.Close
     
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub

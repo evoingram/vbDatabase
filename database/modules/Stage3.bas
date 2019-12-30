@@ -173,7 +173,7 @@ Public Sub pfStage3Ppwk()
     End If
 
     Debug.Print "Stage 3 complete."
-    Call pfClearGlobals
+    
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     sClientTranscriptName = ""
     sCourtDatesID = ""

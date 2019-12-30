@@ -265,7 +265,6 @@ Public Sub pfCreateCDLabel()
     'End If
 
     Call fPrintKCIEnvelope
-    Call pfClearGlobals
     sCourtDatesID = ""
     
 End Sub
@@ -310,7 +309,6 @@ Public Sub pfSelectCoverTemplate()
     End If
 
     Call pfCommunicationHistoryAdd("CourtCover")
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -446,7 +444,6 @@ Public Sub pfCreateCover(sTemplatePath As String)
     rstCommHistory.Close
     Set rstCommHistory = Nothing
     
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -479,7 +476,6 @@ Public Sub fCreatePELLetter()
     End If
 
     Call pfCommunicationHistoryAdd("PackageEnclosedLetter")
-    Call pfClearGlobals
     sCourtDatesID = ""
 End Sub
 
@@ -563,7 +559,6 @@ Public Sub fFactorInvoicEmailF()
 
     qdf.Close
     CurrentDb.Close
-    Call pfClearGlobals
     sCourtDatesID = ""
     
 End Sub
@@ -600,7 +595,7 @@ Public Sub pfInvoicesCSV()
 
 
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
     
 End Sub

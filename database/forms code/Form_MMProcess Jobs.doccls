@@ -205,7 +205,7 @@ Private Sub TypeBTN_Click()
     End If
     'Call PlayAudioFolder
     Documents.Open FileName:=cJob.DocPath.RoughDraft, ReadOnly:=False
-    Call pfClearGlobals
+    
     sCourtDatesID = ""
 End Sub
 
