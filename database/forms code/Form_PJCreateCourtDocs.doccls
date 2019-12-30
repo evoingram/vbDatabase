@@ -34,6 +34,7 @@ Private Sub Command68_Click()
 
     Dim sAnswer As String
     Dim sQuestion As String
+    Dim svURL As String
     
     Dim qdf As QueryDef
     Dim rstTRCUnionAA As DAO.Recordset
@@ -43,8 +44,6 @@ Private Sub Command68_Click()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     If Me.cmbListAllDocuments = "Stage 1:  Deposit Received paperwork" Then
         Forms![NewMainMenu].Form!lblFlash.Caption = "Generating deposit-received document."
@@ -169,11 +168,8 @@ Private Sub Command68_Click()
     
         'real factoring csv plus invoice generated FactoringCSVQuery
         'paypal csv PayPalDepositInvoiceCSVQ & PayPalFactoringInvoiceCSVQ
-    
         
-        Call pfGetOrderingAttorneyInfo
-        
-        If sFactoringApproved = True Then
+        If cJob.App0.FactoringApproved = True Then
     
             DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
             DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True
@@ -230,9 +226,8 @@ Private Sub Command68_Click()
             Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
             qdf.Parameters(0) = sCourtDatesID
             Set rstTRCUnionAA = qdf.OpenRecordset()
-            sFactoringApproved = rstTRCUnionAA.Fields("FactoringApproved")
         
-            If sFactoringApproved = True Then
+            If cJob.App0.FactoringApproved = True Then
         
                 DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
                 DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True
@@ -368,6 +363,7 @@ Private Sub Command68_Click()
     
     Else
     End If
-    Call pfClearGlobals
+    
         Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 End Sub

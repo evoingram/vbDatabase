@@ -6,7 +6,6 @@ Private Sub btnViewInvoice_Click()
 
 
     Dim rstCourtDates As DAO.Recordset
-    Dim sInvoiceNumber As String
     Dim wbViewInvoice As Object
     
     
@@ -16,21 +15,16 @@ Private Sub btnViewInvoice_Click()
     sCourtDatesID = Me.btnVIJobNumberField.Value
     cJob.FindFirst "ID=" & sCourtDatesID
     
-    Set rstCourtDates = CurrentDb.OpenRecordset("SELECT * FROM COURTDATES WHERE ID = " & sCourtDatesID & ";")
-        sInvoiceNumber = rstCourtDates.Fields("InvoiceNo").Value
     
-    rstCourtDates.Close
-    
-    Set rstCourtDates = Nothing
-    
-    Me.txtInvoiceNo.Value = sInvoiceNumber
+    Me.txtInvoiceNo.Value = cJob.InvoiceNo
     If Len(Dir(cJob.DocPath.InvoiceP, vbDirectory)) <> 0 Then
         With Me.wbViewInvoice
             .Navigate2 cJob.DocPath.InvoiceP
             .Requery
         End With
     Else
-        MsgBox "Job number " & sCourtDatesID & ", Invoice number " & sInvoiceNumber & " doesn't have an invoice processed yet."
+        MsgBox "Job number " & sCourtDatesID & ", Invoice number " & cJob.InvoiceNo & " doesn't have an invoice processed yet."
     End If
 
+    sCourtDatesID = ""
 End Sub

@@ -166,7 +166,7 @@ Private Sub pfWashingtonTranscriptCompiler()
             'Certificate
             'Table of Authorities
         
-        
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Compiling Washington COA transcript."
         
         'does this transcript need to be compiled
             'if not, do like normal
@@ -266,7 +266,7 @@ Private Sub pfWashingtonTranscriptCompiler()
                  rstCommHistory.Close
                  Set rstCommHistory = Nothing
                  
-                 Call pfClearGlobals
+                 
                                 
                 'select query to get all transcript dates of current caseID
                 Set rstAllTranscriptsInCase = CurrentDb.OpenRecordset(sAllTranscriptDates)
@@ -350,8 +350,10 @@ Private Sub pfWashingtonTranscriptCompiler()
                 Set aePrimaryDoc = Nothing
                 aeAcroExchange.Exit
                 Set aeAcroExchange = Nothing
+                Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
                 MsgBox "Compilation complete.  Make sure your COA transcript looks fine, including bookmarks."
 
+    sCourtDatesID = ""
 End Sub
 
 
@@ -481,6 +483,7 @@ Private Sub emptyFunction()
     Set oWordApp = Nothing
     Set oWordDoc = Nothing
     Set oWordDoc1 = Nothing
+    sCourtDatesID = ""
 End Sub
 
 

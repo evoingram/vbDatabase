@@ -34,6 +34,7 @@ Private Sub Form_Load()
     '  Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
     'Call DisplayDoc(Me.oleShowDoc, cJob.DocPath.RoughDraft)
 
+    sCourtDatesID = ""
 End Sub
 
 Private Sub Form_Current()
@@ -47,6 +48,7 @@ Private Sub Form_Current()
     'Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
     'Me.oleShowDoc.Requery
   
+    sCourtDatesID = ""
 End Sub
 
 Public Function DisplayDoc(ctlDocControl As Control, sRoughDraftPath As Variant) As String
@@ -148,6 +150,7 @@ NextStep:
 
     'open audio folder
     Shell "C:\WINDOWS\explorer.exe """ & cJob.DocPath.AudioFolder & "", vbNormalFocus
-    
+
+    sCourtDatesID = ""
 
 End Sub

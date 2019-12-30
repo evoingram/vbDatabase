@@ -67,7 +67,6 @@ Public Sub pfStage4Ppwk()
     ' Description : completes all stage 4 tasks / button name is cmdStage4Paperwork
     '============================================================================
 
-    Dim db As Database
     Dim rs1 As DAO.Recordset
     Dim qdf1 As QueryDef
     Dim qdf As QueryDef
@@ -83,33 +82,12 @@ Public Sub pfStage4Ppwk()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
     Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 4 for job " & sCourtDatesID
-    
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
-    Call pfGetOrderingAttorneyInfo
-
-    If sJurisdiction Like "*AVT*" Then
+    If cJob.CaseInfo.Jurisdiction Like "*AVT*" Then
         'paypal commands
         Call fPPDraft
 
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-    
-        Set db = CurrentDb
-        Set qdf1 = CurrentDb.QueryDefs("PaymentQueryInvoiceInfo")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sFinalPrice = rs1.Fields("FinalPrice").Value 'STORE FINAL PRICE IN VARIABLE
-        sInvoiceNumber = rs1.Fields("InvoiceNo").Value 'STORE INVOICE NUMBER IN VARIABLE
-    
-        Set qdf1 = CurrentDb.QueryDefs("TR-AppAddr-Q")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sFactoringApproved = rs1.Fields("FactoringApproved").Value 'STORE FACTORING APPROVED YES/NO IN VARIABLE
-    
-        Set rs1 = db.OpenRecordset("BalanceofPaymentsPerInvoiceQuery")
-        sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -132,33 +110,12 @@ Public Sub pfStage4Ppwk()
         Call pfCommunicationHistoryAdd("CIDFinalIncomeReport") 'LOG INCOME REPORT
         Call pfSendWordDocAsEmail("CIDFinalIncomeReport", "Final Income Notification") 'final income report 'emails adam cid report
     
-        rs1.Close
-    
-    ElseIf sJurisdiction Like "*eScribers*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*eScribers*" Then
     
         'paypal commands
         Call fPPDraft
 
-        Call pfGetOrderingAttorneyInfo
-        Call pfCurrentCaseInfo                   'refresh transcript info
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-    
-        Set db = CurrentDb
-        Set qdf1 = CurrentDb.QueryDefs("PaymentQueryInvoiceInfo")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sFinalPrice = rs1.Fields("FinalPrice").Value 'STORE FINAL PRICE IN VARIABLE
-        sInvoiceNumber = rs1.Fields("InvoiceNo").Value 'STORE INVOICE NUMBER IN VARIABLE
-    
-        Set qdf1 = CurrentDb.QueryDefs("TR-AppAddr-Q")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sFactoringApproved = rs1.Fields("FactoringApproved").Value 'STORE FACTORING APPROVED YES/NO IN VARIABLE
-    
-        Set rs1 = db.OpenRecordset("BalanceofPaymentsPerInvoiceQuery")
-        sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -183,20 +140,12 @@ Public Sub pfStage4Ppwk()
     
         rs1.Close
     
-    ElseIf sJurisdiction Like "*FDA*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*FDA*" Then
     
         'paypal commands
         Call fPPDraft
     
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-        Call pfGetOrderingAttorneyInfo           'STORE FACTORING APPROVED YES/NO IN VARIABLE
-    
-        Set db = CurrentDb
-        Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -219,19 +168,11 @@ Public Sub pfStage4Ppwk()
         Call pfCommunicationHistoryAdd("CIDFinalIncomeReport") 'LOG INCOME REPORT
         Call pfSendWordDocAsEmail("CIDFinalIncomeReport", "Final Income Notification") 'final income report 'emails adam cid report
     
-    ElseIf sJurisdiction Like "*Food and Drug Administration*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*Food and Drug Administration*" Then
     
         'paypal commands
         Call fPPDraft
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-        Call pfGetOrderingAttorneyInfo           'STORE FACTORING APPROVED YES/NO IN VARIABLE
-    
-        Set db = CurrentDb
-        Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -254,20 +195,12 @@ Public Sub pfStage4Ppwk()
         Call pfCommunicationHistoryAdd("CIDFinalIncomeReport") 'LOG INCOME REPORT
         Call pfSendWordDocAsEmail("CIDFinalIncomeReport", "Final Income Notification") 'final income report 'emails adam cid report
     
-    ElseIf sJurisdiction Like "*Weber*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*Weber*" Then
     
         'paypal commands
         Call fPPDraft
         
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-        Call pfGetOrderingAttorneyInfo           'STORE FACTORING APPROVED YES/NO IN VARIABLE
-    
-        Set db = CurrentDb
-        Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0) 'STORE SUM OF ALL PAYMENTS/REFUNDS IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -296,29 +229,7 @@ Public Sub pfStage4Ppwk()
         Call fTranscriptExpensesBeginning        'LOGS STATIC PER-TRANSCRIPT EXPENSES
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
     
-        Set qdf1 = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
-     
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-        sFinalPrice = rs1.Fields("FinalPrice").Value 'STORE FINAL PRICE IN VARIABLE
-        sInvoiceNumber = rs1.Fields("InvoiceNo").Value 'STORE INVOICE NUMBER IN VARIABLE
-     
-        Set qdf1 = CurrentDb.QueryDefs("TR-AppAddr-Q")
-    
-     
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sFactoringApproved = rs1.Fields("FactoringApproved").Value
-        rs1.Close
-        Set qdf1 = CurrentDb.QueryDefs("BalanceofPaymentsPerInvoiceQuery")
-        qdf1.Parameters(0) = sCourtDatesID
-        Set rs1 = qdf1.OpenRecordset
-    
-        sPaymentSum = Nz(rs1.Fields("PaymentSum").Value, 0)
-        sBalanceDue = sFinalPrice - sPaymentSum  'DETERMINES IF DELIVERY HELD OR NO AND REFUND OR BALANCE DUE
-    
-        If sFactoringApproved = True Then        'IF FACTORING APPROVED, DO THE FOLLOWING
+        If cJob.App0.FactoringApproved = True Then        'IF FACTORING APPROVED, DO THE FOLLOWING
         
             Set qdf = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
             qdf.Parameters(0) = sCourtDatesID
@@ -353,18 +264,16 @@ Public Sub pfStage4Ppwk()
                 MsgBox "Transcript will not be factored."
             
             Else
-        
-                Set db = CurrentDb
             
                 sFactoredChkBxSQL = "update [CourtDates] set Factored =(Yes) WHERE ID=" & sCourtDatesID & ";"
-                db.Execute sFactoredChkBxSQL
+                CurrentDb.Execute sFactoredChkBxSQL
                 MsgBox "Transcript has been marked factored."
             
             End If
         
         Else
 
-            If sBalanceDue < 10 And sBalanceDue > 0 Then
+            If (cJob.FinalPrice - Nz(cJob.PaymentSum, 0)) < 10 And (cJob.FinalPrice - Nz(cJob.PaymentSum, 0)) > 0 Then
         
                 Call fTranscriptExpensesAfter    'LOGS DYNAMIC PER-TRANSCRIPT EXPENSES
             
@@ -395,17 +304,17 @@ Public Sub pfStage4Ppwk()
                 Call fTranscriptDeliveryF
     
             
-            ElseIf sBalanceDue <= 0 Then
+            ElseIf (cJob.FinalPrice - Nz(cJob.PaymentSum, 0)) <= 0 Then
         
                 Call pfGenericExportandMailMerge("Invoice", "Stage4s\Refund") 'REPORT FOR ISSUING REFUND, paypal CSV
                 Call pfGenericExportandMailMerge("Invoice", "Stage4s\PP-RefundMadeEmail") 'GENERATE PP INVOICE EMAIL
                 Call pfCommunicationHistoryAdd("Refund") 'LOG ISSUING THE REFUND
             
-                MsgBox "Issue refund in the amount of " & sBalanceDue & " for invoice number  " & sInvoiceNumber & " at PayPal.  Thank you."
+                MsgBox "Issue refund in the amount of " & (cJob.FinalPrice - Nz(cJob.PaymentSum, 0)) & " for invoice number  " & cJob.InvoiceNo & " at PayPal.  Thank you."
                 sBillingURL = "https://www.paypal.com"
                 Application.FollowHyperlink (sBillingURL) 'ISSUE REFUND
             
-                Call fPaymentAdd(sInvoiceNumber, "-" & sBalanceDue) 'FOR RECORDING REFUND
+                Call fPaymentAdd(cJob.InvoiceNo, "-" & (cJob.FinalPrice - Nz(cJob.PaymentSum, 0))) 'FOR RECORDING REFUND
                 Call fTranscriptDeliveryF
             
                 'refund commands PAYPAL
@@ -414,13 +323,13 @@ Public Sub pfStage4Ppwk()
                 Call pfSendWordDocAsEmail("PP-RefundMadeEmail", "Refund Issued")
             
         
-            ElseIf sBalanceDue > 10 Then
+            ElseIf (cJob.FinalPrice - Nz(cJob.PaymentSum, 0)) > 10 Then
                 Set rs1 = CurrentDb.OpenRecordset("SELECT CourtDatesID, PaymentDueDate FROM InvoicePPaymentDueDateQuery WHERE CourtDatesID = " & sCourtDatesID & ";")
                 sPaymentDueDate = rs1.Fields("PaymentDueDate").Value
                 rs1.Close
         
                 CurrentDb.Execute "UPDATE CourtDates SET PaymentDueDate = " & sPaymentDueDate & " WHERE ID = " & sCourtDatesID & ";"
-                MsgBox "Hold delivery.  Send an invoice in the amount of $" & sBalanceDue & " at PayPal.  Thank you."
+                MsgBox "Hold delivery.  Send an invoice in the amount of $" & (cJob.FinalPrice - Nz(cJob.PaymentSum, 0)) & " at PayPal.  Thank you."
                 sBillingURL = "https://www.paypal.com"
                 Application.FollowHyperlink (sBillingURL) 'ISSUE UPDATED INVOICE
             
@@ -436,7 +345,7 @@ Public Sub pfStage4Ppwk()
         
         End If
     
-        If (sJurisdiction) Like ("*" & "KCI" & "*") Then
+        If (cJob.CaseInfo.Jurisdiction) Like ("*" & "KCI" & "*") Then
             MsgBox "This transcript will be paid by the State, so we'll generate their invoice now."
             Call fAcrobatKCIInvoice
         End If
@@ -471,8 +380,8 @@ Public Sub pfStage4Ppwk()
     End If
 
     Debug.Print "Stage 4 complete."
-    Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfNewZip(sPath As String)
@@ -492,6 +401,7 @@ Public Sub pfNewZip(sPath As String)
 
     Print #1, Chr$(80) & Chr$(75) & Chr$(5) & Chr$(6) & String(18, 0)
     Close #1
+    sCourtDatesID = ""
 
 End Sub
 
@@ -517,38 +427,36 @@ Public Sub fTranscriptDeliveryF()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
     
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
     sQuestion = "Have you filed or are you filing the transcript?"
     sAnswer = MsgBox(sQuestion, vbQuestion + vbYesNo, "???")
-    If sJurisdiction = "*AVT*" Then
+    If cJob.CaseInfo.Jurisdiction = "*AVT*" Then
 
         Application.FollowHyperlink ("http://tabula.escribers.net/")
         GoTo ContractorFile
 
-    ElseIf sJurisdiction = "Food and Drug Administration" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Food and Drug Administration" Then
     
         sAnswer = vbNo
         GoTo ContractorFile
 
-    ElseIf sJurisdiction = "*FDA*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*FDA*" Then
      
         sAnswer = vbNo
         GoTo ContractorFile
 
-    ElseIf sJurisdiction = "Weber Oregon" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Weber Oregon" Then
     
         sAnswer = vbNo
         Application.FollowHyperlink ("https://app.therecordxchange.net/myjobs/active")
         GoTo ContractorFile
 
-    ElseIf sJurisdiction = "Weber Nevada" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Weber Nevada" Then
     
         sAnswer = vbNo
         Application.FollowHyperlink ("https://app.therecordxchange.net/myjobs/active")
         GoTo ContractorFile
 
-    ElseIf sJurisdiction = "Weber Bankruptcy" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Weber Bankruptcy" Then
     
         sAnswer = vbNo
         Application.FollowHyperlink ("https://app.therecordxchange.net/myjobs/active")
@@ -556,116 +464,116 @@ Public Sub fTranscriptDeliveryF()
 
     Else
     
-        If sJurisdiction = "King County Superior Court" Then
+        If cJob.CaseInfo.Jurisdiction = "King County Superior Court" Then
     
             Application.FollowHyperlink ("https://ac.courts.wa.gov/index.cfm?fa=efiling.home")
         
-        ElseIf sJurisdiction = "District of Hawaii" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Hawaii" Then
     
             Application.FollowHyperlink ("https://ecf.hib.uscourts.gov/cgi-bin/login.pl")
             Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
-        ElseIf sJurisdiction = "Eastern District of Pennsylvania" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Eastern District of Pennsylvania" Then
     
             Application.FollowHyperlink ("https://ecf.paeb.uscourts.gov/cgi-bin/login.pl")
             'Call FileTranscriptSendEmail(sCompanyEmail)
             Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
-        ElseIf sJurisdiction = "District of Connecticut" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Connecticut" Then
     
             Application.FollowHyperlink ("https://ecf.ctb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Southern District of Alabama" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Southern District of Alabama" Then
     
             Application.FollowHyperlink ("https://ecf.alsb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Eastern District of Arkansas" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Eastern District of Arkansas" Then
     
             Application.FollowHyperlink ("https://ecf.areb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Southern District of California" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Southern District of California" Then
     
             Application.FollowHyperlink ("https://ecf.casb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Eastern District of California" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Eastern District of California" Then
     
             Application.FollowHyperlink ("https://efiling.caeb.uscourts.gov/LoginPage.aspx")
             'Call FileTranscriptSendEmail(sCompanyEmail)
             Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
-        ElseIf sJurisdiction = "Southern District of California" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Southern District of California" Then
     
             Application.FollowHyperlink ("https://ecf.casb.uscourts.gov/cgi-bin/login.pl")
         
-        ElseIf sJurisdiction = "District of Hawaii" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Hawaii" Then
     
             Application.FollowHyperlink ("https://efiling.caeb.uscourts.gov/LoginPage.aspx")
             'Call FileTranscriptSendEmail(sCompanyEmail)
             Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
         
-        ElseIf sJurisdiction = "Central District of Illinois" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Central District of Illinois" Then
     
             Application.FollowHyperlink ("https://ecf.ilcb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Southern District of Illinois" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Southern District of Illinois" Then
     
             Application.FollowHyperlink ("https://ecf.ilsb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Northern District of Iowa" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Northern District of Iowa" Then
     
             Application.FollowHyperlink ("https://ecf.ianb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "District of Kansas" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Kansas" Then
     
             Application.FollowHyperlink ("https://ecf.ksb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Eastern District of Kentucky" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Eastern District of Kentucky" Then
     
             Application.FollowHyperlink ("https://ecf.kyeb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Middle District of Louisiana" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Middle District of Louisiana" Then
     
             Application.FollowHyperlink ("https://ecf.lamb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Western District of Louisiana" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Western District of Louisiana" Then
     
             Application.FollowHyperlink ("https://ecf.lawb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "District of Minnesota" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Minnesota" Then
     
             Application.FollowHyperlink ("https://ecf.mnb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "District of Nebraska" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Nebraska" Then
     
             Application.FollowHyperlink ("https://ecf.neb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "District of New Mexico" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of New Mexico" Then
     
             Application.FollowHyperlink ("https://ecf.nmb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "District of New York" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of New York" Then
     
             Application.FollowHyperlink ("https://ecf.nynb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "Middle District of North Carolina" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Middle District of North Carolina" Then
     
             Application.FollowHyperlink ("https://ecf.ncmb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "District of North Dakota" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of North Dakota" Then
     
             Application.FollowHyperlink ("https://ecf.ndb.uscourts.gov/cgi-bin/login.pl")
     
-        ElseIf sJurisdiction = "District of Oregon" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Oregon" Then
     
             Application.FollowHyperlink ("https://ecf.orb.uscourts.gov/cgi-bin/login.pl")
             Call pfSendWordDocAsEmail("TranscriptsReady", "Transcripts Ready", cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptWC)
             'Call FileTranscriptSendEmail(sCompanyEmail)
     
-        ElseIf sJurisdiction = "District of Rhode Island" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "District of Rhode Island" Then
     
             Application.FollowHyperlink ("https://ecf.rib.uscourts.gov/cgi-bin/login.pl")
         
-        ElseIf sJurisdiction = "Western District of Washington" Then
+        ElseIf cJob.CaseInfo.Jurisdiction = "Western District of Washington" Then
     
             Application.FollowHyperlink ("https://ecf.wawb.uscourts.gov/cgi-bin/login.pl")
         
@@ -715,7 +623,7 @@ ContractorFile:
         CurrentDb.Execute sFiledNotFiledSQL
         MsgBox "Transcript has been marked filed."
     End If
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fGenerateZIPsF()
@@ -738,11 +646,9 @@ Public Sub fGenerateZIPsF()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
-    If sJurisdiction Like "*Weber Nevada*" Or sJurisdiction Like "*Weber Bankruptcy*" Or sJurisdiction Like "*Weber Oregon*" _
-    Or sJurisdiction Like "*Food and Drug Administration*" Or sJurisdiction Like "*FDA*" Or sJurisdiction Like "*AVT*" _
-    Or sJurisdiction Like "*eScribers*" Or sJurisdiction Like "*AVTranz*" Then
+    If cJob.CaseInfo.Jurisdiction Like "*Weber Nevada*" Or cJob.CaseInfo.Jurisdiction Like "*Weber Bankruptcy*" Or cJob.CaseInfo.Jurisdiction Like "*Weber Oregon*" _
+    Or cJob.CaseInfo.Jurisdiction Like "*Food and Drug Administration*" Or cJob.CaseInfo.Jurisdiction Like "*FDA*" Or cJob.CaseInfo.Jurisdiction Like "*AVT*" _
+    Or cJob.CaseInfo.Jurisdiction Like "*eScribers*" Or cJob.CaseInfo.Jurisdiction Like "*AVTranz*" Then
         GoTo Line2
     Else
     End If
@@ -821,7 +727,7 @@ Line2:
     End If
 
     Call fAssignPS
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fUploadtoFTP()
@@ -924,17 +830,19 @@ Public Sub fZIPAudio(sSource As String, sDestination As String)
     End If
 
     Set oApp = CreateObject("Shell.Application")
-    
+    'TODO:  block with variable not set error
     'Copy the files to the compressed folder
-    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
+    'FileCopy sSource, sDestination
+    'oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
     
-    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
+    'While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
 
-        DoEvents
-    Wend
+        'DoEvents
+    'Wend
     
     
     Debug.Print "Find the ZIP file here: " & sDestination
+    sCourtDatesID = ""
     
 End Sub
 
@@ -973,14 +881,15 @@ Public Sub fZIPAudioTranscripts(sSource As String, sDestination As String)
     Set oApp = CreateObject("Shell.Application")
     
     'Copy the files to the compressed folder
-    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
+    'oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
 
-    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
+    'While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
+    '    DoEvents
+    'Wend
+    'On Error GoTo 0
     
     Debug.Print "You find the ZIP file here: " & sDestination
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1022,14 +931,15 @@ Public Sub fZIPTranscripts(sSource As String, sDestination As String)
 
     Set oApp = CreateObject("Shell.Application")
     'Copy the files to the compressed folder
-    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
+    'oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
 
-    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
+    'While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
+    '    DoEvents
+    'Wend
+    'On Error GoTo 0
     
     Debug.Print "You find the ZIP file here: " & sDestination
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1100,15 +1010,13 @@ Public Sub pfSendTrackingEmail()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
     
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    
     deliverySQLstring = "SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";"
     Set rs = CurrentDb.OpenRecordset(deliverySQLstring)
     vTrackingNumber = rs.Fields("TrackingNumber").Value
     rs.Close
     Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
     Call fWunderlistAdd(sCourtDatesID & ":  Package to Ship", Format(Now + 1, "yyyy-mm-dd"))
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fEmailtoPrint(sFiletoEmailPath As String)
@@ -1190,6 +1098,7 @@ Public Sub fAudioDone()
       
     'Line2:
     'Exit Do
+    sCourtDatesID = ""
 End Sub
 
 
@@ -1276,6 +1185,7 @@ eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
     'GoTo eHandlerX
     'Resume
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fPrint4upPDF()
@@ -1358,6 +1268,7 @@ eHandlerX:
 
 
     MsgBox "4-up condensed transcript saved at " & cJob.DocPath.Transcript4up
+    sCourtDatesID = ""
     Exit Sub
 
 eHandler:
@@ -1389,6 +1300,7 @@ Public Sub fPrintKCIEnvelope()
         Call fEmailtoPrint(cJob.DocPath.KCIEnvelope)
     
     End If
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1421,10 +1333,8 @@ Public Sub fAcrobatKCIInvoice()
 
     FileCopy cJob.DocPath.KCITemplate, cJob.DocPath.KCIEmpty
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
-    sContactName = sFirstName & " " & sLastName
-    sCaseName = sParty1 & " v. " & sParty2
+    sContactName = cJob.App0.FirstName & " " & cJob.App0.LastName
+    sCaseName = cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
 
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
@@ -1438,11 +1348,11 @@ Public Sub fAcrobatKCIInvoice()
     
         For Each aaFormField In aaFoFiGroup
             If aaFormField.Name = "Case Name" Then aaFormField.Value = sCaseName
-            If aaFormField.Name = "Trial Court" Then aaFormField.Value = sCaseNumber1
-            If aaFormField.Name = "County" Then aaFormField.Value = sJurisdiction
-            If aaFormField.Name = "COA No" Then aaFormField.Value = sCaseNumber2
+            If aaFormField.Name = "Trial Court" Then aaFormField.Value = cJob.CaseInfo.CaseNumber1
+            If aaFormField.Name = "County" Then aaFormField.Value = cJob.CaseInfo.Jurisdiction
+            If aaFormField.Name = "COA No" Then aaFormField.Value = cJob.CaseInfo.CaseNumber2
             If aaFormField.Name = "Service Requested By" Then aaFormField.Value = sContactName
-            If aaFormField.Name = "Original Report and 1 copy" Then aaFormField.Value = sActualQuantity
+            If aaFormField.Name = "Original Report and 1 copy" Then aaFormField.Value = cJob.ActualQuantity
             If aaFormField.Name = "Date" Then aaFormField.Value = Date
         Next aaFormField
     
@@ -1465,7 +1375,7 @@ eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Details"
     GoTo eHandlerX
     Resume
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfUpload(ByRef mySession As Session)
@@ -1485,8 +1395,6 @@ Public Sub pfUpload(ByRef mySession As Session)
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
     
     With mySessionOptions                        'set up session options
 
@@ -1522,7 +1430,7 @@ Public Sub pfUpload(ByRef mySession As Session)
         MsgBox "Upload of " & transfer.FileName & " succeeded"
     Next
     
-    Call pfClearGlobals
+    sCourtDatesID = ""
     
 End Sub
 
@@ -1587,6 +1495,7 @@ Public Sub fPrivatePrint()
         Call fEmailtoPrint(cJob.DocPath.CDLabelP)
     End If
 
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1695,6 +1604,7 @@ Public Sub fExportRecsToXML()
     rstShippingOptions.Close
     On Error GoTo 0
     Set rstShippingOptions = Nothing
+    sCourtDatesID = ""
  
 End Sub
 
@@ -1740,6 +1650,7 @@ Public Sub fAppendXMLFiles()
     Set file1 = Nothing
     Set file2 = Nothing
     Set FSO = Nothing
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1787,8 +1698,6 @@ Public Sub fCourtofAppealsIXML()
     cJob.FindFirst "ID=" & sCourtDatesID
 
     DoCmd.OpenQuery qnShippingOptionsQ, acViewNormal, acNormal 'pull up shipping query
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
         
     '@Ignore AssignmentNotUsed
     sQueryName = "TempShippingOptionsQ"
@@ -1880,7 +1789,7 @@ Public Sub fCourtofAppealsIXML()
     DoCmd.Close acQuery, qnShippingOptionsQ
     
     MsgBox "Exported COA XML and added entry to CommHistory table."
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 

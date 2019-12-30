@@ -126,10 +126,9 @@ EndIf1:
 
     Debug.Print "Stage 2 complete."
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
     Application.FollowHyperlink cJob.DocPath.CourtCover
-    Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfAutoCorrect()
@@ -169,7 +168,7 @@ Public Sub pfAutoCorrect()
     End If
     On Error GoTo 0
     'oWordApp.Visible = True
-    Set oWordDoc = GetObject(cJob.DocPath.RoughDraft, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.RoughDraft)
 
     With oWordDoc                                'insert rough draft at RoughBKMK bookmark
 
@@ -207,6 +206,7 @@ NextAGShortcut:
     rstAGShortcuts.Close
     Set flCurrentField = Nothing
     Set rstAGShortcuts = Nothing
+    sCourtDatesID = ""
 
 End Sub
 
@@ -222,23 +222,26 @@ Public Sub pfRoughDraftToCoverF()
     '============================================================================
 
     Dim sSpeakerName As String
-    Dim oWordDoc As New Word.Document
-    Dim oWordApp As New Word.Application
     Dim sTextToFind As String
     Dim sReplacementText As String
+    Dim sLastName As String
+    Dim wsyWordStyle As String
+    Dim sMrMs As String
+    
     Dim x As Long
+    
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef
-    Dim wsyWordStyle As String
+    
+    Dim oWordDoc As New Word.Document
+    Dim oWordApp As New Word.Application
+    
     Dim bMatchCase As Boolean
+    
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    
 
     On Error Resume Next
 
@@ -1379,7 +1382,7 @@ Public Sub pfRoughDraftToCoverF()
         
         '********************************** various style-related F/Rs
         Forms![NewMainMenu].Form!lblFlash.Caption = "Step 7 of 10:  Processing headings..."
-        If InStr(sJurisdiction, "AVT") > 0 Or InStr(sJurisdiction, "eScribers") > 0 Then
+        If InStr(cJob.CaseInfo.Jurisdiction, "AVT") > 0 Or InStr(cJob.CaseInfo.Jurisdiction, "eScribers") > 0 Then
         
             sTextToFind = "Q.  "
             sReplacementText = "Q.  "
@@ -1594,12 +1597,12 @@ Public Sub pfRoughDraftToCoverF()
 
     qdf.Close
 
-    If sJurisdiction <> "FDA" And sJurisdiction <> "Food and Drug Administration" And sJurisdiction <> "eScribers NH" And sJurisdiction <> "eScribers Bankruptcy" And sJurisdiction <> "eScribers New Jersey" Then
+    If cJob.CaseInfo.Jurisdiction <> "FDA" And cJob.CaseInfo.Jurisdiction <> "Food and Drug Administration" And cJob.CaseInfo.Jurisdiction <> "eScribers NH" And cJob.CaseInfo.Jurisdiction <> "eScribers Bankruptcy" And cJob.CaseInfo.Jurisdiction <> "eScribers New Jersey" Then
         Call pfHeaders
         'Call fDynamicHeaders
     End If
 
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfStaticSpeakersFindReplace()
@@ -1918,6 +1921,7 @@ Public Sub pfStaticSpeakersFindReplace()
     Set oWordApp = Nothing
 
     DoCmd.Close acQuery, qnViewJobFormAppearancesQ
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfReplaceColonUndercasewithColonUppercase()
@@ -2172,6 +2176,7 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     Set oWordApp = Nothing
 
     DoCmd.Close acQuery, qnViewJobFormAppearancesQ
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfTypeRoughDraftF()
@@ -2189,8 +2194,6 @@ Public Sub pfTypeRoughDraftF()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     Set oRoughDraft = CreateObject("Scripting.FileSystemObject")
 
@@ -2271,7 +2274,7 @@ Public Sub pfTypeRoughDraftF()
     DoCmd.OpenForm FormName:="PJType"            'open window with AGShortcuts, SpeakerList, and jurisdiction notes
 
     Shell "winword " + cJob.DocPath.RoughDraft 'open file
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub wwReplaceWeberOR()
@@ -2322,6 +2325,7 @@ Public Sub pfReplaceAQC()
     Call pfFindRepCitationLinks
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     'Debug.Print "---------------"
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfReplaceMass()
@@ -2344,6 +2348,8 @@ Public Sub pfRoughDraftCFMass()
     Dim sTextToFind As String
     Dim sReplacementText As String
     Dim wsyWordStyle As String
+    Dim sMrMs As String
+    Dim sLastName As String
     
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
@@ -2357,8 +2363,6 @@ Public Sub pfRoughDraftCFMass()
 
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef
-    
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -3608,12 +3612,12 @@ Public Sub pfRoughDraftCFMass()
 
     qdf.Close
 
-    If sJurisdiction <> "FDA" And sJurisdiction <> "Food and Drug Administration" And sJurisdiction <> "eScribers NH" And sJurisdiction <> "eScribers Bankruptcy" And sJurisdiction <> "eScribers New Jersey" Then
+    If cJob.CaseInfo.Jurisdiction <> "FDA" And cJob.CaseInfo.Jurisdiction <> "Food and Drug Administration" And cJob.CaseInfo.Jurisdiction <> "eScribers NH" And cJob.CaseInfo.Jurisdiction <> "eScribers Bankruptcy" And cJob.CaseInfo.Jurisdiction <> "eScribers New Jersey" Then
         Call pfHeaders
         Call fDynamicHeaders
     End If
 
 
-    Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 

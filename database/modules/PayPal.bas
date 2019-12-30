@@ -66,8 +66,6 @@ Private sTemp As String
 
 Public Sub fSendPPEmailFactored()
     'generates factored invoice email for pp
-    'Dim sInvoiceNumber As String
-    Dim sName As String
     Dim vPPInvoiceNo As String
     Dim sHTMLPPB As String
     Dim vPPLink As String
@@ -95,17 +93,10 @@ Public Sub fSendPPEmailFactored()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fPPGenerateJSONInfo                     'refreshes some necessary info
-    'Call pfGetOrderingAttorneyInfo               'refreshes some necessary info
-    'Call pfCurrentCaseInfo                       'refreshes some necessary info
-
+    
     Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
-
-    'sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
-    'sParty1 = rstQuery.Fields("Party1").Value
-    'sParty2 = rstQuery.Fields("Party2").Value
-    sName = cJob.App0.FirstName & " " & cJob.App0.LastName
 
     If IsNull(rstQuery.Fields("TRinv.PPID").Value) Then
         Call fPPDraft
@@ -350,7 +341,7 @@ Public Sub fSendPPEmailFactored()
             '@Ignore UnassignedVariableUsage
             .To = sToEmail
             .CC = sCompanyEmail
-            .Subject = "Transcript Delivery & Invoice for " & sName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
+            .Subject = "Transcript Delivery & Invoice for " & cJob.App0.FirstName & " " & cJob.App0.LastName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
             .Display
@@ -364,7 +355,8 @@ Public Sub fSendPPEmailFactored()
     End If
     On Error GoTo 0
     Call pfCommunicationHistoryAdd("PP Invoice Sent")
-    Call pfClearGlobals
+    
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fPPDraft()
@@ -381,11 +373,9 @@ Public Sub fPPDraft()
     Dim sPassword As String
     Dim sAuth As String
     Dim stringJSON As String
-    Dim sEmail As String
     Dim vInvoiceID As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
     Dim vStatus As String
     Dim vTotal As String
     Dim sToken As String
@@ -398,13 +388,10 @@ Public Sub fPPDraft()
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine1 As String
-    Dim sLine2 As String
     Dim vInventoryRateCode As String
-
+    Dim sInvoiceNumber As String
+    Dim sTemplateID As String
+    
     Dim oRequest As Object
     Dim Json As Object
 
@@ -430,10 +417,9 @@ Beginning:
     vInventoryRateCode = rstRates.Fields("Code").Value
     rstRates.Close
 
-    'Debug.Print sCourtDatesID & " " & sInvoiceNumber
+    'Debug.Print sCourtDatesID & " " & cJob.InvoiceNo
     
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = sCompanyEmail
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
@@ -479,7 +465,7 @@ Beginning:
                                                                   "shipping_info" & Chr(34) & ": {" & Chr(34) & _
                                                                   "first_name" & Chr(34) & ": " & Chr(34) & cJob.App0.FirstName & Chr(34) & "," & Chr(34) & _
                                                                   "last_name" & Chr(34) & ": " & Chr(34) & cJob.App0.LastName & Chr(34) & "," & Chr(34) & _
-                                                                  "address" & Chr(34) & ": {" & Chr(34) & "line1" & Chr(34) & ": " & Chr(34) & sAddress2 & Chr(34) & "," & Chr(34) & _
+                                                                  "address" & Chr(34) & ": {" & Chr(34) & "line1" & Chr(34) & ": " & Chr(34) & cJob.App0.Address & Chr(34) & "," & Chr(34) & _
                                                                   "city" & Chr(34) & ": " & Chr(34) & cJob.App0.City & Chr(34) & "," & Chr(34) & _
                                                                   "state" & Chr(34) & ": " & Chr(34) & cJob.App0.State & Chr(34) & "," & Chr(34) & _
                                                                   "postal_code" & Chr(34) & ": " & Chr(34) & cJob.App0.ZIP & Chr(34) & "," & Chr(34) & _
@@ -499,7 +485,6 @@ Beginning:
                                         "due_date" & Chr(34) & ": " & Chr(34) & cJob.InvoiceDate & " " _
                                       & sInvoiceTime & Chr(34) & "}," & Chr(34) & _
                                         "reference" & Chr(34) & ": " & Chr(34) & sCourtDatesID & Chr(34) & ","
-    '"invoice_date" & Chr(34) & ": {" & Chr(34) & sInvoiceDate & Chr(34) & "}," & Chr(34) & _
 
     json4 = Chr(34) & _
                     "shipping_cost" & Chr(34) & ": {" & Chr(34) & _
@@ -516,6 +501,8 @@ Beginning:
                     "merchant_memo" & Chr(34) & ": " & Chr(34) & vmMemo & "}" & "{" & Chr(34) & _
                     "logo_url" & Chr(34) & ": " & Chr(34) & slURL & "}" & "{" & Chr(34) & _
                     "template_id" & Chr(34) & ": " & Chr(34) & sTemplateID & "}," & "{" & Chr(34) & "number" & Chr(34) & ": " & Chr(34) & cJob.InvoiceNo & Chr(34) & "}"
+                    'TODO: Assign value to sTemplateID
+                    
     'Debug.Print "JSON1--------------------------------------------"
     'Debug.Print json1
     'Debug.Print "JSON2--------------------------------------------"
@@ -577,7 +564,8 @@ Beginning:
     CurrentDb.Execute sUpdatePPStatus
     sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
     CurrentDb.Execute sUpdatePPID
-    Call pfClearGlobals
+    vmMemo = ""
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fPayPalUpdateCheck()
@@ -597,27 +585,7 @@ Public Sub fPayPalUpdateCheck()
     Dim stringJSON As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
-    Dim sInvoiceNo As String
-    Dim sEmail As String
-    Dim sFirstName As String
-    Dim sLastName As String
-    Dim sDescription As String
-    Dim sInvoiceDate As String
-    Dim sPaymentTerms As String
-    Dim sCourtDatesID As String
-    Dim sNote As String
-    Dim sTerms As String
-    Dim sMinimumAmount As String
-    Dim vmMemo As String
-    Dim vlURL As String
-    Dim sTemplateID As String
     Dim vTotal As String
-    Dim sCity As String
-    Dim sState As String
-    Dim sZIP As String
-    Dim sQuantity As String
-    Dim sValue As String
     Dim vInvoiceID As String
     Dim sInvoiceNumber As String
     Dim vStatus As String
@@ -633,11 +601,6 @@ Public Sub fPayPalUpdateCheck()
     Dim vErrorDetails As String
     Dim vTermDays As String
     Dim vDetails As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sText As String
-    Dim sLine1 As String
-    Dim sLine2 As String
     Dim vPPStatus As String
 
     Dim resp As Variant
@@ -673,7 +636,6 @@ Public Sub fPayPalUpdateCheck()
         Do Until rstQuery1.EOF = True
     
             sCourtDatesID = rstQuery1.Fields("ID").Value
-            sInvoiceNumber = rstQuery1.Fields("InvoiceNo").Value
         
             If Not rstQuery1.Fields("PPID").Value = "" Or rstQuery1.Fields("PPID").Value = Null Then
                 vInvoiceID = rstQuery1.Fields("PPID").Value
@@ -692,7 +654,6 @@ Public Sub fPayPalUpdateCheck()
                 vInvoiceID = Replace(Replace(vInvoiceID, " ", ""), "-", "")
             
                 sURL = "https://api.paypal.com/v1/oauth2/token/"
-                sEmail = sCompanyEmail
                 '  https://api.paypal.com/v1/oauth2/token \
                 'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
                 sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
@@ -770,7 +731,8 @@ NextJob:
     rstQuery1.Close
     Set rstQuery1 = Nothing
 
-    Call pfClearGlobals
+    
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fSendPPEmailBalanceDue()
@@ -782,7 +744,6 @@ Public Sub fSendPPEmailBalanceDue()
     ' Description : sends PayPal email for balance due
     '============================================================================
     
-    'Dim sName As String
     Dim vPPInvoiceNo As String
     Dim sHTMLPPB As String
     Dim vPPLink As String
@@ -809,16 +770,13 @@ Public Sub fSendPPEmailBalanceDue()
     
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    
     Call fPPGenerateJSONInfo
-
-    'Call pfGetOrderingAttorneyInfo
-    'Call pfCurrentCaseInfo
 
     Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
-    'sName = cJob.App0.FirstName & " " & cJob.App0.LastName
     'vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
     vPPInvoiceNo = Right(cJob.PPID, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
@@ -1223,6 +1181,7 @@ Public Sub fSendPPEmailBalanceDue()
     End If
     On Error GoTo 0
     Call pfCommunicationHistoryAdd("PP Invoice Sent")
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1235,13 +1194,11 @@ Public Sub fSendPPEmailDeposit()
     ' Description : generates PayPal email for deposit
     '============================================================================
     
-    'Dim sName As String
     Dim vPPInvoiceNo As String
     Dim sHTMLPPB As String
     Dim vPPLink As String
     Dim sQuestion As String
     Dim sAnswer As String
-    Dim sToEmail As String
     Dim sFileNameOut As String
 
     Dim oOutlookApp As Outlook.Application
@@ -1275,8 +1232,6 @@ Public Sub fSendPPEmailDeposit()
     'vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
     vPPInvoiceNo = Right(cJob.PPID, 20)
     vPPInvoiceNo = Replace(Replace(vPPInvoiceNo, " ", ""), "-", "")
-    'sName = cJob.App0.FirstName & " " & cJob.App0.LastName
-    sToEmail = sNotes
 
     'create pp invoice link
     vPPLink = "https://www.paypal.com/invoice/p/#" & vPPInvoiceNo
@@ -1499,7 +1454,7 @@ Public Sub fSendPPEmailDeposit()
         oWordDoc.Content.Copy
     
         With oOutlookMail                        'now, you should have an e-mail with a PP button as well as an invoice with two PP buttons on it.
-            .To = sToEmail
+            .To = cJob.App0.Notes
             .CC = sCompanyEmail
             .Subject = "Deposit Invoice for " & cJob.App0.FirstName & " " & cJob.App0.LastName & ", " & cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
             .BodyFormat = olFormatRichText
@@ -1521,7 +1476,8 @@ Public Sub fSendPPEmailDeposit()
     Set oWordDoc = Nothing
 
     Call pfCommunicationHistoryAdd("PP Invoice Sent") 'record entry in comm history table for logs
-    Call pfClearGlobals
+    
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fPPGetInvoiceInfo()
@@ -1540,28 +1496,7 @@ Public Sub fPPGetInvoiceInfo()
     Dim stringJSON As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
-    Dim sInvoiceNo As String
-    Dim sEmail As String
-    Dim sFirstName As String
-    Dim sLastName As String
-    Dim sDescription As String
-    Dim sInvoiceDate As String
-    Dim sPaymentTerms As String
-    Dim sCourtDatesID As String
-    Dim sNote As String
-    Dim sTerms As String
-    Dim sMinimumAmount As String
-    Dim vmMemo As String
-    Dim vlURL As String
-    Dim sTemplateID As String
     Dim vTotal As String
-    Dim sCity As String
-    Dim sState As String
-    Dim sZIP As String
-    Dim sQuantity As String
-    Dim sValue As String
-    Dim vInvoiceID As String
     Dim sInvoiceNumber As String
     Dim vStatus As String
     Dim resp As Variant
@@ -1585,10 +1520,14 @@ Public Sub fPPGetInvoiceInfo()
     
     Dim parsed As Dictionary
 
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     Call fPPGenerateJSONInfo
 
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = sCompanyEmail
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
@@ -1610,10 +1549,10 @@ Public Sub fPPGetInvoiceInfo()
         .abort
         'Debug.Print "--------------------------------------------"
     End With
-    vInvoiceID = sPPID 'rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
+    'PPID rstTRQPlusCases.Fields("TRInv.PPID").Value ' "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6
   
     'Debug.Print "RESPONSETEXT--------------------------------------------"
-    sURL = "https://api.paypal.com/v1/invoicing/invoices/" & vInvoiceID
+    sURL = "https://api.paypal.com/v1/invoicing/invoices/" & cJob.PPID
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "GET", sURL, False
@@ -1630,7 +1569,7 @@ Public Sub fPPGetInvoiceInfo()
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     sInvoiceNumber = parsed("number")            'third level array
-    vInvoiceID = parsed("id")                    'third level array
+    'vInvoiceID = parsed("id")                    'third level array
     vStatus = parsed("status")                   'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
     'CANCELLED, REFUNDED, PARTIALLY_REFUNDED, MARKED AS REFUNDED
     vTotal = parsed("total_amount")("value")     'second level array
@@ -1655,9 +1594,10 @@ Public Sub fPPGetInvoiceInfo()
     '"status":"DRAFT"
     '"total_amount":{"currency":"USD","value":"3.00"},
     'Next
-    Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & vInvoiceID
+    Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & cJob.PPID
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
+    sCourtDatesID = ""
 
 
 End Sub
@@ -1677,30 +1617,10 @@ Public Sub fPPRefund()
     Dim sPassword As String
     Dim sAuth As String
     Dim stringJSON As String
-    Dim sEmail As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
-    Dim sInvoiceNo As String
-    Dim sFirstName As String
-    Dim sLastName As String
-    Dim sDescription As String
-    Dim sInvoiceDate As String
-    Dim sPaymentTerms As String
-    Dim sCourtDatesID As String
-    Dim sNote As String
-    Dim sTerms As String
-    Dim sMinimumAmount As String
-    Dim vmMemo As String
-    Dim vlURL As String
-    Dim sTemplateID As String
+    'Dim sInvoiceDate As String
     Dim vTotal As String
-    Dim sLine1 As String
-    Dim sCity As String
-    Dim sState As String
-    Dim sZIP As String
-    Dim sQuantity As String
-    Dim sValue As String
     Dim vInvoiceID As String
     Dim sInvoiceNumber As String
     Dim vStatus As String
@@ -1738,18 +1658,13 @@ Public Sub fPPRefund()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fPPGenerateJSONInfo
-    Call pfGetOrderingAttorneyInfo
-    Call pfCurrentCaseInfo
-
+    
     Set qdf = CurrentDb.QueryDefs(qTRIQPlusCases)
     qdf.Parameters(0) = sCourtDatesID
     Set rstQuery = qdf.OpenRecordset
 
-    'sInvoiceNumber = rstQuery.Fields("TRInv.CourtDates.InvoiceNo").Value
     'get pp invoice ID
     'vPPInvoiceNo = rstQuery.Fields("TRInv.PPID").Value
-    'sPaymentSum = rstQuery.Fields("TRInv.PaymentSum").Value
-    'sFinalPrice = rstQuery.Fields("TRInv.FinalPrice").Value
     'vPPInvoiceNo = Right(cJob.PPID, 20)
     vPPInvoiceNo = Replace(Replace(Right(cJob.PPID, 20), " ", ""), "-", "")
 
@@ -1779,10 +1694,9 @@ Public Sub fPPRefund()
     Else                                         'Code for yes
     End If
 
-    sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
+    'sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
     sInvoiceTime = (Format(Now(), "hh:mm:ss"))
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = sCompanyEmail
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
 
@@ -1880,7 +1794,9 @@ Public Sub fPPRefund()
     End If
         
 Exitif:
+    sCourtDatesID = ""
 End Sub
+
 
 Public Function TextBase64Encode(sText As String, sCharset As Variant) As Variant
     '============================================================================
@@ -1923,30 +1839,9 @@ Public Sub fPPUpdate()
     Dim sURL As String
     Dim sAuth As String
     Dim stringJSON As String
-    Dim sEmail As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
-    Dim sInvoiceNo As String
-    Dim sFirstName As String
-    Dim sLastName As String
-    Dim sDescription As String
-    Dim sInvoiceDate As String
-    Dim sPaymentTerms As String
-    Dim sCourtDatesID As String
-    Dim sNote As String
-    Dim sTerms As String
-    Dim sMinimumAmount As String
-    Dim vmMemo As String
-    Dim vlURL As String
-    Dim sTemplateID As String
     Dim vTotal As String
-    Dim sLine1 As String
-    Dim sCity As String
-    Dim sState As String
-    Dim sZIP As String
-    Dim sQuantity As String
-    Dim sValue As String
     Dim vInvoiceID As String
     Dim sInvoiceNumber As String
     Dim vStatus As String
@@ -1976,10 +1871,8 @@ Public Sub fPPUpdate()
     cJob.FindFirst "ID=" & sCourtDatesID
 
     Call fPPGenerateJSONInfo
-    Call pfGetOrderingAttorneyInfo
 
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = sCompanyEmail
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     
@@ -2022,20 +1915,20 @@ Public Sub fPPUpdate()
             "country_code" & Chr(34) & ": " & Chr(34) & sZCountryCode & Chr(34) & "}},"
     
     json2 = Chr(34) & "billing_info" & Chr(34) & ": [{" & Chr(34) & _
-                                                                  "email" & Chr(34) & ": " & Chr(34) & sEmail & Chr(34) & "}],"
+                                                                  "email" & Chr(34) & ": " & Chr(34) & cJob.App0.Notes & Chr(34) & "}],"
     
     '@Ignore UnassignedVariableUsage
     json3 = Chr(34) & "items" & Chr(34) & ": [" & "{" & Chr(34) & "name" & Chr(34) & ": " & Chr(34) & sDescription & Chr(34) & "," & Chr(34) & _
-                                                                                                                                             "quantity" & Chr(34) & ": " & Chr(34) & sQuantity & Chr(34) & "," & Chr(34) & _
+                                                                                                                                             "quantity" & Chr(34) & ": " & Chr(34) & cJob.Quantity & Chr(34) & "," & Chr(34) & _
                                                                                                                                              "unit_price" & Chr(34) & ": {" & Chr(34) & _
                                                                                                                                              "currency" & Chr(34) & ": " & Chr(34) & "USD" & Chr(34) & "," & Chr(34) & _
-                                                                                                                                             "value" & Chr(34) & ": " & Chr(34) & sUnitPrice & Chr(34) & "}}]," & Chr(34) & _
+                                                                                                                                             "value" & Chr(34) & ": " & Chr(34) & cJob.PageRate & Chr(34) & "}}]," & Chr(34) & _
                                                                                                                                              "note" & Chr(34) & ": " & Chr(34) & sNote & Chr(34) & "," & Chr(34) & _
                                                                                                                                              "payment_term" & Chr(34) & ": {" & Chr(34) & _
                                                                                                                                              "term_type" & Chr(34) & ": " & Chr(34) & "NET_" & sTermDays & Chr(34) & "}," & Chr(34) & _
                                                                                                                                              "shipping_info" & Chr(34) & ": {" & Chr(34) & _
-                                                                                                                                             "first_name" & Chr(34) & ": " & Chr(34) & sFirstName & Chr(34) & "," & Chr(34) & _
-                                                                                                                                             "last_name" & Chr(34) & ": " & Chr(34) & sLastName & Chr(34) & "," & Chr(34) & _
+                                                                                                                                             "first_name" & Chr(34) & ": " & Chr(34) & cJob.App0.FirstName & Chr(34) & "," & Chr(34) & _
+                                                                                                                                             "last_name" & Chr(34) & ": " & Chr(34) & cJob.App0.LastName & Chr(34) & "," & Chr(34) & _
                                                                                                                                              "business_name" & Chr(34) & ": " & Chr(34) & "WRTS Sample" & Chr(34) & "," & Chr(34) & _
                                                                                                                                              "address" & Chr(34) & ": {" & Chr(34) & _
                                                                                                                                              "line1" & Chr(34) & ": " & Chr(34) & sCompanyAddress & Chr(34) & "," & Chr(34) & _
@@ -2100,6 +1993,7 @@ Public Sub fPPUpdate()
     CurrentDb.Execute sUpdatePPStatus
     sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
     CurrentDb.Execute sUpdatePPID
+    sCourtDatesID = ""
 
 End Sub
 
@@ -2127,22 +2021,15 @@ Public Sub fManualPPPayment()
     Dim sURL As String
     Dim sAuth As String
     Dim stringJSON As String
-    'Dim sEmail As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    'Dim sInvoiceTime As String
-    'Dim sInvoiceNo As String
-    Dim sDescription As String
     'Dim sInvoiceDate As String
-    'Dim sPaymentTerms As String
     Dim vTotal As String
     Dim vInvoiceID As String
-    'Dim sInvoiceNumber As String
+    Dim sInvoiceNumber As String
     Dim vStatus As String
     Dim sToken As String
     Dim json1 As String
-    'Dim json2 As String
-    'Dim json3 As String
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
@@ -2158,9 +2045,6 @@ Public Sub fManualPPPayment()
     
     Dim oRequest As Object
     Dim Json As Object
-    
-    Dim qdf As QueryDef
-    Dim rstQInfoInvNo As DAO.Recordset
 
     Dim parsed As Dictionary
 
@@ -2170,17 +2054,8 @@ Public Sub fManualPPPayment()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fPPGenerateJSONInfo
-    'Call pfGetOrderingAttorneyInfo
-
-    Set qdf = CurrentDb.QueryDefs("QInfobyInvoiceNumber")
-    qdf.Parameters(0) = sCourtDatesID
-    Set rstQInfoInvNo = qdf.OpenRecordset
-
-    'sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
-    'sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
 
     sURL = "https://api.paypal.com/v1/oauth2/token/"
-    sEmail = sCompanyEmail
     '  https://api.paypal.com/v1/oauth2/token \
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
     
@@ -2207,7 +2082,6 @@ Public Sub fManualPPPayment()
     End With
     vMethod = InputBox("What method was used to pay?  Select/type in either BANK_TRANSFER, CASH, CHECK, CREDIT_CARD, DEBIT_CARD, PAYPAL, WIRE_TRANSFER, or OTHER.")
     'sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
-    'sInvoiceTime = (Format(Now(), "hh:mm:ss"))
     vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & cJob.FinalPrice & ".")
 
     '@Ignore UnassignedVariableUsage
@@ -2240,7 +2114,7 @@ Public Sub fManualPPPayment()
         'Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    'sInvoiceNumber = parsed("number")            'third level array
+    sInvoiceNumber = parsed("number")            'third level array
     vInvoiceID = parsed("id")                    'third level array
     vStatus = parsed("status")                   'third level array
     vTotal = parsed("total_amount")("value")     'second level array
@@ -2274,6 +2148,7 @@ Public Sub fManualPPPayment()
     CurrentDb.Execute sUpdatePPID
 
 
+    sCourtDatesID = ""
 End Sub
 
 

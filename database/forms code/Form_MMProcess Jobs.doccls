@@ -12,6 +12,7 @@ Private Sub JobInfobtn_Click()
         .LinkChildFields = "VJFJobID"
     End With
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub StatusChecklistBTN_Click()
@@ -23,6 +24,7 @@ Private Sub StatusChecklistBTN_Click()
         .LinkChildFields = "CourtDatesID"
     End With
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub OrderingInfoBTN_Click()
@@ -33,6 +35,7 @@ Private Sub OrderingInfoBTN_Click()
         .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
         .LinkChildFields = "CourtDatesID"
     End With
+    sCourtDatesID = ""
 End Sub
 
 Private Sub ViewDocHistoryBTN_Click()
@@ -45,6 +48,7 @@ Private Sub ViewDocHistoryBTN_Click()
         .LinkChildFields = "CourtDatesID"
     End With
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub btnUSPSTracking_Click()
@@ -64,6 +68,7 @@ Private Sub CreateDocsBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "PJCreateCourtDocs"
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub TypeBTN_Click()
@@ -77,11 +82,9 @@ Private Sub TypeBTN_Click()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
     Set fs = CreateObject("Scripting.FileSystemObject")
     
-    If sJurisdiction = "Weber Nevada" Then
+    If cJob.CaseInfo.Jurisdiction = "Weber Nevada" Then
         If Not fs.FileExists(cJob.DocPath.RoughDraft) Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberNV.docx", cJob.DocPath.RoughDraft
         End If
@@ -97,7 +100,7 @@ Private Sub TypeBTN_Click()
     Else
 
     End If
-    If sJurisdiction = "Weber Bankruptcy" Then
+    If cJob.CaseInfo.Jurisdiction = "Weber Bankruptcy" Then
         If Not fs.FileExists(cJob.DocPath.JobDirectoryN & "WeberBKSample.docx") Then
             FileCopy cJob.DocPath.TemplateFolder2 & "WeberNVSample.docx", cJob.DocPath.JobDirectoryN & "WeberNVSample.docx"
         End If
@@ -108,7 +111,7 @@ Private Sub TypeBTN_Click()
     Else
 
     End If
-    If sJurisdiction = "Weber Oregon" Then
+    If cJob.CaseInfo.Jurisdiction = "Weber Oregon" Then
         If Not fs.FileExists(cJob.DocPath.RoughDraft) Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-WeberOR.docx", cJob.DocPath.RoughDraft
         End If
@@ -127,7 +130,7 @@ Private Sub TypeBTN_Click()
     Else
 
     End If
-    If sJurisdiction = "USBC Western Washington" Then
+    If cJob.CaseInfo.Jurisdiction = "USBC Western Washington" Then
         If Not fs.FileExists(cJob.DocPath.JobDirectoryN & "BankruptcyWAGuide.pdf") Then
             FileCopy cJob.DocPath.TemplateFolder2 & "BankruptcyWAGuide.pdf", cJob.DocPath.JobDirectoryN & "BankruptcyWAGuide.pdf"
         End If
@@ -138,7 +141,7 @@ Private Sub TypeBTN_Click()
     Else
     End If
     
-    If sJurisdiction = "Food and Drug Administration" Then
+    If cJob.CaseInfo.Jurisdiction = "Food and Drug Administration" Then
         If Not fs.FileExists(cJob.DocPath.RoughDraft) Then
             FileCopy cJob.DocPath.TemplateFolder2 & "RoughDraft-FDA.docx", cJob.DocPath.RoughDraft
         Else
@@ -146,7 +149,7 @@ Private Sub TypeBTN_Click()
     Else
     End If
 
-    If sJurisdiction = "*Superior Court*" Then
+    If cJob.CaseInfo.Jurisdiction = "*Superior Court*" Then
         If Not fs.FileExists(cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf") Then
             FileCopy cJob.DocPath.TemplateFolder2 & "CourtRules-WACounties.pdf", cJob.DocPath.JobDirectoryN & "CourtRules-WACounties.pdf"
         End If
@@ -157,7 +160,7 @@ Private Sub TypeBTN_Click()
     Else
     End If
 
-    If sJurisdiction = "*USBC*" Then
+    If cJob.CaseInfo.Jurisdiction = "*USBC*" Then
         If Not fs.FileExists(cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf") Then
             FileCopy cJob.DocPath.TemplateFolder2 & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf", cJob.DocPath.JobDirectoryN & "CourtRules-Bankruptcy-TranscriptFormatGuide-1.pdf"
         End If
@@ -176,7 +179,7 @@ Private Sub TypeBTN_Click()
         End If
     End If
     
-    If sJurisdiction = "Massachusetts" Then
+    If cJob.CaseInfo.Jurisdiction = "Massachusetts" Then
         If Not fs.FileExists(cJob.DocPath.JobDirectoryN & "uniformtranscriptformat.pdf") Then
             FileCopy cJob.DocPath.JurisdictionRefs & "Massachusetts\uniformtranscriptformat.pdf", cJob.DocPath.JobDirectoryN & "uniformtranscriptformat.pdf"
         End If
@@ -187,13 +190,13 @@ Private Sub TypeBTN_Click()
     Else
     End If
 
-    If sJurisdiction = "Food and Drug Administration" Then
+    If cJob.CaseInfo.Jurisdiction = "Food and Drug Administration" Then
         Me.ProcessJobSubform.SourceObject = "PJDoctors"
         Me.ProcessJobSubform.Requery
-    ElseIf sJurisdiction = "*FDA*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*FDA*" Then
         Me.ProcessJobSubform.SourceObject = "PJDoctors"
         Me.ProcessJobSubform.Requery
-    ElseIf sJurisdiction = "*fda*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*fda*" Then
         Me.ProcessJobSubform.SourceObject = "PJDoctors"
         Me.ProcessJobSubform.Requery
     Else
@@ -202,13 +205,15 @@ Private Sub TypeBTN_Click()
     End If
     'Call PlayAudioFolder
     Documents.Open FileName:=cJob.DocPath.RoughDraft, ReadOnly:=False
-    Call pfClearGlobals
+    
+    sCourtDatesID = ""
 End Sub
 
 Private Sub ViewJobFolderBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "PJViewJobFolder"
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 
 End Sub
 
@@ -224,9 +229,11 @@ Private Sub ShippingInfoBTN_Click()
     Dim rstMailC As DAO.Recordset
     Dim rstPkgType As DAO.Recordset
 
-    Call pfGetOrderingAttorneyInfo
-
+    Dim cJob As Job
+    Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     SQLString = "SELECT * FROM ShippingOptions WHERE [CourtDatesIDLK] = " & sCourtDatesID & ";"
     Set rs = CurrentDb.OpenRecordset(SQLString)
 
@@ -257,12 +264,12 @@ Private Sub ShippingInfoBTN_Click()
             rs("CertifiedMail").Value = "OFF"
             rs("SignatureConfirmation").Value = "OFF"
             rs("USPSTracking").Value = "ON"
-            rs("ToName").Value = sName
-            rs("ToAddress1").Value = sAddress1
-            rs("ToAddress2").Value = sAddress2
-            rs("ToCity").Value = sCity
-            rs("ToState").Value = sState
-            rs("ToPostalCode").Value = sZIP
+            rs("ToName").Value = cJob.App0.FirstName & " " & cJob.App0.LastName
+            rs("ToAddress1").Value = cJob.App0.Company
+            rs("ToAddress2").Value = cJob.App0.Address
+            rs("ToCity").Value = cJob.App0.City
+            rs("ToState").Value = cJob.App0.State
+            rs("ToPostalCode").Value = cJob.App0.ZIP
             rs("ToCountry").Value = "United States"
             rs("Description").Value = sCourtDatesID & " Transcripts"
             rs("Value").Value = "100"
@@ -297,6 +304,7 @@ Private Sub ShippingInfoBTN_Click()
     rs.Close
     Set rs = Nothing
 
+    sCourtDatesID = ""
 End Sub
 
 Private Sub InvoicingBTN_Click()
@@ -311,4 +319,5 @@ Private Sub SRTextBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "JurisdictionRef"
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub

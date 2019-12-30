@@ -46,12 +46,9 @@ Public Sub pfStage3Ppwk()
     cJob.FindFirst "ID=" & sCourtDatesID
     Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 3 for job " & sCourtDatesID
 
-    Call pfGetOrderingAttorneyInfo
-
     Call pfUpdateCheckboxStatus("AudioProof")
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    If sJurisdiction Like "*AVT*" Then
+    
+    If cJob.CaseInfo.Jurisdiction Like "*AVT*" Then
         sDeliveryURL = "http://tabula.escribers.net/"
     
         Call pfFileRenamePrompt
@@ -64,7 +61,7 @@ Public Sub pfStage3Ppwk()
     
         Application.FollowHyperlink (sDeliveryURL) 'FILE WITH ESCRIBERS
     
-    ElseIf sJurisdiction = "eScribers NH" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "eScribers NH" Then
         sDeliveryURL = "http://tabula.escribers.net/"
         Call pfFileRenamePrompt
         Call fTranscriptDeliveryF
@@ -74,8 +71,7 @@ Public Sub pfStage3Ppwk()
     
         Application.FollowHyperlink (sDeliveryURL) 'FILE WITH ESCRIBERS
    
-    ElseIf sJurisdiction Like "*FDA*" Then
-        Call pfCurrentCaseInfo                   'refresh transcript info
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*FDA*" Then
         Call fTranscriptDeliveryF                '(only the filing)
         Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
         Call pfFileRenamePrompt
@@ -93,7 +89,7 @@ Public Sub pfStage3Ppwk()
             .BCC = ""
     
             .Attachments.Add (sClientTranscriptName)
-            .Subject = sJurisdiction & " " & dHearingDate & " Transcript Ready " & sCourtDatesID
+            .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
@@ -105,8 +101,7 @@ Public Sub pfStage3Ppwk()
     
         Call pfCommunicationHistoryAdd("FileTranscriptEmail") 'LOG FACTORED CLIENT INVOICE
     
-    ElseIf sJurisdiction Like "Food and Drug Administration" Then
-        Call pfCurrentCaseInfo                   'refresh transcript info
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Food and Drug Administration" Then
         Call fTranscriptDeliveryF                '(only the filing)
         Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
         Call pfFileRenamePrompt
@@ -123,7 +118,7 @@ Public Sub pfStage3Ppwk()
             .CC = ""
             .BCC = ""
             .Attachments.Add (sClientTranscriptName)
-            .Subject = sJurisdiction & " " & dHearingDate & " Transcript Ready " & sCourtDatesID
+            .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
         
             Set oWordEditor = .GetInspector.WordEditor
@@ -137,8 +132,7 @@ Public Sub pfStage3Ppwk()
     
         Call pfCommunicationHistoryAdd("FileTranscriptEmail") 'LOG FACTORED CLIENT INVOICE
     
-    ElseIf sJurisdiction Like "Weber" Then
-        Call pfCurrentCaseInfo                   'refresh transcript info
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Weber" Then
         Call fTranscriptDeliveryF                '(only the filing)
         Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
         Call pfFileRenamePrompt
@@ -156,7 +150,7 @@ Public Sub pfStage3Ppwk()
             .CC = ""
             .BCC = ""
             .Attachments.Add (sClientTranscriptName)
-            .Subject = sJurisdiction & " " & dHearingDate & " Transcript Ready " & sCourtDatesID
+            .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
         
             Set oWordEditor = .GetInspector.WordEditor
@@ -179,8 +173,10 @@ Public Sub pfStage3Ppwk()
     End If
 
     Debug.Print "Stage 3 complete."
-    Call pfClearGlobals
+    
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sClientTranscriptName = ""
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfBurnCD()
@@ -232,6 +228,7 @@ Public Sub pfBurnCD()
     
     End If
     
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfCreateRegularPDF()
@@ -357,6 +354,7 @@ Public Sub pfCreateRegularPDF()
     FileCopy cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptFDB
     FileCopy cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFPB
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fDynamicHeaders()
@@ -399,7 +397,6 @@ Public Sub fDynamicHeaders()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    'Call pfCurrentCaseInfo
     
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -534,7 +531,8 @@ Public Sub fDynamicHeaders()
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
             
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfHeaders()
@@ -753,7 +751,7 @@ Public Sub pfHeaders()
                                                    IncludePosition:=False, SeparateNumbers:=False, SeparatorString:=" "
                     On Error GoTo 0
                     
-                    If sStyleName = "Heading 2" Then Selection.TypeText Text:=" -- WITNESSNAME"
+                    If sStyleName = "Heading 2" Then oWordDoc.Application.Selection.TypeText Text:=" -- WITNESSNAME"
                         
                     oWordDoc.Application.Selection.MoveUp Unit:=wdLine, Count:=1, Extend:=wdExtend
                     oWordDoc.Application.Selection.HomeKey Unit:=wdLine, Extend:=wdExtend
@@ -804,7 +802,8 @@ NextItem:
     Set oWordDoc = Nothing
     Set rCurrentSection = Nothing
 
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfTopOfTranscriptBookmark()
@@ -851,10 +850,14 @@ Public Sub pfTopOfTranscriptBookmark()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     'Table of Contents Bookmark
+    
+    
+    
+    
+    
+    
+    
     PDocCover.Open (cJob.DocPath.WACoverP)
-    
-    
-    Debug.Print cJob.DocPath.WACoverP
     
     Set ADoc = PDocCover.OpenAVDoc(cJob.DocPath.WACoverP)
     
@@ -958,6 +961,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Set PDoc = Nothing
     Set ADoc = Nothing
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fPDFBookmarks()
@@ -1018,6 +1022,7 @@ Public Sub fPDFBookmarks()
         aaAcroApp.CloseAllDocs
     
     End If
+    sCourtDatesID = ""
 
 eHandlerX:
     Set aaAcroPDDoc = Nothing

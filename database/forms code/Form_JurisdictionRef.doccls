@@ -13,34 +13,33 @@ Private Sub WBCViewJobFolder_OnUpdated()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    Call pfCurrentCaseInfo
 
-    If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then
+    If cJob.CaseInfo.Jurisdiction = "*AVT*" Or cJob.CaseInfo.Jurisdiction = "*eScribers*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "eScribers\"
 
 
-    ElseIf sJurisdiction = "Food and Drug Administration" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Food and Drug Administration" Then
     
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "FDA"
     
-    ElseIf sJurisdiction = "*FDA*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*FDA*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "FDA"
 
-    ElseIf sJurisdiction = "*Weber*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*Weber*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "Weber"
 
-    ElseIf sJurisdiction = "*County*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*County*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "WACounties"
         
-    ElseIf sJurisdiction = "*USBC*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*USBC*" Then
     
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "USBC"
  
-    ElseIf sJurisdiction = "Massachusetts" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Massachusetts" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "Massachusetts"
     Else
@@ -49,7 +48,8 @@ Private Sub WBCViewJobFolder_OnUpdated()
         Application.FollowHyperlink ("https://ac.courts.wa.gov/index.cfm?fa=efiling.home")
         
     End If
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Private Sub Command5_Click()
@@ -62,36 +62,35 @@ Private Sub Command5_Click()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    Call pfCurrentCaseInfo
 
-    If sJurisdiction = "*AVT*" Or sJurisdiction = "*eScribers*" Then
+    If cJob.CaseInfo.Jurisdiction = "*AVT*" Or cJob.CaseInfo.Jurisdiction = "*eScribers*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "eScribers\"
 
 
-    ElseIf sJurisdiction = "Food and Drug Administration" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Food and Drug Administration" Then
     
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "FDA"
     
-    ElseIf sJurisdiction = "*FDA*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*FDA*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "FDA"
 
-    ElseIf sJurisdiction = "*Weber*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*Weber*" Then
     
         sTranscriptDir = "file:///" & cJob.DocPath.JurisdictionRefs & "Weber"
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "Weber"
 
-    ElseIf sJurisdiction = "*County*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*County*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "WACounties"
         
-    ElseIf sJurisdiction = "*USBC*" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "*USBC*" Then
         
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "USBC"
 
-    ElseIf sJurisdiction = "Massachusetts" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "Massachusetts" Then
     
         Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JurisdictionRefs & "Massachusetts"
     
@@ -103,4 +102,5 @@ Private Sub Command5_Click()
     End If
     
 
+    sCourtDatesID = ""
 End Sub

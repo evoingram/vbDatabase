@@ -45,6 +45,7 @@ Private Sub bUntaggedCmcn_Click()
 End Sub
 
 Private Sub bFinances_Click()
+    Dim svURL As String
     'prcess a job button
     svURL = "https://go.xero.com/AccountsReceivable/Search.aspx?invoiceStatus=INVOICESTATUS%2fDRAFT&graphSearch=False"
     Forms![NewMainMenu]![ProcessJobSubformNMM].SourceObject = "MMFinances"
