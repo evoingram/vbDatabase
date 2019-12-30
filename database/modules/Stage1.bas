@@ -99,10 +99,10 @@ Public Sub pfEnterNewJob()
     Dim sFactoring As String
     Dim sFiled As String
     Dim sBrandingTheme As String
-    Dim sUnitPrice As String
     Dim sIRC As String
     Dim sAccountCode As String
     Dim sJurisdiction As String
+    Dim sStatusesID As String
     
     Dim oExcelApp As Object
     
@@ -178,45 +178,45 @@ Public Sub pfEnterNewJob()
 
     Select Case sTurnaround
     Case "45"
-        sUnitPrice = 64
+        cJob.UnitPrice = 64
         sIRC = 96
     Case "30"
-        sUnitPrice = 58
+        cJob.UnitPrice = 58
         sIRC = 78
     Case "14"
-        sUnitPrice = 59
+        cJob.UnitPrice = 59
         sIRC = 7
     Case "7"
-        sUnitPrice = 60
+        cJob.UnitPrice = 60
         sIRC = 8
     Case "3"
-        sUnitPrice = 42
+        cJob.UnitPrice = 42
         sIRC = 90
     Case "1"
-        sUnitPrice = 61
+        cJob.UnitPrice = 61
         sIRC = 14
     End Select
 
 
     Select Case sJurisdiction
     Case "eScribers"
-        sUnitPrice = 33
+        cJob.UnitPrice = 33
         sIRC = 95
     Case "FDA", "Food and Drug Administration"
-        sUnitPrice = 37
+        cJob.UnitPrice = 37
         sIRC = 41
     Case "Weber"
-        sUnitPrice = 36
+        cJob.UnitPrice = 36
         sIRC = 65
     Case "J&J"
-        sUnitPrice = 36
+        cJob.UnitPrice = 36
         sIRC = 43
     Case "Non-Court", "NonCourt", "noncourt", "non-court"
-        sUnitPrice = 49
+        cJob.UnitPrice = 49
         sIRC = 86
     Case "KCI", "King County Indigent", "KCI King County Superior Court", _
          "KCI Snohomish County Superior Court"
-        sUnitPrice = 40
+        cJob.UnitPrice = 40
         sIRC = 56
     End Select
     
@@ -283,7 +283,7 @@ Public Sub pfEnterNewJob()
     Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
     rstTempCourtDates.MoveFirst
     rstTempCourtDates.Edit
-    rstTempCourtDates.Fields("DueDate").Value = sDueDate
+    rstTempCourtDates.Fields("DueDate").Value = dDueDate
     rstTempCourtDates.Fields("InvoiceDate").Value = dInvoiceDate
     rstTempCourtDates.Fields("AccountCode").Value = sAccountCode
     rstTempCourtDates.Update
@@ -294,7 +294,7 @@ Public Sub pfEnterNewJob()
     CurrentDb.Execute "DELETE FROM TempCustomers WHERE [Company] IS NULL;"
 
     CurrentDb.Execute "UPDATE TempCourtDates SET [InvoiceDate] = " & dInvoiceDate & ", [DueDate] = " & dDueDate & ", [AccountCode] = " & sAccountCode & _
-               ", [UnitPrice] = " & sUnitPrice & ", [InventoryRateCode] = " & sIRC & ", [BrandingTheme] = " & sBrandingTheme & _
+               ", [UnitPrice] = " & cJob.UnitPrice & ", [InventoryRateCode] = " & sIRC & ", [BrandingTheme] = " & sBrandingTheme & _
                ";"
             
     sNewCourtDatesRowSQL = "INSERT INTO TempCases (HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
@@ -496,6 +496,7 @@ Public Sub pfEnterNewJob()
     Call pfClearGlobals
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fCheckTempCustomersCustomers()
@@ -651,6 +652,7 @@ Public Sub fCheckTempCustomersCustomers()
     rstTempCustomers.Close
     Set rstTempCustomers = Nothing
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fCheckTempCasesCases()
@@ -713,7 +715,6 @@ Public Sub fCheckTempCasesCases()
         Set rstMaxCasesID = CurrentDb.OpenRecordset("SELECT MAX(ID) as CasesID From Cases;")
     
         rstMaxCasesID.MoveFirst
-        vCasesID = rstMaxCasesID.Fields("CasesID").Value
         sCasesID = rstMaxCasesID.Fields("CasesID").Value
         rstMaxCasesID.Close
     
@@ -759,8 +760,6 @@ Public Sub fCheckTempCasesCases()
     
     End If
 
-
-    vCasesID = sCasesID
     Set rstCurrentJob = Nothing
     Set rstCheckTCavCa = Nothing
     Set rstTempCases = Nothing
@@ -786,7 +785,6 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     Dim dExpectedAdvanceDate As Date
     Dim dExpectedRebateDate As Date
     Dim sJurisdiction As String
-    Dim sUnitPriceRateSrchSQL As String
     Dim InsertCustomersTempCourtDatesSQLstring As String
     Dim sSubtotal As String
     
@@ -905,6 +903,7 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
                                                & Chr(13) & "Expected Rebate Payment Date:  " & dExpectedRebateDate _
                                                & Chr(13) & "Expected Price Estimate:  $" & sSubtotal
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fAudioPlayPromptTyping()
@@ -928,6 +927,7 @@ Public Sub fAudioPlayPromptTyping()
     Else                                         'Code for yes
         Call fPlayAudioParent
     End If
+    sCourtDatesID = ""
 
 End Sub
 
@@ -947,6 +947,7 @@ Public Sub fProcessAudioParent()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fProcessAudioFolder(cJob.DocPath.JobDirectoryA)
+    sCourtDatesID = ""
 
 End Sub
 
@@ -967,6 +968,7 @@ Public Sub fPlayAudioParent()
     
     Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA)
 
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1055,6 +1057,7 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
 Line2:
     End If
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fProcessAudioFolder(ByVal HostFolder As String)
@@ -1132,6 +1135,7 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
         Next fiCurrentFile
 Line2:
     End If
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfPriceQuoteEmail()
@@ -1284,6 +1288,7 @@ Public Sub pfPriceQuoteEmail()
     oWordApp.Quit
     On Error GoTo 0
     Set oWordApp = Nothing
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfStage1Ppwk()
@@ -1446,6 +1451,7 @@ Line2:                                           'every jurisdiction converges h
     
     Call pfTypeRoughDraftF                       'type rough draft prompt
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fWunderlistAddNewJob()
@@ -1458,25 +1464,18 @@ Public Sub fWunderlistAddNewJob()
     '               have it auto-set the next due date by stage
     '               4 tasks for each job, stage 1, 2, 3, 4
     '============================================================================
-    'global variables lAssigneeID As Long, sDueDate As String, bStarred As Boolean
+    'global variables sWLLIDEricaI As Long, bStarred As Boolean
     '   bCompleted As Boolean, sTitle As String, sWLListID As String
 
     Dim sTitle As String
     Dim sDueDate As String
     Dim vErrorDetails As String
     Dim sURL As String
-    Dim sEmail As String
     Dim sJSON As String
     Dim vErrorIssue As String
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
-    Dim sFile1 As String
-    Dim sFile2 As String
-    Dim sFile3 As String
-    Dim sLine1 As String
-    Dim sLine2 As String
-    Dim sLine3 As String
     Dim sLists As String
     Dim sResponseText As String
     Dim apiWaxLRS As String
@@ -1484,25 +1483,19 @@ Public Sub fWunderlistAddNewJob()
     Dim lFolderID As Long
     Dim iListID As Long
     
+    Dim bCompleted As Boolean
+    Dim bStarred As Boolean
+    
     Dim parsed As Dictionary
     
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
+    
+    'TODO: Why not being used?  Find and exchange for sWLLIDPF
+    lFolderID = 13249242 'id for "Production" folder
 
-    sWLListID = 370524335                        'Ingram Household = 370524335
-    'inbox = 370231796
-    '1ToBeEntered = 388499976
-    '2InProgress = 388499848
-    '3Complete = 388499951
-                        
-    lAssigneeID = 88345676                       'erica / 86846933 adam
-    bCompleted = "false"
-    bStarred = "false"
-    lFolderID = 13249242                         'id for "Production" folder
-
-    sEmail = sCompanyEmail
     sTitle = sCourtDatesID
 
     'create a list JSON
@@ -1624,7 +1617,7 @@ Public Sub fWunderlistAddNewJob()
     sJSON = "{" & Chr(34) & _
                           "list_id" & Chr(34) & ": " & iListID & "," & Chr(34) & _
                           "title" & Chr(34) & ": " & Chr(34) & sTitle & Chr(34) & "," & Chr(34) & _
-                          "assignee_id" & Chr(34) & ": " & lAssigneeID & "," & Chr(34) & _
+                          "assignee_id" & Chr(34) & ": " & sWLLIDEricaI & "," & Chr(34) & _
                           "completed" & Chr(34) & ": " & bCompleted & "," & Chr(34) & _
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
@@ -1664,7 +1657,7 @@ Public Sub fWunderlistAddNewJob()
     sJSON = "{" & Chr(34) & _
                           "list_id" & Chr(34) & ": " & iListID & "," & Chr(34) & _
                           "title" & Chr(34) & ": " & Chr(34) & sTitle & Chr(34) & "," & Chr(34) & _
-                          "assignee_id" & Chr(34) & ": " & lAssigneeID & "," & Chr(34) & _
+                          "assignee_id" & Chr(34) & ": " & sWLLIDEricaI & "," & Chr(34) & _
                           "completed" & Chr(34) & ": " & bCompleted & "," & Chr(34) & _
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
@@ -1699,7 +1692,7 @@ Public Sub fWunderlistAddNewJob()
     sJSON = "{" & Chr(34) & _
                           "list_id" & Chr(34) & ": " & iListID & "," & Chr(34) & _
                           "title" & Chr(34) & ": " & Chr(34) & sTitle & Chr(34) & "," & Chr(34) & _
-                          "assignee_id" & Chr(34) & ": " & lAssigneeID & "," & Chr(34) & _
+                          "assignee_id" & Chr(34) & ": " & sWLLIDEricaI & "," & Chr(34) & _
                           "completed" & Chr(34) & ": " & bCompleted & "," & Chr(34) & _
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
@@ -1733,7 +1726,7 @@ Public Sub fWunderlistAddNewJob()
     sJSON = "{" & Chr(34) & _
                           "list_id" & Chr(34) & ": " & iListID & "," & Chr(34) & _
                           "title" & Chr(34) & ": " & Chr(34) & sTitle & Chr(34) & "," & Chr(34) & _
-                          "assignee_id" & Chr(34) & ": " & lAssigneeID & "," & Chr(34) & _
+                          "assignee_id" & Chr(34) & ": " & sWLLIDEricaI & "," & Chr(34) & _
                           "completed" & Chr(34) & ": " & bCompleted & "," & Chr(34) & _
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
@@ -1760,6 +1753,7 @@ Public Sub fWunderlistAddNewJob()
     '@Ignore AssignmentNotUsed
     sTitle = parsed.item("title")
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub autointake()
@@ -1788,7 +1782,6 @@ Public Sub autointake()
     Dim sCurrentInput As String
     Dim sJobTitle As String
     Dim sBusinessPhone As String
-    Dim sUnitPrice As String
     Dim sIRC As String
     Dim sFiled As String
     Dim sFactoring As String
@@ -1812,11 +1805,6 @@ Public Sub autointake()
     Dim sHEnd As String
     Dim sHStart As String
     Dim sLocation As String
-    Dim dInvoiceDate As String
-    Dim dDueDate As String
-    Dim dExpectedBalanceDate As String
-    Dim dExpectedAdvanceDate As String
-    Dim dExpectedRebateDate As String
     Dim iEstimatedPageCount As String
     Dim sAccountCode As String
     Dim sExtensionXLSM As String
@@ -1840,6 +1828,17 @@ Public Sub autointake()
     Dim sFirstA As String
     Dim sTempCustomersSQL As String
     Dim sBrandingTheme As String
+    Dim sCity As String
+    Dim sState As String
+    Dim sZIP As String
+    Dim sMrMs As String
+    Dim sStatusesID As String
+    
+    Dim dInvoiceDate As Date
+    Dim dDueDate As Date
+    Dim dExpectedBalanceDate As Date
+    Dim dExpectedAdvanceDate As Date
+    Dim dExpectedRebateDate As Date
 
     Dim rstTempJob As DAO.Recordset
     Dim rstCurrentJob As DAO.Recordset
@@ -1929,49 +1928,49 @@ Public Sub autointake()
         
         Select Case sTurnaround
         Case "45"
-            sUnitPrice = 64
+            cJob.UnitPrice = 64
             sIRC = 96
                 
         Case "30"
-            sUnitPrice = 39
+            cJob.UnitPrice = 39
             sIRC = 17
                 
         Case "14"
-            sUnitPrice = 41
+            cJob.UnitPrice = 41
             sIRC = 19
                 
         Case "7"
-            sUnitPrice = 62
+            cJob.UnitPrice = 62
             sIRC = 20
                 
         Case "3"
-            sUnitPrice = 50
+            cJob.UnitPrice = 50
             sIRC = 84
                 
         Case Else
-            sUnitPrice = 61
+            cJob.UnitPrice = 61
             sIRC = 14
         End Select
         
         Select Case True
         Case sJurisdiction Like "*eScribers*"
-            sUnitPrice = 33
+            cJob.UnitPrice = 33
             sIRC = 95
                 
         Case sJurisdiction = "FDA", sJurisdiction = "Food and Drug Administration"
-            sUnitPrice = 37
+            cJob.UnitPrice = 37
             sIRC = 41
                 
         Case sJurisdiction Like "*Weber*", sJurisdiction Like "*J&J*"
-            sUnitPrice = 36
+            cJob.UnitPrice = 36
             sIRC = 65
                 
         Case sJurisdiction = "Non-Court", sJurisdiction = "NonCourt"
-            sUnitPrice = 49
+            cJob.UnitPrice = 49
             sIRC = 86
                 
         Case sJurisdiction Like "*KCI*"
-            sUnitPrice = 40
+            cJob.UnitPrice = 40
             sIRC = 56
         
         End Select
@@ -2041,7 +2040,7 @@ Public Sub autointake()
                    sSubmissionDate & ", " & sFirstName & ", " & sLastName & ", " & "Mrs" & ", " & sFirstA & ", " & sLastA & ", " & sCompany & ", " & sEmail & ", " & sCompanyEmail & _
                    ", " & sHardCopy & ", " & sAddress1 & ", " & sAddress2 & ", " & sCity & ", " & sState & ", " & sZIP & ", " & sTurnaround & ", " & sAudioLength & ", " & sParty1 & ", " & _
                    sParty2 & ", " & sCaseNumber1 & ", " & sCaseNumber2 & ", " & sJudge & ", " & sJurisdiction & ", " & sHearingDate & ", " & sParty1Name & ", " & sParty2Name & ", " & _
-                   sJudgeTitle & ", " & sHearingTitle & ", " & sHEnd & ", " & sHStart & ", " & sLocation & ", " & dInvoiceDate & ", " & dDueDate & ", " & sAccountCode & ", " & sUnitPrice & ", " & _
+                   sJudgeTitle & ", " & sHearingTitle & ", " & sHEnd & ", " & sHStart & ", " & sLocation & ", " & dInvoiceDate & ", " & dDueDate & ", " & sAccountCode & ", " & cJob.UnitPrice & ", " & _
                    sIRC & ", " & sBrandingTheme & ");"
     
         sNewCourtDatesRowSQL = "INSERT INTO TempCases (HearingTitle, Party1, Party1Name, Party2, Party2Name, CaseNumber1, CaseNumber2, " & _
@@ -2305,7 +2304,8 @@ Public Sub autointake()
     Call pfClearGlobals
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Public Sub NewOLEntry()

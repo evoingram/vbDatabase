@@ -129,6 +129,7 @@ EndIf1:
     Application.FollowHyperlink cJob.DocPath.CourtCover
     Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfAutoCorrect()
@@ -206,6 +207,7 @@ NextAGShortcut:
     rstAGShortcuts.Close
     Set flCurrentField = Nothing
     Set rstAGShortcuts = Nothing
+    sCourtDatesID = ""
 
 End Sub
 
@@ -221,15 +223,22 @@ Public Sub pfRoughDraftToCoverF()
     '============================================================================
 
     Dim sSpeakerName As String
-    Dim oWordDoc As New Word.Document
-    Dim oWordApp As New Word.Application
     Dim sTextToFind As String
     Dim sReplacementText As String
+    Dim sLastName As String
+    Dim wsyWordStyle As String
+    Dim sMrMs As String
+    
     Dim x As Long
+    
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef
-    Dim wsyWordStyle As String
+    
+    Dim oWordDoc As New Word.Document
+    Dim oWordApp As New Word.Application
+    
     Dim bMatchCase As Boolean
+    
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -1595,6 +1604,7 @@ Public Sub pfRoughDraftToCoverF()
     End If
 
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfStaticSpeakersFindReplace()
@@ -1913,6 +1923,7 @@ Public Sub pfStaticSpeakersFindReplace()
     Set oWordApp = Nothing
 
     DoCmd.Close acQuery, qnViewJobFormAppearancesQ
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfReplaceColonUndercasewithColonUppercase()
@@ -2167,6 +2178,7 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     Set oWordApp = Nothing
 
     DoCmd.Close acQuery, qnViewJobFormAppearancesQ
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfTypeRoughDraftF()
@@ -2265,6 +2277,7 @@ Public Sub pfTypeRoughDraftF()
 
     Shell "winword " + cJob.DocPath.RoughDraft 'open file
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub wwReplaceWeberOR()
@@ -2315,6 +2328,7 @@ Public Sub pfReplaceAQC()
     Call pfFindRepCitationLinks
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     'Debug.Print "---------------"
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfReplaceMass()
@@ -2337,6 +2351,8 @@ Public Sub pfRoughDraftCFMass()
     Dim sTextToFind As String
     Dim sReplacementText As String
     Dim wsyWordStyle As String
+    Dim sMrMs As String
+    Dim sLastName As String
     
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
@@ -3606,5 +3622,6 @@ Public Sub pfRoughDraftCFMass()
 
 
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 

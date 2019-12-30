@@ -127,6 +127,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     oWordAppDoc.Application.ActiveDocument.Close
     Set oWordAppDoc = Nothing
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 
 End Sub
 
@@ -265,6 +266,7 @@ Public Sub pfCreateCDLabel()
 
     Call fPrintKCIEnvelope
     Call pfClearGlobals
+    sCourtDatesID = ""
     
 End Sub
 
@@ -309,6 +311,7 @@ Public Sub pfSelectCoverTemplate()
 
     Call pfCommunicationHistoryAdd("CourtCover")
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfCreateCover(sTemplatePath As String)
@@ -444,6 +447,7 @@ Public Sub pfCreateCover(sTemplatePath As String)
     Set rstCommHistory = Nothing
     
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fCreatePELLetter()
@@ -476,6 +480,7 @@ Public Sub fCreatePELLetter()
 
     Call pfCommunicationHistoryAdd("PackageEnclosedLetter")
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fFactorInvoicEmailF()
@@ -491,7 +496,6 @@ Public Sub fFactorInvoicEmailF()
     Dim sAnswer As String
     Dim sContactName As String
     Dim sPONumber As String
-    Dim sUnitPriceSQL As String
     
     Dim rstUPCourtDates As DAO.Recordset
     Dim rstUnitPrice As DAO.Recordset
@@ -560,6 +564,7 @@ Public Sub fFactorInvoicEmailF()
     qdf.Close
     CurrentDb.Close
     Call pfClearGlobals
+    sCourtDatesID = ""
     
 End Sub
 
@@ -596,6 +601,7 @@ Public Sub pfInvoicesCSV()
 
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
     Call pfClearGlobals
+    sCourtDatesID = ""
     
 End Sub
 
@@ -696,6 +702,7 @@ Public Sub fCreateWorkingCopy()
     Set oWordApp = Nothing
 
     FileCopy cJob.DocPath.TranscriptWC, cJob.DocPath.TranscriptWCB
+    sCourtDatesID = ""
 
 End Sub
 
@@ -784,6 +791,7 @@ Public Sub pfPrepareCover()
     oWordDoc.Close
     oWordApp.Quit
     rstJobsByCase.Close
+    sCourtDatesID = ""
     
 End Sub
 

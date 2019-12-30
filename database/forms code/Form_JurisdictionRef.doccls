@@ -48,7 +48,8 @@ Private Sub WBCViewJobFolder_OnUpdated()
         Application.FollowHyperlink ("https://ac.courts.wa.gov/index.cfm?fa=efiling.home")
         
     End If
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Private Sub Command5_Click()
@@ -101,4 +102,5 @@ Private Sub Command5_Click()
     End If
     
 
+    sCourtDatesID = ""
 End Sub

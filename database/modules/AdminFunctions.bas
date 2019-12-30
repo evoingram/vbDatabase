@@ -83,8 +83,6 @@ Option Explicit
 '                            Arguments:    NONE
 'fWunderlistAdd()            Description:  adds task to Wunderlist
 '                            Arguments:    NONE
-'fWLGenerateJSONInfo         Description:  get info for WL API
-'                            Arguments:    NONE
 'fWunderlistGetLists()       Description:  gets all Wunderlist lists
 '                            Arguments:    NONE
 'pfRCWRuleScraper1()         Description:  builds RCW rule links and citations
@@ -198,6 +196,7 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     Forms![NewMainMenu].Form!lblFlash.Caption = "You may now find any files downloaded today in" & cJob.DocPath.FileInbox & "."
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 
 End Sub
 
@@ -269,6 +268,7 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
     Set adocOutlookExport = Nothing
     Set oOutlookNamespace = Nothing
     Set oOutlookPickedFolder = Nothing
+    sCourtDatesID = ""
  
 End Sub
 
@@ -372,6 +372,7 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     DoCmd.OpenQuery "FinalUnitPriceQuery"        'PRE-QUERY FOR FINAL SUBTOTAL
     CurrentDb.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
     DoCmd.Close acQuery, "FinalUnitPriceQuery"
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfReadXML()
@@ -421,6 +422,7 @@ Public Sub pfReadXML()
         Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
        
     Loop
+    sCourtDatesID = ""
 
 End Sub
 
@@ -451,18 +453,19 @@ Public Sub pfFileRenamePrompt()
     End If
 
     FileCopy cJob.DocPath.CourtCover, cJob.DocPath.TranscriptFD
-    Name cJob.DocPath.TranscriptFD As cJob.DocPath.JobDirectoryT & sUserInput & ".docx"
-
+    sClientTranscriptName = cJob.DocPath.JobDirectoryT & sUserInput & ".docx"
+    Name cJob.DocPath.TranscriptFD As sClientTranscriptName
     MsgBox "File renamed to " & sClientTranscriptName & ".  Next we will deliver the transcript."
 
     Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
-    Call pfSendWordDocAsEmail("ContractorTranscriptsReady", "Transcripts Ready", sClientTranscriptName)
+    Call pfSendWordDocAsEmail("ContractorTranscriptsReady", "Transcripts Ready", cJob.DocPath.JobDirectoryT & sUserInput & ".docx")
 
     sChkBxFiledNotFiled = "UPDATE [CourtDates] SET FiledNotFiled =(Yes) WHERE ID=" & sCourtDatesID & ";"
 
     CurrentDb.Execute sChkBxFiledNotFiled
 
     MsgBox "Transcript has been delivered.  Next, let's do some admin stuff."
+    sCourtDatesID = ""
 
 End Sub
 
@@ -601,6 +604,7 @@ Public Sub pfCheckFolderExistence()
     End If
     Call pfClearGlobals
     Set cJob = Nothing
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
@@ -631,6 +635,7 @@ Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
     rstCHAdd.Update
 
     rstCHAdd.Close
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1257,6 +1262,7 @@ Public Sub pfGenerateJobTasks()
     
 
     Call pfClearGlobals
+    sCourtDatesID = ""
     
 End Sub
 
@@ -1522,6 +1528,7 @@ Public Sub pfCommHistoryExportSub()
     Set rs = Nothing
     Set nsOutlookNmSpc = Nothing
     Set oOutlookAccessTestFolder = Nothing
+    sCourtDatesID = ""
 
     Exit Sub
 
@@ -1705,6 +1712,7 @@ Public Sub pfAskforAudio()
     
     End If
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfAskforNotes()
@@ -1805,6 +1813,7 @@ Public Sub pfAskforNotes()
             End If
         Next i
     End If
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfRCWRuleScraper()
@@ -2206,43 +2215,6 @@ Public Function GetLevel(strItem As String) As Long
     GetLevel = (intDiff / 2) + 1
 End Function
 
-Public Sub fWLGenerateJSONInfo()
-    '============================================================================
-    ' Name        : fWLGenerateJSONInfo
-    ' Author      : Erica L Ingram
-    ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call fWLGenerateJSONInfo
-    ' Description : get info for WL API
-    '============================================================================
-    '{
-    '  "list_id": 12345, Ingram Household = 370524335
-    'inbox = 370231796
-    '1ToBeEntered = 388499976
-    '2InProgress = 388499848
-    '3Complete = 388499951
-  
-    '  "title": "Hallo",
-    '  "assignee_id": 123,
-    '  "completed": true,
-    '  "due_date": "2013-08-30",
-    '  "starred": false
-    '}
-
-    'GET a.wunderlist.com/api/v1/lists/:id
-    'PATCH a.wunderlist.com/api/v1/lists/:id
-
-    Dim rstTRQPlusCases As DAO.Recordset
-    Dim db As Database
-    Dim qdf As QueryDef
-
-    sWLListID = 370524335                        'ingram household
-    'or try inbox 370231796
-    lAssigneeID = 88345676                       'erica / 86846933 adam
-    bCompleted = "false"
-    bStarred = "false"
-
-
-End Sub
 
 Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
     '============================================================================
@@ -2269,7 +2241,14 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
     Dim response As Variant
     Dim rep As Variant
     
+    Dim bCompleted As Boolean
+    Dim bStarred As Boolean
+    
     Dim parsed As Dictionary
+
+    bCompleted = False
+    bStarred = False
+    
     '{
     '  "list_id": 12345,
     '  "title": "Hallo",
@@ -2278,23 +2257,12 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
     '  "due_date": "2013-08-30",
     '  "starred": false
     '}
-
-    Call fWLGenerateJSONInfo
-
-    '{
-    '  "list_id": 12345,
-    '  "title": "Hallo",
-    '  "assignee_id": 123,
-    '  "completed": true,
-    '  "due_date": "2013-08-30",
-    '  "starred": false
-    '}
-    'Public lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
+    'Public sWLLIDEricaI As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
     json1 = "{" & Chr(34) & _
-                          "list_id" & Chr(34) & ": " & sWLListID & "," & Chr(34) & _
+                          "list_id" & Chr(34) & ": " & sWLLIDIngramH & "," & Chr(34) & _
                           "title" & Chr(34) & ": " & Chr(34) & sTitle & Chr(34) & "," & Chr(34) & _
-                          "assignee_id" & Chr(34) & ": " & lAssigneeID & "," & Chr(34) & _
+                          "assignee_id" & Chr(34) & ": " & sWLLIDEricaI & "," & Chr(34) & _
                           "completed" & Chr(34) & ": " & bCompleted & "," & Chr(34) & _
                           "due_date" & Chr(34) & ": " & Chr(34) & sDueDate & Chr(34) & "," & Chr(34) & _
                           "starred" & Chr(34) & ": " & bStarred & _
@@ -2303,8 +2271,8 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
     'Debug.Print json1
 
     'Debug.Print "RESPONSETEXT--------------------------------------------"
-    sURL = "https://a.wunderlist.com/api/v1/tasks" '?completed=False" & bCompleted  '?list_id=" & sWLListID & '"&?title=" & sTitle &
-    '"&?assignee_id=" & lAssigneeID & "&?completed=" & bCompleted & "&?due_date=" & sDueDate
+    sURL = "https://a.wunderlist.com/api/v1/tasks" '?completed=False" & bCompleted  '?list_id=" & sWLLIDIngramH & '"&?title=" & sTitle &
+    '"&?assignee_id=" & sWLLIDEricaI & "&?completed=" & bCompleted & "&?due_date=" & sDueDate
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "POST", sURL, False
@@ -2325,10 +2293,10 @@ Public Sub fWunderlistAdd(sTitle As String, sDueDate As String)
     End With
     'Next
     'Debug.Print "--------------------------------------------"
-    'Debug.Print "Task Title:  " & sTitle & "   |   List ID:  " & sWLListID & " " & lAssigneeID
+    'Debug.Print "Task Title:  " & sTitle & "   |   List ID:  " & sWLLIDIngramH & " " & sWLLIDEricaI
     'Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & sDueDate
     'Debug.Print "--------------------------------------------"
-    'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
+    'sWLLIDEricaI As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
 End Sub
 
@@ -2345,7 +2313,6 @@ Public Sub fWunderlistGetTasksOnList()
     Dim vInvoiceID As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
     Dim vStatus As String
     Dim vTotal As String
     Dim json1 As String
@@ -2363,6 +2330,9 @@ Public Sub fWunderlistGetTasksOnList()
     Dim Json As Object
     Dim oWebBrowser As Object
         
+    Dim bCompleted As Boolean
+    Dim bStarred As Boolean
+    
     Dim parsed As Dictionary
     
     Dim rstRates As DAO.Recordset
@@ -2375,19 +2345,17 @@ Public Sub fWunderlistGetTasksOnList()
     '  "starred": false
     '}
 
-    Call fWLGenerateJSONInfo
-
     '{
     '  "list_id": 12345
     '}
-    'Public lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
+    'Public sWLLIDEricaI As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
     
-    json1 = "{" & Chr(34) & "list_id" & Chr(34) & ": " & sWLListID & "}"
+    json1 = "{" & Chr(34) & "list_id" & Chr(34) & ": " & sWLLIDIngramH & "}"
 
     'Debug.Print "JSON1--------------------------------------------"
     'Debug.Print json1
     'Debug.Print "RESPONSETEXT--------------------------------------------"
-    sURL = "https://a.wunderlist.com/api/v1/tasks?list_id=" & sWLListID
+    sURL = "https://a.wunderlist.com/api/v1/tasks?list_id=" & sWLLIDIngramH
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "GET", sURL, False
@@ -2419,6 +2387,7 @@ Public Sub fWunderlistGetTasksOnList()
     For Each rep In vDetails                     ' third level objects
         vErrorIssue = rep("id")
         vErrorDetails = rep("due_date")
+        bCompleted = rep("completed")
         Debug.Print "--------------------------------------------"
         Debug.Print "Error ID:  " & vErrorIssue
         Debug.Print "Error Details:  " & vErrorDetails
@@ -2427,10 +2396,10 @@ Public Sub fWunderlistGetTasksOnList()
         'Debug.Print "Error Details:  " & vErrorDetails
         Debug.Print "--------------------------------------------"
     Next
-    Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLListID & " " & lAssigneeID
+    Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLLIDIngramH & " " & sWLLIDEricaI
     Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & " "
     Debug.Print "--------------------------------------------"
-    'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
+    'sWLLIDEricaI As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
 End Sub
 
@@ -2447,8 +2416,6 @@ Public Sub fWunderlistGetLists()
     Dim vInvoiceID As String
     Dim apiWaxLRS As String
     Dim vErrorIssue As String
-    Dim sInvoiceTime As String
-    Dim vStatus As String
     Dim vTotal As String
     Dim sToken As String
     Dim json1 As String
@@ -2471,16 +2438,9 @@ Public Sub fWunderlistGetLists()
     
     Dim parsed As Dictionary
     
-    '{
-    '  "list_id": 12345,
-    '  "title": "Hallo",
-    '  "assignee_id": 123,
-    '  "completed": true,
-    '  "due_date": "2013-08-30",
-    '  "starred": false
-    '}
-
-    Call fWLGenerateJSONInfo
+    Dim bCompleted As Boolean
+    Dim bStarred As Boolean
+    
     'https://www.wunderlist.com/oauth/authorize?client_id=ID&redirect_uri=URL&state=RANDOM
 
     '@Ignore AssignmentNotUsed
@@ -2494,9 +2454,9 @@ Public Sub fWunderlistGetLists()
     '  "due_date": "2013-08-30",
     '  "starred": false
     '}
-    'Public lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
+    'Public sWLLIDEricaI As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
-    json1 = "{" & Chr(34) & "list_id" & Chr(34) & ": " & sWLListID & "}"
+    json1 = "{" & Chr(34) & "list_id" & Chr(34) & ": " & sWLLIDIngramH & "}"
     'Debug.Print "RESPONSETEXT--------------------------------------------"
     sURL = "https://a.wunderlist.com/api/v1/lists"
     With CreateObject("WinHttp.WinHttpRequest.5.1")
@@ -2526,10 +2486,10 @@ Public Sub fWunderlistGetLists()
     'Debug.Print "Error Message:  " & vErrorMessage
     'Debug.Print "Error Info Link:  " & vErrorILink
     'Debug.Print "--------------------------------------------"
-    'Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLListID & " " & lAssigneeID
+    'Debug.Print "Task Title:  " & " " & "   |   List ID:  " & sWLLIDIngramH & " " & sWLLIDEricaI
     'Debug.Print "Completed:  " & bCompleted & "   |   Due Date:  " & " "
     'Debug.Print "--------------------------------------------"
-    'lAssigneeID As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
+    'sWLLIDEricaI As Long, sDueDate As String, bStarred As Boolean, bCompleted As Boolean, sTitle As String, sWLListID As String
 
 End Sub
 
@@ -2553,8 +2513,6 @@ Public Sub fWunderlistGetFolders()
     Dim vErrorDetails As String
 
     Dim parsed As Dictionary
-
-    Call fWLGenerateJSONInfo
     
     'gets list of folders or folder revisions
 
@@ -3500,6 +3458,7 @@ EndHere:
 
     End If
 
+    sCourtDatesID = ""
 
 End Sub
 
@@ -3553,6 +3512,7 @@ EndHere:
 
     End If
 
+    sCourtDatesID = ""
 
 End Sub
 
@@ -3612,6 +3572,7 @@ EndHere:
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fCompleteStage1Tasks()
@@ -3691,6 +3652,7 @@ EndHere:
 
     End If
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fCompleteStage2Tasks()
@@ -3771,6 +3733,7 @@ EndHere:
 
     End If
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fCompleteStage3Tasks()
@@ -3849,6 +3812,7 @@ EndHere:
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fCompleteStage4Tasks()
@@ -3927,6 +3891,7 @@ EndHere:
 
     End If
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fFixBarAddressField()

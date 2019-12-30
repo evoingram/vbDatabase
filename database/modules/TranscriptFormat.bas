@@ -68,8 +68,6 @@ Public Sub test1()
     ' Description : parent function that finds certain entries within a transcript and assigns TC entries to them for indexing purposes
     '============================================================================
     
-    Dim sMrMs2 As String
-    Dim sLastName2 As String
     Dim vSpeakerName As String
     
     Dim oWordApp As New Word.Application
@@ -118,7 +116,8 @@ Public Sub test1()
     On Error GoTo 0
     Set oCourtCoverWD = Nothing
     Set oWordApp = Nothing
-            
+
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfReplaceBMKWwithBookmark()
@@ -715,6 +714,7 @@ Public Sub pfCreateBookmarks()
 
 
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacementText As String)
@@ -760,6 +760,7 @@ Public Sub pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacemen
 
     oWordDoc.SaveAs2 FileName:=sFileName
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfCreateIndexesTOAs()
@@ -957,7 +958,8 @@ Public Sub pfCreateIndexesTOAs()
         oWordDoc.Close
         oWordApp.Quit
         
-        
+
+    sCourtDatesID = ""
     End With
 End Sub
 
@@ -1053,14 +1055,15 @@ Public Sub pfReplaceFDA()
     
     oWordDoc.Save
     oWordDoc.Close
-    rs.Close                                     'Close the recordset
+    rs.Close
     rs1.Close
     oWordApp.Quit
     Set oWordDoc = Nothing
-    Set rs = Nothing                             'Clean up
-    Set rs1 = Nothing                            'Clean up
+    Set rs = Nothing
+    Set rs1 = Nothing
     Set oWordApp = Nothing
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfDynamicSpeakersFindReplace()
@@ -1267,16 +1270,17 @@ Public Sub pfDynamicSpeakersFindReplace()
                 x = x + 1                        'add 1 to x for next speaker name
                 rs.MoveNext                      'go to next speaker name
                 
-            Loop                                 'back up to the top
+            Loop 'back up to the top
         Else
 
-            MsgBox "There are no dynamic speakers." 'msg upon completion
+            MsgBox "There are no dynamic speakers."
+            
         End If
     
         'MsgBox "Finished looping through dynamic speakers."
     
-        rs.Close                                 'Close the recordset
-        Set rs = Nothing                         'Clean up
+        rs.Close
+        Set rs = Nothing
         oWordDoc.SaveAs2 FileName:=cJob.DocPath.CourtCover
         oWordDoc.Close
         oWordApp.Quit
@@ -1286,7 +1290,8 @@ Public Sub pfDynamicSpeakersFindReplace()
         Set oWordApp = Nothing
 
     End With
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
@@ -1734,6 +1739,7 @@ ExitLoop2:
 
     oWordApp.Quit
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub FPJurors()
@@ -1910,6 +1916,7 @@ Public Sub FPJurors()
     On Error GoTo 0
     oWordApp.Quit
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfTCEntryReplacement()
@@ -2139,5 +2146,6 @@ ParenDone:
     Set rstViewJFAppQ = Nothing
     Set oCourtCoverWD = Nothing
     Set oWordApp = Nothing
+    sCourtDatesID = ""
 End Sub
 

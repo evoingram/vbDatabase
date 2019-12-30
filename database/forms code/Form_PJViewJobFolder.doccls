@@ -11,6 +11,7 @@ Private Sub WBCViewJobFolder_OnUpdated()
     
 
     Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JobDirectory
+    sCourtDatesID = ""
 
 End Sub
 
@@ -24,5 +25,6 @@ Private Sub Command5_Click()
     
 
     Me.WBCViewJobFolder.Navigate2 "file:///" & cJob.DocPath.JobDirectory
+    sCourtDatesID = ""
 
 End Sub

@@ -12,11 +12,9 @@ Option Compare Database
 Option Explicit
 
 
-Public sDueDate As String
-Public bStarred As String
-Public bCompleted As String
-Public sTitle As String
-Public sWLListID As String
+Private sDueDate As String
+Private sTitle As String
+
 Private sPPID As String
 Private pPageRate As String
 Private sInvoiceNo As String
@@ -31,6 +29,10 @@ Private sPaymentSum As String
 Private sFactoringCost As String
 Private sBrandingTheme As String
 Private sInventoryRateCode As String
+Private sUnitPrice As String
+Private sLocation As String
+Private pClientTranscriptName As String
+Private sStatusesID As String
 
 Private mApp0 As App0
 Private mApp1 As App1
@@ -43,7 +45,6 @@ Private mCaseInfo As CaseInfo
 Private mStatus As Status
 Private mDocPath As DocPath
 
-Private sCourtDatesID As Long
 Public sApp0 As Long
 Public sApp1 As Long
 Public sApp2 As Long
@@ -64,7 +65,6 @@ Public lngNumOfMins1 As Long
 Public lngNumOfSecsRem1 As Long
 Public lngNumOfSecs1 As Long
 Public i As Long
-Public lAssigneeID As Long
 
 Public oWordApp As Word.Document
 Public oWordDoc As Word.Application
@@ -79,6 +79,14 @@ Private dDueDate As Date
 
 Private mrstRecordset As Recordset
 Private mbooLoaded As Boolean
+
+Public Property Get ClientTranscriptName() As String
+    ClientTranscriptName = pClientTranscriptName
+End Property
+
+Public Property Let ClientTranscriptName(rData As String)
+    pClientTranscriptName = rData
+End Property
 
 Public Property Get InvoiceNo() As String
     InvoiceNo = sInvoiceNo
@@ -393,6 +401,7 @@ Private Sub Load()
         Me.UnitPrice = Nz(.Fields("UnitPrice").Value)
         Me.Location = Nz(.Fields("Location").Value)
         Me.PPID = Nz(.Fields("PPID").Value)
+        Me.ClientTranscriptName = ""
     End With
     
     Dim sUnitPriceSQL As String

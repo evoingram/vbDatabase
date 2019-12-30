@@ -6,7 +6,6 @@ Private Sub btnAddUSPSTrackingNumber_Click()
 
 
     Dim sTrackingNumber As String
-    Dim sCourtDatesID As String
     Dim sShippingCost As String
     Dim rstShippingOptions As DAO.Recordset
     Dim rstCourtDates As DAO.Recordset
@@ -37,4 +36,5 @@ Private Sub btnAddUSPSTrackingNumber_Click()
     Me.tTrackingNo.Value = ""
     Me.tShippingCost.Value = ""
 
+    sCourtDatesID = ""
 End Sub

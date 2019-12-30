@@ -125,4 +125,5 @@ Private Sub Command78_Click()
 
     Call pfClearGlobals
 
+    sCourtDatesID = ""
 End Sub

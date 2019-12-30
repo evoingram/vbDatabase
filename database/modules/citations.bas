@@ -626,7 +626,8 @@ Done:
     
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Public Function apiCourtListener(sInputState, sInput1, Optional sInput2 As String)

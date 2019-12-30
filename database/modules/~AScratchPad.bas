@@ -353,6 +353,7 @@ Private Sub pfWashingtonTranscriptCompiler()
                 Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
                 MsgBox "Compilation complete.  Make sure your COA transcript looks fine, including bookmarks."
 
+    sCourtDatesID = ""
 End Sub
 
 
@@ -482,6 +483,7 @@ Private Sub emptyFunction()
     Set oWordApp = Nothing
     Set oWordDoc = Nothing
     Set oWordDoc1 = Nothing
+    sCourtDatesID = ""
 End Sub
 
 

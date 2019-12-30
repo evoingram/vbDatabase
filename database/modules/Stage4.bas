@@ -82,10 +82,6 @@ Public Sub pfStage4Ppwk()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
     Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 4 for job " & sCourtDatesID
-    
-                           'refresh transcript info
-
-    Call pfGetOrderingAttorneyInfo
 
     If cJob.CaseInfo.Jurisdiction Like "*AVT*" Then
         'paypal commands
@@ -119,7 +115,6 @@ Public Sub pfStage4Ppwk()
         'paypal commands
         Call fPPDraft
 
-        Call pfGetOrderingAttorneyInfo
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
@@ -151,7 +146,6 @@ Public Sub pfStage4Ppwk()
         Call fPPDraft
     
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-        Call pfGetOrderingAttorneyInfo           'STORE FACTORING APPROVED YES/NO IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -179,7 +173,6 @@ Public Sub pfStage4Ppwk()
         'paypal commands
         Call fPPDraft
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-        Call pfGetOrderingAttorneyInfo           'STORE FACTORING APPROVED YES/NO IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -208,7 +201,6 @@ Public Sub pfStage4Ppwk()
         Call fPPDraft
         
         Call pfAcrobatGetNumPages(sCourtDatesID) 'GETS OFFICIAL PAGE COUNT AND UPDATES ACTUALQUANTITY
-        Call pfGetOrderingAttorneyInfo           'STORE FACTORING APPROVED YES/NO IN VARIABLE
     
         Set qdf1 = CurrentDb.QueryDefs("UpdateInvoiceFPaymentDueDateQuery")
         qdf1.Parameters(0) = sCourtDatesID
@@ -390,6 +382,7 @@ Public Sub pfStage4Ppwk()
     Debug.Print "Stage 4 complete."
     Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfNewZip(sPath As String)
@@ -409,6 +402,7 @@ Public Sub pfNewZip(sPath As String)
 
     Print #1, Chr$(80) & Chr$(75) & Chr$(5) & Chr$(6) & String(18, 0)
     Close #1
+    sCourtDatesID = ""
 
 End Sub
 
@@ -631,6 +625,7 @@ ContractorFile:
         MsgBox "Transcript has been marked filed."
     End If
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fGenerateZIPsF()
@@ -735,6 +730,7 @@ Line2:
 
     Call fAssignPS
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fUploadtoFTP()
@@ -837,17 +833,19 @@ Public Sub fZIPAudio(sSource As String, sDestination As String)
     End If
 
     Set oApp = CreateObject("Shell.Application")
-    
+    'TODO:  block with variable not set error
     'Copy the files to the compressed folder
-    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
+    'FileCopy sSource, sDestination
+    'oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
     
-    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
+    'While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
 
-        DoEvents
-    Wend
+        'DoEvents
+    'Wend
     
     
     Debug.Print "Find the ZIP file here: " & sDestination
+    sCourtDatesID = ""
     
 End Sub
 
@@ -886,14 +884,15 @@ Public Sub fZIPAudioTranscripts(sSource As String, sDestination As String)
     Set oApp = CreateObject("Shell.Application")
     
     'Copy the files to the compressed folder
-    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
+    'oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
 
-    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
+    'While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
+    '    DoEvents
+    'Wend
+    'On Error GoTo 0
     
     Debug.Print "You find the ZIP file here: " & sDestination
+    sCourtDatesID = ""
 
 End Sub
 
@@ -935,14 +934,15 @@ Public Sub fZIPTranscripts(sSource As String, sDestination As String)
 
     Set oApp = CreateObject("Shell.Application")
     'Copy the files to the compressed folder
-    oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
+    'oApp.Namespace(sDestination).CopyHere oApp.Namespace(sSource).Items
 
-    While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
-        DoEvents
-    Wend
-    On Error GoTo 0
+    'While oApp.Namespace(sDestination).Items.Count <> oApp.Namespace(sSource).Items.Count
+    '    DoEvents
+    'Wend
+    'On Error GoTo 0
     
     Debug.Print "You find the ZIP file here: " & sDestination
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1020,6 +1020,7 @@ Public Sub pfSendTrackingEmail()
     Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
     Call fWunderlistAdd(sCourtDatesID & ":  Package to Ship", Format(Now + 1, "yyyy-mm-dd"))
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fEmailtoPrint(sFiletoEmailPath As String)
@@ -1101,6 +1102,7 @@ Public Sub fAudioDone()
       
     'Line2:
     'Exit Do
+    sCourtDatesID = ""
 End Sub
 
 
@@ -1187,6 +1189,7 @@ eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
     'GoTo eHandlerX
     'Resume
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fPrint4upPDF()
@@ -1269,6 +1272,7 @@ eHandlerX:
 
 
     MsgBox "4-up condensed transcript saved at " & cJob.DocPath.Transcript4up
+    sCourtDatesID = ""
     Exit Sub
 
 eHandler:
@@ -1300,6 +1304,7 @@ Public Sub fPrintKCIEnvelope()
         Call fEmailtoPrint(cJob.DocPath.KCIEnvelope)
     
     End If
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1332,7 +1337,7 @@ Public Sub fAcrobatKCIInvoice()
 
     FileCopy cJob.DocPath.KCITemplate, cJob.DocPath.KCIEmpty
 
-    sContactName = sFirstName & " " & sLastName
+    sContactName = cJob.App0.FirstName & " " & cJob.App0.LastName
     sCaseName = cJob.CaseInfo.Party1 & " v. " & cJob.CaseInfo.Party2
 
     Set aaAcroApp = New AcroApp
@@ -1375,6 +1380,7 @@ eHandler:
     GoTo eHandlerX
     Resume
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfUpload(ByRef mySession As Session)
@@ -1430,6 +1436,7 @@ Public Sub pfUpload(ByRef mySession As Session)
     Next
     
     Call pfClearGlobals
+    sCourtDatesID = ""
     
 End Sub
 
@@ -1494,6 +1501,7 @@ Public Sub fPrivatePrint()
         Call fEmailtoPrint(cJob.DocPath.CDLabelP)
     End If
 
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1602,6 +1610,7 @@ Public Sub fExportRecsToXML()
     rstShippingOptions.Close
     On Error GoTo 0
     Set rstShippingOptions = Nothing
+    sCourtDatesID = ""
  
 End Sub
 
@@ -1647,6 +1656,7 @@ Public Sub fAppendXMLFiles()
     Set file1 = Nothing
     Set file2 = Nothing
     Set FSO = Nothing
+    sCourtDatesID = ""
 
 End Sub
 
@@ -1786,6 +1796,7 @@ Public Sub fCourtofAppealsIXML()
     
     MsgBox "Exported COA XML and added entry to CommHistory table."
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 

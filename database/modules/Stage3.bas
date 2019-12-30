@@ -46,8 +46,6 @@ Public Sub pfStage3Ppwk()
     cJob.FindFirst "ID=" & sCourtDatesID
     Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 3 for job " & sCourtDatesID
 
-    Call pfGetOrderingAttorneyInfo
-
     Call pfUpdateCheckboxStatus("AudioProof")
     
     If cJob.CaseInfo.Jurisdiction Like "*AVT*" Then
@@ -177,6 +175,8 @@ Public Sub pfStage3Ppwk()
     Debug.Print "Stage 3 complete."
     Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sClientTranscriptName = ""
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfBurnCD()
@@ -228,6 +228,7 @@ Public Sub pfBurnCD()
     
     End If
     
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfCreateRegularPDF()
@@ -353,6 +354,7 @@ Public Sub pfCreateRegularPDF()
     FileCopy cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptFDB
     FileCopy cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFPB
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fDynamicHeaders()
@@ -529,7 +531,8 @@ Public Sub fDynamicHeaders()
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
             
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfHeaders()
@@ -799,7 +802,8 @@ NextItem:
     Set oWordDoc = Nothing
     Set rCurrentSection = Nothing
 
-    
+
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfTopOfTranscriptBookmark()
@@ -846,10 +850,14 @@ Public Sub pfTopOfTranscriptBookmark()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     'Table of Contents Bookmark
+    
+    
+    
+    
+    
+    
+    
     PDocCover.Open (cJob.DocPath.WACoverP)
-    
-    
-    Debug.Print cJob.DocPath.WACoverP
     
     Set ADoc = PDocCover.OpenAVDoc(cJob.DocPath.WACoverP)
     
@@ -953,6 +961,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Set PDoc = Nothing
     Set ADoc = Nothing
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fPDFBookmarks()
@@ -1013,6 +1022,7 @@ Public Sub fPDFBookmarks()
         aaAcroApp.CloseAllDocs
     
     End If
+    sCourtDatesID = ""
 
 eHandlerX:
     Set aaAcroPDDoc = Nothing

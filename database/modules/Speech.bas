@@ -107,6 +107,7 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
         
     Next oSubfolder
 
+    sCourtDatesID = ""
 End Sub
 
 'four separate functions on separate schedules
@@ -372,6 +373,7 @@ Public Sub pfPrepareTranscript()
         Next oCurrentFile
     Next oSubfolder
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfRunCopyTranscTextBAT()
@@ -389,6 +391,7 @@ Public Sub pfRunCopyTranscTextBAT()
     cJob.FindFirst "ID=" & sCourtDatesID
 
     Call Shell(cJob.DocPath.SpeechUP & "\CopyTranscriptTXT.bat " & cJob.DocPath.SpeechUP)
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfSRTranscribe()
@@ -413,6 +416,7 @@ Public Sub pfSRTranscribe()
     cJob.FindFirst "ID=" & sCourtDatesID
 
     Call Shell(cJob.DocPath.SpeechUP & "\SRTranscribe.bat " & cJob.DocPath.SpeechUP)
+    sCourtDatesID = ""
 
 End Sub
 
@@ -461,6 +465,7 @@ Public Sub pfTrainAudio()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\audiotrain.bat " & cJob.DocPath.SpeechUP)
+    sCourtDatesID = ""
 
 End Sub
 
@@ -480,6 +485,7 @@ Public Sub pfRenameBaseFiles()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\FileRename.bat " & cJob.DocPath.SpeechUP)
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfSplitAudio()
@@ -511,8 +517,11 @@ Public Sub pfPrepareAudio()
     
     Dim cJob As Job
     Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\audioprep.bat " & cJob.DocPath.SpeechUP)
+    sCourtDatesID = ""
 End Sub
 
 '---------------------------------------------------------
@@ -667,6 +676,7 @@ Public Sub pfAddSubfolder()
     
     Next oSubfolder
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfDownloadFile(sURL As String, sSaveAs As String)
@@ -716,6 +726,7 @@ Public Sub pfCorpusUpload()
 
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     pfDoFolder oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
+    sCourtDatesID = ""
 
 End Sub
 
@@ -766,7 +777,6 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     Dim sFilePathDIC As String
     Dim sFilePathLM As String
     Dim sFileURL As String
-    Dim sCourtDatesID As String
     Dim sActionURL As String
     Dim sMainURL As String
     Dim sResponseText As String
@@ -854,6 +864,7 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     Debug.Print "LM saved to:  " & sFilePathLM
     Debug.Print "-----------------------"
 
+    sCourtDatesID = ""
 End Sub
 
 Public Function pfGetFile(sFileName As String) As String
@@ -980,7 +991,8 @@ Public Sub pfDoFolder(Folder As Variant)
         End If
      
     Next
- 
+
+    sCourtDatesID = ""
 End Sub
 
 

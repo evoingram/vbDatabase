@@ -61,7 +61,7 @@ Public Function addRSet(sTableName As String) As String
     Dim sAppNumber As String
     Dim sIRC As String
     Dim sBrandingTheme As String
-
+    
     Dim rstCourtDatesID As DAO.Recordset
     Dim rstTempJob As DAO.Recordset
     Dim rstCurrentJob As DAO.Recordset
@@ -114,43 +114,43 @@ Public Function addRSet(sTableName As String) As String
             
         Select Case sTurnaround
         Case "45"
-            sUnitPrice = 64
+            cJob.UnitPrice = 64
             sIRC = 96
         Case "30"
-            sUnitPrice = 58
+            cJob.UnitPrice = 58
             sIRC = 78
         Case "14"
-            sUnitPrice = 59
+            cJob.UnitPrice = 59
             sIRC = 7
         Case "7"
-            sUnitPrice = 60
+            cJob.UnitPrice = 60
             sIRC = 8
         Case "3"
-            sUnitPrice = 42
+            cJob.UnitPrice = 42
             sIRC = 90
         Case "1"
-            sUnitPrice = 61
+            cJob.UnitPrice = 61
             sIRC = 14
         End Select
         
         Select Case sJurisdiction
         Case "eScribers"
-            sUnitPrice = 33
+            cJob.UnitPrice = 33
             sIRC = 95
         Case "FDA", "Food and Drug Administration"
-            sUnitPrice = 37
+            cJob.UnitPrice = 37
             sIRC = 41
         Case "Weber"
-            sUnitPrice = 36
+            cJob.UnitPrice = 36
             sIRC = 65
         Case "J&J"
-            sUnitPrice = 36
+            cJob.UnitPrice = 36
             sIRC = 43
         Case "Non-Court", "NonCourt"
-            sUnitPrice = 49
+            cJob.UnitPrice = 49
             sIRC = 86
         Case "KCI"
-            sUnitPrice = 40
+            cJob.UnitPrice = 40
             sIRC = 56
         End Select
         
@@ -207,7 +207,7 @@ Public Function addRSet(sTableName As String) As String
         rstTableName.Fields("InvoiceDate").Value = dInvoiceDate
         rstTableName.Fields("DueDate").Value = dDueDate
         rstTableName.Fields("AccountCode").Value = sAccountCode
-        rstTableName.Fields("UnitPrice").Value = sUnitPrice
+        rstTableName.Fields("UnitPrice").Value = cJob.UnitPrice
         rstTableName.Fields("InventoryRateCode").Value = sIRC
         rstTableName.Fields("BrandingTheme").Value = sBrandingTheme
         rstTableName.Update
@@ -296,10 +296,9 @@ Public Function addRSet(sTableName As String) As String
         
         'place customer ID # in correct job number in courtdates
         rstTempJob.MoveFirst
-        sOrderingID = rstTempJob.Fields("AppID").Value
         
         If IsNull(rstCurrentJob!OrderingID) Then
-            CurrentDb.Execute "UPDATE CourtDates SET OrderingID = " & sOrderingID & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
+            CurrentDb.Execute "UPDATE CourtDates SET OrderingID = " & rstTempJob.Fields("AppID").Value & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
             rstCurrentJob.Close
         End If
         
@@ -357,6 +356,7 @@ Public Function addRSet(sTableName As String) As String
     Set rstTableName = Nothing
     Set rstTempCourtDates = Nothing
 
+    sCourtDatesID = ""
 End Function
 
 Public Sub editRSet(sTableName As String, sFieldName As String, sValue As String)

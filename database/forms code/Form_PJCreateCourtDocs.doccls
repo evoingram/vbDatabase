@@ -34,6 +34,7 @@ Private Sub Command68_Click()
 
     Dim sAnswer As String
     Dim sQuestion As String
+    Dim svURL As String
     
     Dim qdf As QueryDef
     Dim rstTRCUnionAA As DAO.Recordset
@@ -167,9 +168,6 @@ Private Sub Command68_Click()
     
         'real factoring csv plus invoice generated FactoringCSVQuery
         'paypal csv PayPalDepositInvoiceCSVQ & PayPalFactoringInvoiceCSVQ
-    
-        
-        Call pfGetOrderingAttorneyInfo
         
         If cJob.App0.FactoringApproved = True Then
     
@@ -367,4 +365,5 @@ Private Sub Command68_Click()
     End If
     Call pfClearGlobals
         Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
+    sCourtDatesID = ""
 End Sub

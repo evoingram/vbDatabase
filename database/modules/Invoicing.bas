@@ -143,6 +143,7 @@ Public Sub fApplyShipDateTrackingNumber()
     rstCourtDates.Close                          'Close the recordset
     Set rstCourtDates = Nothing                  'Clean up
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fApplyPayPalPayment()
@@ -223,6 +224,7 @@ Public Sub fApplyPayPalPayment()
     rstCourtDates.Close                          'Close the recordset
     Set rstCourtDates = Nothing                  'Clean up
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fGenerateInvoiceNumber()
@@ -275,6 +277,7 @@ Public Sub fGenerateInvoiceNumber()
     rstCourtDates.Close
     rstMaxCourtDates.Close
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fIsFactoringApproved()
@@ -289,12 +292,10 @@ Public Sub fIsFactoringApproved()
 
     Dim cJob As Job
     Set cJob = New Job
+    Dim svURL As String
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    
-
-    Call pfGetOrderingAttorneyInfo
 
     svURL = "https://www.paypal.com"
     DoCmd.OpenQuery qUPQ, acViewNormal, acReadOnly
@@ -332,6 +333,7 @@ Public Sub fIsFactoringApproved()
         
     End If
 
+    sCourtDatesID = ""
 
 End Sub
 
@@ -388,6 +390,7 @@ Public Sub fDepositPaymentReceived()
 
     End If
 Exitif:
+    sCourtDatesID = ""
 End Sub
 
 Public Sub pfAutoCalculateFactorInterest()
@@ -483,6 +486,7 @@ Public Sub pfAutoCalculateFactorInterest()
 
     Else
     End If
+    sCourtDatesID = ""
 
 End Sub
 
@@ -521,6 +525,7 @@ Public Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
 
     Call fManualPPPayment
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fUpdateFactoringDates()
@@ -535,8 +540,9 @@ Public Sub fUpdateFactoringDates()
 
     Dim sExpectedAdvanceAmount As String
     Dim sExpectedRebateAmount As String
-    Dim sUnitPriceRateSQL As String
     Dim sCDCalcUpdateSQL As String
+    
+    Dim dExpectedBalanceDate As Date
     
     Dim iUnitPriceID As Long
 
@@ -585,6 +591,7 @@ Public Sub fUpdateFactoringDates()
     
     Call pfClearGlobals
 
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fTranscriptExpensesBeginning()
@@ -794,6 +801,7 @@ Public Sub fTranscriptExpensesBeginning()
     MsgBox "Static Expenses Added!"
     
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fTranscriptExpensesAfter()
@@ -851,6 +859,7 @@ Public Sub fTranscriptExpensesAfter()
 
     MsgBox "Dynamic Expenses Added!"
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Public Sub fShippingExpenseEntry(sTrackingNumber As String)
@@ -920,4 +929,5 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     rstExpenses.Close
     
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub

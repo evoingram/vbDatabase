@@ -2,21 +2,6 @@ Attribute VB_Name = "~CurrentCaseInfo"
 '@Folder("Database.General.Modules")
 Option Compare Database
 Option Explicit
-'============================================================================
-' Name        : GetOrderingAttorneyInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call pfGetOrderingAttorneyInfo
-' Description : refreshes ordering attorney info for transcript
-'============================================================================
-
-'============================================================================
-' Name        : pfClearGlobals
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call pfClearGlobals
-' Description : clears all global variables
-'============================================================================
 
 '============================================================================
 ' Name        : fPPGenerateJSONInfo
@@ -27,52 +12,19 @@ Option Explicit
 '============================================================================
 
 Public sCourtDatesID As String
-Public sEmail As String
-Public sDescription As String
-Public sInvoiceDate As String
-Public sInvoiceTime As String
-Public sPaymentTerms As String
-Public sNote As String
+Public sClientTranscriptName As String
+Public vmMemo As String
 Public sTerms As String
 Public sMinimumAmount As String
-Public vmMemo As String
-Public vlURL As String
-Public sTemplateID As String
-Public sLine1 As String
-Public sCity As String
-Public sState As String
-Public sZIP As String
-Public sValue As String
-Public sCustomerID As String
-Public sStatusesID As String
-Public sClientTranscriptName As String
-Public sCurrentTranscriptName As String
-Public svURL As String
-Public sLinkToCSV As String
-Public sFirstName As String
-Public sLastName As String
-Public sMrMs As String
-Public sName As String
-Public sAddress1 As String
-Public sAddress2 As String
-Public sNotes As String
+Public sPaymentTerms As String
+Public sNote As String
 Public sTime As String
 Public sTime1 As String
-Public vCasesID As String
-Public vStatus As String
-Public sUnitPrice As String
-Public sOrderingID As String
-Public sInvoiceID As String
-Public HyperlinkString As String
-Public rtfStringBody As String
-Public sLocation As String
-Public sDueDate As String
-Public bStarred As String
-Public bCompleted As String
-Public sTitle As String
-Public sWLListID As String
+Public sInvoiceTime As String
+Public sDescription As String
+Public sInvoiceDate As String
 
-Public lAssigneeID As Long
+'timer variables
 Public lngNumOfHrs As Long
 Public lngNumOfMins As Long
 Public lngNumOfSecsRem As Long
@@ -82,8 +34,6 @@ Public lngNumOfMins1 As Long
 Public lngNumOfSecsRem1 As Long
 Public lngNumOfSecs1 As Long
 Public i As Long
-
-Public dExpectedBalanceDate As Date
 
 'Public SharedRecognizer As SpSharedRecognizer
 'Public theRecognizers As ISpeechObjectTokens
@@ -117,6 +67,17 @@ Public Const sCompanyZIP As String = "98119"
 Public Const sZCountryCode As String = "US"
 Public Const sDrive As String = "T:\"
 
+    
+'wunderlist IDs
+Public Const sWLLIDIngramH As String = "370524335" 'ingram household
+Public Const sWLLIDEricaI As String = "88345676"   'erica
+Public Const sWLLIDAdamI As String = "86846933"    'adam
+Public Const sWLLIDInbox As String = "370231796"   'inbox
+Public Const sWLLID1TBE As String = "388499976"    '1ToBeEntered
+Public Const sWLLID2IP As String = "388499848"     '2InProgress
+Public Const sWLLID3C As String = "388499951"      '3Complete
+Public Const sWLLIDPF As String = "13249242"        '"Production" folder
+    
 '@Ignore ConstantNotUsed
 Public Const slURL As String = "\\hubcloud\evoingram\Administration\Marketing\LOGO-5inch-by-1.22inches.jpg"
 '@Ignore ConstantNotUsed
@@ -124,39 +85,6 @@ Public Const sPPTemplateName As String = "Amount only"
 Public Const sTermDays As String = "30"
 
 
-Public Sub pfGetOrderingAttorneyInfo()
-    
-    '============================================================================
-    ' Name        : GetOrderingAttorneyInfo
-    ' Author      : Erica L Ingram
-    ' Copyright   : 2019, A Quo Co.
-    ' Call command: Call pfGetOrderingAttorneyInfo
-    ' Description : refreshes ordering attorney info for transcript
-    '============================================================================
-
-    Dim rstOrderingAttyInfo As DAO.Recordset
-    Dim cJob As Job
-    Set cJob = New Job
-    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
-    cJob.FindFirst "ID=" & sCourtDatesID
-    
-    sFirstName = cJob.App0.FirstName
-    sLastName = cJob.App0.LastName
-    sName = sFirstName & " " & sLastName
-    sAddress1 = cJob.App0.Company
-    sAddress2 = cJob.App0.Address
-    sLine1 = cJob.App0.Address
-    sCity = cJob.App0.City
-    sState = cJob.App0.State
-    sZIP = cJob.App0.ZIP
-    sUnitPrice = cJob.UnitPrice
-    sEmail = cJob.App0.Notes
-    sNotes = cJob.App0.Notes
-    sOrderingID = cJob.sApp0
-    sMrMs = cJob.App0.MrMs
-    sUnitPrice = cJob.PageRate
-    
-End Sub
 
 Public Sub fPPGenerateJSONInfo()
     '============================================================================
@@ -172,14 +100,12 @@ Public Sub fPPGenerateJSONInfo()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
     
-    
-    
+    'TODO:  fix terms of service link
     'PPID = "INV2-C8EE-ZVC5-5U36-MF27" 'INV2-K8L5-ML2R-2GLL-7KW6 '
     'sInvoiceDate = (Format((Date + 28), "yyyy-mm-dd")) & " PST"
     
     sInvoiceTime = (Format(Now(), "hh:mm:ss"))
     sMinimumAmount = "1"
-    sValue = sUnitPrice
     sDescription = "Job No.:  " & sCourtDatesID & "  |  " & _
                    "Invoice No.:  " & cJob.CaseInfo.CaseNumber1 & "\n" & _
                    cJob.CaseInfo.Party1 & " v " & cJob.CaseInfo.Party2 & "\n" & _
@@ -359,41 +285,7 @@ Public Sub pfClearGlobals()
     ' Call command: Call pfClearGlobals
     ' Description : clears all global variables
     '============================================================================
-    sCourtDatesID = ""
-    sEmail = ""
-    sDescription = ""
-    sInvoiceTime = ""
-    sPaymentTerms = ""
-    sNote = ""
-    sTerms = ""
-    sMinimumAmount = ""
-    vmMemo = ""
-    vlURL = ""
-    sTemplateID = ""
-    sLine1 = ""
-    sCity = ""
-    sState = ""
-    sZIP = ""
-    sValue = ""
+    
     Set oWordApp = Nothing
     Set oWordDoc = Nothing
-    sCustomerID = ""
-    sStatusesID = ""
-    svURL = ""
-    sLinkToCSV = ""
-    sFirstName = ""
-    sLastName = ""
-    sMrMs = ""
-    sName = ""
-    sAddress1 = ""
-    sAddress2 = ""
-    sNotes = ""
-    HyperlinkString = ""
-    rtfStringBody = ""
-    sTime = ""
-    sTime1 = ""
-    sClientTranscriptName = ""
-    sCurrentTranscriptName = ""
-    sLocation = ""
-
 End Sub

@@ -132,8 +132,6 @@ Option Explicit
 '                            Arguments:    NONE
 'fWunderlistAdd()                Description:  adds task to Wunderlist
 '                            Arguments:    NONE
-'fWLGenerateJSONInfo             Description:  get info for WL API
-'                            Arguments:    NONE
 'fWunderlistGetLists()           Description:  gets all Wunderlist lists
 '                            Arguments:    NONE
 'pfRCWRuleScraper1()             Description:  builds RCW rule links and citations
@@ -149,24 +147,15 @@ Option Explicit
 '    Public SharedRecognizer As SpSharedRecognizer
 '    Public i As Long
 '    Public sCourtDatesID As String
-'    Public sEmail As String, sDescription As String
+'    Public sDescription As String
 '    Public sInvoiceTime As String, sPaymentTerms As String, sNote As String
-'    Public sTerms As String, sMinimumAmount As String, vmMemo As String, vlURL As String, sTemplateID As String
-'    Public sLine1 As String, sCity As String, sState As String, sZIP As String, sValue As String
-'    Public sCustomerID As String, sStatusesID As String
-'    Public svURL As String, sLinkToCSV As String
-'    Public sFirstName As String, sLastName As String, sMrMs As String
-'    Public sName As String, sAddress1 As String, sAddress2 As String, sNotes As String
+'    Public sTerms As String
 '    Public qnTRCourtQ As String, qnTRCourtUnionAppAddrQ As String, qnShippingOptionsQ As String, qnViewJobFormAppearancesQ As String
-'    HyperlinkString As String, rtfstringbody As String, sTime As String, sTime1 As String
+'    Public sTime As String, sTime1 As String
 '    Public lngNumOfHrs As Long, lngNumOfMins As Long, lngNumOfSecsRem As Long, lngNumOfSecs As Long
 '    Public lngNumOfHrs1 As Long, lngNumOfMins1 As Long, lngNumOfSecsRem1 As Long, lngNumOfSecs1 As Long
-'    Public sClientTranscriptName As String, sCurrentTranscriptName As String
  
 'functions:
-
-'pfGetOrderingAttorneyInfo:  Description:  refreshes ordering attorney info for transcript
-'                            Arguments:    NONE
 
 'pfClearGlobals:             Description:  clears all global variables
 '                            Arguments:    NONE

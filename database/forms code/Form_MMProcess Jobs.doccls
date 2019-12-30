@@ -12,6 +12,7 @@ Private Sub JobInfobtn_Click()
         .LinkChildFields = "VJFJobID"
     End With
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub StatusChecklistBTN_Click()
@@ -23,6 +24,7 @@ Private Sub StatusChecklistBTN_Click()
         .LinkChildFields = "CourtDatesID"
     End With
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub OrderingInfoBTN_Click()
@@ -33,6 +35,7 @@ Private Sub OrderingInfoBTN_Click()
         .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
         .LinkChildFields = "CourtDatesID"
     End With
+    sCourtDatesID = ""
 End Sub
 
 Private Sub ViewDocHistoryBTN_Click()
@@ -45,6 +48,7 @@ Private Sub ViewDocHistoryBTN_Click()
         .LinkChildFields = "CourtDatesID"
     End With
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub btnUSPSTracking_Click()
@@ -64,6 +68,7 @@ Private Sub CreateDocsBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "PJCreateCourtDocs"
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
 
 Private Sub TypeBTN_Click()
@@ -201,12 +206,14 @@ Private Sub TypeBTN_Click()
     'Call PlayAudioFolder
     Documents.Open FileName:=cJob.DocPath.RoughDraft, ReadOnly:=False
     Call pfClearGlobals
+    sCourtDatesID = ""
 End Sub
 
 Private Sub ViewJobFolderBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "PJViewJobFolder"
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 
 End Sub
 
@@ -222,9 +229,11 @@ Private Sub ShippingInfoBTN_Click()
     Dim rstMailC As DAO.Recordset
     Dim rstPkgType As DAO.Recordset
 
-    Call pfGetOrderingAttorneyInfo
-
+    Dim cJob As Job
+    Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     SQLString = "SELECT * FROM ShippingOptions WHERE [CourtDatesIDLK] = " & sCourtDatesID & ";"
     Set rs = CurrentDb.OpenRecordset(SQLString)
 
@@ -255,12 +264,12 @@ Private Sub ShippingInfoBTN_Click()
             rs("CertifiedMail").Value = "OFF"
             rs("SignatureConfirmation").Value = "OFF"
             rs("USPSTracking").Value = "ON"
-            rs("ToName").Value = sName
-            rs("ToAddress1").Value = sAddress1
-            rs("ToAddress2").Value = sAddress2
-            rs("ToCity").Value = sCity
-            rs("ToState").Value = sState
-            rs("ToPostalCode").Value = sZIP
+            rs("ToName").Value = cJob.App0.FirstName & " " & cJob.App0.LastName
+            rs("ToAddress1").Value = cJob.App0.Company
+            rs("ToAddress2").Value = cJob.App0.Address
+            rs("ToCity").Value = cJob.App0.City
+            rs("ToState").Value = cJob.App0.State
+            rs("ToPostalCode").Value = cJob.App0.ZIP
             rs("ToCountry").Value = "United States"
             rs("Description").Value = sCourtDatesID & " Transcripts"
             rs("Value").Value = "100"
@@ -295,6 +304,7 @@ Private Sub ShippingInfoBTN_Click()
     rs.Close
     Set rs = Nothing
 
+    sCourtDatesID = ""
 End Sub
 
 Private Sub InvoicingBTN_Click()
@@ -309,4 +319,5 @@ Private Sub SRTextBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "JurisdictionRef"
     Me.ProcessJobSubform.Requery
+    sCourtDatesID = ""
 End Sub
