@@ -11,6 +11,8 @@ Option Explicit
 ' Description : get info for invoice
 '============================================================================
 
+'TODO: Make a class
+'payment related globals
 Public sCourtDatesID As String
 Public sClientTranscriptName As String
 Public vmMemo As String
@@ -66,7 +68,6 @@ Public Const sCompanyState As String = "WA"
 Public Const sCompanyZIP As String = "98119"
 Public Const sZCountryCode As String = "US"
 Public Const sDrive As String = "T:\"
-
     
 'wunderlist IDs
 Public Const sWLLIDIngramH As String = "370524335" 'ingram household
