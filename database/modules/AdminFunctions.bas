@@ -301,7 +301,8 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     Dim sQuestion As String
     Dim sAnswer As String
     Dim sSQL As String
-
+    Dim sActualQuantity As String
+    
     Dim qdf As QueryDef
     
     Dim oAcrobatDoc As Object
@@ -1165,9 +1166,7 @@ Public Sub pfGenerateJobTasks()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
-    sTaskTitle = "(1.1) Enter job & contacts into database:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(1.1) Enter job & contacts into database:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = Date + 1
     dStart = Date
     iTaskMinuteLength = "2"
@@ -1182,20 +1181,20 @@ Public Sub pfGenerateJobTasks()
                        "|Estimate:  " & cJob.Subtotal & "   |"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(1.2) Payment:  If factored, proceed with set-up.  If not, send invoice & wait for payment :  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(1.2) Payment:  If factored, proceed with set-up.  If not, send invoice & wait for payment :  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = Date + 1
     iTaskMinuteLength = "2"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(1.3) Generate documents: cover, autocorrect, AGshortcuts, Xero CSV, CD label, transcripts ready, package-enclosed letter:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(1.3) Generate documents: cover, autocorrect, AGshortcuts, Xero CSV, CD label, transcripts ready, package-enclosed letter:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = Date + 1
     iTaskMinuteLength = "2"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    iTypingTime = Round((((sAudioLength * 3) / 60) + 1), 0)
+    iTypingTime = Round((((cJob.AudioLength * 3) / 60) + 1), 0)
 
     For i = 1 To iTypingTime
-        sTaskTitle = "(2.1) Type:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+        sTaskTitle = "(2.1) Type:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
         dDue = cJob.DueDate - 3
         iTaskMinuteLength = "60"
         sPriority = "(2) Stage 2"
@@ -1203,55 +1202,55 @@ Public Sub pfGenerateJobTasks()
     
     Next i
 
-    sTaskTitle = "(3.1) Find/replace add to cover page:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(3.1) Find/replace add to cover page:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = cJob.DueDate - 2
     iTaskMinuteLength = "3"
     sPriority = "(3) Stage 3"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(3.2) Hyperlink:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(3.2) Hyperlink:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = cJob.DueDate - 2
     iTaskMinuteLength = "15"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(3.3) Send email if more info needed and hold transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(3.3) Send email if more info needed and hold transcript:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = cJob.DueDate - 2
     iTaskMinuteLength = "2"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    iAudioProofTime = Round((((sAudioLength * 1.5) / 60) + 1), 0)
+    iAudioProofTime = Round((((cJob.AudioLength * 1.5) / 60) + 1), 0)
     
     For i = 1 To iAudioProofTime
     
-        sTaskTitle = "(3.4) Audio-proof:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+        sTaskTitle = "(3.4) Audio-proof:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
         dDue = cJob.DueDate - 2
         iTaskMinuteLength = "60"
         Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
         
     Next i
 
-    sTaskTitle = "(4.1) Make final transcript docs, pdf, zip, etc:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(4.1) Make final transcript docs, pdf, zip, etc:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = cJob.DueDate - 1
     iTaskMinuteLength = "3"
     sPriority = "(4) Stage 4"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
     
-    sTaskTitle = "(4.2) Invoice if balance due or factored.  Refund if applicable:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(4.2) Invoice if balance due or factored.  Refund if applicable:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = cJob.DueDate - 1
     iTaskMinuteLength = "1"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(4.3) Deliver as necessary electronically if transcript not held:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(4.3) Deliver as necessary electronically if transcript not held:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = cJob.DueDate - 1
     iTaskMinuteLength = "1"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    sTaskTitle = "(4.4) File transcript:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    sTaskTitle = "(4.4) File transcript:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     dDue = cJob.DueDate - 1
     iTaskMinuteLength = "3"
     Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
 
-    'sTaskTitle = "(4.5) Send invoice to factoring:  " & sCourtDatesID & ", Approx. " & sAudioLength & " mins"
+    'sTaskTitle = "(4.5) Send invoice to factoring:  " & sCourtDatesID & ", Approx. " & cJob.AudioLength & " mins"
     'dDue = cJob.DueDate - 1
     'iTaskMinuteLength = "1"
     'Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
@@ -2354,7 +2353,7 @@ Public Sub fWunderlistGetTasksOnList()
     Dim vErrorMessage As String
     Dim vErrorILink As String
     Dim vErrorDetails As String
-
+    'Dim sInvoiceNumber as String
     Dim resp As Variant
     Dim response As Variant
     Dim rep As Variant

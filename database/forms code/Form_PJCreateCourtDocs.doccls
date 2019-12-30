@@ -44,8 +44,6 @@ Private Sub Command68_Click()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
     If Me.cmbListAllDocuments = "Stage 1:  Deposit Received paperwork" Then
         Forms![NewMainMenu].Form!lblFlash.Caption = "Generating deposit-received document."
     
@@ -173,7 +171,7 @@ Private Sub Command68_Click()
         
         Call pfGetOrderingAttorneyInfo
         
-        If sFactoringApproved = True Then
+        If cJob.App0.FactoringApproved = True Then
     
             DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
             DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True
@@ -230,9 +228,8 @@ Private Sub Command68_Click()
             Set qdf = CurrentDb.QueryDefs(qnTRCourtUnionAppAddrQ)
             qdf.Parameters(0) = sCourtDatesID
             Set rstTRCUnionAA = qdf.OpenRecordset()
-            sFactoringApproved = rstTRCUnionAA.Fields("FactoringApproved")
         
-            If sFactoringApproved = True Then
+            If cJob.App0.FactoringApproved = True Then
         
                 DoCmd.OpenQuery qFCSVQ, acViewNormal, acAdd
                 DoCmd.TransferText acExportDelim, , qFCSVQ, cJob.DocPath.PPCSV, True

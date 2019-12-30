@@ -126,7 +126,6 @@ EndIf1:
 
     Debug.Print "Stage 2 complete."
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
     Application.FollowHyperlink cJob.DocPath.CourtCover
     Call pfClearGlobals
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
@@ -169,7 +168,7 @@ Public Sub pfAutoCorrect()
     End If
     On Error GoTo 0
     'oWordApp.Visible = True
-    Set oWordDoc = GetObject(cJob.DocPath.RoughDraft, "Word.Document")
+    Set oWordDoc = GetObject(cJob.DocPath.RoughDraft)
 
     With oWordDoc                                'insert rough draft at RoughBKMK bookmark
 
@@ -235,10 +234,6 @@ Public Sub pfRoughDraftToCoverF()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    
 
     On Error Resume Next
 
@@ -1379,7 +1374,7 @@ Public Sub pfRoughDraftToCoverF()
         
         '********************************** various style-related F/Rs
         Forms![NewMainMenu].Form!lblFlash.Caption = "Step 7 of 10:  Processing headings..."
-        If InStr(sJurisdiction, "AVT") > 0 Or InStr(sJurisdiction, "eScribers") > 0 Then
+        If InStr(cJob.CaseInfo.Jurisdiction, "AVT") > 0 Or InStr(cJob.CaseInfo.Jurisdiction, "eScribers") > 0 Then
         
             sTextToFind = "Q.  "
             sReplacementText = "Q.  "
@@ -1594,7 +1589,7 @@ Public Sub pfRoughDraftToCoverF()
 
     qdf.Close
 
-    If sJurisdiction <> "FDA" And sJurisdiction <> "Food and Drug Administration" And sJurisdiction <> "eScribers NH" And sJurisdiction <> "eScribers Bankruptcy" And sJurisdiction <> "eScribers New Jersey" Then
+    If cJob.CaseInfo.Jurisdiction <> "FDA" And cJob.CaseInfo.Jurisdiction <> "Food and Drug Administration" And cJob.CaseInfo.Jurisdiction <> "eScribers NH" And cJob.CaseInfo.Jurisdiction <> "eScribers Bankruptcy" And cJob.CaseInfo.Jurisdiction <> "eScribers New Jersey" Then
         Call pfHeaders
         'Call fDynamicHeaders
     End If
@@ -2190,8 +2185,6 @@ Public Sub pfTypeRoughDraftF()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
     Set oRoughDraft = CreateObject("Scripting.FileSystemObject")
 
     If cJob.CaseInfo.Jurisdiction = "Weber Nevada" Then
@@ -2357,8 +2350,6 @@ Public Sub pfRoughDraftCFMass()
 
     Dim drSpeakerName As DAO.Recordset
     Dim qdf As QueryDef
-    
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -3608,7 +3599,7 @@ Public Sub pfRoughDraftCFMass()
 
     qdf.Close
 
-    If sJurisdiction <> "FDA" And sJurisdiction <> "Food and Drug Administration" And sJurisdiction <> "eScribers NH" And sJurisdiction <> "eScribers Bankruptcy" And sJurisdiction <> "eScribers New Jersey" Then
+    If cJob.CaseInfo.Jurisdiction <> "FDA" And cJob.CaseInfo.Jurisdiction <> "Food and Drug Administration" And cJob.CaseInfo.Jurisdiction <> "eScribers NH" And cJob.CaseInfo.Jurisdiction <> "eScribers Bankruptcy" And cJob.CaseInfo.Jurisdiction <> "eScribers New Jersey" Then
         Call pfHeaders
         Call fDynamicHeaders
     End If

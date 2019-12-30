@@ -95,8 +95,6 @@ Public Sub fApplyShipDateTrackingNumber()
                     If x > 0 Then
                     
                         Call pfCommunicationHistoryAdd("TrackingNumber") 'comms history entry for paypal email
-                                            
-                        Call pfCurrentCaseInfo                       'refresh transcript info
                         
                         Do While Len(Dir(cJob.DocPath.ShippingOutputFolder)) > 0
                         
@@ -161,8 +159,14 @@ Public Sub fApplyPayPalPayment()
     Dim rstOLPayPalPmt As DAO.Recordset
     Dim x As Long
 
-
+    'TODO: narrow these dao recordsets down
+    
     Dim vAmount As String
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     Set rstCourtDates = CurrentDb.OpenRecordset("SELECT ID, InvoiceNo FROM CourtDates")
     Set rstOLPayPalPmt = CurrentDb.OpenRecordset("OLPayPalPayments")
     
@@ -172,7 +176,6 @@ Public Sub fApplyPayPalPayment()
     
         Do Until rstCourtDates.EOF = True
     
-            sInvoiceNumber = rstCourtDates.Fields("InvoiceNo").Value
             sCourtDatesID = rstCourtDates.Fields("ID").Value
         
             If Not (rstOLPayPalPmt.EOF And rstOLPayPalPmt.BOF) Then 'For each row in OLPayPalPayments
@@ -186,7 +189,7 @@ Public Sub fApplyPayPalPayment()
                         vAmount = 0
                         Call pfCommunicationHistoryAdd("PayPalPayment") 'comms history entry for paypal email
                     
-                        Call fPaymentAdd(sInvoiceNumber, vAmount) 'apply payment to sCourtDatesID
+                        Call fPaymentAdd(cJob.InvoiceNo, vAmount) 'apply payment to sCourtDatesID
                         rstOLPayPalPmt.delete    'delete in OLPayPalPayments
                     Else
                     
@@ -201,8 +204,7 @@ Public Sub fApplyPayPalPayment()
             
             Else
             End If
-        
-            sInvoiceNumber = ""
+
             sCourtDatesID = ""
         
             rstCourtDates.MoveNext
@@ -237,6 +239,7 @@ Public Sub fGenerateInvoiceNumber()
     Dim rstCourtDates As DAO.Recordset
     Dim sQuestion As String
     Dim sAnswer As String
+    Dim sInvoiceNumber As String
 
     Set rstMaxCourtDates = CurrentDb.OpenRecordset("SELECT MAX(InvoiceNo) FROM CourtDates;")
     sInvoiceNumber = rstMaxCourtDates.Fields(0).Value
@@ -284,8 +287,12 @@ Public Sub fIsFactoringApproved()
     ' Description : checks if factoring is approved for customer
     '============================================================================
 
+    Dim cJob As Job
+    Set cJob = New Job
 
-    Dim vFA As String
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
 
     Call pfGetOrderingAttorneyInfo
 
@@ -295,10 +302,9 @@ Public Sub fIsFactoringApproved()
     DoCmd.Close acQuery, qUPQ
     DoCmd.Close acQuery, "InvUpdateUnitPriceQuery"
 
-    'check if approved for factoring
-    vFA = sFactoringApproved
+    'if approved for factoring
     
-    If vFA = "True" Then                         'if box checked, then do this
+    If cJob.App0.FactoringApproved = "True" Then                         'if box checked, then do this
 
         'send price quote
         Call pfGenericExportandMailMerge("Invoice", "Stage1s\PriceQuote")
@@ -338,10 +344,7 @@ Public Sub fDepositPaymentReceived()
     ' Call command: Call fDepositPaymentReceived
     ' Description : does some things after a deposit is paid
     '============================================================================
-
-    Dim rstQInfoInvNo As DAO.Recordset
-    Dim qdf As QueryDef
-
+    
     Dim vAmount As String
     Dim sQuestion As String
     Dim sAnswer As String
@@ -351,14 +354,6 @@ Public Sub fDepositPaymentReceived()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    
-    'Set qdf = CurrentDb.QueryDefs("QInfobyInvoiceNumber")
-    'qdf.Parameters(0) = sCourtDatesID
-    'Set rstQInfoInvNo = qdf.OpenRecordset
-
-    'sInvoiceNumber = rstQInfoInvNo.Fields("InvoiceNo").Value
-    'sFinalPrice = rstQInfoInvNo.Fields("FinalPrice").Value
-    
 
     'calculate refund
     vAmount = InputBox("How much was the payment?  Their invoice totals up to $" & cJob.FinalPrice & ".")
@@ -405,12 +400,24 @@ Public Sub pfAutoCalculateFactorInterest()
     ' Description : add 1% after every 7 days payment not made
     '============================================================================
 
-    Dim rstCustomers As DAO.Recordset
-    Dim rstCourtDates As DAO.Recordset
+    Dim sFactoringApproved As String
+    Dim sSubtotal As String
+    Dim sPaymentSum As String
+    Dim sFactoringCost As String
+    
     Dim dInvoiceDate As Date
+    
     Dim iOrderingID As Long
     Dim iDateDifference As Long
-
+    
+    Dim rstCustomers As DAO.Recordset
+    Dim rstCourtDates As DAO.Recordset
+    
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
     Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
 
     If Not (rstCourtDates.EOF And rstCourtDates.BOF) Then 'For each CourtDates.ID
@@ -531,7 +538,6 @@ Public Sub fUpdateFactoringDates()
     Dim sUnitPriceRateSQL As String
     Dim sCDCalcUpdateSQL As String
     
-    Dim dInvoiceDate As Date
     Dim iUnitPriceID As Long
 
     Dim rstUnitPriceRate As DAO.Recordset
@@ -542,15 +548,12 @@ Public Sub fUpdateFactoringDates()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    sExpectedRebateAmount = (sFinalPrice * 0.18)
-    sExpectedAdvanceAmount = (sFinalPrice * 0.8)
-    dInvoiceDate = Date
-    dExpectedBalanceDate = (Date + sTurnaroundTime) - 2
-    dExpectedRebateDate = DateAdd("d", 28, dExpectedAdvanceDate) 'dExpectedAdvanceDate + 28
-    dExpectedAdvanceDate = (Date + sTurnaroundTime) - 2
-    sEstimatedPageCount = ((sAudioLength / 60) * 45)
-
-
+    sExpectedRebateAmount = (cJob.FinalPrice * 0.18)
+    sExpectedAdvanceAmount = (cJob.FinalPrice * 0.8)
+    dExpectedBalanceDate = (Date + cJob.TurnaroundTime) - 2
+    
+    
+    'TODO: update rates here
     'avail turnarounds 7 10 14 30 1 3
     'if jurisdiction contains and turnaround contains, for each different rate
     'avt rate 33 $1.35 or 35 $1.60, janet rate 37 $2.20, non-court rate 38 $2.00 per minute
@@ -567,84 +570,15 @@ Public Sub fUpdateFactoringDates()
 
     'Court Transcription
 
-    '    30 calendar-day turnaround, $3.00/page 39
+    '    30 calendar-day turnaround, $2.65/page 39
     '    14 calendar-day turnaround, $3.50/page 41
     '    07 calendar-day turnaround, $4.00/page 62
     '    03 calendar-day turnaround, $4.75/page 57
     '    same day/overnight turnaround, $5.25/page 61
-
-
-    If sAudioLength > 865 Then
     
-        If ((sJurisdiction) Like ("*" & "fda" & "*")) Then
-            iUnitPriceID = 37
-        ElseIf ((sJurisdiction) Like ("*" & "KCI" & "*")) Then iUnitPriceID = 40
-        ElseIf ((sJurisdiction) Like ("*" & "AVT" & "*")) Then iUnitPriceID = 33
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("30")) Then iUnitPriceID = 58
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("14")) Then iUnitPriceID = 59
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("7")) Then iUnitPriceID = 60
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("3")) Then iUnitPriceID = 42
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("30")) Then iUnitPriceID = 58
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("14")) Then iUnitPriceID = 59
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("7")) Then iUnitPriceID = 60
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("3")) Then iUnitPriceID = 42
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (sTurnaroundTime) Like ("10")) Then iUnitPriceID = 49
-        ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        ElseIf ((sJurisdiction) Like ("*" & "noncourt" & "*") And (sTurnaroundTime) Like ("10")) Then iUnitPriceID = 49
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*")) Then iUnitPriceID = 37
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("30")) Then iUnitPriceID = 58
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("14")) Then iUnitPriceID = 59
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("7")) Then iUnitPriceID = 60
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("3")) Then iUnitPriceID = 42
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        End If
-
-
-    Else
     
-        If ((sJurisdiction) Like ("*" & "fda" & "*")) Then
-            iUnitPriceID = 37
-        ElseIf ((sJurisdiction) Like ("*" & "KCI" & "*")) Then iUnitPriceID = 40
-        ElseIf ((sJurisdiction) Like ("*" & "AVT" & "*")) Then iUnitPriceID = 33
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("30")) Then iUnitPriceID = 39
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("14")) Then iUnitPriceID = 41
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("7")) Then iUnitPriceID = 62
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("3")) Then iUnitPriceID = 57
-        ElseIf ((sJurisdiction) Like ("*" & "bankruptcy" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("30")) Then iUnitPriceID = 39
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("14")) Then iUnitPriceID = 41
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("7")) Then iUnitPriceID = 62
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("3")) Then iUnitPriceID = 57
-        ElseIf ((sJurisdiction) Like ("*" & "superior court" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (sTurnaroundTime) Like ("10")) Then iUnitPriceID = 49
-        ElseIf ((sJurisdiction) Like ("*" & "non-court" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        ElseIf ((sJurisdiction) Like ("*" & "noncourt" & "*") And (sTurnaroundTime) Like ("10")) Then iUnitPriceID = 49
-        ElseIf ((sJurisdiction) Like ("*" & "Food and Drug Administration" & "*")) Then iUnitPriceID = 37
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("30")) Then iUnitPriceID = 39
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("14")) Then iUnitPriceID = 41
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("7")) Then iUnitPriceID = 62
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("3")) Then iUnitPriceID = 57
-        ElseIf ((sJurisdiction) Like ("*" & "Massachusetts" & "*") And (sTurnaroundTime) Like ("1")) Then iUnitPriceID = 61
-        End If
-
-    End If
-
-    'if non-court, use audio length as page count for rate calculation
-    If iUnitPriceID Like "49" And sTurnaroundTime <> "1" Then sEstimatedPageCount = sAudioLength
-
-    If iUnitPriceID = 49 Then sEstimatedPageCount = sAudioLength
-
-    sSubtotal = sEstimatedPageCount * cJob.PageRate 'calculate total price estimate
-
-    If sSubtotal < 50 Then                       'set minimum charge
-        iUnitPriceID = 48
-        sSubtotal = 50
-    End If
-
     'insert calculated fields into courtdates
-    sCDCalcUpdateSQL = "UPDATE CourtDates SET [ExpectedRebateDate] = " & dExpectedRebateDate & ", [ExpectedAdvanceDate] = " & dExpectedAdvanceDate & ", [Subtotal] = " & sSubtotal & " WHERE ID = " & sCourtDatesID & ";"
+    sCDCalcUpdateSQL = "UPDATE CourtDates SET [ExpectedRebateDate] = " & Format(cJob.ExpectedRebateDate, "mm-dd-yyyy") & ", [ExpectedAdvanceDate] = " & Format(cJob.ExpectedAdvanceDate, "mm-dd-yyyy") & ", [Subtotal] = " & cJob.Subtotal & " WHERE ID = " & sCourtDatesID & ";"
 
     CurrentDb.Execute sCDCalcUpdateSQL
     CurrentDb.Close
@@ -874,29 +808,34 @@ Public Sub fTranscriptExpensesAfter()
     '               paper x actualquantity (after job completed)   |
     '               Vendor, ExpensesDate, Amount, Memo
     '============================================================================
-
+    
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+    
+    'TODO: Fix hard copy expenses calculation
+    
     Dim rstExpensesAdd As DAO.Recordset
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     Set rstExpensesAdd = CurrentDb.OpenRecordset("Expenses")
 
     rstExpensesAdd.AddNew                        'static
         rstExpensesAdd("Vendor").Value = "internet rent etc"
         rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.09 * sEstimatedPageCount
+        rstExpensesAdd("Amount").Value = 0.09 * cJob.EstimatedPageCount
         rstExpensesAdd("Memo").Value = "internet rent electricity website"
         rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
     rstExpensesAdd.Update
 
     rstExpensesAdd.AddNew                        'paper
         rstExpensesAdd("Vendor").Value = "OfficeSupply.com"
         rstExpensesAdd("ExpensesDate").Value = Now
-        rstExpensesAdd("Amount").Value = 0.01 * sEstimatedPageCount
+        rstExpensesAdd("Amount").Value = 0.01 * cJob.EstimatedPageCount
         rstExpensesAdd("Memo").Value = "paper"
         rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
     rstExpensesAdd.Update
 
     rstExpensesAdd.AddNew                        'ink
@@ -905,7 +844,7 @@ Public Sub fTranscriptExpensesAfter()
         rstExpensesAdd("Amount").Value = 0.008
         rstExpensesAdd("Memo").Value = "ink"
         rstExpensesAdd("CourtDatesID").Value = sCourtDatesID
-        rstExpensesAdd("InvoiceNo").Value = sInvoiceNumber
+        rstExpensesAdd("InvoiceNo").Value = cJob.InvoiceNo
     rstExpensesAdd.Update
     
     rstExpensesAdd.Close
@@ -942,8 +881,6 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     'Set qdf1 = CurrentDb.QueryDefs(qnTRCourtQ)
     'qdf1.Parameters(0) = sCourtDatesID

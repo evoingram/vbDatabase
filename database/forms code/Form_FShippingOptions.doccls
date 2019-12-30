@@ -47,8 +47,6 @@ Private Sub Command78_Click()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
         
     SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
     Set rs1 = CurrentDb.OpenRecordset(SQLString)
@@ -120,7 +118,7 @@ Private Sub Command78_Click()
     Call fShippingExpenseEntry(sTrackingNumber)
 
 
-    If ((sJurisdiction) Like ("*" & "SUPERIOR COURT" & "*")) Then
+    If ((cJob.CaseInfo.Jurisdiction) Like ("*" & "SUPERIOR COURT" & "*")) Then
         Call fCourtofAppealsIXML
     End If
     On Error GoTo 0

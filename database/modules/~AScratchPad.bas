@@ -166,7 +166,7 @@ Private Sub pfWashingtonTranscriptCompiler()
             'Certificate
             'Table of Authorities
         
-        
+        Forms![NewMainMenu].Form!lblFlash.Caption = "Compiling Washington COA transcript."
         
         'does this transcript need to be compiled
             'if not, do like normal
@@ -350,6 +350,7 @@ Private Sub pfWashingtonTranscriptCompiler()
                 Set aePrimaryDoc = Nothing
                 aeAcroExchange.Exit
                 Set aeAcroExchange = Nothing
+                Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
                 MsgBox "Compilation complete.  Make sure your COA transcript looks fine, including bookmarks."
 
 End Sub

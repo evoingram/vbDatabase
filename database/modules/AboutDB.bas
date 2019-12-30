@@ -148,16 +148,14 @@ Option Explicit
 '    Public theRecognizers As ISpeechObjectTokens
 '    Public SharedRecognizer As SpSharedRecognizer
 '    Public i As Long
-'    Public sParty1 As String, sCompany As String, sParty2 As String, sCourtDatesID As String, sInvoiceNumber As String
-'    Public sParty1Name As String, sParty2Name As String, sInvoiceNo As String, sEmail As String, sDescription As String
-'    Public sSubtotal As String, sInvoiceDate As String, sInvoiceTime As String, sPaymentTerms As String, sNote As String
+'    Public sCourtDatesID As String
+'    Public sEmail As String, sDescription As String
+'    Public sInvoiceTime As String, sPaymentTerms As String, sNote As String
 '    Public sTerms As String, sMinimumAmount As String, vmMemo As String, vlURL As String, sTemplateID As String
-'    Public sLine1 As String, sCity As String, sState As String, sZIP As String, sQuantity As String, sValue As String
-'    Public sActualQuantity As String, sJurisdiction As String, sTurnaroundTime As String, sCaseNumber1 As String, sCaseNumber2 As String
-'    Public sCustomerID As String, sAudioLength As String, sEstimatedPageCount As String, sStatusesID As String, sFinalPrice As String
-'    Public dDueDate As Date, dExpectedAdvanceDate As Date, dExpectedRebateDate As Date, sPaymentSum As String
-'    Public sBalanceDue As String, sFactoringCost As String, svURL As String, sLinkToCSV As String, sFactoringApproved As String
-'    Public sFirstName As String, sLastName As String, dHearingDate As Date, sMrMs As String
+'    Public sLine1 As String, sCity As String, sState As String, sZIP As String, sValue As String
+'    Public sCustomerID As String, sStatusesID As String
+'    Public svURL As String, sLinkToCSV As String
+'    Public sFirstName As String, sLastName As String, sMrMs As String
 '    Public sName As String, sAddress1 As String, sAddress2 As String, sNotes As String
 '    Public qnTRCourtQ As String, qnTRCourtUnionAppAddrQ As String, qnShippingOptionsQ As String, qnViewJobFormAppearancesQ As String
 '    HyperlinkString As String, rtfstringbody As String, sTime As String, sTime1 As String
@@ -166,9 +164,6 @@ Option Explicit
 '    Public sClientTranscriptName As String, sCurrentTranscriptName As String
  
 'functions:
-
-'pfCurrentCaseInfo:          Description:  refreshes global variables for current transcript
-'                            Arguments:    NONE
 
 'pfGetOrderingAttorneyInfo:  Description:  refreshes ordering attorney info for transcript
 '                            Arguments:    NONE

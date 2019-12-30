@@ -51,6 +51,7 @@ Public Function addRSet(sTableName As String) As String
     Dim sFiled As String
     Dim sFactoring As String
     Dim sTurnaround As String
+    Dim sJurisdiction As String
     Dim sAccountCode As String
     Dim sNewCourtDatesRowSQL As String
     Dim sTempJobSQL As String
@@ -58,6 +59,8 @@ Public Function addRSet(sTableName As String) As String
     Dim sTempCustomersSQL As String
     Dim sCurrentTempApp As String
     Dim sAppNumber As String
+    Dim sIRC As String
+    Dim sBrandingTheme As String
 
     Dim rstCourtDatesID As DAO.Recordset
     Dim rstTempJob As DAO.Recordset
@@ -68,7 +71,7 @@ Public Function addRSet(sTableName As String) As String
     Dim x As Long
 
     Dim dInvoiceDate As Date
-    
+    Dim dDueDate As Date
     
     Dim cJob As Job
     Set cJob = New Job

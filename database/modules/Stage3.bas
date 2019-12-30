@@ -49,9 +49,8 @@ Public Sub pfStage3Ppwk()
     Call pfGetOrderingAttorneyInfo
 
     Call pfUpdateCheckboxStatus("AudioProof")
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
-    If sJurisdiction Like "*AVT*" Then
+    
+    If cJob.CaseInfo.Jurisdiction Like "*AVT*" Then
         sDeliveryURL = "http://tabula.escribers.net/"
     
         Call pfFileRenamePrompt
@@ -64,7 +63,7 @@ Public Sub pfStage3Ppwk()
     
         Application.FollowHyperlink (sDeliveryURL) 'FILE WITH ESCRIBERS
     
-    ElseIf sJurisdiction = "eScribers NH" Then
+    ElseIf cJob.CaseInfo.Jurisdiction = "eScribers NH" Then
         sDeliveryURL = "http://tabula.escribers.net/"
         Call pfFileRenamePrompt
         Call fTranscriptDeliveryF
@@ -74,8 +73,7 @@ Public Sub pfStage3Ppwk()
     
         Application.FollowHyperlink (sDeliveryURL) 'FILE WITH ESCRIBERS
    
-    ElseIf sJurisdiction Like "*FDA*" Then
-        Call pfCurrentCaseInfo                   'refresh transcript info
+    ElseIf cJob.CaseInfo.Jurisdiction Like "*FDA*" Then
         Call fTranscriptDeliveryF                '(only the filing)
         Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
         Call pfFileRenamePrompt
@@ -93,7 +91,7 @@ Public Sub pfStage3Ppwk()
             .BCC = ""
     
             .Attachments.Add (sClientTranscriptName)
-            .Subject = sJurisdiction & " " & dHearingDate & " Transcript Ready " & sCourtDatesID
+            .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
             Set oWordEditor = .GetInspector.WordEditor
             .GetInspector.WordEditor.Content.Paste
@@ -105,8 +103,7 @@ Public Sub pfStage3Ppwk()
     
         Call pfCommunicationHistoryAdd("FileTranscriptEmail") 'LOG FACTORED CLIENT INVOICE
     
-    ElseIf sJurisdiction Like "Food and Drug Administration" Then
-        Call pfCurrentCaseInfo                   'refresh transcript info
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Food and Drug Administration" Then
         Call fTranscriptDeliveryF                '(only the filing)
         Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
         Call pfFileRenamePrompt
@@ -123,7 +120,7 @@ Public Sub pfStage3Ppwk()
             .CC = ""
             .BCC = ""
             .Attachments.Add (sClientTranscriptName)
-            .Subject = sJurisdiction & " " & dHearingDate & " Transcript Ready " & sCourtDatesID
+            .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
         
             Set oWordEditor = .GetInspector.WordEditor
@@ -137,8 +134,7 @@ Public Sub pfStage3Ppwk()
     
         Call pfCommunicationHistoryAdd("FileTranscriptEmail") 'LOG FACTORED CLIENT INVOICE
     
-    ElseIf sJurisdiction Like "Weber" Then
-        Call pfCurrentCaseInfo                   'refresh transcript info
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Weber" Then
         Call fTranscriptDeliveryF                '(only the filing)
         Call pfGenericExportandMailMerge("Case", "Stage4s\ContractorTranscriptsReady")
         Call pfFileRenamePrompt
@@ -156,7 +152,7 @@ Public Sub pfStage3Ppwk()
             .CC = ""
             .BCC = ""
             .Attachments.Add (sClientTranscriptName)
-            .Subject = sJurisdiction & " " & dHearingDate & " Transcript Ready " & sCourtDatesID
+            .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
         
             Set oWordEditor = .GetInspector.WordEditor
@@ -399,7 +395,6 @@ Public Sub fDynamicHeaders()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    'Call pfCurrentCaseInfo
     
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
@@ -753,7 +748,7 @@ Public Sub pfHeaders()
                                                    IncludePosition:=False, SeparateNumbers:=False, SeparatorString:=" "
                     On Error GoTo 0
                     
-                    If sStyleName = "Heading 2" Then Selection.TypeText Text:=" -- WITNESSNAME"
+                    If sStyleName = "Heading 2" Then oWordDoc.Application.Selection.TypeText Text:=" -- WITNESSNAME"
                         
                     oWordDoc.Application.Selection.MoveUp Unit:=wdLine, Count:=1, Extend:=wdExtend
                     oWordDoc.Application.Selection.HomeKey Unit:=wdLine, Extend:=wdExtend

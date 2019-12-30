@@ -102,12 +102,14 @@ Public Sub pfEnterNewJob()
     Dim sUnitPrice As String
     Dim sIRC As String
     Dim sAccountCode As String
+    Dim sJurisdiction As String
     
     Dim oExcelApp As Object
     
     Dim x As Long
     
     Dim dInvoiceDate As Date
+    Dim dDueDate As Date
     
     Dim rstTempJob As DAO.Recordset
     Dim rstCurrentJob As DAO.Recordset
@@ -171,7 +173,6 @@ Public Sub pfEnterNewJob()
     Set rstTempCourtDates = CurrentDb.OpenRecordset("TempCourtDates")
     rstTempCourtDates.MoveFirst
     sJurisdiction = rstTempCourtDates.Fields("JurisDiction").Value
-    sAudioLength = rstTempCourtDates.Fields("AudioLength").Value
     sTurnaround = rstTempCourtDates.Fields("TurnaroundTimesCD").Value
     rstTempCourtDates.Close
 
@@ -274,7 +275,6 @@ Public Sub pfEnterNewJob()
     rstTempCourtDates.Close
     
     dInvoiceDate = (Date + sTurnaround) - 2
-    sInvoiceDate = (Date + sTurnaround) - 2
     dDueDate = (Date + sTurnaround) - 2
     sAccountCode = 400
     'Format(Now, "mm-dd-yyyy")
@@ -284,7 +284,7 @@ Public Sub pfEnterNewJob()
     rstTempCourtDates.MoveFirst
     rstTempCourtDates.Edit
     rstTempCourtDates.Fields("DueDate").Value = sDueDate
-    rstTempCourtDates.Fields("InvoiceDate").Value = sInvoiceDate
+    rstTempCourtDates.Fields("InvoiceDate").Value = dInvoiceDate
     rstTempCourtDates.Fields("AccountCode").Value = sAccountCode
     rstTempCourtDates.Update
     rstTempCourtDates.Close
@@ -788,6 +788,7 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     Dim sJurisdiction As String
     Dim sUnitPriceRateSrchSQL As String
     Dim InsertCustomersTempCourtDatesSQLstring As String
+    Dim sSubtotal As String
     
     Dim rs2 As DAO.Recordset
     Dim rstTempCourtDates As DAO.Recordset
@@ -996,8 +997,6 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     Call pfAskforNotes
 
@@ -1330,7 +1329,6 @@ Public Sub pfStage1Ppwk()
     cJob.FindFirst "ID=" & sCourtDatesID
     Forms![NewMainMenu].Form!lblFlash.Caption = "Completing Stage 1 for job " & sCourtDatesID
     
-    Call pfCurrentCaseInfo                       'refresh transcript info
     Call pfCheckFolderExistence                  'checks for job folder and creates it if not exists
 
     sCourtRulesPath1 = cJob.DocPath.TemplateFolder1 & "CourtRules-Bankruptcy-Rates.pdf"
@@ -1364,58 +1362,25 @@ Public Sub pfStage1Ppwk()
     FileCopy sCourtRulesPath7, sCourtRulesPath7a
 
     Select Case True
-    Case sJurisdiction Like "*AVT*", sJurisdiction Like "*AVTranz*", _
-         sJurisdiction Like "*eScribers*", sJurisdiction Like "*FDA*", _
-         sJurisdiction Like "Food and Drug Administration", _
-         sJurisdiction Like "Weber Oregon", sJurisdiction Like "Weber Bankruptcy", _
-         sJurisdiction Like "Weber Nevada"
+    Case cJob.CaseInfo.Jurisdiction Like "*AVT*", cJob.CaseInfo.Jurisdiction Like "*AVTranz*", _
+         cJob.CaseInfo.Jurisdiction Like "*eScribers*", cJob.CaseInfo.Jurisdiction Like "*FDA*", _
+         cJob.CaseInfo.Jurisdiction Like "Food and Drug Administration", _
+         cJob.CaseInfo.Jurisdiction Like "Weber Oregon", cJob.CaseInfo.Jurisdiction Like "Weber Bankruptcy", _
+         cJob.CaseInfo.Jurisdiction Like "Weber Nevada"
         GoTo Line2
-    Case sJurisdiction Like "*USBC*", sJurisdiction Like "*Bankruptcy*"
+    Case cJob.CaseInfo.Jurisdiction Like "*USBC*", cJob.CaseInfo.Jurisdiction Like "*Bankruptcy*"
         FileCopy sCourtRulesPath1, sCourtRulesPath1a
         FileCopy sCourtRulesPath2, sCourtRulesPath2a
         FileCopy sCourtRulesPath3, sCourtRulesPath3a
         FileCopy sCourtRulesPath4, sCourtRulesPath4a
         FileCopy sCourtRulesPath5, sCourtRulesPath5a
         FileCopy sCourtRulesPath6, sCourtRulesPath6a
-    Case sJurisdiction Like "*Superior Court*", sJurisdiction Like "*District Court*", sJurisdiction Like "*Supreme Court*"
+    Case cJob.CaseInfo.Jurisdiction Like "*Superior Court*", cJob.CaseInfo.Jurisdiction Like "*District Court*", cJob.CaseInfo.Jurisdiction Like "*Supreme Court*"
         FileCopy sCourtRulesPath8, sCourtRulesPath8a
         FileCopy sCourtRulesPath9, sCourtRulesPath9a
-    Case sJurisdiction Like "Massachusetts"
+    Case cJob.CaseInfo.Jurisdiction Like "Massachusetts"
         FileCopy sCourtRulesPath10, sCourtRulesPath10a
     End Select
-
-    '
-    '
-    'If sJurisdiction Like "*AVT*" Or sJurisdiction Like "*AVTranz*" Or sJurisdiction Like "*eScribers*" Then
-    '    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
-    '    GoTo Line2
-    'End If
-    '
-    'If sJurisdiction Like "*FDA*" Or sJurisdiction Like "Food and Drug Administration" Then
-    '    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
-    '    GoTo Line2
-    'End If
-    '
-    'If sJurisdiction Like "*USBC*" Or sJurisdiction Like "*Bankruptcy*" Then
-    '    FileCopy sCourtRulesPath1, sCourtRulesPath1a
-    '    FileCopy sCourtRulesPath2, sCourtRulesPath2a
-    '    FileCopy sCourtRulesPath3, sCourtRulesPath3a
-    '    FileCopy sCourtRulesPath4, sCourtRulesPath4a
-    '    FileCopy sCourtRulesPath5, sCourtRulesPath5a
-    '    FileCopy sCourtRulesPath6, sCourtRulesPath6a
-    'End If
-    '
-    'If sJurisdiction Like "*Superior Court*" Or sJurisdiction Like "*District Court*" Or sJurisdiction Like "*Supreme Court*" Then
-    '    FileCopy sCourtRulesPath8, sCourtRulesPath8a
-    '    FileCopy sCourtRulesPath9, sCourtRulesPath9a
-    'End If
-    ''
-    'If sJurisdiction Like "Weber Oregon" Or sJurisdiction Like "Weber Bankruptcy" Or sJurisdiction Like "Weber Nevada" Then
-    '    GoTo Line2
-    '    'FileCopy sCourtRulesPath9, sCourtRulesPath9a
-    'End If
-    '
-    'If sJurisdiction Like "Massachusetts" Then FileCopy sCourtRulesPath10, sCourtRulesPath10a
 
     'Call pfCreateCDLabel 'cd label
     Call pfUpdateCheckboxStatus("CDLabel")
@@ -1521,9 +1486,10 @@ Public Sub fWunderlistAddNewJob()
     
     Dim parsed As Dictionary
     
-    Call pfCurrentCaseInfo
-
+    Dim cJob As Job
+    Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     sWLListID = 370524335                        'Ingram Household = 370524335
     'inbox = 370231796
@@ -1559,8 +1525,8 @@ Public Sub fWunderlistAddNewJob()
         .abort
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    iListID = parsed("id")                       'get new list_id
-    sTitle = parsed("title")
+    iListID = parsed.item("id")                       'get new list_id
+    sTitle = parsed.item("title")
     
     'get folder ID
     
@@ -1586,10 +1552,10 @@ Public Sub fWunderlistAddNewJob()
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
     
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    vErrorName = parsed("id")                    '("value") 'second level array
-    vErrorMessage = parsed("title")
+    vErrorName = parsed.item("id")                    '("value") 'second level array
+    vErrorMessage = parsed.item("title")
     Dim rep As Object
-    Set rep = parsed("list_ids")
+    Set rep = parsed.item("list_ids")
     
     vErrorILink = ""
     Dim x As Long
@@ -1603,7 +1569,7 @@ Public Sub fWunderlistAddNewJob()
         End If
         x = x + 1
     Next
-    vErrorIssue = parsed("revision")
+    vErrorIssue = parsed.item("revision")
 
     'put list in folder ID
 
@@ -1684,17 +1650,16 @@ Public Sub fWunderlistAddNewJob()
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = parsed("list_id")                  'get new list_id
-    sTitle = parsed("title")
+    iListID = parsed.item("list_id")                  'get new list_id
+    sTitle = parsed.item("title")
 
 
     'create a task add JSON
-        
+        'TODO:  sDueDate
     sTitle = "Stage 2"
     bCompleted = "false"
     bStarred = "false"
-    sDueDate = (Format((dDueDate - 4), "yyyy-mm-dd"))
-    'dDueDate
+    sDueDate = (Format((Format(cJob.DueDate, "mm-dd-yyyy") - 4), "yyyy-mm-dd"))
     
     sJSON = "{" & Chr(34) & _
                           "list_id" & Chr(34) & ": " & iListID & "," & Chr(34) & _
@@ -1721,16 +1686,15 @@ Public Sub fWunderlistAddNewJob()
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = parsed("list_id")                  'get new list_id
-    sTitle = parsed("title")
+    iListID = parsed.item("list_id")                  'get new list_id
+    sTitle = parsed.item("title")
 
     'create a task add JSON
         
     sTitle = "Stage 3"
     bCompleted = "false"
     bStarred = "false"
-    sDueDate = (Format((dDueDate - 3), "yyyy-mm-dd"))
-    'dDueDate
+    sDueDate = (Format((Format(cJob.DueDate, "mm-dd-yyyy") - 3), "yyyy-mm-dd"))
     
     sJSON = "{" & Chr(34) & _
                           "list_id" & Chr(34) & ": " & iListID & "," & Chr(34) & _
@@ -1756,15 +1720,15 @@ Public Sub fWunderlistAddNewJob()
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
-    iListID = parsed("list_id")                  'get new list_id
-    sTitle = parsed("title")
+    iListID = parsed.item("list_id")                  'get new list_id
+    sTitle = parsed.item("title")
 
     'create a task add JSON
     
     sTitle = "Stage 4"
     bCompleted = "false"
     bStarred = "false"
-    sDueDate = (Format((dDueDate - 1), "yyyy-mm-dd"))
+    sDueDate = (Format((Format(cJob.DueDate, "mm-dd-yyyy") - 1), "yyyy-mm-dd"))
     
     sJSON = "{" & Chr(34) & _
                           "list_id" & Chr(34) & ": " & iListID & "," & Chr(34) & _
@@ -1792,15 +1756,16 @@ Public Sub fWunderlistAddNewJob()
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
     
     '@Ignore AssignmentNotUsed
-    iListID = parsed("list_id")                  'get new list_id
+    iListID = parsed.item("list_id")                  'get new list_id
     '@Ignore AssignmentNotUsed
-    sTitle = parsed("title")
+    sTitle = parsed.item("title")
 
 End Sub
 
 Public Sub autointake()
     Forms![NewMainMenu].Form!lblFlash.Caption = "Entering new job into database."
     'autoread email form into access db
+    'TODO: fix variables
     Dim sSubmissionDate As String
     Dim sEmailText As String
     Dim sSplitInfo() As String
@@ -1874,6 +1839,7 @@ Public Sub autointake()
     Dim sQuestion As String
     Dim sFirstA As String
     Dim sTempCustomersSQL As String
+    Dim sBrandingTheme As String
 
     Dim rstTempJob As DAO.Recordset
     Dim rstCurrentJob As DAO.Recordset

@@ -156,10 +156,9 @@ Public Sub pfReplaceBMKWwithBookmark()
 
         If .bookmarks.Exists("TopLine") = True Then
     
-            'sHearingLocation, sStartTime, sEndTime
             .bookmarks("TopLine").Select
-            .Application.Selection.TypeText Text:=UCase(sHearingLocation) & ", " & _
-                                                                          FormatDateTime(dHearingDate, vbLongDate) & ", " & UCase(sStartTime)
+            .Application.Selection.TypeText Text:=UCase(cJob.Location) & ", " & _
+                                                                          FormatDateTime(Format(cJob.HearingDate, "mm-dd-yyyy"), vbLongDate) & ", " & UCase(Format(cJob.HearingStartTime, "h:mm AM/PM"))
         Else
             MsgBox "Bookmark ""TopLine"" does not exist!"
         End If
@@ -167,18 +166,16 @@ Public Sub pfReplaceBMKWwithBookmark()
 
         If .bookmarks.Exists("EndTime") = True Then
     
-            If Right(sEndTime, 2) = "AM" Then
-                sEndTime = Replace(sEndTime, "AM", "a.m.")
+            If Right(Format(cJob.HearingEndTime, "h:mm AM/PM"), 2) = "AM" Then
+                Format(cJob.HearingEndTime, "h:mm AM/PM") = Replace(Format(cJob.HearingEndTime, "h:mm AM/PM"), "AM", "a.m.")
         
-            ElseIf Right(sEndTime, 2) = "PM" Then
-                sEndTime = Replace(sEndTime, "PM", "p.m.")
+            ElseIf Right(Format(cJob.HearingEndTime, "h:mm AM/PM"), 2) = "PM" Then
+                Format(cJob.HearingEndTime, "h:mm AM/PM") = Replace(Format(cJob.HearingEndTime, "h:mm AM/PM"), "PM", "p.m.")
         
             End If
     
-    
-            'sHearingLocation, sStartTime, sEndTime
             .bookmarks("EndTime").Select
-            .Application.Selection.TypeText Text:=UCase(sEndTime)
+            .Application.Selection.TypeText Text:=UCase(Format(cJob.HearingEndTime, "h:mm AM/PM"))
         Else
             MsgBox "Bookmark ""EndTime"" does not exist!"
         End If
@@ -674,16 +671,16 @@ Public Sub pfCreateBookmarks()
 
         If .bookmarks.Exists("TopLine") = True Then
     
-            If Right(sStartTime, 6) = ":00 AM" Then
-                sStartTime = Replace(sStartTime, ":00 AM", " a.m.")
+            If Right(Format(cJob.HearingStartTime, "h:mm AM/PM"), 6) = ":00 AM" Then
+                Format(cJob.HearingStartTime, "h:mm AM/PM") = Replace(Format(cJob.HearingStartTime, "h:mm AM/PM"), ":00 AM", " a.m.")
         
-            ElseIf Right(sStartTime, 6) = ":00 PM" Then
-                sStartTime = Replace(sStartTime, ":00 PM", " p.m.")
+            ElseIf Right(Format(cJob.HearingStartTime, "h:mm AM/PM"), 6) = ":00 PM" Then
+                Format(cJob.HearingStartTime, "h:mm AM/PM") = Replace(Format(cJob.HearingStartTime, "h:mm AM/PM"), ":00 PM", " p.m.")
         
             End If
             
-            sTopLine = UCase(sHearingLocation) & ", " & UCase(FormatDateTime(dHearingDate, vbLongDate)) & ", " & UCase(sStartTime)
-            'sHearingLocation, sStartTime, sEndTime
+            sTopLine = UCase(cJob.Location) & ", " & UCase(FormatDateTime(Format(cJob.HearingDate, "mm-dd-yyyy"), vbLongDate)) & ", " & UCase(Format(cJob.HearingStartTime, "h:mm AM/PM"))
+
             .bookmarks("TopLine").Select
             .Application.Selection.Font.Underline = wdUnderlineSingle
             .Application.Selection.TypeText Text:=sTopLine
@@ -695,17 +692,16 @@ Public Sub pfCreateBookmarks()
 
         If .bookmarks.Exists("EndTime") = True Then
     
-            If Right(sEndTime, 6) = ":00 AM" Then
-                sEndTime = Replace(sEndTime, ":00 AM", " a.m.")
+            If Right(Format(cJob.HearingEndTime, "h:mm AM/PM"), 6) = ":00 AM" Then
+                Format(cJob.HearingEndTime, "h:mm AM/PM") = Replace(Format(cJob.HearingEndTime, "h:mm AM/PM"), ":00 AM", " a.m.")
         
-            ElseIf Right(sEndTime, 6) = ":00 PM" Then
-                sEndTime = Replace(sEndTime, ":00 PM", " p.m.")
+            ElseIf Right(Format(cJob.HearingEndTime, "h:mm AM/PM"), 6) = ":00 PM" Then
+                Format(cJob.HearingEndTime, "h:mm AM/PM") = Replace(Format(cJob.HearingEndTime, "h:mm AM/PM"), ":00 PM", " p.m.")
         
             End If
     
-            'sHearingLocation, sStartTime, sEndTime
             .bookmarks("EndTime").Select
-            .Application.Selection.TypeText Text:=sEndTime
+            .Application.Selection.TypeText Text:=Format(cJob.HearingEndTime, "h:mm AM/PM")
         Else
             MsgBox "Bookmark ""EndTime"" does not exist!"
         End If
@@ -855,7 +851,7 @@ Public Sub pfCreateIndexesTOAs()
         '.indexes(1).TabLeader = wdTabLeaderDots
     
      
-        If InStr(sJurisdiction, "AVT") = 0 And InStr(sJurisdiction, "eScribers") = 0 And InStr(sJurisdiction, "FDA") = 0 And InStr(sJurisdiction, "Food and Drug Administration") = 0 And InStr(sJurisdiction, "Weber") = 0 Then
+        If InStr(cJob.CaseInfo.Jurisdiction, "AVT") = 0 And InStr(cJob.CaseInfo.Jurisdiction, "eScribers") = 0 And InStr(cJob.CaseInfo.Jurisdiction, "FDA") = 0 And InStr(cJob.CaseInfo.Jurisdiction, "Food and Drug Administration") = 0 And InStr(cJob.CaseInfo.Jurisdiction, "Weber") = 0 Then
                 
             
             oWordDoc.Application.Selection.Goto What:=wdGoToBookmark, Name:="TOAC"
@@ -994,12 +990,10 @@ Public Sub pfReplaceFDA()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
     'Set oWordApp = CreateObject("Word.Application")
     oWordApp.Visible = False
     Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
-    If sJurisdiction = "Food and Drug Administration" Then
+    If cJob.CaseInfo.Jurisdiction = "Food and Drug Administration" Then
         'run a query to pull doctors FDA find
         QueryName = "Q-Doctors"
                 
@@ -1771,8 +1765,6 @@ Public Sub FPJurors()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
-
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     x = 101                                      '101 is number of first PROSPECTIVE JUROR
     On Error Resume Next
@@ -1960,10 +1952,6 @@ Public Sub pfTCEntryReplacement()
     Set qdf = CurrentDb.QueryDefs(qnTRCourtQ)    'open query
     qdf.Parameters(0) = sCourtDatesID
     Set rstTRCourtQ = qdf.OpenRecordset
-    sJurisdiction = rstTRCourtQ!Jurisdiction
-    sParty1Name = rstTRCourtQ!Party1Name
-    sParty2Name = rstTRCourtQ!Party2Name
-
     qdf.Close
     rstTRCourtQ.Close
 
@@ -2016,13 +2004,13 @@ Public Sub pfTCEntryReplacement()
             pfDelay 1
             Call pfFieldTCReplaceAll("(crr)", "^pCOURT'S RULING" & "^p", Chr(34) & "TC" & Chr(34) & " " & Chr(34) & "Court's Ruling" & Chr(34) & " " & "\f e")
             pfDelay 1
-            Call pfFieldTCReplaceAll("(aa1)", "^pARGUMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            Call pfFieldTCReplaceAll("(aa1)", "^pARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & cJob.CaseInfo.Party1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             pfDelay 1
-            Call pfFieldTCReplaceAll("(ar1)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            Call pfFieldTCReplaceAll("(ar1)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & cJob.CaseInfo.Party1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             pfDelay 1
-            Call pfFieldTCReplaceAll("(ao1)", "^pOPENING STATEMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            Call pfFieldTCReplaceAll("(ao1)", "^pOPENING STATEMENT FOR THE " & UCase(cJob.CaseInfo.Party1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & cJob.CaseInfo.Party1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             pfDelay 1
-            Call pfFieldTCReplaceAll("(ac1)", "^pCLOSING ARGUMENT FOR THE " & UCase(sParty1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & sParty1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+            Call pfFieldTCReplaceAll("(ac1)", "^pCLOSING ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party1Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & cJob.CaseInfo.Party1Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             pfDelay 1
             Call pfSingleTCReplaceAll("(sbb)", "^p(Sidebar begins at ##:## ap.m.)^p")
             pfDelay 1
@@ -2091,10 +2079,10 @@ Public Sub pfTCEntryReplacement()
             If Not rstViewJFAppQ.EOF Then
                 sMrMs2 = rstViewJFAppQ!MrMs      'get MrMs & LastName variables
                 sLastName2 = rstViewJFAppQ!LastName
-                Call pfFieldTCReplaceAll("(aa2)", "^pARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ar2)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ao2)", "^pOPENING STATEMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ac2)", "^pCLOSING ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(aa2)", "^pARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ar2)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ao2)", "^pOPENING STATEMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ac2)", "^pCLOSING ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             End If
         
             If Not rstViewJFAppQ.EOF Then rstViewJFAppQ.MoveNext
@@ -2102,10 +2090,10 @@ Public Sub pfTCEntryReplacement()
             If Not rstViewJFAppQ.EOF Then
                 sMrMs2 = rstViewJFAppQ!MrMs      'get MrMs & LastName variables
                 sLastName2 = rstViewJFAppQ!LastName
-                Call pfFieldTCReplaceAll("(aa3)", "^pARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ar3)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ao3)", "^pOPENING STATEMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ac3)", "^pCLOSING ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(aa3)", "^pARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ar3)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ao3)", "^pOPENING STATEMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ac3)", "^pCLOSING ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             End If
         
             If Not rstViewJFAppQ.EOF Then rstViewJFAppQ.MoveNext
@@ -2113,10 +2101,10 @@ Public Sub pfTCEntryReplacement()
             If Not rstViewJFAppQ.EOF Then
                 sMrMs2 = rstViewJFAppQ!MrMs      'get MrMs & LastName variables
                 sLastName2 = rstViewJFAppQ!LastName
-                Call pfFieldTCReplaceAll("(aa4)", "^pARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ar4)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ao4)", "^pOPENING STATEMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ac4)", "^pCLOSING ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(aa4)", "^pARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ar4)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ao4)", "^pOPENING STATEMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ac4)", "^pCLOSING ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             End If
         
             If Not rstViewJFAppQ.EOF Then rstViewJFAppQ.MoveNext
@@ -2124,10 +2112,10 @@ Public Sub pfTCEntryReplacement()
             If Not rstViewJFAppQ.EOF Then
                 sMrMs2 = rstViewJFAppQ!MrMs      'get MrMs & LastName variables
                 sLastName2 = rstViewJFAppQ!LastName
-                Call pfFieldTCReplaceAll("(aa5)", "^pARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ar5)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ao5)", "^pOPENING STATEMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ac5)", "^pCLOSING ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(aa5)", "^pARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ar5)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ao5)", "^pOPENING STATEMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ac5)", "^pCLOSING ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             End If
         
             If Not rstViewJFAppQ.EOF Then rstViewJFAppQ.MoveNext
@@ -2135,10 +2123,10 @@ Public Sub pfTCEntryReplacement()
             If Not rstViewJFAppQ.EOF Then
                 sMrMs2 = rstViewJFAppQ!MrMs      'get MrMs & LastName variables
                 sLastName2 = rstViewJFAppQ!LastName
-                Call pfFieldTCReplaceAll("(aa6)", "^pARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ar6)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ao6)", "^pOPENING STATEMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
-                Call pfFieldTCReplaceAll("(ac6)", "^pCLOSING ARGUMENT FOR THE " & UCase(sParty2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & sParty2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(aa6)", "^pARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ar6)", "^pREBUTTAL ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Rebuttal Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ao6)", "^pOPENING STATEMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Opening Statement for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
+                Call pfFieldTCReplaceAll("(ac6)", "^pCLOSING ARGUMENT FOR THE " & UCase(cJob.CaseInfo.Party2Name) & " BY " & UCase(sMrMs2) & ". " & UCase(sLastName2) & "^p", "TC ""Closing Argument for the " & cJob.CaseInfo.Party2Name & " by " & sMrMs2 & ". " & sLastName2 & """ \f a")
             End If
         
             GoTo ParenDone

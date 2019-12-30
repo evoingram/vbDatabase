@@ -12,9 +12,26 @@ Option Compare Database
 Option Explicit
 
 
-Private sCourtDatesID As Long
-Private dHearingStartTime As Date
-Private dHearingEndTime As Date
+Public sDueDate As String
+Public bStarred As String
+Public bCompleted As String
+Public sTitle As String
+Public sWLListID As String
+Private sPPID As String
+Private pPageRate As String
+Private sInvoiceNo As String
+Private sTurnaroundTime As String
+Private sEstimatedPageCount As String
+Private sAudioLength As String
+Private sActualQuantity As String
+Private sQuantity As String
+Private sSubtotal As String
+Private sFinalPrice As String
+Private sPaymentSum As String
+Private sFactoringCost As String
+Private sBrandingTheme As String
+Private sInventoryRateCode As String
+
 Private mApp0 As App0
 Private mApp1 As App1
 Private mApp2 As App2
@@ -25,6 +42,8 @@ Private mApp6 As App6
 Private mCaseInfo As CaseInfo
 Private mStatus As Status
 Private mDocPath As DocPath
+
+Private sCourtDatesID As Long
 Public sApp0 As Long
 Public sApp1 As Long
 Public sApp2 As Long
@@ -36,7 +55,6 @@ Public sDocPath As Long
 Public sCaseID As Long
 Public sStatusID As Long
 Public sStatusCID As Long
-
 Public lngNumOfHrs As Long
 Public lngNumOfMins As Long
 Public lngNumOfSecsRem As Long
@@ -46,17 +64,18 @@ Public lngNumOfMins1 As Long
 Public lngNumOfSecsRem1 As Long
 Public lngNumOfSecs1 As Long
 Public i As Long
+Public lAssigneeID As Long
 
 Public oWordApp As Word.Document
 Public oWordDoc As Word.Application
-Public lAssigneeID As Long
-Public sDueDate As String
-Public bStarred As String
-Public bCompleted As String
-Public sTitle As String
-Public sWLListID As String
-Private sPPID As String
-Private pPageRate As String
+
+Private dHearingDate As Date
+Private dHearingStartTime As Date
+Private dHearingEndTime As Date
+Private dExpectedAdvanceDate As Date
+Private dExpectedRebateDate As Date
+Private dInvoiceDate As Date
+Private dDueDate As Date
 
 Private mrstRecordset As Recordset
 Private mbooLoaded As Boolean
@@ -77,12 +96,12 @@ Public Property Let Subtotal(rData As String)
     sSubtotal = rData
 End Property
 
-Public Property Get InvoiceDate() As String
-    InvoiceDate = sInvoiceDate
+Public Property Get InvoiceDate() As Date
+    InvoiceDate = dInvoiceDate
 End Property
 
-Public Property Let InvoiceDate(rData As String)
-    sInvoiceDate = rData
+Public Property Let InvoiceDate(rData As Date)
+    dInvoiceDate = rData
 End Property
 
 Public Property Get Quantity() As String

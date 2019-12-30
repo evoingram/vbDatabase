@@ -105,7 +105,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
 
     sArray = Split(sExportTopic, "\")
 
-    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder1 & sArray(1) & "-Template.docx") 'sArray(1)/export topic is folder\subject
+    Set oWordAppDoc = GetObject(cJob.DocPath.TemplateFolder4 & sArray(1) & "-Template.docx") 'sArray(1)/export topic is folder\subject
     oWordAppDoc.Application.Visible = False
 
     oWordAppDoc.MailMerge.OpenDataSource _
@@ -213,8 +213,6 @@ Public Sub pfCreateCDLabel()
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    
-    Call pfCurrentCaseInfo 'refresh transcript info
 
     DoCmd.TransferSpreadsheet TransferType:=acExport, TableName:=qnTRCourtUnionAppAddrQ, FileName:=cJob.DocPath.CaseInfo
 
@@ -283,25 +281,29 @@ Public Sub pfSelectCoverTemplate()
 
     sFDAQuery = "Food" & "*" & "and" & "*" & "Drug" & "*" & "Administration"
 
-    Call pfCurrentCaseInfo                       'refresh transcript info
+    Dim cJob As Job
+    Set cJob = New Job
 
-    If ((sJurisdiction) Like ("*" & sFDAQuery & "*")) Then
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
+
+    If ((cJob.CaseInfo.Jurisdiction) Like ("*" & sFDAQuery & "*")) Then
         pfCreateCover ("Stage2s\TR-JEW-FDA.doc")
-    ElseIf sJurisdiction = "AVT USBC" Then pfCreateCover ("Stage2s\TR-AVT-Bankruptcy.dotm")
-    ElseIf sJurisdiction = "Weber Oregon" Then pfCreateCover ("Stage2s\TR-WeberOregon-Template.dotm")
-    ElseIf sJurisdiction = "Weber Nevada" Then pfCreateCover ("Stage2s\TR-WeberNevada-Template.dotm")
-    ElseIf sJurisdiction = "Weber Bankruptcy" Then pfCreateCover ("Stage2s\TR-WeberBankruptcy-Template.dotm")
-    ElseIf sJurisdiction = "Non-Court" Then pfCreateCover ("Stage2s\TR-noncourt.docx")
-    ElseIf sJurisdiction Like "District" & " " & "of" & " " Then pfCreateCover ("Stage2s\TR-Bankruptcy.dotm")
-    ElseIf sJurisdiction = "JJ BK" Then pfCreateCover ("Stage2s\TR-JJ-Bankruptcy.docx")
-    ElseIf sJurisdiction = "JJ NJ" Then pfCreateCover ("Stage2s\TR-JJ-NJ.docx")
-    ElseIf sJurisdiction = "AVT NH" Then pfCreateCover ("Stage2s\TR-AVT-NH.dotm")
-    ElseIf sJurisdiction = "AVTOC" Then pfCreateCover ("Stage2s\TR-AVT-OC-CA.dotm")
-    ElseIf sJurisdiction = "eScribers NH" Then pfCreateCover ("Stage2s\TR-AVT-NH.dotm")
-    ElseIf sJurisdiction = "eScribers AVT NH" Then pfCreateCover ("Stage2s\TR-AVT-NH.dotm") '1.3.2
-    ElseIf sJurisdiction = "eScribers Bankruptcy" Then pfCreateCover ("Stage2s\TR-AVT-Bankruptcy.dotm")
-    ElseIf sJurisdiction = "eScribers bankruptcy" Then pfCreateCover ("Stage2s\TR-AVT-Bankruptcy.dotm")
-    ElseIf sJurisdiction Like "Massachusetts" Then pfCreateCover ("Stage2s\TR-Mass.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "AVT USBC" Then pfCreateCover ("Stage2s\TR-AVT-Bankruptcy.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "Weber Oregon" Then pfCreateCover ("Stage2s\TR-WeberOregon-Template.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "Weber Nevada" Then pfCreateCover ("Stage2s\TR-WeberNevada-Template.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "Weber Bankruptcy" Then pfCreateCover ("Stage2s\TR-WeberBankruptcy-Template.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "Non-Court" Then pfCreateCover ("Stage2s\TR-noncourt.docx")
+    ElseIf cJob.CaseInfo.Jurisdiction Like "District" & " " & "of" & " " Then pfCreateCover ("Stage2s\TR-Bankruptcy.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "JJ BK" Then pfCreateCover ("Stage2s\TR-JJ-Bankruptcy.docx")
+    ElseIf cJob.CaseInfo.Jurisdiction = "JJ NJ" Then pfCreateCover ("Stage2s\TR-JJ-NJ.docx")
+    ElseIf cJob.CaseInfo.Jurisdiction = "AVT NH" Then pfCreateCover ("Stage2s\TR-AVT-NH.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "AVTOC" Then pfCreateCover ("Stage2s\TR-AVT-OC-CA.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "eScribers NH" Then pfCreateCover ("Stage2s\TR-AVT-NH.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "eScribers AVT NH" Then pfCreateCover ("Stage2s\TR-AVT-NH.dotm") '1.3.2
+    ElseIf cJob.CaseInfo.Jurisdiction = "eScribers Bankruptcy" Then pfCreateCover ("Stage2s\TR-AVT-Bankruptcy.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction = "eScribers bankruptcy" Then pfCreateCover ("Stage2s\TR-AVT-Bankruptcy.dotm")
+    ElseIf cJob.CaseInfo.Jurisdiction Like "Massachusetts" Then pfCreateCover ("Stage2s\TR-Mass.dotm")
     Else: pfCreateCover ("Stage2s\TR-WACounties.dotm")
     End If
 
@@ -504,8 +506,6 @@ Public Sub fFactorInvoicEmailF()
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-
-    Call pfCurrentCaseInfo                       'refresh transcript info
 
     Call pfGenericExportandMailMerge("Case", "Stage4s\FactorInvoiceEmail")
 
