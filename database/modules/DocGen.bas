@@ -127,7 +127,7 @@ Public Sub pfGenericExportandMailMerge(sMerge As String, sExportTopic As String)
     oWordAppDoc.Application.ActiveDocument.Close
     Set oWordAppDoc = Nothing
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -161,19 +161,19 @@ Public Sub pfSendWordDocAsEmail(vCHTopic As String, vSubject As String, _
     oWordDoc.Content.Copy
     
     With oOutlookMail
-        .To = ""
-        .CC = ""
-        .BCC = ""
+        .To = vbNullString
+        .CC = vbNullString
+        .BCC = vbNullString
         .Subject = vSubject
         .BodyFormat = olFormatRichText
         Set oWordEditor = .GetInspector.WordEditor
         .GetInspector.WordEditor.Content.Paste
         .Display
-        If sAttachment1 = "" And sAttachment2 = "" And sAttachment3 = "" And sAttachment4 = "" Then GoTo LoopExit
-        If Not sAttachment1 = "" Then GoTo At1
-        If Not sAttachment1 = "" And sAttachment2 = "" Then GoTo At2
-        If Not sAttachment1 = "" And sAttachment2 = "" And sAttachment3 = "" Then GoTo At3
-        If Not sAttachment1 = "" And sAttachment2 = "" And sAttachment3 = "" And sAttachment4 = "" Then GoTo At4
+        If sAttachment1 = vbNullString And sAttachment2 = vbNullString And sAttachment3 = vbNullString And sAttachment4 = vbNullString Then GoTo LoopExit
+        If Not sAttachment1 = vbNullString Then GoTo At1
+        If Not sAttachment1 = vbNullString And sAttachment2 = vbNullString Then GoTo At2
+        If Not sAttachment1 = vbNullString And sAttachment2 = vbNullString And sAttachment3 = vbNullString Then GoTo At3
+        If Not sAttachment1 = vbNullString And sAttachment2 = vbNullString And sAttachment3 = vbNullString And sAttachment4 = vbNullString Then GoTo At4
 At4:
         .Attachments.Add (sAttachment4)
 At3:
@@ -223,7 +223,7 @@ Public Sub pfCreateCDLabel()
     sCommHistoryHyperlink = sCourtDatesID & "-CD-Label" & "#" & cJob.DocPath.CDLabel
     
 
-    oPubDoc.MailMerge.OpenDataSource bstrDataSource:=cJob.DocPath.CaseInfo, bstrTable:="", fOpenExclusive:=True, fneverprompt:=1 'performs mail merge
+    oPubDoc.MailMerge.OpenDataSource bstrDataSource:=cJob.DocPath.CaseInfo, bstrTable:=vbNullString, fOpenExclusive:=True, fneverprompt:=1 'performs mail merge
     oPubDoc.MailMerge.Execute Pause:=True, Destination:=pbMergeToNewPublication
     oPubDoc.SaveAs FileName:=cJob.DocPath.CDLabel         'saves file in job number folder in in progress
     oPubDoc.Close
@@ -265,7 +265,7 @@ Public Sub pfCreateCDLabel()
     'End If
 
     Call fPrintKCIEnvelope
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     
 End Sub
 
@@ -309,7 +309,7 @@ Public Sub pfSelectCoverTemplate()
     End If
 
     Call pfCommunicationHistoryAdd("CourtCover")
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfCreateCover(sTemplatePath As String)
@@ -393,7 +393,7 @@ Public Sub pfCreateCover(sTemplatePath As String)
         "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & cJob.DocPath.CourtCover & ";Mode=Read;Extended Properties=" & Chr(34) & Chr(34) & "HDR=YES;IMEX=1;" _
             & Chr(34) & Chr(34) & ";Jet OLEDB:System database=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & ";Jet OLEDB:Registry Path=" & Chr(34) & Chr(34) & Chr(34) & Chr(34) & _
             ";Jet OLEDB:Engine Type=34;Jet OLEDB;" _
-            , SQLStatement:="SELECT * FROM `AAAAADataRange`", SQLStatement1:="", _
+            , SQLStatement:="SELECT * FROM `AAAAADataRange`", SQLStatement1:=vbNullString, _
             SubType:=wdMergeSubTypeAccess
         .MailMerge.DataSource.FirstRecord = wdDefaultFirstRecord
         .MailMerge.DataSource.LastRecord = wdDefaultLastRecord
@@ -444,7 +444,7 @@ Public Sub pfCreateCover(sTemplatePath As String)
     rstCommHistory.Close
     Set rstCommHistory = Nothing
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fCreatePELLetter()
@@ -476,7 +476,7 @@ Public Sub fCreatePELLetter()
     End If
 
     Call pfCommunicationHistoryAdd("PackageEnclosedLetter")
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fFactorInvoicEmailF()
@@ -559,7 +559,7 @@ Public Sub fFactorInvoicEmailF()
 
     qdf.Close
     CurrentDb.Close
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     
 End Sub
 
@@ -596,7 +596,7 @@ Public Sub pfInvoicesCSV()
 
     Call pfUpdateCheckboxStatus("InvoiceCompleted")
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     
 End Sub
 
@@ -671,7 +671,7 @@ Public Sub fCreateWorkingCopy()
         
             'delete cert section
             Set wsSections = .Sections
-            Set oRng = .Range(Start:=.bookmarks("CertBMK").Range.End, End:=.bookmarks("ToABMK").Range.Start)
+            Set oRng = .Range(Start:=.Bookmarks("CertBMK").Range.End, End:=.Bookmarks("ToABMK").Range.Start)
             oRng.delete
         
             For x = wsSections.Last.Index To 1 Step -1
@@ -697,7 +697,7 @@ Public Sub fCreateWorkingCopy()
     Set oWordApp = Nothing
 
     FileCopy cJob.DocPath.TranscriptWC, cJob.DocPath.TranscriptWCB
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -770,7 +770,7 @@ Public Sub pfPrepareCover()
         sVolumeText = "Volume " & y & ":  " & Format(cJob.HearingDate, "dddd, mmmm d, yyyy")
         'Debug.Print sVolumeText
         With oWordDoc
-            .bookmarks(sBookmarkName).Select
+            .Bookmarks(sBookmarkName).Select
             .Application.Selection.TypeText Text:=sVolumeText
         End With
         y = y + 1
@@ -786,7 +786,7 @@ Public Sub pfPrepareCover()
     oWordDoc.Close
     oWordApp.Quit
     rstJobsByCase.Close
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     
 End Sub
 

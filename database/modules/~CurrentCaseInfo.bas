@@ -3,14 +3,6 @@ Attribute VB_Name = "~CurrentCaseInfo"
 Option Compare Database
 Option Explicit
 
-'============================================================================
-' Name        : fPPGenerateJSONInfo
-' Author      : Erica L Ingram
-' Copyright   : 2019, A Quo Co.
-' Call command: Call fPPGenerateJSONInfo
-' Description : get info for invoice
-'============================================================================
-
 'TODO: make sure cJob cleared/cleaned up properly
 
 'TODO: Make a class
@@ -27,6 +19,8 @@ Public sTime1 As String
 Public sInvoiceTime As String
 Public sDescription As String
 Public sInvoiceDate As String
+
+Public sBookmarkName As String
 
 'timer variables
 Public lngNumOfHrs As Long

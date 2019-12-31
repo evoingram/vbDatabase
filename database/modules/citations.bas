@@ -187,7 +187,7 @@ Public Sub pfFindRepCitationLinks()
         'Debug.Print "SQL Statement:  " & sCurrentLinkSQL
         'Debug.Print "----------------------------------------------------------"
         
-        sOriginalSearchTerm = ""
+        sOriginalSearchTerm = vbNullString
         
         y = y + 1
     
@@ -241,7 +241,7 @@ ExitLoop:
             'look up on courtlistener
                     
             sInput1 = sSearchTermArray(x)        'search term 1
-            sInput2 = ""                         'search term 2     'enter name of state here, 'federal', 'special''which courts go with which states
+            sInput2 = vbNullString                         'search term 2     'enter name of state here, 'federal', 'special''which courts go with which states
             sOriginalSearchTerm = sInput1
             
             Set sID = apiCourtListener(sInputState, sOriginalSearchTerm)
@@ -261,7 +261,7 @@ ExitLoop:
                         Set oCitations = rep.item("citation")
                                     
                         For Each oEntry In oCitations
-                            If oEntry = "null" Or oEntry = "" Or oEntry = Null Or oEntry = "Null" Then
+                            If oEntry = "null" Or oEntry = vbNullString Or oEntry = Null Or oEntry = "Null" Then
                                 sCitation = sCitation & ", " & "null"
                                 'Debug.Print sCitation
                                             
@@ -333,7 +333,7 @@ ExitLoop:
                             
                     y = 1
                             
-                    sCitation = ""
+                    sCitation = vbNullString
                     j = j + 1
                 Next
                         
@@ -515,11 +515,11 @@ NextSearchTerm:
                  
                                 
         End If
-        sQFindCitation = ""
-        qReplaceHyperlink = ""
-        sQLongCitation = ""
-        sQCHCategory = ""
-        sQWebAddress = ""
+        sQFindCitation = vbNullString
+        qReplaceHyperlink = vbNullString
+        sQLongCitation = vbNullString
+        sQCHCategory = vbNullString
+        sQWebAddress = vbNullString
 
         
         
@@ -539,7 +539,7 @@ ExitLoop1:
         .Replacement.ClearFormatting
     
         .Text = " |"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -553,7 +553,7 @@ ExitLoop1:
     
     
         .Text = "(cht) "
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -627,7 +627,7 @@ Done:
     Set oWordDoc = Nothing
     Set oWordApp = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Function apiCourtListener(sInputState, sInput1, Optional sInput2 As String)
@@ -694,7 +694,7 @@ Dim parsed As Dictionary
             ElseIf sInputState = "Wyoming" Then sInputCourt = "wyd+wyb+wyo+" & sInputCourt
             End If
             
-            If sInput2 = "" Then
+            If sInput2 = vbNullString Then
                 'only input1
                 sURL = "https://www.courtlistener.com/api/rest/v3/search/" & "?q=" & sInput1 & "&court=" & sInputCourt & "&order_by=score+desc&stat_Precedential=on" & "&fields=caseName" '
             Else

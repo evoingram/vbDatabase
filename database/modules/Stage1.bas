@@ -115,15 +115,9 @@ Public Sub pfEnterNewJob()
     Dim rstCurrentJob As DAO.Recordset
     Dim rstCurrentCasesID As DAO.Recordset
     Dim rstTempCourtDates As DAO.Recordset
-    Dim rstTempCases As DAO.Recordset
-    Dim rstTempCustomers As DAO.Recordset
     Dim rstCurrentStatusesEntry As DAO.Recordset
     Dim rstMaxCasesID As DAO.Recordset
     Dim rstCourtDatesID As DAO.Recordset
-    Dim rstTableName As DAO.Recordset
-    
-    Dim oExcelWB As Excel.Workbook
-    Dim oExcelMacroWB As Excel.Workbook
     
     Dim cJob As Job
     Set cJob = New Job
@@ -136,7 +130,6 @@ Public Sub pfEnterNewJob()
     oExcelMacroWB.Application.Visible = True
     Debug.Print cJob.DocPath.OrderFormCustomersXLSX
     'oExcelMacroWB.SaveAs FileFormat:=6
-    Dim sXLSMPath As String
 
     Debug.Print oExcelMacroWB.Path
     
@@ -415,7 +408,7 @@ Public Sub pfEnterNewJob()
         sCurrentTempApp = rstTempJob.Fields("AppID").Value
         sAppNumber = "App" & x
     
-        If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
+        If Not rstTempJob.EOF Or sCurrentTempApp <> vbNullString Or Not IsNull(sCurrentTempApp) Then
         
             Select Case sAppNumber
             Case "App0"
@@ -496,7 +489,7 @@ Public Sub pfEnterNewJob()
     
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fCheckTempCustomersCustomers()
@@ -525,7 +518,6 @@ Public Sub fCheckTempCustomersCustomers()
 
     Dim rstTempCustomers As DAO.Recordset
     Dim rstCheckTCuvCu As DAO.Recordset
-    Dim rstCustomers As DAO.Recordset
     Dim rstCustomersID As DAO.Recordset
     
     Set rstTempCustomers = CurrentDb.OpenRecordset("TempCustomers")
@@ -536,46 +528,46 @@ Public Sub fCheckTempCustomersCustomers()
     
         Do Until rstTempCustomers.EOF = True
         
-            If rstTempCustomers.Fields("LastName").Value <> "" Then
+            If rstTempCustomers.Fields("LastName").Value <> vbNullString Then
                 tcLastName = rstTempCustomers.Fields("LastName").Value
             End If
-            If rstTempCustomers.Fields("FirstName").Value <> "" Then
+            If rstTempCustomers.Fields("FirstName").Value <> vbNullString Then
                 tcFirstName = rstTempCustomers.Fields("FirstName").Value
             End If
-            If rstTempCustomers.Fields("Company").Value <> "" Then
+            If rstTempCustomers.Fields("Company").Value <> vbNullString Then
                 tcCompany = rstTempCustomers.Fields("Company").Value
             End If
-            If rstTempCustomers.Fields("AppID").Value <> "" Then
+            If rstTempCustomers.Fields("AppID").Value <> vbNullString Then
                 tcCID = rstTempCustomers.Fields("AppID").Value
             End If
-            If rstTempCustomers.Fields("Company").Value <> "" Then
+            If rstTempCustomers.Fields("Company").Value <> vbNullString Then
                 tcCompany = rstTempCustomers("Company").Value
             End If
-            If rstTempCustomers.Fields("MrMs").Value <> "" Then
+            If rstTempCustomers.Fields("MrMs").Value <> vbNullString Then
                 tcMrMs = rstTempCustomers.Fields("MrMs").Value
             End If
-            If rstTempCustomers.Fields("JobTitle").Value <> "" Then
+            If rstTempCustomers.Fields("JobTitle").Value <> vbNullString Then
                 tcJobTitle = rstTempCustomers.Fields("JobTitle").Value
             End If
-            If rstTempCustomers.Fields("BusinessPhone").Value <> "" Then
+            If rstTempCustomers.Fields("BusinessPhone").Value <> vbNullString Then
                 tcBusinessPhone = rstTempCustomers.Fields("BusinessPhone").Value
             End If
-            If rstTempCustomers.Fields("Address").Value <> "" Then
+            If rstTempCustomers.Fields("Address").Value <> vbNullString Then
                 tcAddress = rstTempCustomers.Fields("Address").Value
             End If
-            If rstTempCustomers.Fields("City").Value <> "" Then
+            If rstTempCustomers.Fields("City").Value <> vbNullString Then
                 tcCity = rstTempCustomers.Fields("City").Value
             End If
-            If rstTempCustomers.Fields("State").Value <> "" Then
+            If rstTempCustomers.Fields("State").Value <> vbNullString Then
                 tcState = rstTempCustomers.Fields("State").Value
             End If
-            If rstTempCustomers.Fields("ZIP").Value <> "" Then
+            If rstTempCustomers.Fields("ZIP").Value <> vbNullString Then
                 tcZIP = rstTempCustomers.Fields("ZIP").Value
             End If
-            If rstTempCustomers.Fields("Notes").Value <> "" Then
+            If rstTempCustomers.Fields("Notes").Value <> vbNullString Then
                 tcNotes = rstTempCustomers.Fields("Notes").Value
             End If
-            If rstTempCustomers.Fields("FactoringApproved").Value <> "" Then
+            If rstTempCustomers.Fields("FactoringApproved").Value <> vbNullString Then
                 tcFactoringApproved = rstTempCustomers.Fields("FactoringApproved").Value
             End If
     
@@ -588,7 +580,6 @@ Public Sub fCheckTempCustomersCustomers()
                 Set rstCustomersID = CurrentDb.OpenRecordset("SELECT MAX(ID) as IDNo FROM Customers")
                     tcCID = rstCustomersID.Fields("IDNo").Value
                 rstCustomersID.Close
-                'Set rstCustomers = CurrentDb.OpenRecordset("SELECT * From Customers;")
                 'Debug.Print "INSERT INTO Customers (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, ZIP, FactoringApproved, Notes) " & _
                                 "VALUES (" & _
                                   tcLastName & ", " & tcFirstName & ", " & tcCompany & ", " & tcMrMs & ", " & tcJobTitle & ", " & tcBusinessPhone & ", " & tcAddress & ", " & _
@@ -652,7 +643,7 @@ Public Sub fCheckTempCustomersCustomers()
     rstTempCustomers.Close
     Set rstTempCustomers = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fCheckTempCasesCases()
@@ -666,7 +657,6 @@ Public Sub fCheckTempCasesCases()
 
     Dim sCheckTCaAgainstCaSQL As String
     Dim sNewCasesIDSQL As String
-    Dim tcsCourtDatesID As String
     Dim sCasesID As String
     Dim tcHearingTitle As String
     Dim tcParty1 As String
@@ -682,7 +672,6 @@ Public Sub fCheckTempCasesCases()
     Dim rstTempCases As DAO.Recordset
     Dim rstCheckTCavCa As DAO.Recordset
     Dim rstMaxCasesID As DAO.Recordset
-    Dim rstCurrentJob As DAO.Recordset
 
     Set rstTempCases = CurrentDb.OpenRecordset("TempCases")
     rstTempCases.MoveFirst
@@ -760,7 +749,6 @@ Public Sub fCheckTempCasesCases()
     
     End If
 
-    Set rstCurrentJob = Nothing
     Set rstCheckTCavCa = Nothing
     Set rstTempCases = Nothing
 
@@ -785,10 +773,8 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
     Dim dExpectedAdvanceDate As Date
     Dim dExpectedRebateDate As Date
     Dim sJurisdiction As String
-    Dim InsertCustomersTempCourtDatesSQLstring As String
     Dim sSubtotal As String
     
-    Dim rs2 As DAO.Recordset
     Dim rstTempCourtDates As DAO.Recordset
     Dim rstRates As DAO.Recordset
     
@@ -903,7 +889,7 @@ Public Sub fInsertCalculatedFieldintoTempCourtDates()
                                                & Chr(13) & "Expected Rebate Payment Date:  " & dExpectedRebateDate _
                                                & Chr(13) & "Expected Price Estimate:  $" & sSubtotal
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fAudioPlayPromptTyping()
@@ -927,7 +913,7 @@ Public Sub fAudioPlayPromptTyping()
     Else                                         'Code for yes
         Call fPlayAudioParent
     End If
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -947,7 +933,7 @@ Public Sub fProcessAudioParent()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call fProcessAudioFolder(cJob.DocPath.JobDirectoryA)
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -968,7 +954,7 @@ Public Sub fPlayAudioParent()
     
     Call fPlayAudioFolder(cJob.DocPath.JobDirectoryA)
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -986,14 +972,10 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
     Dim sAnswer As String
     Dim sFileTypes() As String
     
-    Dim blNotFirstIteration As Boolean
     
     Dim fiCurrentFile As File
     Dim foHFolder As Folder
     Dim FSO As Scripting.FileSystemObject
-    
-    Dim item As Variant
-    
     
     Dim cJob As Job
     Set cJob = New Job
@@ -1057,7 +1039,7 @@ Public Sub fPlayAudioFolder(ByVal sHostFolder As String)
 Line2:
     End If
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fProcessAudioFolder(ByVal HostFolder As String)
@@ -1073,8 +1055,6 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
     Dim sQuestion As String
     Dim sAnswer As String
     Dim sFileTypes() As String
-    
-    Dim blNotFirstIteration As Boolean
     
     Dim fiCurrentFile As File
     Dim foHFolder As Folder
@@ -1135,7 +1115,7 @@ Public Sub fProcessAudioFolder(ByVal HostFolder As String)
         Next fiCurrentFile
 Line2:
     End If
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfPriceQuoteEmail()
@@ -1169,9 +1149,7 @@ Public Sub pfPriceQuoteEmail()
     Dim oWordAppDoc As New Word.Application
     Dim oOutlookApp As New Outlook.Application
     Dim oWordDoc As New Word.Document
-    Dim oWordEditor As Word.editor
     Dim oWordApp As New Word.Application
-    Dim Rng As Range
     
     Dim oOutlookMail As Object
     
@@ -1275,12 +1253,11 @@ Public Sub pfPriceQuoteEmail()
 
     Set oOutlookMail = oOutlookApp.CreateItem(0)
     With oOutlookMail
-        .To = ""
-        .CC = ""
-        .BCC = ""
+        .To = vbNullString
+        .CC = vbNullString
+        .BCC = vbNullString
         .Subject = "Transcript Price Quote"
         .BodyFormat = olFormatRichText
-        'Set oWordEditor = .GetInspector.WordEditor
         .GetInspector.WordEditor.Content.Paste
         .Display
     End With
@@ -1288,7 +1265,7 @@ Public Sub pfPriceQuoteEmail()
     oWordApp.Quit
     On Error GoTo 0
     Set oWordApp = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfStage1Ppwk()
@@ -1451,7 +1428,7 @@ Line2:                                           'every jurisdiction converges h
     
     Call pfTypeRoughDraftF                       'type rough draft prompt
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fWunderlistAddNewJob()
@@ -1476,8 +1453,6 @@ Public Sub fWunderlistAddNewJob()
     Dim vErrorName As String
     Dim vErrorMessage As String
     Dim vErrorILink As String
-    Dim sLists As String
-    Dim sResponseText As String
     Dim apiWaxLRS As String
 
     Dim lFolderID As Long
@@ -1550,7 +1525,7 @@ Public Sub fWunderlistAddNewJob()
     Dim rep As Object
     Set rep = parsed.item("list_ids")
     
-    vErrorILink = ""
+    vErrorILink = vbNullString
     Dim x As Long
     x = 1
     Dim ID As Variant
@@ -1753,7 +1728,7 @@ Public Sub fWunderlistAddNewJob()
     '@Ignore AssignmentNotUsed
     sTitle = parsed.item("title")
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub autointake()
@@ -1774,14 +1749,9 @@ Public Sub autointake()
     Dim sYourName As String
     Dim sFirstName As String
     Dim sLastName As String
-    Dim sAFirst As String
-    Dim sALast As String
-    Dim tcCID As String
     Dim sAppNumber As String
     Dim vCasesID As String
     Dim sCurrentInput As String
-    Dim sJobTitle As String
-    Dim sBusinessPhone As String
     Dim sIRC As String
     Dim sFiled As String
     Dim sFactoring As String
@@ -1807,11 +1777,6 @@ Public Sub autointake()
     Dim sLocation As String
     Dim iEstimatedPageCount As String
     Dim sAccountCode As String
-    Dim sExtensionXLSM As String
-    Dim sExtensionXLS As String
-    Dim sFullPathXLS As String
-    Dim sFullPathXLSM As String
-    Dim sPartialPath As String
     Dim sTurnaroundTimesCD As String
     Dim sInvoiceNumber As String
     Dim sNewCourtDatesRowSQL As String
@@ -1846,15 +1811,9 @@ Public Sub autointake()
     Dim rstCurrentStatusesEntry As DAO.Recordset
     Dim rstStatuses As DAO.Recordset
     Dim rstMaxCasesID As DAO.Recordset
-    Dim rstTempCDs As DAO.Recordset
     Dim rstOLP As DAO.Recordset
     Dim rstTempCourtDates As DAO.Recordset
-    Dim rstTempCases As DAO.Recordset
-    Dim rstTempCustomers As DAO.Recordset
-    Dim rstTableName As DAO.Recordset
     
-    Dim oExcelWB As Excel.Workbook
-    Dim oExcelMacroWB As Excel.Workbook
     
     Dim x As Long
     Dim y As Long
@@ -2067,6 +2026,7 @@ Public Sub autointake()
             sLastName = sCurrentAppString(0)
             sFirstName = sCurrentAppString(1)
             sCompany = sCurrentAppString(2)
+            sMrMs = sCurrentAppString(3)
             sEmail = sCurrentAppString(3)
             sHardCopy = sCurrentAppString(4)
             sTurnaround = sCurrentAppString(5)
@@ -2085,7 +2045,7 @@ Public Sub autointake()
                                                 
             CurrentDb.Execute "INSERT INTO TempCourtDates (LastName, FirstName, Company, MrMs, JobTitle, BusinessPhone, Address, City, State, " & _
                        "ZIP, Notes, FactoringApproved) VALUES (" & _
-                       sLastName & ", " & sFirstName & ", " & sLastName & ", " & sCompany & ", " & sMrMs & ", " & "" & ", " & "" & ", " & sAddress1 & " " & sAddress2 & ", " & _
+                       sLastName & ", " & sFirstName & ", " & sLastName & ", " & sCompany & ", " & sMrMs & ", " & vbNullString & ", " & vbNullString & ", " & sAddress1 & " " & sAddress2 & ", " & _
                        sCity & ", " & sState & ", " & sZIP & ", " & sEmail & ", " & sFactoring & ");"
             'move to next appearance
         Next
@@ -2198,7 +2158,7 @@ Public Sub autointake()
             sCurrentTempApp = rstTempJob.Fields("AppID").Value
             sAppNumber = "App" & x
                 
-            If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
+            If Not rstTempJob.EOF Or sCurrentTempApp <> vbNullString Or Not IsNull(sCurrentTempApp) Then
                 Select Case sAppNumber
                 Case "App1", "App2", "App3", "App4", "App5", "App6"
                     CurrentDb.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
@@ -2305,7 +2265,7 @@ Public Sub autointake()
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub NewOLEntry()
@@ -2325,14 +2285,14 @@ End Sub
 Private Sub ResetDisplay()
 
     MinimizeNavigationPane
-    'Me.lblFlash.Visible = False
-    'Me.txtMarquee.Visible = False
-    'Me.TimerInterval = 0
-    '
-    'Me.cmd10.Caption = "Scrolling Marquee Text"
-    'Me.cmd10.ForeColor = RGB(63, 63, 63)
-    'Me.cmd10.FontWeight = 400
-    'Me.cmd10.FontSize = 12
+    Me.lblFlash.Visible = False
+    Me.txtMarquee.Visible = False
+    Me.TimerInterval = 0
+    
+    Me.cmd10.Caption = "Scrolling Marquee Text"
+    Me.cmd10.ForeColor = RGB(63, 63, 63)
+    Me.cmd10.FontWeight = 400
+    Me.cmd10.FontSize = 12
     
 End Sub
 
@@ -2346,28 +2306,28 @@ Private Sub ScrollingMarquee()
     'Sets the timer in motion for case 10 - scrolling text
 
     n = 10
-    '@Ignore AssignmentNotUsed
-    sCourtDatesID = DMax("[ID]", "CourtDates")
-    
-    'If Me.TimerInterval = 0 Then
-    'Me.cmd10.Caption = "STOP Scrolling Marquee Text"
-    'Me.cmd10.ForeColor = RGB(0, 32, 68)
-    'Me.cmd10.FontWeight = 800
-    'Me.cmd10.FontSize = 16
-    'Me.TimerInterval = 100
-    'Me.txtMarquee.Visible = True
-    strText = "      IMPORTANT MESSAGE : You have a new job.  Please enter " & sCourtDatesID & " to process it or send an invoice . . . . "
+        '@Ignore AssignmentNotUsed
+        sCourtDatesID = DMax("[ID]", "CourtDates")
+        
+        If Me.TimerInterval = 0 Then
+        Me.cmd10.Caption = "STOP Scrolling Marquee Text"
+        Me.cmd10.ForeColor = RGB(0, 32, 68)
+        Me.cmd10.FontWeight = 800
+        Me.cmd10.FontSize = 16
+        Me.TimerInterval = 100
+        Me.txtMarquee.Visible = True
+        strText = "      IMPORTANT MESSAGE : You have a new job.  Please enter " & sCourtDatesID & " to process it or send an invoice . . . . "
 
-    'Else
-    'Me.TimerInterval = 0
-    'Me.txtMarquee.Visible = False
-    'Me.cmd10.Caption = "Scrolling Marquee Text"
-    'Me.cmd10.ForeColor = RGB(0, 32, 68)
-    'Me.cmd10.FontWeight = 400
-    'Me.cmd10.FontSize = 12
-    '@Ignore AssignmentNotUsed
-    strText = ""
-    'End If
+    Else
+        Me.TimerInterval = 0
+        Me.txtMarquee.Visible = False
+        Me.cmd10.Caption = "Scrolling Marquee Text"
+        Me.cmd10.ForeColor = RGB(0, 32, 68)
+        Me.cmd10.FontWeight = 400
+        Me.cmd10.FontSize = 12
+        '@Ignore AssignmentNotUsed
+        strText = vbNullString
+    End If
     
 End Sub
 

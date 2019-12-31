@@ -119,9 +119,9 @@ Public Sub fApplyShipDateTrackingNumber()
                 
                 Loop
             
-                vShipDate = ""
-                sCourtDatesID = ""
-                sTrackingNumber = ""
+                vShipDate = vbNullString
+                sCourtDatesID = vbNullString
+                sTrackingNumber = vbNullString
                 
                 rstCourtDates.MoveNext
                 
@@ -143,7 +143,7 @@ Public Sub fApplyShipDateTrackingNumber()
     rstCourtDates.Close                          'Close the recordset
     Set rstCourtDates = Nothing                  'Clean up
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fApplyPayPalPayment()
@@ -206,7 +206,7 @@ Public Sub fApplyPayPalPayment()
             Else
             End If
 
-            sCourtDatesID = ""
+            sCourtDatesID = vbNullString
         
             rstCourtDates.MoveNext
         Loop
@@ -224,7 +224,7 @@ Public Sub fApplyPayPalPayment()
     rstCourtDates.Close                          'Close the recordset
     Set rstCourtDates = Nothing                  'Clean up
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fGenerateInvoiceNumber()
@@ -277,7 +277,7 @@ Public Sub fGenerateInvoiceNumber()
     rstCourtDates.Close
     rstMaxCourtDates.Close
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fIsFactoringApproved()
@@ -333,7 +333,7 @@ Public Sub fIsFactoringApproved()
         
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -390,7 +390,7 @@ Public Sub fDepositPaymentReceived()
 
     End If
 Exitif:
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfAutoCalculateFactorInterest()
@@ -486,7 +486,7 @@ Public Sub pfAutoCalculateFactorInterest()
 
     Else
     End If
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -525,7 +525,7 @@ Public Sub fPaymentAdd(sInvoiceNumber As String, vAmount As String)
 
     Call fManualPPPayment
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fUpdateFactoringDates()
@@ -591,7 +591,7 @@ Public Sub fUpdateFactoringDates()
     
     
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fTranscriptExpensesBeginning()
@@ -801,7 +801,7 @@ Public Sub fTranscriptExpensesBeginning()
     MsgBox "Static Expenses Added!"
     
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fTranscriptExpensesAfter()
@@ -859,7 +859,7 @@ Public Sub fTranscriptExpensesAfter()
 
     MsgBox "Dynamic Expenses Added!"
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fShippingExpenseEntry(sTrackingNumber As String)
@@ -929,5 +929,5 @@ Public Sub fShippingExpenseEntry(sTrackingNumber As String)
     rstExpenses.Close
     
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub

@@ -34,7 +34,7 @@ Private Sub Form_Load()
     '  Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
     'Call DisplayDoc(Me.oleShowDoc, cJob.DocPath.RoughDraft)
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub Form_Current()
@@ -48,7 +48,7 @@ Private Sub Form_Current()
     'Me.oleShowDoc.SourceDoc = cJob.DocPath.RoughDraft
     'Me.oleShowDoc.Requery
   
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Function DisplayDoc(ctlDocControl As Control, sRoughDraftPath As Variant) As String
@@ -59,7 +59,7 @@ Public Function DisplayDoc(ctlDocControl As Control, sRoughDraftPath As Variant)
     Dim intSlashLocation As Long
   
     With ctlDocControl
-        If Trim(sRoughDraftPath & " ") = "" Then
+        If Trim(sRoughDraftPath & " ") = vbNullString Then
             .Visible = False
             strResult = "No document name specified."
         Else
@@ -146,11 +146,11 @@ Public Sub pfOpenWork()
 
 NextStep:
     'open roughdraft doc
-    Shell "C:\WINDOWS\explorer.exe """ & cJob.DocPath.RoughDraft & "", vbNormalFocus
+    Shell "C:\WINDOWS\explorer.exe """ & cJob.DocPath.RoughDraft & vbNullString, vbNormalFocus
 
     'open audio folder
-    Shell "C:\WINDOWS\explorer.exe """ & cJob.DocPath.AudioFolder & "", vbNormalFocus
+    Shell "C:\WINDOWS\explorer.exe """ & cJob.DocPath.AudioFolder & vbNullString, vbNormalFocus
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub

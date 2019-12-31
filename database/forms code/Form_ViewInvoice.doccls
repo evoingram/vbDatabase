@@ -26,5 +26,5 @@ Private Sub btnViewInvoice_Click()
         MsgBox "Job number " & sCourtDatesID & ", Invoice number " & cJob.InvoiceNo & " doesn't have an invoice processed yet."
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub

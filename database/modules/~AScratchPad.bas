@@ -1,8 +1,6 @@
 Attribute VB_Name = "~AScratchPad"
 '@Folder("Database.General.Modules")
 
-'TODO: get permissions and hook into various case mgmt software to get orders
-
 '*****Medium Priority*****
 
 '*****Low Priority*****
@@ -45,6 +43,7 @@ Attribute VB_Name = "~AScratchPad"
 '============================================================================
 
 Option Explicit
+
 
 'Private Declare PtrSafe Function CallNextHookEx Lib "user32" (ByVal hHook As Long, _
 ByVal ncode As Long, ByVal wParam As Long, lParam As Any) As Long
@@ -98,6 +97,29 @@ Private Sub testClassesInfo()
     'On Error GoTo 0
 End Sub
 
+Private Sub toasts()
+
+
+End Sub
+Sub demoUIAutomation()
+    Dim oUIAutomation As New CUIAutomation8
+    Dim oUIADesktop As IUIAutomationElement
+    Dim allChilds As IUIAutomationElementArray
+    
+    Set oUIADesktop = oUIAutomation.GetRootElement
+    
+    Debug.Print oUIADesktop.CurrentName
+    
+    Set allChilds = oUIADesktop.FindAll(TreeScope_Children, oUIAutomation.CreateTrueCondition)
+    
+    For i = 0 To allChilds.Length - 1
+        Debug.Print i & ":=" & allChilds.GetElement(i).CurrentName & vbTab & allChilds.GetElement(i).CurrentClassName
+    Next
+        
+End Sub
+
+
+
 
 Private Sub pfWashingtonTranscriptCompiler()
     '============================================================================
@@ -131,7 +153,6 @@ Private Sub pfWashingtonTranscriptCompiler()
     Dim rstCommHistory As DAO.Recordset
     
     Dim oWordDoc As New Word.Document
-    Dim oWordApp As New Word.Application
     Dim oWordDoc1 As New Word.Document
     
     Dim xlRange As Excel.Range
@@ -353,7 +374,7 @@ Private Sub pfWashingtonTranscriptCompiler()
                 Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
                 MsgBox "Compilation complete.  Make sure your COA transcript looks fine, including bookmarks."
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 
@@ -413,7 +434,7 @@ Private Sub emptyFunction()
         With .Selection.Find
         
             .Text = "#PPB1#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -446,7 +467,7 @@ Private Sub emptyFunction()
     
         With .Selection.Find
             .Text = "#PPB2#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -483,7 +504,8 @@ Private Sub emptyFunction()
     Set oWordApp = Nothing
     Set oWordDoc = Nothing
     Set oWordDoc1 = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
+    
 End Sub
 
 

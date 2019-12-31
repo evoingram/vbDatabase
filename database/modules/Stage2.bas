@@ -128,7 +128,7 @@ EndIf1:
 
     Application.FollowHyperlink cJob.DocPath.CourtCover
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfAutoCorrect()
@@ -189,7 +189,7 @@ Public Sub pfAutoCorrect()
             
             End If
         
-            If IsNull(rstAGShortcuts.Fields(sFieldName).Value) Or rstAGShortcuts.Fields(sFieldName).Value = "" Or rstAGShortcuts.Fields(sFieldName).Value = " " Then
+            If IsNull(rstAGShortcuts.Fields(sFieldName).Value) Or rstAGShortcuts.Fields(sFieldName).Value = vbNullString Or rstAGShortcuts.Fields(sFieldName).Value = " " Then
                 GoTo NextAGShortcut
             
             Else
@@ -206,7 +206,7 @@ NextAGShortcut:
     rstAGShortcuts.Close
     Set flCurrentField = Nothing
     Set rstAGShortcuts = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -236,8 +236,6 @@ Public Sub pfRoughDraftToCoverF()
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
     
-    Dim bMatchCase As Boolean
-    
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -258,9 +256,9 @@ Public Sub pfRoughDraftToCoverF()
 
     With oWordDoc                                'insert rough draft at RoughBKMK bookmark
 
-        If .bookmarks.Exists("RoughBKMK") = True Then
+        If .Bookmarks.Exists("RoughBKMK") = True Then
     
-            .bookmarks("RoughBKMK").Select
+            .Bookmarks("RoughBKMK").Select
             .Application.Selection.InsertFile FileName:=cJob.DocPath.RoughDraft
         
         Else
@@ -292,7 +290,7 @@ Public Sub pfRoughDraftToCoverF()
     qdf.Parameters(0) = sCourtDatesID
     Set drSpeakerName = qdf.OpenRecordset
     
-    'Forms![NewMainMenu].Form!lblFlash.Value = ""
+    'Forms![NewMainMenu].Form!lblFlash.Value = vbNullString
     Forms![NewMainMenu].Form!lblFlash.Caption = "Step 1 of 10:  Processing speakers..."
     If Not (drSpeakerName.EOF And drSpeakerName.BOF) Then
         drSpeakerName.MoveFirst
@@ -388,11 +386,11 @@ Public Sub pfRoughDraftToCoverF()
                 
         
             'clear variables before
-            sMrMs = ""
-            sLastName = ""
-            sSpeakerName = ""
-            sTextToFind = ""
-            sReplacementText = ""
+            sMrMs = vbNullString
+            sLastName = vbNullString
+            sSpeakerName = vbNullString
+            sTextToFind = vbNullString
+            sReplacementText = vbNullString
             
             x = x + 1                            'add 1 to x for next speaker name
             drSpeakerName.MoveNext               'go to next speaker name
@@ -1364,9 +1362,9 @@ Public Sub pfRoughDraftToCoverF()
                 sReplacementText = "?" & Chr(34) & "^p" & sSpeakerName
                 Call pfSingleFindReplace(sTextToFind, sReplacementText)
             
-                sMrMs = ""                       'clear variables before loop
-                sLastName = ""
-                sSpeakerName = ""
+                sMrMs = vbNullString                       'clear variables before loop
+                sLastName = vbNullString
+                sSpeakerName = vbNullString
             
                 x = x + 1                        'add 1 to x for next speaker name
                 drSpeakerName.MoveNext           'go to next speaker name
@@ -1476,7 +1474,7 @@ Public Sub pfRoughDraftToCoverF()
         
         sTextToFind = "^^p"
         sReplacementText = vbCrLf
-        wsyWordStyle = ""
+        wsyWordStyle = vbNullString
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, bFormat:=True, bMatchCase:=True)
         
         sTextToFind = "Q.  "
@@ -1586,7 +1584,7 @@ Public Sub pfRoughDraftToCoverF()
         
         sTextToFind = "TC " & Chr(34) & "TC" & Chr(34) & " "
         sReplacementText = "TC "
-        wsyWordStyle = ""
+        wsyWordStyle = vbNullString
         Call pfSingleTCReplaceAll(sTextToFind, sReplacementText, bFormat:=True, bMatchCase:=True)
         
         
@@ -1602,7 +1600,7 @@ Public Sub pfRoughDraftToCoverF()
         'Call fDynamicHeaders
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfStaticSpeakersFindReplace()
@@ -1921,7 +1919,7 @@ Public Sub pfStaticSpeakersFindReplace()
     Set oWordApp = Nothing
 
     DoCmd.Close acQuery, qnViewJobFormAppearancesQ
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfReplaceColonUndercasewithColonUppercase()
@@ -2176,7 +2174,7 @@ Public Sub pfReplaceColonUndercasewithColonUppercase()
     Set oWordApp = Nothing
 
     DoCmd.Close acQuery, qnViewJobFormAppearancesQ
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfTypeRoughDraftF()
@@ -2274,7 +2272,7 @@ Public Sub pfTypeRoughDraftF()
     DoCmd.OpenForm FormName:="PJType"            'open window with AGShortcuts, SpeakerList, and jurisdiction notes
 
     Shell "winword " + cJob.DocPath.RoughDraft 'open file
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub wwReplaceWeberOR()
@@ -2325,7 +2323,7 @@ Public Sub pfReplaceAQC()
     Call pfFindRepCitationLinks
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
     'Debug.Print "---------------"
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfReplaceMass()
@@ -2375,9 +2373,9 @@ Public Sub pfRoughDraftCFMass()
     Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
     With oWordDoc                                'insert rough draft at RoughBKMK bookmark
 
-        If .bookmarks.Exists("RoughBKMK") = True Then
+        If .Bookmarks.Exists("RoughBKMK") = True Then
     
-            .bookmarks("RoughBKMK").Select
+            .Bookmarks("RoughBKMK").Select
             .Application.Selection.InsertFile FileName:=cJob.DocPath.RoughDraft
         
         Else
@@ -2504,11 +2502,11 @@ Public Sub pfRoughDraftCFMass()
                 
         
             'clear variables before
-            sMrMs = ""
-            sLastName = ""
-            sSpeakerName = ""
-            sTextToFind = ""
-            sReplacementText = ""
+            sMrMs = vbNullString
+            sLastName = vbNullString
+            sSpeakerName = vbNullString
+            sTextToFind = vbNullString
+            sReplacementText = vbNullString
             
             x = x + 1                            'add 1 to x for next speaker name
             drSpeakerName.MoveNext               'go to next speaker name
@@ -3589,9 +3587,9 @@ Public Sub pfRoughDraftCFMass()
                 sReplacementText = "?" & Chr(34) & "^p" & sSpeakerName
                 Call pfSingleFindReplace(sTextToFind, sReplacementText)
             
-                sMrMs = ""                       'clear variables before loop
-                sLastName = ""
-                sSpeakerName = ""
+                sMrMs = vbNullString                       'clear variables before loop
+                sLastName = vbNullString
+                sSpeakerName = vbNullString
             
                 x = x + 1                        'add 1 to x for next speaker name
                 drSpeakerName.MoveNext           'go to next speaker name
@@ -3618,6 +3616,6 @@ Public Sub pfRoughDraftCFMass()
     End If
 
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 

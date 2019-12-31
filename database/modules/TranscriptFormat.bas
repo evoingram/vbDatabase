@@ -27,7 +27,7 @@ Option Compare Database
 '                           Arguments:    NONE
 'pfSingleFindReplace:           Description:  find and replace all of one item
 '                           Arguments:    sTextToFind, sReplacementText
-'                                         Optional wsyWordStyle = "", bForward = True, bWrap = "wdFindContinue"
+'                                         Optional wsyWordStyle = vbNullString, bForward = True, bWrap = "wdFindContinue"
 '                                         Optional bFormat = False, bMatchCase = True, bMatchWholeWord = False
 '                                         Optional bMatchWildcards = False, bMatchSoundsLike = False, bMatchAllWordForms = False
 'pfReplaceFDA:                  Description:  doctor speaker name find/replaces for FDA transcripts
@@ -51,14 +51,6 @@ Option Compare Database
         
 '============================================================================
 
-Private sFileName As String
-Private oWordApp As New Word.Application
-Private oWordDoc As New Word.Document
-Private qdf As QueryDef
-Private sQueryName As String
-Private db As Database
-Public sBookmarkName As String
-
 Public Sub test1()
     '============================================================================
     ' Name        : pfTCEntryReplacement
@@ -68,14 +60,10 @@ Public Sub test1()
     ' Description : parent function that finds certain entries within a transcript and assigns TC entries to them for indexing purposes
     '============================================================================
     
-    Dim vSpeakerName As String
-    
     Dim oWordApp As New Word.Application
     Dim oCourtCoverWD As New Word.Document
     
-    Dim rstTRCourtQ As DAO.Recordset
     Dim rstViewJFAppQ As DAO.Recordset
-    Dim qdf As QueryDef
 
     
     Dim cJob As Job
@@ -83,16 +71,18 @@ Public Sub test1()
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
     '@Ignore AssignmentNotUsed
-    Set oWordApp = CreateObject("Word.Application")
-
+    
     On Error Resume Next
+    Set oWordApp = GetObject(cJob.DocPath.CourtCover)
+
     Set oWordApp = GetObject(, "Word.Application")
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
-    oWordApp.Visible = False
-    
+    On Error GoTo 0
     Set oCourtCoverWD = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
+    oWordApp.Application.Visible = False
+    
     Call pfFieldTCReplaceAll("(ee1)", "^p" & "DIRECT EXAMINATION" & "^p", Chr(34) & "Direct Examination by " & Chr(34) & " \l 3")
     Call pfFieldTCReplaceAll("(ee2)", "^p" & "CROSS-EXAMINATION" & "^p", Chr(34) & "Cross-Examination by " & Chr(34) & " \l 3")
     Call pfFieldTCReplaceAll("(ee3)", "^p" & "REDIRECT EXAMINATION" & "^p", Chr(34) & "Redirect Examination by " & Chr(34) & " \l 3")
@@ -117,7 +107,7 @@ Public Sub test1()
     Set oCourtCoverWD = Nothing
     Set oWordApp = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfReplaceBMKWwithBookmark()
@@ -130,6 +120,11 @@ Public Sub pfReplaceBMKWwithBookmark()
     '============================================================================
 
     Dim sBookmarkName As String
+    
+    Dim cJob As Job
+    Set cJob = New Job
+    sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
+    cJob.FindFirst "ID=" & sCourtDatesID
 
     ActiveDocument.Application.Selection.Find.ClearFormatting
     ActiveDocument.Application.Selection.Find.Replacement.ClearFormatting
@@ -137,25 +132,25 @@ Public Sub pfReplaceBMKWwithBookmark()
     With ActiveDocument.Application.Selection.Find
         sBookmarkName = "RoughBKMK"
         .Text = "#RBMK#"
-        ActiveDocument.bookmarks.Add Name:=sBookmarkName
+        ActiveDocument.Bookmarks.Add Name:=sBookmarkName
         sBookmarkName = "CertBMK"
         .Text = "#CBMK#"
-        ActiveDocument.bookmarks.Add Name:=sBookmarkName
+        ActiveDocument.Bookmarks.Add Name:=sBookmarkName
         sBookmarkName = "ToABMK"
         .Text = "#TBMK#"
-        ActiveDocument.bookmarks.Add Name:=sBookmarkName
+        ActiveDocument.Bookmarks.Add Name:=sBookmarkName
         sBookmarkName = "TopLine"
         .Text = "#TOPL#"
-        ActiveDocument.bookmarks.Add Name:=sBookmarkName
+        ActiveDocument.Bookmarks.Add Name:=sBookmarkName
         sBookmarkName = "EndTime"
         .Text = "#ENDT#"
-        ActiveDocument.bookmarks.Add Name:=sBookmarkName
+        ActiveDocument.Bookmarks.Add Name:=sBookmarkName
     End With
     With ActiveDocument                          'insert topline at TopLine bookmark
 
-        If .bookmarks.Exists("TopLine") = True Then
+        If .Bookmarks.Exists("TopLine") = True Then
     
-            .bookmarks("TopLine").Select
+            .Bookmarks("TopLine").Select
             .Application.Selection.TypeText Text:=UCase(cJob.Location) & ", " & _
                                                                           FormatDateTime(Format(cJob.HearingDate, "mm-dd-yyyy"), vbLongDate) & ", " & UCase(Format(cJob.HearingStartTime, "h:mm AM/PM"))
         Else
@@ -163,7 +158,7 @@ Public Sub pfReplaceBMKWwithBookmark()
         End If
         .MailMerge.MainDocumentType = wdNotAMergeDocument
 
-        If .bookmarks.Exists("EndTime") = True Then
+        If .Bookmarks.Exists("EndTime") = True Then
     
             If Right(Format(cJob.HearingEndTime, "h:mm AM/PM"), 2) = "AM" Then
                 Format(cJob.HearingEndTime, "h:mm AM/PM") = Replace(Format(cJob.HearingEndTime, "h:mm AM/PM"), "AM", "a.m.")
@@ -173,7 +168,7 @@ Public Sub pfReplaceBMKWwithBookmark()
         
             End If
     
-            .bookmarks("EndTime").Select
+            .Bookmarks("EndTime").Select
             .Application.Selection.TypeText Text:=UCase(Format(cJob.HearingEndTime, "h:mm AM/PM"))
         Else
             MsgBox "Bookmark ""EndTime"" does not exist!"
@@ -192,10 +187,13 @@ Public Sub pfCreateBookmarks()
     ' Call command: Call pfCreateBookmarks
     ' Description : replaces #TOC_# notations in transcript with bookmarks and then places index at bookmarks
     '============================================================================
-
+    'TODO: rewrite this function
     Dim sBookmarkName As String
     Dim vBookmarkName As String
-            Dim sTopLine As String
+    Dim sTopLine As String
+    
+    Dim oWordDoc As Word.Document
+    Dim oWordApp As Word.Application
     
     
     Dim cJob As Job
@@ -206,11 +204,13 @@ Public Sub pfCreateBookmarks()
     'oWordDoc.Activate
     On Error Resume Next
     Set oWordApp = GetObject(, "Word.Application")
+    
     If Err <> 0 Then
         Set oWordApp = CreateObject("Word.Application")
     End If
 
     Set oWordDoc = oWordApp.Documents.Open(cJob.DocPath.CourtCover)
+    
     On Error GoTo 0
 
 
@@ -219,7 +219,7 @@ Public Sub pfCreateBookmarks()
 
     With oWordDoc.Application.Selection.Find
         .Text = "#TOPOFT#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -243,7 +243,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
     sBookmarkName = "TopOfT"
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
 
     oWordDoc.Application.Selection.Find.ClearFormatting
@@ -251,7 +251,7 @@ Public Sub pfCreateBookmarks()
 
     With oWordDoc.Application.Selection.Find
         .Text = "#RBMK#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -275,8 +275,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
     sBookmarkName = "RoughBKMK"
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
-
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
 
     oWordDoc.Application.Selection.Find.ClearFormatting
@@ -284,7 +283,7 @@ Public Sub pfCreateBookmarks()
 
     With oWordDoc.Application.Selection.Find
         .Text = "#TOPL#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -308,14 +307,14 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
     sBookmarkName = "TopLine"
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
     oWordDoc.Application.Selection.Find.ClearFormatting
     oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
 
     With oWordDoc.Application.Selection.Find
         .Text = "#ENDT#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -339,7 +338,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
     sBookmarkName = "EndTime"
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
     oWordApp.Application.Selection.Find.ClearFormatting
     oWordApp.Application.Selection.Find.Replacement.ClearFormatting
@@ -347,7 +346,7 @@ Public Sub pfCreateBookmarks()
 
     With oWordDoc.Application.Selection.Find
         .Text = "#CBMK#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -371,7 +370,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
     sBookmarkName = "CertBMK"
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
 
     oWordApp.Application.Selection.Find.ClearFormatting
@@ -379,7 +378,7 @@ Public Sub pfCreateBookmarks()
 
     With oWordDoc.Application.Selection.Find
         .Text = "#TBMK#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -403,14 +402,14 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
     sBookmarkName = "ToABMK"
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
     oWordApp.Application.Selection.Find.ClearFormatting
     oWordApp.Application.Selection.Find.Replacement.ClearFormatting
 
     With oWordDoc.Application.Selection.Find
         .Text = "#TOCA#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -434,7 +433,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
     sBookmarkName = "IndexA"
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
     sBookmarkName = "IndexB"
 
@@ -442,7 +441,7 @@ Public Sub pfCreateBookmarks()
     oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
     With oWordDoc.Application.Selection.Find
         .Text = "#TOCB#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -466,7 +465,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
 
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
     sBookmarkName = "IndexC"
 
@@ -474,7 +473,7 @@ Public Sub pfCreateBookmarks()
     oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
     With oWordDoc.Application.Selection.Find
         .Text = "#TOCC#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -498,7 +497,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
 
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
     sBookmarkName = "IndexD"
 
@@ -506,7 +505,7 @@ Public Sub pfCreateBookmarks()
     oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
     With oWordDoc.Application.Selection.Find
         .Text = "#TOCD#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -530,7 +529,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
 
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
     sBookmarkName = "IndexE"
 
@@ -538,7 +537,7 @@ Public Sub pfCreateBookmarks()
     oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
     With oWordDoc.Application.Selection.Find
         .Text = "#TOCE#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -562,7 +561,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
 
-    oWordDoc.bookmarks.Add Name:=sBookmarkName
+    oWordDoc.Bookmarks.Add Name:=sBookmarkName
 
 
     vBookmarkName = "TOAC"
@@ -573,7 +572,7 @@ Public Sub pfCreateBookmarks()
     With oWordDoc.Application.Selection.Find
 
         .Text = "#TOAC#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -597,7 +596,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
 
-    oWordDoc.bookmarks.Add Name:=vBookmarkName
+    oWordDoc.Bookmarks.Add Name:=vBookmarkName
 
 
 
@@ -608,7 +607,7 @@ Public Sub pfCreateBookmarks()
     With oWordDoc.Application.Selection.Find
 
         .Text = "#TOAR#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -632,7 +631,7 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
 
-    oWordDoc.bookmarks.Add Name:=vBookmarkName
+    oWordDoc.Bookmarks.Add Name:=vBookmarkName
 
     vBookmarkName = "TOAO"
     oWordDoc.Application.Selection.Find.ClearFormatting
@@ -640,7 +639,7 @@ Public Sub pfCreateBookmarks()
 
     With oWordDoc.Application.Selection.Find
         .Text = "#TOAO#"
-        .Replacement.Text = ""
+        .Replacement.Text = vbNullString
         .Forward = True
         .Wrap = wdFindContinue
         .Format = False
@@ -664,11 +663,11 @@ Public Sub pfCreateBookmarks()
         .Execute
     End With
 
-    oWordDoc.bookmarks.Add Name:=vBookmarkName
+    oWordDoc.Bookmarks.Add Name:=vBookmarkName
 
     With oWordDoc                                'insert topline at TopLine bookmark
 
-        If .bookmarks.Exists("TopLine") = True Then
+        If .Bookmarks.Exists("TopLine") = True Then
     
             If Right(Format(cJob.HearingStartTime, "h:mm AM/PM"), 6) = ":00 AM" Then
                 Format(cJob.HearingStartTime, "h:mm AM/PM") = Replace(Format(cJob.HearingStartTime, "h:mm AM/PM"), ":00 AM", " a.m.")
@@ -680,16 +679,16 @@ Public Sub pfCreateBookmarks()
             
             sTopLine = UCase(cJob.Location) & ", " & UCase(FormatDateTime(Format(cJob.HearingDate, "mm-dd-yyyy"), vbLongDate)) & ", " & UCase(Format(cJob.HearingStartTime, "h:mm AM/PM"))
 
-            .bookmarks("TopLine").Select
-            .Application.Selection.Font.Underline = wdUnderlineSingle
-            .Application.Selection.TypeText Text:=sTopLine
-            .Application.Selection.Font.Underline = wdUnderlineNone
+            .Bookmarks("TopLine").Select
+            oWordDoc.Application.Selection.Font.Underline = wdUnderlineSingle
+            oWordDoc.Application.Selection.TypeText Text:=sTopLine
+            oWordDoc.Application.Selection.Font.Underline = wdUnderlineNone
         Else
             MsgBox "Bookmark ""TopLine"" does not exist!"
         End If
         .MailMerge.MainDocumentType = wdNotAMergeDocument
 
-        If .bookmarks.Exists("EndTime") = True Then
+        If .Bookmarks.Exists("EndTime") = True Then
     
             If Right(Format(cJob.HearingEndTime, "h:mm AM/PM"), 6) = ":00 AM" Then
                 Format(cJob.HearingEndTime, "h:mm AM/PM") = Replace(Format(cJob.HearingEndTime, "h:mm AM/PM"), ":00 AM", " a.m.")
@@ -699,7 +698,7 @@ Public Sub pfCreateBookmarks()
         
             End If
     
-            .bookmarks("EndTime").Select
+            .Bookmarks("EndTime").Select
             .Application.Selection.TypeText Text:=Format(cJob.HearingEndTime, "h:mm AM/PM")
         Else
             MsgBox "Bookmark ""EndTime"" does not exist!"
@@ -710,11 +709,11 @@ Public Sub pfCreateBookmarks()
 
     oWordDoc.Save
     oWordDoc.Close (wdSaveChanges)
+    oWordApp.Quit
 
 
 
-
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacementText As String)
@@ -728,15 +727,18 @@ Public Sub pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacemen
     Dim oWordApp As New Word.Application
     Dim oWordDoc As New Word.Document
     
-    'Set oWordApp = GetObject(, "Word.Application")
+    On Error Resume Next
+    Set oWordApp = GetObject(, "Word.Application")
 
-    'If Err <> 0 Then
-    '    Set oWordApp = CreateObject("Word.Application")
-    'End If
+    If Err <> 0 Then
+        Set oWordApp = CreateObject("Word.Application")
+    End If
 
     'oWordApp.Activate
-    'Set oWordDoc = oWordApp.Documents.Add(sCourtDatesID & "-CourtCover.docx")
-    Set oWordDoc = GetObject(sCourtDatesID & "-CourtCover.docx", "Word.Document")
+    Set oWordDoc = oWordApp.Documents.Open(sCourtDatesID & "-CourtCover.docx")
+    On Error GoTo 0
+    
+    Set oWordDoc = GetObject(sCourtDatesID & "-CourtCover.docx")
 
     oWordDoc.Application.Selection.Find.ClearFormatting
     oWordDoc.Application.Selection.Find.Replacement.ClearFormatting
@@ -757,10 +759,10 @@ Public Sub pfApplyStyle(sStyleName As String, sTextToFind As String, sReplacemen
 
     oWordDoc.Application.Selection.Find.Execute Replace:=wdReplaceAll
 
+    oWordDoc.Save
+    'oWordDoc.SaveAs2 FileName:=sCourtDatesID & "-CourtCover.docx"
 
-    oWordDoc.SaveAs2 FileName:=sFileName
-
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfCreateIndexesTOAs()
@@ -795,7 +797,7 @@ Public Sub pfCreateIndexesTOAs()
 
     With oWordDoc
         .Application.Selection.Goto What:=wdGoToBookmark, Name:="IndexA"
-        With oWordDoc.bookmarks
+        With oWordDoc.Bookmarks
             .DefaultSorting = wdSortByName
             .ShowHidden = False
         End With
@@ -805,7 +807,7 @@ Public Sub pfCreateIndexesTOAs()
         'wdAutoPosition, IndexLanguage:=wdEnglishUS
         '.indexes(1).TabLeader = wdTabLeaderDots
         .Application.Selection.Goto What:=wdGoToBookmark, Name:="IndexB"
-        With oWordDoc.bookmarks
+        With oWordDoc.Bookmarks
             .DefaultSorting = wdSortByName
             .ShowHidden = False
         End With
@@ -817,7 +819,7 @@ Public Sub pfCreateIndexesTOAs()
             '.indexes(1).TabLeader = wdTabLeaderDots
         End With
         .Application.Selection.Goto What:=wdGoToBookmark, Name:="IndexC"
-        With oWordDoc.bookmarks
+        With oWordDoc.Bookmarks
             .DefaultSorting = wdSortByName
             .ShowHidden = False
         End With
@@ -829,7 +831,7 @@ Public Sub pfCreateIndexesTOAs()
             '.indexes(1).TabLeader = wdTabLeaderDots
         End With
         .Application.Selection.Goto What:=wdGoToBookmark, Name:="IndexD"
-        With oWordDoc.bookmarks
+        With oWordDoc.Bookmarks
             .DefaultSorting = wdSortByName
             .ShowHidden = False
         End With
@@ -841,7 +843,7 @@ Public Sub pfCreateIndexesTOAs()
             '.indexes(1).TabLeader = wdTabLeaderDots
         End With
         .Application.Selection.Goto What:=wdGoToBookmark, Name:="IndexE"
-        With oWordDoc.bookmarks
+        With oWordDoc.Bookmarks
             .DefaultSorting = wdSortByName
             .ShowHidden = False
         End With
@@ -856,7 +858,7 @@ Public Sub pfCreateIndexesTOAs()
                 
             
             oWordDoc.Application.Selection.Goto What:=wdGoToBookmark, Name:="TOAC"
-            With oWordDoc.bookmarks
+            With oWordDoc.Bookmarks
                 .DefaultSorting = wdSortByName
                 .ShowHidden = False
             End With
@@ -868,7 +870,7 @@ Public Sub pfCreateIndexesTOAs()
             
              
             oWordDoc.Application.Selection.Goto What:=wdGoToBookmark, Name:="TOAR"
-            With oWordDoc.bookmarks
+            With oWordDoc.Bookmarks
                 .DefaultSorting = wdSortByName
                 .ShowHidden = False
             End With
@@ -879,7 +881,7 @@ Public Sub pfCreateIndexesTOAs()
              
              
             oWordDoc.Application.Selection.Goto What:=wdGoToBookmark, Name:="TOAO"
-            With oWordDoc.bookmarks
+            With oWordDoc.Bookmarks
                 .DefaultSorting = wdSortByName
                 .ShowHidden = False
             End With
@@ -927,7 +929,7 @@ Public Sub pfCreateIndexesTOAs()
     
         With oWordDoc.Application.Selection.Find
             .Text = "For the :" & "^p"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -942,7 +944,7 @@ Public Sub pfCreateIndexesTOAs()
     
         With oWordDoc.Application.Selection.Find
             .Text = "By:   , ESQ." & "^p"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -959,7 +961,7 @@ Public Sub pfCreateIndexesTOAs()
         oWordApp.Quit
         
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     End With
 End Sub
 
@@ -1039,11 +1041,11 @@ Public Sub pfReplaceFDA()
                 oWordDoc.Application.Selection.Find.Execute Replace:=wdReplaceAll
 
                 'cleaning up
-                FindFDA1 = ""
-                FindFDA2 = ""
-                FindFDA3 = ""
-                FindFDA4 = ""
-                ReplaceWithName = ""
+                FindFDA1 = vbNullString
+                FindFDA2 = vbNullString
+                FindFDA3 = vbNullString
+                FindFDA4 = vbNullString
+                ReplaceWithName = vbNullString
             
                 rs.MoveNext
             Loop
@@ -1063,7 +1065,7 @@ Public Sub pfReplaceFDA()
     Set rs1 = Nothing
     Set oWordApp = Nothing
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfDynamicSpeakersFindReplace()
@@ -1263,9 +1265,9 @@ Public Sub pfDynamicSpeakersFindReplace()
                     .MatchAllWordForms = False
                 End With
                 'clear variables before loop
-                sMrMs = ""
-                sLastName = ""
-                vSpeakerName = ""
+                sMrMs = vbNullString
+                sLastName = vbNullString
+                vSpeakerName = vbNullString
             
                 x = x + 1                        'add 1 to x for next speaker name
                 rs.MoveNext                      'go to next speaker name
@@ -1291,10 +1293,10 @@ Public Sub pfDynamicSpeakersFindReplace()
 
     End With
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
-Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
+Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = vbNullString, Optional bForward As Boolean = True, _
                                Optional bWrap As String = "wdFindContinue", Optional bFormat As Boolean = False, Optional bMatchCase As Boolean = True, _
                                Optional bMatchWholeWord As Boolean = False, Optional bMatchWildcards As Boolean = False, _
                                Optional bMatchSoundsLike As Boolean = False, Optional bMatchAllWordForms As Boolean = False)
@@ -1307,7 +1309,6 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
     '============================================================================
     
     Dim oWordDoc As Word.Document
-    Dim oWordApp As Word.Application
     
     Dim cJob As Job
     Set cJob = New Job
@@ -1323,7 +1324,7 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
     With oWordDoc.Application.Selection.Find
         .Text = sTextToFind
         .Replacement.Text = sReplacementText
-        If wsyWordStyle <> "" Then
+        If wsyWordStyle <> vbNullString Then
             .Replacement.Style = oWordDoc.Styles(wsyWordStyle)
         Else
         End If
@@ -1354,7 +1355,7 @@ Public Sub pfSingleFindReplace(ByVal sTextToFind As String, ByVal sReplacementTe
     oWordDoc.Save
 End Sub
 
-Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = "", Optional bForward As Boolean = True, _
+Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementText As String, Optional ByVal wsyWordStyle As String = vbNullString, Optional bForward As Boolean = True, _
                                 Optional bWrap As String = "wdFindContinue", Optional bFormat As Boolean = False, Optional bMatchCase As Boolean = True, _
                                 Optional bMatchWholeWord As Boolean = False, Optional bMatchWildcards As Boolean = False, _
                                 Optional bMatchSoundsLike As Boolean = False, Optional bMatchAllWordForms As Boolean = False)
@@ -1375,7 +1376,7 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
     On Error Resume Next
     
     Set oWordDoc = GetObject(cJob.DocPath.CourtCover)
-    oWordDoc.Visible = False
+    oWordDoc.Application.Visible = False
     oWordDoc.Application.Selection.HomeKey Unit:=wdStory
 
     With oWordDoc.Application
@@ -1385,28 +1386,52 @@ Public Sub pfSingleTCReplaceAll(ByVal sTextToFind As String, ByVal sReplacementT
         With .Selection.Find
             .Text = sTextToFind
             .Replacement.Text = sReplacementText
-            If wsyWordStyle <> "" Then
+            If wsyWordStyle <> vbNullString Then
                 .Replacement.Style = oWordDoc.Styles(wsyWordStyle)
             Else
             End If
-            .Forward = True
-            .Format = bFormat
-            .MatchCase = False
+            If bForward <> Empty Then
+                .Forward = bForward
+            Else
+                .Forward = True
+            End If
+            If bFormat <> Empty Then
+                .Format = bFormat
+            Else
+                .Format = False
+            End If
             If bMatchCase <> Empty Then
                 .MatchCase = bMatchCase
             Else
+                .MatchCase = False
             End If
-            .MatchWholeWord = False
-            .MatchWildcards = False
-            .MatchSoundsLike = False
-            .MatchAllWordForms = False
+            If bMatchWholeWord <> Empty Then
+                .MatchWholeWord = bMatchWholeWord
+            Else
+                .MatchWholeWord = False
+            End If
+            If bMatchWildcards <> Empty Then
+                .MatchWildcards = bMatchWildcards
+            Else
+                .MatchWildcards = False
+            End If
+            If bMatchSoundsLike <> Empty Then
+                .MatchSoundsLike = bMatchSoundsLike
+            Else
+                .MatchSoundsLike = False
+            End If
+            If bMatchAllWordForms <> Empty Then
+                .MatchAllWordForms = bMatchAllWordForms
+            Else
+                .MatchAllWordForms = False
+            End If
         End With
     
         .Selection.Find.Execute Replace:=wdReplaceAll
     
     End With
     oWordDoc.Save
-
+    On Error GoTo 0
 End Sub
 
 Public Sub pfFieldTCReplaceAll(sTexttoSearch As String, sReplacementText As String, sFieldText As String)
@@ -1503,7 +1528,6 @@ Public Sub pfWordIndexer()
     Dim sExclusions As String
     Dim sCurrentEntry1 As String
     Dim sCurrentEntry2 As String
-    Dim sCurrentEntry3 As String
     Dim sCurrentEntry4 As String
     Dim sCurrentEntry5 As String
     Dim vBookmarkName As String
@@ -1572,14 +1596,14 @@ Public Sub pfWordIndexer()
         sInput = " " & LCase(Trim(sInput)) & " "
     
         For w = 0 To UBound(Split(sExclusions, ",")) 'loop through sExclusions
-            While InStr(sInput, " " & Split(sExclusions, ",")(w) & " ") > 0
+            Do While InStr(sInput, " " & Split(sExclusions, ",")(w) & " ") > 0
                 sInput = Replace(sInput, " " & Split(sExclusions, ",")(w) & " ", " ")
-            Wend
+            Loop
         Next
     
-        While InStr(sInput, "  ") > 0
+        Do While InStr(sInput, "  ") > 0
             sInput = Replace(sInput, "  ", " ")
-        Wend
+        Loop
     
         sInput = " " & Trim(sInput) & " "
         x = UBound(Split(sInput, " "))
@@ -1587,9 +1611,9 @@ Public Sub pfWordIndexer()
     
         For w = 1 To x
             sCurrentEntryOriginal = Split(sInput, " ")(1) 'get word count
-            While InStr(sInput, " " & sCurrentEntryOriginal & " ") > 0
+            Do While InStr(sInput, " " & sCurrentEntryOriginal & " ") > 0
                 sInput = Replace(sInput, " " & sCurrentEntryOriginal & " ", " ")
-            Wend
+            Loop
             y = z - UBound(Split(sInput, " "))   'calculate replaced count
             sCurrentIndexEntry = sCurrentIndexEntry & sCurrentEntryOriginal & vbTab & y & vbCr 'update current index entry
             z = UBound(Split(sInput, " "))
@@ -1598,18 +1622,18 @@ Public Sub pfWordIndexer()
         Next
     
         sInput = sCurrentIndexEntry
-        sCurrentIndexEntry = ""
+        sCurrentIndexEntry = vbNullString
         sCurrentEntry5 = UBound(Split(sInput, vbCr)) - 1
     
         For w = 0 To sCurrentEntry5
-            sCurrentEntryOriginal = ""
+            sCurrentEntryOriginal = vbNullString
             With .Range
                 With .Find
                     .ClearFormatting
                     sCurrentEntry4 = Split(Split(sInput, vbCr)(w), vbTab)(0)
                     sCurrentEntry1 = " " & Split(Split(sInput, vbCr)(w), vbTab)(1)
                     .Text = sCurrentEntry4
-                    .Replacement.Text = ""
+                    .Replacement.Text = vbNullString
                     .Wrap = wdFindStop
                     .Forward = True
                     .Format = False
@@ -1621,7 +1645,7 @@ Public Sub pfWordIndexer()
                     .Execute
                 End With
                 Do While .Find.Found
-                    If sCurrentEntryOriginal = "" Then sCurrentEntryOriginal = sCurrentEntryOriginal & " " & .Information(wdActiveEndPageNumber)
+                    If sCurrentEntryOriginal = vbNullString Then sCurrentEntryOriginal = sCurrentEntryOriginal & " " & .Information(wdActiveEndPageNumber)
                     sCurrentEntry1 = Right(sCurrentEntryOriginal, 2)
                     sCurrentEntry2 = " " & .Information(wdActiveEndPageNumber)
                     If sCurrentEntry1 = sCurrentEntry2 Then sCurrentEntryOriginal = sCurrentEntryOriginal
@@ -1629,13 +1653,13 @@ Public Sub pfWordIndexer()
                     .Collapse (wdCollapseEnd)
                     .Find.Execute
                 
-                    If sCurrentEntry1 = "" Then GoTo ExitLoop1
+                    If sCurrentEntry1 = vbNullString Then GoTo ExitLoop1
                 Loop
 ExitLoop1:
             End With
             sCurrentEntryOriginal = Replace(Trim(sCurrentEntryOriginal), " ", ",")
             sCurrentIndexEntry = sCurrentIndexEntry & Split(sInput, vbCr)(w) & vbTab & sCurrentEntryOriginal & vbCr
-            If sCurrentEntryOriginal = "" Then GoTo ExitLoop2
+            If sCurrentEntryOriginal = vbNullString Then GoTo ExitLoop2
         Next
     End With
     oWordApp1.Quit
@@ -1673,7 +1697,7 @@ ExitLoop2:
         .Application.Selection.Find.Replacement.ClearFormatting
         With .Application.Selection.Find
             .Text = "#WI#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -1697,7 +1721,7 @@ ExitLoop2:
             .Execute
         End With
     
-        .bookmarks.Add Name:=vBookmarkName
+        .Bookmarks.Add Name:=vBookmarkName
         .Application.Selection.EndKey Unit:=wdStory, Extend:=wdExtend
     
         With .Application.Selection.PageSetup.TextColumns
@@ -1739,7 +1763,7 @@ ExitLoop2:
 
     oWordApp.Quit
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub FPJurors()
@@ -1751,7 +1775,6 @@ Public Sub FPJurors()
     ' Description : does find/replacements of prospective jurors in transcript
     '============================================================================
 
-    Dim sSpeakerName As String
     Dim ssSpeakerFind As String
     Dim sdSpeakerFind As String
     Dim sqSpeakerFind As String
@@ -1916,7 +1939,7 @@ Public Sub FPJurors()
     On Error GoTo 0
     oWordApp.Quit
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfTCEntryReplacement()
@@ -1930,7 +1953,6 @@ Public Sub pfTCEntryReplacement()
     
     Dim sMrMs2 As String
     Dim sLastName2 As String
-    Dim vSpeakerName As String
     
     Dim rstTRCourtQ As DAO.Recordset
     Dim rstViewJFAppQ As DAO.Recordset
@@ -2146,6 +2168,7 @@ ParenDone:
     Set rstViewJFAppQ = Nothing
     Set oCourtCoverWD = Nothing
     Set oWordApp = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
+
 

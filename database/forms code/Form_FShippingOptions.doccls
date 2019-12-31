@@ -125,5 +125,5 @@ Private Sub Command78_Click()
 
     
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub

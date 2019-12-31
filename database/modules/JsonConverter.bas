@@ -158,7 +158,7 @@ Public Function ParseJson(ByVal JsonString As String) As Object
     json_Index = 1
 
     ' Remove vbCr, vbLf, and vbTab from json_String
-    JsonString = VBA.Replace(VBA.Replace(VBA.Replace(JsonString, VBA.vbCr, ""), VBA.vbLf, ""), VBA.vbTab, "")
+    JsonString = VBA.Replace(VBA.Replace(VBA.Replace(JsonString, VBA.vbCr, vbNullString), VBA.vbLf, vbNullString), VBA.vbTab, vbNullString)
 
     json_SkipSpaces JsonString, json_Index
     Select Case VBA.Mid$(JsonString, json_Index, 1)
@@ -277,8 +277,8 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
                         json_Converted = ConvertToJson(JsonValue(json_Index, json_Index2D), Whitespace, json_CurrentIndentation + 2)
 
                         ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
-                        If json_Converted = "" Then
-                            ' (nest to only check if converted = "")
+                        If json_Converted = vbNullString Then
+                            ' (nest to only check if converted = vbNullString)
                             If json_IsUndefined(JsonValue(json_Index, json_Index2D)) Then
                                 json_Converted = "null"
                             End If
@@ -302,8 +302,8 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
                     json_Converted = ConvertToJson(JsonValue(json_Index), Whitespace, json_CurrentIndentation + 1)
 
                     ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
-                    If json_Converted = "" Then
-                        ' (nest to only check if converted = "")
+                    If json_Converted = vbNullString Then
+                        ' (nest to only check if converted = vbNullString)
                         If json_IsUndefined(JsonValue(json_Index)) Then
                             json_Converted = "null"
                         End If
@@ -351,7 +351,7 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
             For Each json_Key In JsonValue.Keys
                 ' For Objects, undefined (Empty/Nothing) is not added to object
                 json_Converted = ConvertToJson(JsonValue(json_Key), Whitespace, json_CurrentIndentation + 1)
-                If json_Converted = "" Then
+                If json_Converted = vbNullString Then
                     json_SkipItem = json_IsUndefined(JsonValue(json_Key))
                 Else
                     json_SkipItem = False
@@ -399,8 +399,8 @@ Public Function ConvertToJson(ByVal JsonValue As Variant, Optional ByVal Whitesp
                 json_Converted = ConvertToJson(json_Value, Whitespace, json_CurrentIndentation + 1)
 
                 ' For Arrays/Collections, undefined (Empty/Nothing) is treated as null
-                If json_Converted = "" Then
-                    ' (nest to only check if converted = "")
+                If json_Converted = vbNullString Then
+                    ' (nest to only check if converted = vbNullString)
                     If json_IsUndefined(json_Value) Then
                         json_Converted = "null"
                     End If
@@ -722,6 +722,7 @@ Private Function json_Encode(ByVal json_Text As Variant) As String
         json_BufferAppend json_Buffer, json_Char, json_BufferPosition, json_BufferLength
     Next json_Index
 
+    '@Ignore UnassignedVariableUsage
     json_Encode = json_BufferToString(json_Buffer, json_BufferPosition)
 End Function
 
@@ -955,7 +956,7 @@ Public Function ParseIso(utc_IsoString As String) As Date
 
     If UBound(utc_Parts) > 0 Then
         If VBA.InStr(utc_Parts(1), "Z") Then
-            utc_TimeParts = VBA.Split(VBA.Replace(utc_Parts(1), "Z", ""), ":")
+            utc_TimeParts = VBA.Split(VBA.Replace(utc_Parts(1), "Z", vbNullString), ":")
         Else
             utc_OffsetIndex = VBA.InStr(1, utc_Parts(1), "+")
             If utc_OffsetIndex = 0 Then
@@ -1051,7 +1052,7 @@ Private Function utc_ConvertDate(utc_Value As Date, Optional utc_ConvertToUtc As
 
     utc_Result = utc_ExecuteInShell(utc_ShellCommand)
 
-    If utc_Result.utc_Output = "" Then
+    If utc_Result.utc_Output = vbNullString Then
         Err.Raise 10015, "UtcConverter.utc_ConvertDate", "'date' command failed"
     Else
         utc_Parts = Split(utc_Result.utc_Output, " ")
@@ -1110,6 +1111,7 @@ Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
 End Function
 
 #End If
+
 
 
 

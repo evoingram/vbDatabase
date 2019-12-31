@@ -111,7 +111,7 @@ Public Function addRSet(sTableName As String) As String
             dInvoiceDate = (Date + sTurnaround) - 2
             dDueDate = (Date + sTurnaround) - 2
             sAccountCode = 400
-            
+            'TODO: sTurnaround & sFullPathXLS has no value
         Select Case sTurnaround
         Case "45"
             cJob.UnitPrice = 64
@@ -271,7 +271,7 @@ Public Function addRSet(sTableName As String) As String
         oExcelMacroWB.SaveAs Replace(cJob.DocPath.OrderFormCustomersXLSM, ".xlsm", ".xls"), FileFormat:=xlWorkbookDefault
         oExcelMacroWB.Close True
         Set oExcelMacroWB = Nothing
-        
+        'TODO: Change sFullPathXLS
         Set oExcelWB = oExcelApp.Application.Workbooks.Open(FileName:=sFullPathXLS, Local:=True)
         oExcelWB.Application.DisplayAlerts = False
         oExcelWB.Application.Visible = False
@@ -321,7 +321,7 @@ Public Function addRSet(sTableName As String) As String
             sCurrentTempApp = rstTempJob.Fields("AppID").Value
             sAppNumber = "App" & x
             
-            If Not rstTempJob.EOF Or sCurrentTempApp <> "" Or Not IsNull(sCurrentTempApp) Then
+            If Not rstTempJob.EOF Or sCurrentTempApp <> vbNullString Or Not IsNull(sCurrentTempApp) Then
                 'currentdb.Execute "UPDATE CourtDates SET " & sAppNumber & " = " & sCurrentTempApp & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
                 
                 'Set rstTempCDs = currentdb.OpenRecordset("SELECT * FROM CourtDates WHERE [ID] = " & sCourtDatesID & ";") '
@@ -356,7 +356,7 @@ Public Function addRSet(sTableName As String) As String
     Set rstTableName = Nothing
     Set rstTempCourtDates = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Function
 
 Public Sub editRSet(sTableName As String, sFieldName As String, sValue As String)

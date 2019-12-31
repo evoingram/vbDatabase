@@ -32,9 +32,9 @@ Private Sub btnAddUSPSTrackingNumber_Click()
     rstShippingOptions.Close
 
     MsgBox ("Tracking number updated")
-    Me.cmbCourtDatesID.Value = ""
-    Me.tTrackingNo.Value = ""
-    Me.tShippingCost.Value = ""
+    Me.cmbCourtDatesID.Value = vbNullString
+    Me.tTrackingNo.Value = vbNullString
+    Me.tShippingCost.Value = vbNullString
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub

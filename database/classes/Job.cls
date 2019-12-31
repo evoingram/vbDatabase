@@ -401,7 +401,7 @@ Private Sub Load()
         Me.UnitPrice = Nz(.Fields("UnitPrice").Value)
         Me.Location = Nz(.Fields("Location").Value)
         Me.PPID = Nz(.Fields("PPID").Value)
-        Me.ClientTranscriptName = ""
+        Me.ClientTranscriptName = vbNullString
     End With
     
     Dim sUnitPriceSQL As String

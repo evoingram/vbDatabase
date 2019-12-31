@@ -2,6 +2,86 @@
 Option Compare Database
 Option Explicit
 
+Private Sub searchJobs()
+
+Dim sSearchTerms As String
+Dim sSQL1 As String
+Dim sSQL2 As String
+Dim sSQL3 As String
+Dim sFinalSearchSQL As String
+
+Dim qdf As QueryDef
+
+sSearchTerms = tSearchTerms.Value
+Debug.Print tSearchTerms
+
+    'tSearchTerms
+    sSQL1 = "SELECT CourtDates.ID, CourtDates.InvoiceNo, CourtDates.AudioLength, Cases.Party1, Cases.Party1Name, Cases.Party2, Cases.Party2Name, " & _
+        "Cases.CaseNumber1, Cases.CaseNumber2, Cases.HearingTitle, Cases.Judge, Cases.JudgeTitle, Cases.Jurisdiction, Customers.Company, Customers.MrMs, " & _
+        "Customers.LastName, Customers.FirstName, Customers.EmailAddress, Customers.BusinessPhone, Customers.Address, Customers.City, Customers.State, " & _
+        "Customers.ZIP, CourtDates.HearingDate, CourtDates.HearingStartTime, CourtDates.HearingEndTime, CourtDates.CasesID, CourtDates.OrderingID, " & _
+        "CourtDates.Subtotal, CourtDates.ShipDate, CourtDates.TrackingNumber, CourtDates.InvoiceDate, CourtDates.Quantity, CourtDates.ActualQuantity, " & _
+        "CourtDates.ExpectedRebateDate, CourtDates.ExpectedAdvanceDate, CourtDates.FinalPrice, CourtDates.UnitPrice " & _
+    "FROM (CourtDates " & _
+    "INNER JOIN Customers ON (Customers.ID = CourtDates.OrderingID)" & _
+                         " OR (Customers.ID = CourtDates.App6)" & _
+                         " OR (Customers.ID = CourtDates.App5)" & _
+                         " OR (Customers.ID = CourtDates.App4)" & _
+                         " OR (Customers.ID = CourtDates.App3)" & _
+                         " OR (Customers.ID = CourtDates.App2)" & _
+                         " OR (Customers.ID = CourtDates.App1))" & _
+    " INNER JOIN Cases ON Cases.ID = CourtDates.CasesID" & _
+    " WHERE ((Customers.FirstName) like '" & tSearchTerms & "'" & _
+    " OR (Customers.LastName) like '" & tSearchTerms & "'" & _
+    " OR (Customers.Company) like '" & tSearchTerms & "'" & _
+    " OR (Customers.EmailAddress) like '" & tSearchTerms & "'" & _
+    " OR (Customers.BusinessPhone) like '" & tSearchTerms & "'" & _
+    " OR (Customers.Address) like '" & tSearchTerms & "'" & _
+    " OR (Customers.City) like '" & tSearchTerms & "'" & _
+    " OR (Customers.State) like '" & tSearchTerms & "'" & _
+    " OR (Customers.ZIP) like '" & tSearchTerms & "'"
+    sSQL2 = " OR (Cases.Party1) like '" & tSearchTerms & "'" & _
+    " OR (Cases.Party1Name) like '" & tSearchTerms & "'" & _
+    " OR (Cases.Party2) like '" & tSearchTerms & "'" & _
+    " OR (Cases.Party2Name) like '" & tSearchTerms & "'" & _
+    " OR (Cases.CaseNumber1) like '" & tSearchTerms & "'" & _
+    " OR (Cases.CaseNumber2) like '" & tSearchTerms & "'" & _
+    " OR (Cases.HearingTitle) like '" & tSearchTerms & "'" & _
+    " OR (Cases.Judge) like '" & tSearchTerms & "'" & _
+    " OR (Cases.JudgeTitle) like '" & tSearchTerms & "'" & _
+    " OR (Cases.Jurisdiction) like '" & tSearchTerms & "'" & _
+    " OR (Customers.Company) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.HearingDate) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.HearingStartTime) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.HearingEndTime) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.CasesID) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.OrderingID) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.Subtotal) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.ShipDate) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.TrackingNumber) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.InvoiceDate) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.Quantity) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.ActualQuantity) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.ExpectedRebateDate) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.ExpectedAdvanceDate) like '" & tSearchTerms & "'"
+    sSQL3 = " OR (CourtDates.FinalPrice) like '" & tSearchTerms & "'" & _
+    " OR (CourtDates.UnitPrice) like '" & tSearchTerms & "'" & _
+    ");"
+    
+    sFinalSearchSQL = sSQL1 & sSQL2 & sSQL3
+    
+    Debug.Print sFinalSearchSQL
+    
+    Set qdf = CurrentDb.CreateQueryDef("sqlSearch", sFinalSearchSQL)
+    Me.SearchJobsSubform.SourceObject = "Query.sqlSearch"
+    
+End Sub
+
+Private Sub btnSearch_Click()
+Call searchJobs
+
+End Sub
+
 Private Sub Command40_Click()
     Me.SearchJobsSubform.SourceObject = "Query." & "SCB-JobNumber"
     Me.SearchJobsSubform.Requery

@@ -49,7 +49,7 @@ Private Sub WBCViewJobFolder_OnUpdated()
         
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub Command5_Click()
@@ -102,5 +102,5 @@ Private Sub Command5_Click()
     End If
     
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
