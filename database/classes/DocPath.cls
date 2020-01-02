@@ -138,6 +138,9 @@ Private pZAudioTranscriptsB As String
 Private pZAudioTranscriptsF As String
 Private pZTranscriptsB As String
 Private pZTranscriptsF As String
+Private pWordIndexDBT As String
+Private sInvoiceNumber As String
+
 Public Property Get InvoiceP() As String
     InvoiceP = pInvoiceP
 End Property
@@ -933,7 +936,7 @@ Public Sub Class_Initialize()
         
         pAPFTR = "C:/Program Files (x86)/FTR/ForTheRecord/TheRecordPlayer.exe"
         
-        If Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] <> "" Then
+        If Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField] <> vbNullString Then
             
             sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
             Dim rstTableName As DAO.Recordset

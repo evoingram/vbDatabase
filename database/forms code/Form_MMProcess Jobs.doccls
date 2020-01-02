@@ -6,49 +6,49 @@ Private Sub JobInfobtn_Click()
     sCourtDatesID = Me.JobNumberField.Value
     With Me.ProcessJobSubform
         .SourceObject = "PJViewJobForm"
-        .LinkMasterFields = ""
-        .LinkChildFields = ""
+        .LinkMasterFields = vbNullString
+        .LinkChildFields = vbNullString
         .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
         .LinkChildFields = "VJFJobID"
     End With
     Me.ProcessJobSubform.Requery
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub StatusChecklistBTN_Click()
     With Me.ProcessJobSubform
         .SourceObject = "PJStatuses"
-        .LinkMasterFields = ""
-        .LinkChildFields = ""
+        .LinkMasterFields = vbNullString
+        .LinkChildFields = vbNullString
         .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
         .LinkChildFields = "CourtDatesID"
     End With
     Me.ProcessJobSubform.Requery
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub OrderingInfoBTN_Click()
     With Me.ProcessJobSubform
         .SourceObject = "PJOrderingInfoForm"
-        .LinkMasterFields = ""
-        .LinkChildFields = ""
+        .LinkMasterFields = vbNullString
+        .LinkChildFields = vbNullString
         .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
         .LinkChildFields = "CourtDatesID"
     End With
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub ViewDocHistoryBTN_Click()
 
     With Me.ProcessJobSubform
         .SourceObject = "SBFMDocHistQ"
-        .LinkMasterFields = ""
-        .LinkChildFields = ""
+        .LinkMasterFields = vbNullString
+        .LinkChildFields = vbNullString
         .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
         .LinkChildFields = "CourtDatesID"
     End With
     Me.ProcessJobSubform.Requery
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub btnUSPSTracking_Click()
@@ -68,7 +68,7 @@ Private Sub CreateDocsBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "PJCreateCourtDocs"
     Me.ProcessJobSubform.Requery
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub TypeBTN_Click()
@@ -206,14 +206,14 @@ Private Sub TypeBTN_Click()
     'Call PlayAudioFolder
     Documents.Open FileName:=cJob.DocPath.RoughDraft, ReadOnly:=False
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub ViewJobFolderBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "PJViewJobFolder"
     Me.ProcessJobSubform.Requery
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -281,8 +281,8 @@ Private Sub ShippingInfoBTN_Click()
         With Me.ProcessJobSubform
             .SourceObject = "FShippingOptions"
             .Requery
-            .LinkMasterFields = ""
-            .LinkChildFields = ""
+            .LinkMasterFields = vbNullString
+            .LinkChildFields = vbNullString
             .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
             .LinkChildFields = "CourtDatesID"
             .Form.RecordSource = SQLString
@@ -292,8 +292,8 @@ Private Sub ShippingInfoBTN_Click()
         With Me.ProcessJobSubform
             .SourceObject = "FShippingOptions"
             .Requery
-            .LinkMasterFields = ""
-            .LinkChildFields = ""
+            .LinkMasterFields = vbNullString
+            .LinkChildFields = vbNullString
             .LinkMasterFields = "Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]"
             .LinkChildFields = "CourtDatesID"
             .Form.RecordSource = SQLString
@@ -304,7 +304,7 @@ Private Sub ShippingInfoBTN_Click()
     rs.Close
     Set rs = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Private Sub InvoicingBTN_Click()
@@ -319,5 +319,5 @@ Private Sub SRTextBTN_Click()
     sCourtDatesID = Me.JobNumberField.Value
     Me.ProcessJobSubform.SourceObject = "JurisdictionRef"
     Me.ProcessJobSubform.Requery
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub

@@ -373,7 +373,7 @@ Private Function dict_GetFormattedKey(dict_Key As Variant) As String
             ' -> Approach: Append lowercase characters to original key
             '    AbC -> AbC___b_, abc -> abc__abc, ABC -> ABC_____
             Dim dict_Lowercase As String
-            dict_Lowercase = ""
+            dict_Lowercase = vbNullString
 
             Dim dict_i As Integer
             Dim dict_Char As String

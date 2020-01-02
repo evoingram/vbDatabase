@@ -84,9 +84,9 @@ Public Sub pfStage3Ppwk()
         oWordDoc.Content.Copy
     
         With oOutlookMail
-            .To = ""
-            .CC = ""
-            .BCC = ""
+            .To = vbNullString
+            .CC = vbNullString
+            .BCC = vbNullString
     
             .Attachments.Add (sClientTranscriptName)
             .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
@@ -114,9 +114,9 @@ Public Sub pfStage3Ppwk()
         oWordDoc.Content.Copy
     
         With oOutlookMail
-            .To = ""
-            .CC = ""
-            .BCC = ""
+            .To = vbNullString
+            .CC = vbNullString
+            .BCC = vbNullString
             .Attachments.Add (sClientTranscriptName)
             .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
@@ -146,9 +146,9 @@ Public Sub pfStage3Ppwk()
         oWordDoc.Content.Copy
     
         With oOutlookMail
-            .To = ""
-            .CC = ""
-            .BCC = ""
+            .To = vbNullString
+            .CC = vbNullString
+            .BCC = vbNullString
             .Attachments.Add (sClientTranscriptName)
             .Subject = cJob.CaseInfo.Jurisdiction & " " & Format(cJob.HearingDate, "mm-dd-yyyy") & " Transcript Ready " & sCourtDatesID
             .BodyFormat = olFormatRichText
@@ -175,8 +175,8 @@ Public Sub pfStage3Ppwk()
     Debug.Print "Stage 3 complete."
     
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    sClientTranscriptName = ""
-    sCourtDatesID = ""
+    sClientTranscriptName = vbNullString
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfBurnCD()
@@ -228,7 +228,7 @@ Public Sub pfBurnCD()
     
     End If
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfCreateRegularPDF()
@@ -290,7 +290,7 @@ Public Sub pfCreateRegularPDF()
                     With rngStory.Find
                         .Replacement.ClearFormatting
                         .Text = "***WORKING COPY***^p"
-                        .Replacement.Text = ""
+                        .Replacement.Text = vbNullString
                         .Forward = True
                         .Wrap = wdFindContinue
                         .Format = False
@@ -306,7 +306,7 @@ Public Sub pfCreateRegularPDF()
                     .Application.Selection.Find.Replacement.ClearFormatting
                     With rngStory.Find
                         .Text = "***WORKING COPY***"
-                        .Replacement.Text = ""
+                        .Replacement.Text = vbNullString
                         .Forward = True
                         .Wrap = wdFindContinue
                         .Format = False
@@ -325,7 +325,7 @@ Public Sub pfCreateRegularPDF()
             Next rngStory
         
             .RemoveDocumentInformation (wdRDIAll) 'remove vba and document info
-            
+            'TODO: Fix this oVBComponent crap
             'For Each oVBComponent In .VBProject.oVBComponents
              With oVBComponent
             'If .Type = 100 Then
@@ -354,7 +354,7 @@ Public Sub pfCreateRegularPDF()
     FileCopy cJob.DocPath.TranscriptFD, cJob.DocPath.TranscriptFDB
     FileCopy cJob.DocPath.TranscriptFP, cJob.DocPath.TranscriptFPB
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fDynamicHeaders()
@@ -378,18 +378,14 @@ Public Sub fDynamicHeaders()
     'stop at CertBMK
     'save & close
 
-    Dim sBookmarkName As String
-    Dim sHeading As String
     Dim sHeadings() As String
     
     Dim oWordApp As Word.Application
     Dim oWordDoc As Word.Document
-    Dim oWordField As Field
     Dim oWordSection As Section
     
     Dim x As Long
     Dim y As Long
-    Dim z As Long
     
     Dim oRange As Range
     
@@ -422,12 +418,10 @@ Public Sub fDynamicHeaders()
 
     ' Loop through fields/cross-references in transcript
     'Debug.Print UBound(sHeadings) & " headings in document"
-    sHeading = sHeadings(x)
-    'Debug.Print "Current Heading: " & sHeading
 
 
     'go to first heading
-    oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToFirst, Count:=1, Name:=""
+    oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToFirst, Count:=1, Name:=vbNullString
         
     For x = 1 To UBound(sHeadings)
     
@@ -457,9 +451,9 @@ Public Sub fDynamicHeaders()
         'exit header
         oWordDoc.Application.Selection.EscapeKey
         
-        oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1, Name:=""
+        oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1, Name:=vbNullString
         
-        oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1, Name:=""
+        oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1, Name:=vbNullString
     Next
     
     oWordDoc.Application.Selection.HomeKey Unit:=wdStory
@@ -470,12 +464,9 @@ Public Sub fDynamicHeaders()
     'Debug.Print "next field:  " & x & sHeadings(x)
 
     'go to first heading
-    oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToFirst, Count:=1, Name:=""
+    oWordDoc.ApplicationSelection.Goto What:=wdGoToHeading, which:=wdGoToFirst, Count:=1, Name:=vbNullString
         
     For x = 1 To UBound(sHeadings)
-        sHeading = sHeadings(x)
-    
-        'Debug.Print "Current Heading: " & sHeading
         
         
         'edit header for this section
@@ -507,7 +498,7 @@ Public Sub fDynamicHeaders()
 
         'go to next heading starting from next page
         
-        oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1, Name:=""
+        oWordDoc.Application.Selection.Goto What:=wdGoToHeading, which:=wdGoToNext, Count:=1, Name:=vbNullString
         
         'Debug.Print "next field:  " & x + 1 & sHeadings(x + 1)
     Next
@@ -532,7 +523,7 @@ Public Sub fDynamicHeaders()
     Set oWordApp = Nothing
             
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfHeaders()
@@ -544,33 +535,26 @@ Public Sub pfHeaders()
     ' Description : add sections and headers programmatically
     '============================================================================
     Forms![NewMainMenu].Form!lblFlash.Caption = "Step 8 of 10:  Processing headers..."
-    Dim sCurrentSection As String
+    
     Dim sCurrentHeading As String
     Dim aStyleList() As String
     Dim sStyleName As String
     ReDim aStyleList(1 To 1) As String
-    Dim sListStyle As String
     Dim nSectionNum As Integer
     
     Dim astrHeadings As Variant
     Dim StyleName As Variant
-    Dim Header As Variant
     
     Dim bFound As Boolean
     
     Dim oWordDoc As New Word.Document
     Dim oWordApp As New Word.Application
-    Dim sec As Word.Section
     Dim rCurrentSection As Range
-    Dim HdrRange As Range
     
     Dim intItem As Long
     Dim iCurrentSectionNo As Long
     Dim intLevel As Long
-    Dim x As Long
-    Dim z As Long
-    Dim k As Long
-    Dim oHF As HeaderFooter
+    'Dim oHF As HeaderFooter
     Dim iMaxHeadingsCount As Long
     Dim iHeadingsNumber As Long
     Dim iSectionNumber As Long
@@ -648,8 +632,8 @@ Public Sub pfHeaders()
         
         
             With .Selection.Find
-                .Text = ""
-                .Replacement.Text = ""
+                .Text = vbNullString
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -682,8 +666,8 @@ Public Sub pfHeaders()
             sStyleName = "Heading " & intLevel
         
             With .Selection.Find
-                .Text = ""
-                .Replacement.Text = ""
+                .Text = vbNullString
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -725,7 +709,7 @@ Public Sub pfHeaders()
                 intLevel = GetLevel(CStr(astrHeadings(iHeadingsNumber)))
                     
                 sStyleName = "Heading " & intLevel
-                                        
+                'TODO: Track down intItem
                 iSectionIndex = intItem
                 'Debug.Print ("Section Number:  " & iSectionIndex & "   |   " & "Headings Number:  " & iHeadingsNumber)
                 If iSectionNumber = 1 Then GoTo SkipFrontPage
@@ -757,8 +741,8 @@ Public Sub pfHeaders()
                     oWordDoc.Application.Selection.HomeKey Unit:=wdLine, Extend:=wdExtend
                     oWordDoc.Application.Selection.Find.ClearFormatting
                     With oWordDoc.Application.Selection.Find
-                        .Text = ""
-                        .Replacement.Text = ""
+                        .Text = vbNullString
+                        .Replacement.Text = vbNullString
                         .Forward = True
                         .Wrap = wdFindContinue
                         .Format = False
@@ -803,7 +787,7 @@ NextItem:
     Set rCurrentSection = Nothing
 
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfTopOfTranscriptBookmark()
@@ -817,16 +801,10 @@ Public Sub pfTopOfTranscriptBookmark()
     Dim ADoc As AcroAVDoc
     Dim PDBookmark As AcroPDBookmark
     Dim PDFPageView As AcroAVPageView
-    Dim parentBookmark As AcroPDBookmark
-    
-    Dim oPDFBookmarks As Object
-    Dim jso As Object
-    Dim BookMarkRoot As Object
     
     Dim numpages As Variant
     Dim n As Variant
-    
-    
+        
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
@@ -834,10 +812,6 @@ Public Sub pfTopOfTranscriptBookmark()
     
     
     'Top of Transcript Bookmark
-    
-    
-    
-    
     Set AcroApp = CreateObject("AcroExch.App")
     
     
@@ -845,18 +819,11 @@ Public Sub pfTopOfTranscriptBookmark()
     Set PDocAll = CreateObject("AcroExch.PDDoc")
     Set PDocCover = CreateObject("AcroExch.PDDoc")
     Set ADoc = CreateObject("AcroExch.AVDoc")
-    Set PDBookmark = CreateObject("AcroExch.PDBookmark", "")
+    Set PDBookmark = CreateObject("AcroExch.PDBookmark", vbNullString)
 
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     
     'Table of Contents Bookmark
-    
-    
-    
-    
-    
-    
-    
     PDocCover.Open (cJob.DocPath.WACoverP)
     
     Set ADoc = PDocCover.OpenAVDoc(cJob.DocPath.WACoverP)
@@ -961,7 +928,7 @@ Public Sub pfTopOfTranscriptBookmark()
     Set PDoc = Nothing
     Set ADoc = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fPDFBookmarks()
@@ -980,10 +947,7 @@ Public Sub fPDFBookmarks()
     Dim aaAcroApp As Acrobat.AcroApp
     Dim aaAcroAVDoc As Acrobat.AcroAVDoc
     Dim aaAcroPDDoc As Acrobat.AcroPDDoc
-    
-    Dim pp As Object
 
-    Dim pdTranscriptFinalDistiller As PdfDistiller
     Dim aaAFormApp As AFORMAUTLib.AFormApp
 
     
@@ -995,7 +959,7 @@ Public Sub fPDFBookmarks()
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, vbNullString) Then
         aaAcroAVDoc.Maximize (1)
     
         Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
@@ -1022,7 +986,7 @@ Public Sub fPDFBookmarks()
         aaAcroApp.CloseAllDocs
     
     End If
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 eHandlerX:
     Set aaAcroPDDoc = Nothing

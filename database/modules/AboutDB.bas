@@ -411,7 +411,7 @@ Option Explicit
 '                           Arguments:    NONE
 'pfSingleFindReplace:           Description:  find and replace all of one item
 '                           Arguments:    sTextToFind, sReplacementText
-'                                         Optional wsyWordStyle = "", bForward = True, bWrap = "wdFindContinue"
+'                                         Optional wsyWordStyle = vbNullString, bForward = True, bWrap = "wdFindContinue"
 '                                         Optional bFormat = False, bMatchCase = True, bMatchWholeWord = False
 '                                         Optional bMatchWildcards = False, bMatchSoundsLike = False, bMatchAllWordForms = False
 'pfReplaceFDA:                  Description:  doctor speaker name find/replaces for FDA transcripts

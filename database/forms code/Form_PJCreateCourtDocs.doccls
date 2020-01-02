@@ -320,7 +320,7 @@ Private Sub Command68_Click()
     
             With .Selection.Find
                 .Text = "#PPB1#"
-                .Replacement.Text = ""
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -365,5 +365,5 @@ Private Sub Command68_Click()
     End If
     
         Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub

@@ -164,7 +164,7 @@ Public Sub fSendPPEmailFactored()
     
         With .Selection.Find
             .Text = "#PPB1#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -200,7 +200,7 @@ Public Sub fSendPPEmailFactored()
     
         With .Selection.Find
             .Text = "#PPB2#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -282,7 +282,7 @@ Public Sub fSendPPEmailFactored()
     
             With .Selection.Find
                 .Text = "#PPB1#"
-                .Replacement.Text = ""
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -356,7 +356,7 @@ Public Sub fSendPPEmailFactored()
     On Error GoTo 0
     Call pfCommunicationHistoryAdd("PP Invoice Sent")
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fPPDraft()
@@ -524,7 +524,7 @@ Beginning:
         'Debug.Print json5
         .send json5
         apiWaxLRS = .responseText
-        sToken = ""
+        sToken = vbNullString
         .abort
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
@@ -564,8 +564,8 @@ Beginning:
     CurrentDb.Execute sUpdatePPStatus
     sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
     CurrentDb.Execute sUpdatePPID
-    vmMemo = ""
-    sCourtDatesID = ""
+    vmMemo = vbNullString
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fPayPalUpdateCheck()
@@ -637,7 +637,7 @@ Public Sub fPayPalUpdateCheck()
     
             sCourtDatesID = rstQuery1.Fields("ID").Value
         
-            If Not rstQuery1.Fields("PPID").Value = "" Or rstQuery1.Fields("PPID").Value = Null Then
+            If Not rstQuery1.Fields("PPID").Value = vbNullString Or rstQuery1.Fields("PPID").Value = Null Then
                 vInvoiceID = rstQuery1.Fields("PPID").Value
             Else
                 GoTo NextJob
@@ -647,7 +647,7 @@ Public Sub fPayPalUpdateCheck()
         
             'set vStatus of current invoice
                 
-            If vInvoiceID = "" Then
+            If vInvoiceID = vbNullString Then
                 GoTo NextJob
             Else
                 vInvoiceID = Right(vInvoiceID, 20)
@@ -671,7 +671,7 @@ Public Sub fPayPalUpdateCheck()
                     apiWaxLRS = .responseText
                     'Debug.Print apiWaxLRS
                     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-                    sToken = parsed("access_token") 'third level array
+                    sToken = parsed.item("access_token") 'third level array
                     .abort
                     'Debug.Print "--------------------------------------------"
                 End With
@@ -689,15 +689,15 @@ Public Sub fPayPalUpdateCheck()
                     ' json5 = json1 & json2 & json3
                     .send                        ' json5
                     apiWaxLRS = .responseText
-                    sToken = ""
+                    sToken = vbNullString
                     .abort
                     'Debug.Print apiWaxLRS
                     'Debug.Print "--------------------------------------------"
                 End With
                 Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-                sInvoiceNumber = parsed("number") 'third level array
-                vInvoiceID = parsed("id")        'third level array
-                vStatus = parsed("status")       'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
+                sInvoiceNumber = parsed.item("number") 'third level array
+                vInvoiceID = parsed.item("id")        'third level array
+                vStatus = parsed.item("status")       'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
                 'CANCELLED, REFUNDED, PARTIALLY_REFUNDED, MARKED AS REFUNDED
                                                                         
                 Debug.Print "--------------------------------------------"
@@ -732,7 +732,7 @@ NextJob:
     Set rstQuery1 = Nothing
 
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fSendPPEmailBalanceDue()
@@ -839,7 +839,7 @@ Public Sub fSendPPEmailBalanceDue()
     
         With .Selection.Find
             .Text = "#PPB1#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -875,7 +875,7 @@ Public Sub fSendPPEmailBalanceDue()
     
         With .Selection.Find
             .Text = "#PPB2#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -957,7 +957,7 @@ Public Sub fSendPPEmailBalanceDue()
     
             With .Selection.Find
                 .Text = "#PPB1#"
-                .Replacement.Text = ""
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -1070,7 +1070,7 @@ Public Sub fSendPPEmailBalanceDue()
     
             With .Selection.Find
                 .Text = "#PPB1#"
-                .Replacement.Text = ""
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -1107,7 +1107,7 @@ Public Sub fSendPPEmailBalanceDue()
     
             With .Selection.Find
                 .Text = "#PPB2#"
-                .Replacement.Text = ""
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -1181,7 +1181,7 @@ Public Sub fSendPPEmailBalanceDue()
     End If
     On Error GoTo 0
     Call pfCommunicationHistoryAdd("PP Invoice Sent")
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -1235,7 +1235,7 @@ Public Sub fSendPPEmailDeposit()
 
     'create pp invoice link
     vPPLink = "https://www.paypal.com/invoice/p/#" & vPPInvoiceNo
-    vPPInvoiceNo = ""
+    vPPInvoiceNo = vbNullString
 
     'create PPButton html (construct string, save it into text file in job folder)
     sHTMLPPB = "<html><body><br><br><a href =" & Chr(34) & vPPLink & Chr(34) & _
@@ -1287,7 +1287,7 @@ Public Sub fSendPPEmailDeposit()
         With .Selection.Find
         
             .Text = "#PPB1#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -1320,7 +1320,7 @@ Public Sub fSendPPEmailDeposit()
     
         With .Selection.Find
             .Text = "#PPB2#"
-            .Replacement.Text = ""
+            .Replacement.Text = vbNullString
             .Forward = True
             .Wrap = wdFindContinue
             .Format = False
@@ -1401,7 +1401,7 @@ Public Sub fSendPPEmailDeposit()
     
             With .Selection.Find
                 .Text = "#PPB1#"
-                .Replacement.Text = ""
+                .Replacement.Text = vbNullString
                 .Forward = True
                 .Wrap = wdFindContinue
                 .Format = False
@@ -1477,7 +1477,7 @@ Public Sub fSendPPEmailDeposit()
 
     Call pfCommunicationHistoryAdd("PP Invoice Sent") 'record entry in comm history table for logs
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fPPGetInvoiceInfo()
@@ -1545,7 +1545,7 @@ Public Sub fPPGetInvoiceInfo()
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = parsed("access_token")          'third level array
+        sToken = parsed.item("access_token")          'third level array
         .abort
         'Debug.Print "--------------------------------------------"
     End With
@@ -1562,24 +1562,24 @@ Public Sub fPPGetInvoiceInfo()
         ' json5 = json1 & json2 & json3
         .send                                    ' json5
         apiWaxLRS = .responseText
-        sToken = ""
+        sToken = vbNullString
         .abort
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = parsed("number")            'third level array
+    sInvoiceNumber = parsed.item("number")            'third level array
     'vInvoiceID = parsed("id")                    'third level array
-    vStatus = parsed("status")                   'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
+    vStatus = parsed.item("status")                   'third level array 'can be either DRAFT, UNPAID, SENT, SCHEDULED, PARTIALLY_PAID, PAYMENT_PENDING, PAID, MARKED_AS_PAID,
     'CANCELLED, REFUNDED, PARTIALLY_REFUNDED, MARKED AS REFUNDED
-    vTotal = parsed("total_amount")("value")     'second level array
-    vErrorName = parsed("name")                  '("value") 'second level array
-    vErrorMessage = parsed("message")            '("value") 'second level array
-    vErrorILink = parsed("information_link")     '("value") 'second level array
-    vDetails = parsed("details")                 'second level array
+    vTotal = parsed.item("total_amount")("value")     'second level array
+    vErrorName = parsed.item("name")                  '("value") 'second level array
+    vErrorMessage = parsed.item("message")            '("value") 'second level array
+    vErrorILink = parsed.item("information_link")     '("value") 'second level array
+    vDetails = parsed.item("details")                 'second level array
     'For Each rep In vDetails ' third level objects
-    vErrorIssue = parsed("field")
-    vErrorDetails = parsed("issue")
+    vErrorIssue = parsed.item("field")
+    vErrorDetails = parsed.item("issue")
     'Next
     Debug.Print "--------------------------------------------"
     Debug.Print "Error Name:  " & vErrorName
@@ -1597,7 +1597,7 @@ Public Sub fPPGetInvoiceInfo()
     Debug.Print "Invoice No.:  " & sInvoiceNumber & "   |   Invoice ID:  " & cJob.PPID
     Debug.Print "Status:  " & vStatus & "   |   Total:  " & vTotal
     Debug.Print "--------------------------------------------"
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 
 End Sub
@@ -1701,8 +1701,8 @@ Public Sub fPPRefund()
     'sAuth = TextBase64Encode(myCn.GetConnection, "us-ascii") 'mycn.GetConnection
 
     sAuth = TextBase64Encode(Environ("ppUserName") & ":" & Environ("ppPassword"), "us-ascii") 'mycn.GetConnection
-    sPassword = ""
-    sUserName = ""
+    sPassword = vbNullString
+    sUserName = vbNullString
     With CreateObject("WinHttp.WinHttpRequest.5.1")
         '.Visible = True
         .Open "POST", sURL, False
@@ -1717,8 +1717,8 @@ Public Sub fPPRefund()
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = parsed("access_token")          'third level array
-        sAuth = ""
+        sToken = parsed.item("access_token")          'third level array
+        sAuth = vbNullString
         .abort
         Debug.Print "--------------------------------------------"
     End With
@@ -1744,20 +1744,20 @@ Public Sub fPPRefund()
         .setRequestHeader "Authorization", "Bearer " & sToken
         .send json1
         apiWaxLRS = .responseText
-        sToken = ""
+        sToken = vbNullString
         .abort
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = parsed("number")            'third level array
-    vInvoiceID = parsed("id")                    'third level array
-    vStatus = parsed("status")                   'third level array
-    vTotal = parsed("total_amount")("value")     'second level array
-    vErrorName = parsed("name")                  '("value") 'second level array
-    vErrorMessage = parsed("message")            '("value") 'second level array
-    vErrorILink = parsed("information_link")     '("value") 'second level array
-    vDetails = parsed("details")                 'second level array
+    sInvoiceNumber = parsed.item("number")            'third level array
+    vInvoiceID = parsed.item("id")                    'third level array
+    vStatus = parsed.item("status")                   'third level array
+    vTotal = parsed.item("total_amount")("value")     'second level array
+    vErrorName = parsed.item("name")                  '("value") 'second level array
+    vErrorMessage = parsed.item("message")            '("value") 'second level array
+    vErrorILink = parsed.item("information_link")     '("value") 'second level array
+    vDetails = parsed.item("details")                 'second level array
     'For Each rep In vDetails ' third level objects
     '   vErrorIssue = rep("field")
     '  vErrorDetails = rep("issue")
@@ -1794,7 +1794,7 @@ Public Sub fPPRefund()
     End If
         
 Exitif:
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 
@@ -1892,8 +1892,8 @@ Public Sub fPPUpdate()
         apiWaxLRS = .responseText
         Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = parsed("access_token")          'third level array
-        sAuth = ""
+        sToken = parsed.item("access_token")          'third level array
+        sAuth = vbNullString
         .abort
         Debug.Print "--------------------------------------------"
     End With
@@ -1956,19 +1956,19 @@ Public Sub fPPUpdate()
         json5 = json1 & json2 & json3
         .send json5
         apiWaxLRS = .responseText
-        sToken = ""
+        sToken = vbNullString
         .abort
         Debug.Print apiWaxLRS
         Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = parsed("number")            'third level array
-    vInvoiceID = parsed("id")                    'third level array
-    vStatus = parsed("status")                   'third level array
-    vTotal = parsed("total_amount")("value")     'second level array
-    vErrorName = parsed("name")                  '("value") 'second level array
-    vErrorMessage = parsed("message")            '("value") 'second level array
-    vErrorILink = parsed("information_link")     '("value") 'second level array
+    sInvoiceNumber = parsed.item("number")            'third level array
+    vInvoiceID = parsed.item("id")                    'third level array
+    vStatus = parsed.item("status")                   'third level array
+    vTotal = parsed.item("total_amount")("value")     'second level array
+    vErrorName = parsed.item("name")                  '("value") 'second level array
+    vErrorMessage = parsed.item("message")            '("value") 'second level array
+    vErrorILink = parsed.item("information_link")     '("value") 'second level array
     'vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
     '    vErrorIssue = rep("field")
@@ -1993,7 +1993,7 @@ Public Sub fPPUpdate()
     CurrentDb.Execute sUpdatePPStatus
     sUpdatePPID = "UPDATE CourtDates SET PPID = " & Chr(34) & vInvoiceID & Chr(34) & " WHERE [ID] = " & sCourtDatesID & ";"
     CurrentDb.Execute sUpdatePPID
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -2075,8 +2075,8 @@ Public Sub fManualPPPayment()
         apiWaxLRS = .responseText
         'Debug.Print apiWaxLRS
         Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-        sToken = parsed("access_token")          'third level array
-        sAuth = ""
+        sToken = parsed.item("access_token")          'third level array
+        sAuth = vbNullString
         .abort
         'Debug.Print "--------------------------------------------"
     End With
@@ -2108,19 +2108,19 @@ Public Sub fManualPPPayment()
         'json5 = json1 & json2 & json3
         .send json1
         apiWaxLRS = .responseText
-        sToken = ""
+        sToken = vbNullString
         .abort
         'Debug.Print apiWaxLRS
         'Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    sInvoiceNumber = parsed("number")            'third level array
-    vInvoiceID = parsed("id")                    'third level array
-    vStatus = parsed("status")                   'third level array
-    vTotal = parsed("total_amount")("value")     'second level array
-    vErrorName = parsed("name")                  '("value") 'second level array
-    vErrorMessage = parsed("message")            '("value") 'second level array
-    vErrorILink = parsed("information_link")     '("value") 'second level array
+    sInvoiceNumber = parsed.item("number")            'third level array
+    vInvoiceID = parsed.item("id")                    'third level array
+    vStatus = parsed.item("status")                   'third level array
+    vTotal = parsed.item("total_amount")("value")     'second level array
+    vErrorName = parsed.item("name")                  '("value") 'second level array
+    vErrorMessage = parsed.item("message")            '("value") 'second level array
+    vErrorILink = parsed.item("information_link")     '("value") 'second level array
     'vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
     '    vErrorIssue = rep("field")
@@ -2148,7 +2148,7 @@ Public Sub fManualPPPayment()
     CurrentDb.Execute sUpdatePPID
 
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 

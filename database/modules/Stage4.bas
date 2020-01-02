@@ -381,7 +381,7 @@ Public Sub pfStage4Ppwk()
 
     Debug.Print "Stage 4 complete."
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfNewZip(sPath As String)
@@ -401,7 +401,7 @@ Public Sub pfNewZip(sPath As String)
 
     Print #1, Chr$(80) & Chr$(75) & Chr$(5) & Chr$(6) & String(18, 0)
     Close #1
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -623,7 +623,7 @@ ContractorFile:
         CurrentDb.Execute sFiledNotFiledSQL
         MsgBox "Transcript has been marked filed."
     End If
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fGenerateZIPsF()
@@ -727,7 +727,7 @@ Line2:
     End If
 
     Call fAssignPS
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fUploadtoFTP()
@@ -800,9 +800,6 @@ Public Sub fZIPAudio(sSource As String, sDestination As String)
 
     Dim defpath As String
     
-    Dim rstCourtDates As DAO.Recordset
-    
-    Dim strDate As Date
     
     Dim filecopied As Object
     Dim oApp As Object
@@ -813,7 +810,6 @@ Public Sub fZIPAudio(sSource As String, sDestination As String)
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
     
-    Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
     defpath = CurrentProject.Path
 
     If Right(defpath, 1) <> "\" Then
@@ -842,7 +838,7 @@ Public Sub fZIPAudio(sSource As String, sDestination As String)
     
     
     Debug.Print "Find the ZIP file here: " & sDestination
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     
 End Sub
 
@@ -855,7 +851,6 @@ Public Sub fZIPAudioTranscripts(sSource As String, sDestination As String)
     ' Description : zips audio & transcripts folders in \Production\2InProgress\####\
     '============================================================================
 
-    Dim strDate As String
     Dim defpath As String
     Dim FolderName2 As String
     
@@ -889,7 +884,7 @@ Public Sub fZIPAudioTranscripts(sSource As String, sDestination As String)
     'On Error GoTo 0
     
     Debug.Print "You find the ZIP file here: " & sDestination
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -904,18 +899,13 @@ Public Sub fZIPTranscripts(sSource As String, sDestination As String)
 
     Dim defpath As String
     
-    Dim rstCourtDates As DAO.Recordset
-    
     Dim filecopied As Object
     Dim oApp As Object
-    
     
     Dim cJob As Job
     Set cJob = New Job
     sCourtDatesID = Forms![NewMainMenu]![ProcessJobSubformNMM].Form![JobNumberField]
     cJob.FindFirst "ID=" & sCourtDatesID
-    
-    Set rstCourtDates = CurrentDb.OpenRecordset("CourtDates")
 
     defpath = CurrentProject.Path
     If Right(defpath, 1) <> "\" Then
@@ -939,7 +929,7 @@ Public Sub fZIPTranscripts(sSource As String, sDestination As String)
     'On Error GoTo 0
     
     Debug.Print "You find the ZIP file here: " & sDestination
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -1002,8 +992,6 @@ Public Sub pfSendTrackingEmail()
     Dim deliverySQLstring As String
     
     Dim rs As DAO.Recordset
-
-    Dim Rng As Range
     
     Dim cJob As Job
     Set cJob = New Job
@@ -1015,8 +1003,9 @@ Public Sub pfSendTrackingEmail()
     vTrackingNumber = rs.Fields("TrackingNumber").Value
     rs.Close
     Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
-    Call fWunderlistAdd(sCourtDatesID & ":  Package to Ship", Format(Now + 1, "yyyy-mm-dd"))
-    sCourtDatesID = ""
+    Call fWunderlistAdd(sCourtDatesID & ":  Package to Ship " & vTrackingNumber, Format(Now + 1, "yyyy-mm-dd"))
+    
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fEmailtoPrint(sFiletoEmailPath As String)
@@ -1040,10 +1029,10 @@ Public Sub fEmailtoPrint(sFiletoEmailPath As String)
 
     With oOutlookMail
         .To = "print@aquoco.co"
-        .CC = ""
-        .BCC = ""
-        .Subject = ""
-        .HTMLBody = ""
+        .CC = vbNullString
+        .BCC = vbNullString
+        .Subject = vbNullString
+        .HTMLBody = vbNullString
         .Attachments.Add sFiletoEmailPath
     End With
 
@@ -1098,7 +1087,7 @@ Public Sub fAudioDone()
       
     'Line2:
     'Exit Do
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 
@@ -1120,7 +1109,7 @@ Public Sub fPrint2upPDF()
     Dim pdTranscriptFinalDistiller As PdfDistiller
     Dim aaAFormApp As AFORMAUTLib.AFormApp
     
-    Dim pp As Object
+    'Dim pp As Object
 
     
     Dim cJob As Job
@@ -1131,7 +1120,7 @@ Public Sub fPrint2upPDF()
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, vbNullString) Then
         aaAcroAVDoc.Maximize (1)
     
         Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
@@ -1165,7 +1154,6 @@ Public Sub fPrint2upPDF()
 
     Set pdTranscriptFinalDistiller = Nothing
 
-eHandlerX:
     Set aaAcroPDDoc = Nothing
     Set aaAcroAVDoc = Nothing
     Set aaAcroApp = Nothing
@@ -1180,12 +1168,11 @@ eHandlerX:
 
 
     MsgBox "2-up condensed transcript saved at " & cJob.DocPath.T2upPS
+    sCourtDatesID = vbNullString
 
 eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Detail"
-    'GoTo eHandlerX
-    'Resume
-    sCourtDatesID = ""
+    Resume
 End Sub
 
 Public Sub fPrint4upPDF()
@@ -1205,7 +1192,6 @@ Public Sub fPrint4upPDF()
     Dim aaAcroPDDoc As Acrobat.AcroPDDoc
     Dim pdTranscriptFinalDistiller As PdfDistiller
     Dim aaAFormApp As AFORMAUTLib.AFormApp
-    Dim oPDFPrintSettings As Object
 
     
     Dim cJob As Job
@@ -1216,7 +1202,7 @@ Public Sub fPrint4upPDF()
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.TranscriptFP, vbNullString) Then
 
         aaAcroAVDoc.Maximize (1)
     
@@ -1268,7 +1254,7 @@ eHandlerX:
 
 
     MsgBox "4-up condensed transcript saved at " & cJob.DocPath.Transcript4up
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     Exit Sub
 
 eHandler:
@@ -1300,7 +1286,7 @@ Public Sub fPrintKCIEnvelope()
         Call fEmailtoPrint(cJob.DocPath.KCIEnvelope)
     
     End If
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -1339,7 +1325,7 @@ Public Sub fAcrobatKCIInvoice()
     Set aaAcroApp = New AcroApp
     Set aaAcroAVDoc = CreateObject("AcroExch.AVDoc")
 
-    If aaAcroAVDoc.Open(cJob.DocPath.KCIEmpty, "") Then
+    If aaAcroAVDoc.Open(cJob.DocPath.KCIEmpty, vbNullString) Then
         aaAcroAVDoc.Maximize (1)
     
         Set aaAcroPDDoc = aaAcroAVDoc.GetPDDoc()
@@ -1375,7 +1361,7 @@ eHandler:
     MsgBox Err.Number & ": " & Err.Description, vbCritical, "Error Details"
     GoTo eHandlerX
     Resume
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfUpload(ByRef mySession As Session)
@@ -1430,7 +1416,7 @@ Public Sub pfUpload(ByRef mySession As Session)
         MsgBox "Upload of " & transfer.FileName & " succeeded"
     Next
     
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     
 End Sub
 
@@ -1495,7 +1481,7 @@ Public Sub fPrivatePrint()
         Call fEmailtoPrint(cJob.DocPath.CDLabelP)
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -1604,7 +1590,7 @@ Public Sub fExportRecsToXML()
     rstShippingOptions.Close
     On Error GoTo 0
     Set rstShippingOptions = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
  
 End Sub
 
@@ -1650,7 +1636,7 @@ Public Sub fAppendXMLFiles()
     Set file1 = Nothing
     Set file2 = Nothing
     Set FSO = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -1663,12 +1649,9 @@ Public Sub fCourtofAppealsIXML()
     ' Call command: Call fCourtofAppealsIXML
     ' Description : creates Court of Appeals XML for shipping
     '============================================================================
-
-    Dim sTSOCourtDatesID As String
+    
     Dim sTempShipOptions As String
-    Dim sTempShippingOQ1 As String
     Dim sMacroName As String
-    Dim sQueryName As String
     Dim SQLString As String
     Dim sMailClassNo As String
     Dim sPackageTypeNo As String
@@ -1683,14 +1666,11 @@ Public Sub fCourtofAppealsIXML()
     Dim rstPkgType As DAO.Recordset
     Dim rs1 As DAO.Recordset
     Dim rstShippingOptions As DAO.Recordset
-    Dim qdf As DAO.QueryDef
     Dim qdf1 As QueryDef
     
     Dim oExcelApp As New Excel.Application
     Dim oExcelWkbk As New Excel.Workbook
     Dim oExcelSheet As New Excel.Worksheet
-    Dim oExcelWkbk2 As New Excel.Workbook
-    
     
     Dim cJob As Job
     Set cJob = New Job
@@ -1698,9 +1678,6 @@ Public Sub fCourtofAppealsIXML()
     cJob.FindFirst "ID=" & sCourtDatesID
 
     DoCmd.OpenQuery qnShippingOptionsQ, acViewNormal, acNormal 'pull up shipping query
-        
-    '@Ignore AssignmentNotUsed
-    sQueryName = "TempShippingOptionsQ"
 
     SQLString = "SELECT * FROM [ShippingOptions] WHERE [ShippingOptions].[CourtDatesID] = " & sCourtDatesID & ";"
     Set rs1 = CurrentDb.OpenRecordset(SQLString)
@@ -1733,12 +1710,9 @@ Public Sub fCourtofAppealsIXML()
     rstShippingOptions.Fields("Output") = cJob.DocPath.ShippingOutputFolder & sCourtDatesID & "-CoA-Output.xml"
     rstShippingOptions.Update
 
-    '@Ignore AssignmentNotUsed
-    sTempShippingOQ1 = "TempShippingOptionsQ1"
-
     Set rstTempShippingOQ1 = CurrentDb.OpenRecordset(sNewSQL)
-    '@Ignore AssignmentNotUsed
-    sTSOCourtDatesID = rstTempShippingOQ1("ReferenceID").Value
+    
+    'sTSOCourtDatesID = rstTempShippingOQ1("ReferenceID").Value
 
     Set oExcelApp = CreateObject("Excel.Application")
     Set oExcelWkbk = oExcelApp.Workbooks.Open(cJob.DocPath.TempShipOptionsQ1XLSM)
@@ -1789,7 +1763,7 @@ Public Sub fCourtofAppealsIXML()
     DoCmd.Close acQuery, qnShippingOptionsQ
     
     MsgBox "Exported COA XML and added entry to CommHistory table."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 

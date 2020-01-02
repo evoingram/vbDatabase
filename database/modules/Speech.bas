@@ -96,7 +96,7 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
                 
                     FileCopy sFullCompletedDocPath, oCurrentFile
                 
-                    Debug.Print "Original Transcript:  " & sFullCompletedDocPath; ""
+                    Debug.Print "Original Transcript:  " & sFullCompletedDocPath; vbNullString
                     Debug.Print "Copied to:  " & oCurrentFileString
                 
                 End If
@@ -107,7 +107,7 @@ Public Sub pfCopyTranscriptFromCompletedToPrepared()
         
     Next oSubfolder
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 'four separate functions on separate schedules
@@ -224,7 +224,7 @@ Public Sub pfPrepareTranscript()
                                     .Replacement.ClearFormatting
                                     .Style = wsStyle
                                     .Text = "*"
-                                    .Replacement.Text = ""
+                                    .Replacement.Text = vbNullString
                                     .Forward = True
                                     .Wrap = wdFindStop
                                     .Format = True
@@ -309,27 +309,27 @@ Public Sub pfPrepareTranscript()
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText)
                     
                         sTextToFind = "."
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText)
                 
                         sTextToFind = ","
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText)
                     
                         sTextToFind = "'"
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText)
                 
                         sTextToFind = "?"
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText)
                 
                         sTextToFind = "^13\((*)\)^13"
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText, bWrap:="wdFindStop", bMatchCase:=False)
                 
                         sTextToFind = "CERTIFICATE OF TRANSCRIBER"
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText, bWrap:="wdFindContinue", bFormat:=False)
                     
                         .Application.Selection.EndKey Unit:=wdStory, Extend:=wdExtend
@@ -350,11 +350,11 @@ Public Sub pfPrepareTranscript()
                         .SaveAs2 FileName:=cJob.DocPath.SpeechUP & sCourtDatesID & "\WorkingFiles\Transcript.txt", FileFormat:=wdFormatText
                     
                         sTextToFind = "</s> (wavfilename)"
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText, bMatchWildcards:=False, bFormat:=False)
                     
                         sTextToFind = "<s> "
-                        sReplacementText = ""
+                        sReplacementText = vbNullString
                         Call pfSingleFindReplace(sTextToFind:=sTextToFind, sReplacementText:=sReplacementText, bMatchWildcards:=False, bForward:=True)
                     
                         .SaveAs2 FileName:=oSubfolder.Path & "\WorkingFiles\" & "Base-corpus.txt", FileFormat:=wdFormatText
@@ -373,7 +373,7 @@ Public Sub pfPrepareTranscript()
         Next oCurrentFile
     Next oSubfolder
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfRunCopyTranscTextBAT()
@@ -391,7 +391,7 @@ Public Sub pfRunCopyTranscTextBAT()
     cJob.FindFirst "ID=" & sCourtDatesID
 
     Call Shell(cJob.DocPath.SpeechUP & "\CopyTranscriptTXT.bat " & cJob.DocPath.SpeechUP)
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfSRTranscribe()
@@ -416,7 +416,7 @@ Public Sub pfSRTranscribe()
     cJob.FindFirst "ID=" & sCourtDatesID
 
     Call Shell(cJob.DocPath.SpeechUP & "\SRTranscribe.bat " & cJob.DocPath.SpeechUP)
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -465,7 +465,7 @@ Public Sub pfTrainAudio()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\audiotrain.bat " & cJob.DocPath.SpeechUP)
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -485,7 +485,7 @@ Public Sub pfRenameBaseFiles()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\FileRename.bat " & cJob.DocPath.SpeechUP)
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfSplitAudio()
@@ -521,7 +521,7 @@ Public Sub pfPrepareAudio()
     cJob.FindFirst "ID=" & sCourtDatesID
     
     Call Shell(cJob.DocPath.SpeechUP & "\audioprep.bat " & cJob.DocPath.SpeechUP)
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 '---------------------------------------------------------
@@ -676,7 +676,7 @@ Public Sub pfAddSubfolder()
     
     Next oSubfolder
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfDownloadFile(sURL As String, sSaveAs As String)
@@ -726,7 +726,7 @@ Public Sub pfCorpusUpload()
 
     Set oFolderObject = CreateObject("Scripting.FileSystemObject")
     pfDoFolder oFolderObject.GetFolder(cJob.DocPath.SpeechUP)
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -864,7 +864,7 @@ Public Sub pfIEPostStringRequest(sURL As String, sFormData As String, sBoundary 
     Debug.Print "LM saved to:  " & sFilePathLM
     Debug.Print "-----------------------"
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Function pfGetFile(sFileName As String) As String
@@ -950,7 +950,7 @@ Public Sub pfDoFolder(Folder As Variant)
             With oTranscriptionWD
                 With .Application.Selection.Find
                     .Text = "$"
-                    .Replacement.Text = ""
+                    .Replacement.Text = vbNullString
                     .Forward = True
                     .Wrap = wdFindContinue
                     .Format = False
@@ -964,7 +964,7 @@ Public Sub pfDoFolder(Folder As Variant)
             
                 With .Application.Selection.Find
                     .Text = Chr(34)
-                    .Replacement.Text = ""
+                    .Replacement.Text = vbNullString
                     .Forward = True
                     .Wrap = wdFindContinue
                     .Format = False
@@ -992,7 +992,7 @@ Public Sub pfDoFolder(Folder As Variant)
      
     Next
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 

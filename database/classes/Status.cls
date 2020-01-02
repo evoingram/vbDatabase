@@ -11,7 +11,6 @@ Attribute VB_Exposed = False
 Option Compare Database
 Option Explicit
 
-Private mFactoringApproved As Boolean
 Private mContactsEntered As Boolean
 Private mJobEntered As Boolean
 Private mFixAppears As Boolean

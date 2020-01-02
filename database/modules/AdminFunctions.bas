@@ -196,7 +196,7 @@ Public Sub pfDownloadFTPsite(ByRef mySession As Session)
     Forms![NewMainMenu].Form!lblFlash.Caption = "You may now find any files downloaded today in" & cJob.DocPath.FileInbox & "."
     pfDelay (5)
     Forms![NewMainMenu].Form!lblFlash.Caption = "Ready to process."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -268,7 +268,7 @@ Public Sub pfProcessFolder(ByVal oOutlookPickedFolder As Outlook.MAPIFolder)
     Set adocOutlookExport = Nothing
     Set oOutlookNamespace = Nothing
     Set oOutlookPickedFolder = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
  
 End Sub
 
@@ -364,7 +364,7 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     sSQL = "UPDATE [CourtDates] SET [CourtDates].[ActualQuantity] = " & sActualQuantity & " WHERE [CourtDates].[ID] = " & sCourtDatesID & ";"
 
     '@Ignore AssignmentNotUsed
-    Set qdf = CurrentDb.CreateQueryDef("", sSQL)
+    Set qdf = CurrentDb.CreateQueryDef(vbNullString, sSQL)
     CurrentDb.Execute sSQL
 
     Set qdf = Nothing
@@ -372,7 +372,7 @@ Public Sub pfAcrobatGetNumPages(sCourtDatesID As String)
     DoCmd.OpenQuery "FinalUnitPriceQuery"        'PRE-QUERY FOR FINAL SUBTOTAL
     CurrentDb.Execute "INVUpdateFinalUnitPriceQuery" 'UPDATES FINAL SUBTOTAL
     DoCmd.Close acQuery, "FinalUnitPriceQuery"
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfReadXML()
@@ -422,7 +422,7 @@ Public Sub pfReadXML()
         Call pfSendWordDocAsEmail("Shipped", "Transcript Shipped")
        
     Loop
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -448,7 +448,7 @@ Public Sub pfFileRenamePrompt()
     & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date", "Enter the new name for the transcript here, without the extension." & Chr(13) & _
     "Weber Format:  A169195_transcript_2018-09-18_IngramEricaL" & Chr(13) & "AMOR Format: Audio Name" & Chr(13) & "eScribers format [JobNumber]_[DRAFT]_Date")
 
-    If sUserInput = "Enter the new name for the transcript here, without the extension." Or sUserInput = "" Then
+    If sUserInput = "Enter the new name for the transcript here, without the extension." Or sUserInput = vbNullString Then
         Exit Sub
     End If
 
@@ -465,7 +465,7 @@ Public Sub pfFileRenamePrompt()
     CurrentDb.Execute sChkBxFiledNotFiled
 
     MsgBox "Transcript has been delivered.  Next, let's do some admin stuff."
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -603,7 +603,7 @@ Public Sub pfCheckFolderExistence()
     
     End If
     Set cJob = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
@@ -634,7 +634,7 @@ Public Sub pfCommunicationHistoryAdd(sCHTopic As String)
     rstCHAdd.Update
 
     rstCHAdd.Close
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -657,7 +657,7 @@ Public Sub pfStripIllegalChar(sInput As String)
     '@Ignore AssignmentNotUsed
     oRegex.Global = True
     '@Ignore AssignmentNotUsed
-    StripIllegalChar = oRegex.Replace(sInput, "")
+    StripIllegalChar = oRegex.Replace(sInput, vbNullString)
 
     Set oRegex = Nothing
  
@@ -1260,7 +1260,7 @@ Public Sub pfGenerateJobTasks()
     'Call AddTaskToTasks(sTaskTitle, iTaskMinuteLength, sPriority, dDue, sTaskCategory, sTaskDescription, dStart)
     
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
     
 End Sub
 
@@ -1526,7 +1526,7 @@ Public Sub pfCommHistoryExportSub()
     Set rs = Nothing
     Set nsOutlookNmSpc = Nothing
     Set oOutlookAccessTestFolder = Nothing
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
     Exit Sub
 
@@ -1710,7 +1710,7 @@ Public Sub pfAskforAudio()
     
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfAskforNotes()
@@ -1811,7 +1811,7 @@ Public Sub pfAskforNotes()
             End If
         Next i
     End If
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub pfRCWRuleScraper()
@@ -1880,7 +1880,7 @@ Public Sub pfRCWRuleScraper()
             
                 Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
                 objHttp.Open "GET", sWebAddress, False
-                objHttp.send ""
+                objHttp.send vbNullString
             
                 Title = objHttp.responseText
             
@@ -1951,7 +1951,7 @@ NextNumber1:
                 
                     Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
                     objHttp.Open "GET", sWebAddress, False
-                    objHttp.send ""
+                    objHttp.send vbNullString
                 
                     Title = objHttp.responseText
                 
@@ -2023,7 +2023,7 @@ Public Sub pfUSCRuleScraper()
     Dim z As Long
 
     vRules = Array("CR ", "CrR ", "RAP ", "Rule ", "RCW ", "ER ")
-    vRuleNumbers = Array("", "", "")
+    vRuleNumbers = Array(vbNullString, vbNullString, vbNullString)
 
     For i = 1 To 54
         'Title 1-54
@@ -2374,14 +2374,14 @@ Public Sub fWunderlistGetTasksOnList()
     apiWaxLRS = "{" & Chr(34) & "List" & Chr(34) & ":" & apiWaxLRS & "}"
     '"total_amount":{"currency":"USD","value":"3.00"},
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    'sInvoiceNumber = Parsed("number") 'third level array
-    'vInvoiceID = Parsed("id") 'third level array
-    'vStatus = Parsed("status") 'third level array
-    'vTotal = Parsed("total_amount")("value") 'second level array
-    'vErrorName = Parsed("id") '("value") 'second level array
-    'vErrorMessage = Parsed("due_date") '("value") 'second level array
-    'vErrorILink = Parsed("links") '("value") 'second level array
-    Set vDetails = parsed("list")                'second level array
+    'sInvoiceNumber = Parsed.item("number") 'third level array
+    'vInvoiceID = Parsed.item("id") 'third level array
+    'vStatus = Parsed.item("status") 'third level array
+    'vTotal = Parsed.item("total_amount")("value") 'second level array
+    'vErrorName = Parsed.item("id") '("value") 'second level array
+    'vErrorMessage = Parsed.item("due_date") '("value") 'second level array
+    'vErrorILink = Parsed.item("links") '("value") 'second level array
+    Set vDetails = parsed.item("list")                'second level array
     For Each rep In vDetails                     ' third level objects
         vErrorIssue = rep("id")
         vErrorDetails = rep("due_date")
@@ -2470,9 +2470,9 @@ Public Sub fWunderlistGetLists()
         'Debug.Print "--------------------------------------------"
     End With
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    vErrorName = parsed("name")                  '("value") 'second level array
-    vErrorMessage = parsed("message")            '("value") 'second level array
-    vErrorILink = parsed("links")                '("value") 'second level array
+    vErrorName = parsed.item("name")                  '("value") 'second level array
+    vErrorMessage = parsed.item("message")            '("value") 'second level array
+    vErrorILink = parsed.item("links")                '("value") 'second level array
     '
     'Set vDetails = Parsed("details") 'second level array
     'For Each rep In vDetails ' third level objects
@@ -2550,10 +2550,10 @@ Public Sub fWunderlistGetFolders()
     apiWaxLRS = Left(apiWaxLRS, Len(apiWaxLRS) - 1)
     apiWaxLRS = Right(apiWaxLRS, Len(apiWaxLRS) - 1)
     Set parsed = JsonConverter.ParseJson(apiWaxLRS)
-    vErrorName = parsed("id")                    '("value") 'second level array
-    vErrorMessage = parsed("title")              '("value") 'second level array
-    vErrorILink = parsed("list_ids")             '("value") 'second level array
-    vErrorIssue = parsed("revision")             '("value") 'second level array
+    vErrorName = parsed.item("id")                    '("value") 'second level array
+    vErrorMessage = parsed.item("title")              '("value") 'second level array
+    vErrorILink = parsed.item("list_ids")             '("value") 'second level array
+    vErrorIssue = parsed.item("revision")             '("value") 'second level array
 
     'Debug.Print "--------------------------------------------"
     'Debug.Print "Folder ID:  " & vErrorName & "   |   " & "Folder Title:  " & vErrorMessage
@@ -2628,7 +2628,7 @@ Public Sub pfUSCRuleScraper1()
     
         Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
         objHttp.Open "GET", sWebAddress, False
-        objHttp.send ""
+        objHttp.send vbNullString
     
         Title = objHttp.responseText
     
@@ -2678,7 +2678,7 @@ NextNumber:
         
             Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
             objHttp.Open "GET", sWebAddress, False
-            objHttp.send ""
+            objHttp.send vbNullString
         
             Title = objHttp.responseText
         
@@ -2730,7 +2730,7 @@ NextNumber1:
             
                 Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
                 objHttp.Open "GET", sWebAddress, False
-                objHttp.send ""
+                objHttp.send vbNullString
             
                 Title = objHttp.responseText
             
@@ -2783,7 +2783,7 @@ NextNumber2:
     
             Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
             objHttp.Open "GET", sWebAddress, False
-            objHttp.send ""
+            objHttp.send vbNullString
     
             Title = objHttp.responseText
     
@@ -2835,7 +2835,7 @@ NextNumber3:
         
             Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
             objHttp.Open "GET", sWebAddress, False
-            objHttp.send ""
+            objHttp.send vbNullString
         
             Title = objHttp.responseText
         
@@ -2891,7 +2891,7 @@ NextNumber4:
         
             Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
             objHttp.Open "GET", sWebAddress, False
-            objHttp.send ""
+            objHttp.send vbNullString
         
             Title = objHttp.responseText
         
@@ -3006,7 +3006,7 @@ Public Sub pfRCWRuleScraper1()
                 
                 Set oHTTPText = CreateObject("MSXML2.ServerXMLHTTP")
                 oHTTPText.Open "GET", sWebAddress, False
-                oHTTPText.send ""
+                oHTTPText.send vbNullString
                 
                 Title = oHTTPText.responseText
                 sCheck = Left(Title, 215)
@@ -3081,7 +3081,7 @@ NextNumber3:
                     
                         Set oHTTPText = CreateObject("MSXML2.ServerXMLHTTP")
                         oHTTPText.Open "GET", sWebAddress, False
-                        oHTTPText.send ""
+                        oHTTPText.send vbNullString
                     
                         Title = oHTTPText.responseText
                     
@@ -3208,7 +3208,7 @@ Public Sub pfMARuleScraper()
             
                 Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
                 objHttp.Open "GET", sWebAddress, False
-                objHttp.send ""
+                objHttp.send vbNullString
             
                 If j = 150 Then                  'error
             
@@ -3251,7 +3251,7 @@ Public Sub pfMARuleScraper()
                                 
                     Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
                     objHttp.Open "GET", sWebAddress, False
-                    objHttp.send ""
+                    objHttp.send vbNullString
                                 
                     If j = 150 Then              'error
                 
@@ -3295,7 +3295,7 @@ Public Sub pfMARuleScraper()
                     
                         Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
                         objHttp.Open "GET", sWebAddress, False
-                        objHttp.send ""
+                        objHttp.send vbNullString
                     
                         If j = 50 Then           'error
                     
@@ -3337,7 +3337,7 @@ Public Sub pfMARuleScraper()
                         
                             Set objHttp = CreateObject("MSXML2.ServerXMLHTTP")
                             objHttp.Open "GET", sWebAddress, False
-                            objHttp.send ""
+                            objHttp.send vbNullString
                         
                             If j = 50 Then       'error
                         
@@ -3456,7 +3456,7 @@ EndHere:
 
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -3510,7 +3510,7 @@ EndHere:
 
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 
 End Sub
 
@@ -3570,7 +3570,7 @@ EndHere:
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fCompleteStage1Tasks()
@@ -3650,7 +3650,7 @@ EndHere:
 
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fCompleteStage2Tasks()
@@ -3731,7 +3731,7 @@ EndHere:
 
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fCompleteStage3Tasks()
@@ -3810,7 +3810,7 @@ EndHere:
     rstCommHistory.Close
     Set rstCommHistory = Nothing
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fCompleteStage4Tasks()
@@ -3889,7 +3889,7 @@ EndHere:
 
     End If
 
-    sCourtDatesID = ""
+    sCourtDatesID = vbNullString
 End Sub
 
 Public Sub fFixBarAddressField()
@@ -3932,7 +3932,7 @@ Public Sub fFixBarAddressField()
         'get bar name, company name, address field value, phone
         sBarName = rstBarAddresses.Fields("BarName").Value
         sCompany = rstBarAddresses.Fields("Company").Value
-        If sCompany = "" Then sCompany = "Attorney at Law"
+        If sCompany = vbNullString Then sCompany = "Attorney at Law"
         sAddress = rstBarAddresses.Fields("Address").Value
         sPhone = rstBarAddresses.Fields("Phone").Value
         
@@ -3977,10 +3977,10 @@ Public Sub fFixBarAddressField()
             sCityArray() = Split(sAddressArray(1), ",")
             
             If sCityArray(1) <> Empty Then sCityArray1() = Split(sCityArray(1), " ")
-            If sCityArray1(1) <> "" Then sState = sCityArray1(1)
-            If sCityArray1(0) <> "" Then sCity = sCityArray(0)
+            If sCityArray1(1) <> vbNullString Then sState = sCityArray1(1)
+            If sCityArray1(0) <> vbNullString Then sCity = sCityArray(0)
             On Error Resume Next
-            If sCityArray1(2) <> "" Then sZIP = Left(sCityArray1(2), 5)
+            If sCityArray1(2) <> vbNullString Then sZIP = Left(sCityArray1(2), 5)
         End If
     
         'Debug.Print sCompany
@@ -4006,7 +4006,7 @@ Public Sub fFixBarAddressField()
         rstCustomers.Fields("JobTitle").Value = "Attorney"
         rstCustomers.Update
         
-        sAddress2 = ""
+        sAddress2 = vbNullString
 
         rstBarAddresses.MoveNext
     Loop
