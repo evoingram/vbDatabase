@@ -13,7 +13,7 @@ Dim sFinalSearchSQL As String
 Dim qdf As QueryDef
 
 sSearchTerms = tSearchTerms.Value
-Debug.Print tSearchTerms
+'Debug.Print tSearchTerms
 
     'tSearchTerms
     sSQL1 = "SELECT CourtDates.ID, CourtDates.InvoiceNo, CourtDates.AudioLength, Cases.Party1, Cases.Party1Name, Cases.Party2, Cases.Party2Name, " & _
@@ -71,7 +71,9 @@ Debug.Print tSearchTerms
     sFinalSearchSQL = sSQL1 & sSQL2 & sSQL3
     
     Debug.Print sFinalSearchSQL
-    
+    On Error Resume Next
+    DoCmd.DeleteObject acQuery, "sqlSearch"
+    On Error GoTo 0
     Set qdf = CurrentDb.CreateQueryDef("sqlSearch", sFinalSearchSQL)
     Me.SearchJobsSubform.SourceObject = "Query.sqlSearch"
     

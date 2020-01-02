@@ -1528,6 +1528,7 @@ Public Sub pfWordIndexer()
     Dim sExclusions As String
     Dim sCurrentEntry1 As String
     Dim sCurrentEntry2 As String
+    Dim sCurrentEntry3 As String
     Dim sCurrentEntry4 As String
     Dim sCurrentEntry5 As String
     Dim vBookmarkName As String
@@ -1575,13 +1576,13 @@ Public Sub pfWordIndexer()
                   "live,might,lives,lived,living,long,longer,look,looked,looking,looks,love,made,mail,make,makes,making,man,march,matter,mean,meaning,means,meant,meet,meets,might,mind," & _
                   "met,more,most,mount,names,name,need,needed,needs,never,new,news,next,nor,notice,number,numbers,numbered,old,only,open,original,other,own,owned,page,parent,parents,parties,party," & _
                   "pattern,period,periods,petition,petitioner,response,responses,respondent,problem,problems,point,please,put,read,purpose,record,records,prior,report,restraining,service,sorry,sort,kind,statute," & _
-                  "six,school,under,through,think,thought,things,thing,they're,these,there's,there,tell,telling,table,take,such,stattues,still,temporary,thrown,took,too,though,through,sure," & _
+                  "six,school,under,through,think,thought,things,thing,they're,the,these,there's,there,tell,telling,table,take,such,stattues,still,temporary,thrown,took,too,though,through,sure," & _
                   "wi,try,trying,tried,tries,see,seeing,saw,sees,self,person,persons,people," & _
                   "you've,you're,well,we'll,went,we're,why,what,who,will,way,wanted,want,very,us,until,week,weeks,yesterday,talk,talking,use,which,wherever,some,question,questions"
           
     With oWordDoc1
         .Application.DisplayAlerts = False
-        .Application.Visible = False
+        '.Application.Visible = False
         sInput = .Content.Text
         
         For w = 1 To 255                         'hyphens & single quotes kept; strip unwanted chars
