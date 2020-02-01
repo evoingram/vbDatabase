@@ -1,0 +1,2 @@
+Start "C:\Program Files (x86)\Microsoft Office\root\Office16\EXCEL.EXE" \\hubcloud\evoingram\jotform.xlsx
+Start "C:\Program Files (x86)\Microsoft Office\root\Office16\EXCEL.EXE" \\hubcloud\evoingram\jotformcustomers.csv

@@ -1,0 +1,182 @@
+<grammar version="1.0" xml:lang="en-US" root="rAvailability"
+ xmlns="http://www.w3.org/2001/06/grammar">
+
+  <rule id="rAvailability">
+    <item> Date </item>
+    <ruleref uri="#digit1" />
+    <ruleref uri="#digit2" />
+    <ruleref uri="#digit3" />
+    <ruleref uri="#digit4" />
+    <ruleref uri="#digit8" />
+    <ruleref uri="#digit9" />
+    <item> audio length </item>
+    <ruleref uri="#digit5" />
+    <ruleref uri="#digit6" />
+    <ruleref uri="#digit7" />
+    <ruleref uri="#digit10" />
+  </rule>
+
+
+  <rule id="digit1">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit2">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit3">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+
+  <rule id="digit4">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit5">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit6">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit7">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit4">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+  <rule id="digit8">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+  <rule id="digit9">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+  <rule id="digit10">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+</grammar>

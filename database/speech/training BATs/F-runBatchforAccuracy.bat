@@ -1,0 +1,2 @@
+cd /D S:\UnprocessedAudio\2
+S:\sphinxtrain\bin\Release\Win32\pocketsphinx_batch.exe -adcin yes -cepdir wav -cepext .wav -ctl sample-5m-wav.fileids -lm en-us.lm.bin -dict cmudict-en-us.dict -hmm en-us-adapt -hyp test.hyp

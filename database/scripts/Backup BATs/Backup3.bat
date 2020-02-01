@@ -1,0 +1,3 @@
+copy /Y C:\Transcription\Database\AQCProduction-backend.accdb "\\HUBCLOUD\evoingram\Database\Backups\AQCProduction-backend-Wednesday.accdb"
+copy /Y C:\Transcription\Database\AQCProduction-frontend.accde "\\HUBCLOUD\evoingram\Database\Backups\AQCProduction-frontend-Wednesday.accde"
+copy /Y C:\Transcription\Database\AQCProduction.accdb "\\HUBCLOUD\evoingram\Database\Backups\AQCProduction-Wednesday.accdb"
