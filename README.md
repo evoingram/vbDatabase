@@ -20,18 +20,18 @@ This database has been created with concepts from GTD incorporated into its work
 There is also a working speech recognition component that I have never used because I need something more robust than PocketSphinx; it will do things at the click of a button like record the audio in the proper format, complete the speech recognition, and auto-feed the engine audio & transcripts to make it more accurate. It formats court transcripts into an engine-readable format. A chunk of it was done using batch files, but comes out of VBA & starts from clicking an Access form button.
 <br><br>
 
-* References/Libraries Used @ https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries
-* DB Table Schema @ https://github.com/evoingram/VBProjects/blob/master/database/doc_rptObjects.pdf
-* DB SQL Queries @ https://github.com/evoingram/VBProjects/blob/master/database/SQL_Queries.pdf
-* DB Forms Info @ https://github.com/evoingram/VBProjects/blob/master/database/Forms_Info.pdf
-* DB Relationship Report @ https://github.com/evoingram/VBProjects/blob/master/database/RelationshipReport.pdf
-* DB Classes @ https://github.com/evoingram/VBProjects/tree/master/database/classes
-* DB Modules @ https://github.com/evoingram/VBProjects/tree/master/database/modules
-* DB Forms Code @ https://github.com/evoingram/VBProjects/tree/master/database/forms%20code
+* [References/Libraries Used](https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries)
+* [DB Table Schema](https://github.com/evoingram/VBProjects/blob/master/database/doc_rptObjects.pdf)
+* [DB SQL Queries](https://github.com/evoingram/VBProjects/blob/master/database/SQL_Queries.pdf)
+* [DB Forms Info](https://github.com/evoingram/VBProjects/blob/master/database/Forms_Info.pdf)
+* [DB Relationship Report](https://github.com/evoingram/VBProjects/blob/master/database/RelationshipReport.pdf) 
+* [DB Classes](https://github.com/evoingram/VBProjects/tree/master/database/classes) 
+* [DB Modules](https://github.com/evoingram/VBProjects/tree/master/database/modules) 
+* [DB Forms Code](https://github.com/evoingram/VBProjects/tree/master/database/forms%20code) 
 
-* Speech Recognition Batch Files @ https://github.com/evoingram/VBProjects/blob/master/database/speech/
-* Batch Files/VBScripts Used @ https://github.com/evoingram/VBProjects/tree/master/database/scripts
-* Excel Files Used @ https://github.com/evoingram/VBProjects/tree/master/database/InProgressExcels
+* [Speech Recognition Batch Files](https://github.com/evoingram/VBProjects/blob/master/database/speech/)
+* [Batch Files/VBScripts Used](https://github.com/evoingram/VBProjects/tree/master/database/scripts)
+* [Excel Files Used](https://github.com/evoingram/VBProjects/tree/master/database/InProgressExcels) 
 
-* Word Templates @ https://github.com/evoingram/VBProjects/tree/master/database/Templates
-<br>(everything in /Templates/Other/ is old/outdated/not used)
+* [Word Templates](https://github.com/evoingram/VBProjects/tree/master/database/Templates)
+(everything in /Templates/Other/ are old/outdated/not used)
