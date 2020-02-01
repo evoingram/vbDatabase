@@ -34,4 +34,4 @@ There is also a working speech recognition component that I have never used beca
 * Excel Files Used @ https://github.com/evoingram/VBProjects/tree/master/database/InProgressExcels
 
 * Word Templates @ https://github.com/evoingram/VBProjects/tree/master/database/Templates
-(everything in /Templates/Other/ are old/outdated/not used)
+<br>(everything in /Templates/Other/ is old/outdated/not used)
