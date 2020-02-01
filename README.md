@@ -26,3 +26,19 @@ DB Relationship Report @ https://github.com/evoingram/VBProjects/blob/master/dat
 Speech Recognition Batch Files @ https://github.com/evoingram/VBProjects/blob/master/database/speech/<br>
 References/Libraries Used @ https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries<br>
 Batch Files/VBScripts Used @ https://github.com/evoingram/VBProjects/tree/master/database/scripts<br>
+
+* References/Libraries Used @ https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries
+* DB Table Schema @ https://github.com/evoingram/VBProjects/blob/master/database/doc_rptObjects.pdf
+* DB SQL Queries @ https://github.com/evoingram/VBProjects/blob/master/database/SQL_Queries.pdf
+* DB Forms Info @ https://github.com/evoingram/VBProjects/blob/master/database/Forms_Info.pdf
+* DB Relationship Report @ https://github.com/evoingram/VBProjects/blob/master/database/RelationshipReport.pdf
+* DB Classes @ https://github.com/evoingram/VBProjects/tree/master/database/classes
+* DB Modules @ https://github.com/evoingram/VBProjects/tree/master/database/modules
+* DB Forms Code @ https://github.com/evoingram/VBProjects/tree/master/database/forms%20code
+
+* Speech Recognition Batch Files @ https://github.com/evoingram/VBProjects/blob/master/database/speech/
+* Batch Files/VBScripts Used @ https://github.com/evoingram/VBProjects/tree/master/database/scripts
+* Excel Files Used @ https://github.com/evoingram/VBProjects/tree/master/database/InProgressExcels
+
+* Word Templates @ https://github.com/evoingram/VBProjects/tree/master/database/Templates
+(everything in /Templates/Other/ are old/outdated/not used)
