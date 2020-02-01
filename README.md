@@ -18,8 +18,8 @@ In Progress:  Porting this online.
 This database has been created with concepts from GTD incorporated into its workflow. It uses a strict folder system developed by me to manage all of the related files it deals with.
 <br><br>
 There is also a working speech recognition component that I have never used because I need something more robust than PocketSphinx; it will do things at the click of a button like record the audio in the proper format, complete the speech recognition, and auto-feed the engine audio & transcripts to make it more accurate. It formats court transcripts into an engine-readable format. A chunk of it was done using batch files, but comes out of VBA & starts from clicking an Access form button.
-<br>
-* DB Schema @ https://github.com/evoingram/VBProjects/blob/master/database/doc_rptObjects.pdf
-* Speech Recognition Batch Files & Components @ https://github.com/evoingram/VBProjects/blob/master/database/speech/
-* References/Libraries Used @ https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries
-* Batch Files/VBScripts Used @ https://github.com/evoingram/VBProjects/tree/master/database/scripts
+<br><br>
+DB Schema @ https://github.com/evoingram/VBProjects/blob/master/database/doc_rptObjects.pdf<br>
+Speech Recognition Batch Files & Components @ https://github.com/evoingram/VBProjects/blob/master/database/speech/<br>
+References/Libraries Used @ https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries<br>
+Batch Files/VBScripts Used @ https://github.com/evoingram/VBProjects/tree/master/database/scripts<br>
