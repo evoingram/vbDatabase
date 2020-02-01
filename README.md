@@ -22,7 +22,8 @@ There is also a working speech recognition component that I have never used beca
 
 * [References/Libraries Used](https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries)
 * [DB Table Schema](https://github.com/evoingram/VBProjects/blob/master/database/doc_rptObjects.pdf)
-* [DB SQL Queries](https://github.com/evoingram/VBProjects/blob/master/database/SQL_Queries.pdf)
+* [DB SQL Queries Report](https://github.com/evoingram/VBProjects/blob/master/database/SQL_Queries.pdf)
+* [DB SQL Queries Text & SQL Files](https://github.com/evoingram/VBProjects/tree/master/database/sql-queries)
 * [DB Forms Info](https://github.com/evoingram/VBProjects/blob/master/database/Forms_Info.pdf)
 * [DB Relationship Report](https://github.com/evoingram/VBProjects/blob/master/database/RelationshipReport.pdf) 
 * [DB Classes](https://github.com/evoingram/VBProjects/tree/master/database/classes) 
