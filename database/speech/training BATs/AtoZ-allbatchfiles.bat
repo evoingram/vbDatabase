@@ -1,0 +1,8 @@
+cd /D "S:\UnprocessedAudio\2"
+call "S:\training BATs\A-ConvertWAVtoMFC.bat"
+call "S:\training BATs\B-ConvertMDEF.bat"
+call "S:\training BATs\C-runBWstats.bat"
+call "S:\training BATs\D-run-mllrsolve.bat"
+call "S:\training BATs\E-run-mapadapt.bat"
+call "S:\training BATs\F-runBatchforAccuracy.bat"
+call "S:\training BATs\G-runWAlignforAccuracyReport.bat"

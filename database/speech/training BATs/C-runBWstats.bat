@@ -1,0 +1,2 @@
+cd /D S:\UnprocessedAudio\2
+S:\sphinxtrain\bin\Release\Win32\bw.exe -hmmdir en-us -moddeffn en-us/mdef.txt -ts2cbfn .ptm. -svspec 0-12/13-25/26-38 -feat 1s_c_d_dd -cmn current -agc none -dictfn cmudict-en-us.dict -ctlfn sample-5m-wav.fileids -lsnfn sample-5m-wav.transcription -accumdir .

@@ -1,0 +1,95 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0DE15D4C-5DAF-48C8-A235-83B5727CFABD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>CountPages</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Office.Interop.Access.Dao, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Office.Interop.Access.Dao.15.0.4420.1017\lib\net20\Microsoft.Office.Interop.Access.Dao.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="A New Day.lnk" />
+    <None Include="A New Job.lnk" />
+    <None Include="Available.grxml" />
+    <None Include="Check FTP Today.lnk" />
+    <None Include="CountPages.grxml" />
+    <None Include="Job Schedule by Stage.lnk" />
+    <None Include="NewJob.bat" />
+    <None Include="packages.config" />
+    <None Include="Process Job.lnk" />
+    <None Include="Process Stage 1.vbs.lnk" />
+    <None Include="Process Stage 2.vbs.lnk" />
+    <None Include="Process Stage 3.vbs.lnk" />
+    <None Include="ProcessJob.bat" />
+    <None Include="Record Court Hearing.lnk" />
+    <None Include="Scan.lnk" />
+    <None Include="Speech.bat" />
+    <None Include="StartMyDay.bat" />
+    <None Include="StartScan.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AdaptiveCard-CIDIncomeReport.txt" />
+    <Content Include="AdaptiveCard-JobInfo.txt" />
+    <Content Include="AdaptiveCard-JobsByStage.txt" />
+    <Content Include="AdaptiveCard-NextActions.txt" />
+    <Content Include="AdaptiveCard-OrderForm.txt" />
+    <Content Include="AdaptiveCard-PriceQuote.txt" />
+    <Content Include="AdaptiveCard-Wikipedia.txt" />
+    <Content Include="CheckFTP.vbs" />
+    <Content Include="cortana-count-pages.txt" />
+    <Content Include="ShippingMonitor.vbs" />
+    <Content Include="Stage1.vbs" />
+    <Content Include="Stage2.vbs" />
+    <Content Include="Stage3.vbs" />
+    <Content Include="StageSchedule.vbs" />
+    <Content Include="TaskDaily.vbs" />
+    <Content Include="TaskMonthly.vbs" />
+    <Content Include="TaskWeekly.vbs" />
+    <Content Include="Text-Available.txt" />
+    <Content Include="Text-CountPages.txt" />
+    <Content Include="Text-PriceQuote.txt" />
+    <Content Include="XML-CountPages.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Class1.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>

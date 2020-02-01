@@ -1,0 +1,1 @@
+S:\pocketsphinx\bin\Release\Win32\pocketsphinx_continuous.exe -infile sample-5m-wav.wav -hmm en-us-adapt -lm en-us.lm.bin -dict cmudict-en-us.dict >> full-output.txt

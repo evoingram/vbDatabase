@@ -1,0 +1,1 @@
+cscript T:\scripts\Cortana\Stage1.vbs

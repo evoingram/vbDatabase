@@ -1,0 +1,124 @@
+<grammar version="1.0" xml:lang="en-US" root="rCountPages"
+ xmlns="http://www.w3.org/2001/06/grammar">
+
+  <rule id="rCountPages">
+    <item> Count Pages </item>
+    <item> Job [Number] </item>
+    <ruleref uri="#digit1" />
+    <ruleref uri="#digit2" />
+    <ruleref uri="#digit3" />
+    <ruleref uri="#digit4" />
+    <item> Pages </item>
+    <ruleref uri="#digit5" />
+    <ruleref uri="#digit6" />
+    <ruleref uri="#digit7" />
+  </rule>
+
+
+  <rule id="digit1">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit2">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit3">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+
+  <rule id="digit4">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit5">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit6">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+  <rule id="digit7">
+    <one-of>
+      <item> one </item>
+      <item> two </item>
+      <item> three </item>
+      <item> four </item>
+      <item> five </item>
+      <item> six </item>
+      <item> seven </item>
+      <item> eight </item>
+      <item> nine </item>
+      <item> zero </item>
+    </one-of>
+  </rule>
+
+</grammar>

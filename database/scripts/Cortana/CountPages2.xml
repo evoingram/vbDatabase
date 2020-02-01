@@ -1,0 +1,9 @@
+<GRAMMAR LANGID="409">
+    <DEFINE>
+	<ID NAME="RID_FileGame" VAL="200"/>
+    </DEFINE>
+	
+   <RULE NAME="filegame" ID="RID_FileGame" TOPLEVEL="ACTIVE">
+      <P>file +game</P>
+   </RULE>
+</GRAMMAR>

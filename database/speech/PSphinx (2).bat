@@ -1,0 +1,1 @@
+S:\pocketsphinx\bin\Release\Win32\pocketsphinx_continuous.exe -infile S:\pocketsphinx\test\data\goforward.raw -hmm S:\pocketsphinx\model\en-us\en-us -lm S:\pocketsphinx\model\en-us\en-us.lm.bin -dict S:\pocketsphinx\model\en-us\cmudict-en-us.dict >> S:\pocketsphinx\full-output.txt

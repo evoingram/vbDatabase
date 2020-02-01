@@ -1,0 +1,47 @@
+<GRAMMAR LANGID="409">
+    <DEFINE>
+        <ID NAME="RANK" VAL="1"/>
+    </DEFINE>
+   <RULE NAME="playcard" TOPLEVEL="ACTIVE" EXPORT="1">
+      <O>Count Pages</O>
+      <P>Job</P>
+      <O>...</O>
+      <RULEREF NAME="rank"/>
+      <RULEREF NAME="rank"/>
+      <RULEREF NAME="rank"/>
+      <RULEREF NAME="rank"/>
+      <O>Pages</O>
+      <RULEREF NAME="rank"/>
+      <RULEREF NAME="rank"/>
+      <RULEREF NAME="rank"/>
+      <O>...</O>
+   </RULE>
+   <RULE NAME="rank">
+      <!-- Specify the property name/id in the LIST
+              tag, which will be inherited by all
+              of the list tag's child phrase tags.
+           Specifying the name/id in the LIST tag avoids
+              having to specify it multiple times, once
+              for each P tag -->
+      <L PROPNAME="rank" PROPID="RANK">
+         <P VAL="0">zero</P>
+         <P VAL="1">ace</P>
+         <P VAL="2">two</P>
+         <P VAL="3">three</P>
+         <P VAL="4">four</P>
+         <P VAL="5">five</P>
+         <P VAL="6">six</P>
+         <P VAL="7">seven</P>
+         <P VAL="8">eight</P>
+         <P VAL="9">nine</P>
+      </L>
+   </RULE>
+
+
+
+   <RULE NAME="newgame" TOPLEVEL="ACTIVE">
+      <O>next</O>
+   </RULE>
+
+<!-- End of Grammar definition -->
+</GRAMMAR>

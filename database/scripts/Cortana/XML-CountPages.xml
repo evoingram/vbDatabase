@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<VoiceCommands xmlns="http://schemas.microsoft.com/voicecommands/1.2">
+    <CommandSet xml:lang="en-us" Name="AQCWorkCommands">
+        <CommandPrefix>AQC</CommandPrefix>
+        <Example>count final pages of previous jobs</Example>
+
+        <Command Name="Count_Pages">
+            <Example>Count pages</Example>
+            <ListenFor> count pages [job number] </ListenFor>
+            <Feedback>Counting pages</Feedback>
+            <Navigate />
+        </Command>
+        ...
+    </CommandSet>
+</VoiceCommands>
