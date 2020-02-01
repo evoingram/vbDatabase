@@ -1,0 +1,79 @@
+Hello there,
+
+I am writing this e-mail to give you a price quote and a couple of extra details about our work.
+
+Now, if you are fine with the transcript being only electronically delivered to you, with the court receiving the required electronic and hard copies, then we offer the following page rates for 15 or more hours of audio: 
+ 
+•  30 calendar-day turnaround, $3.10/page
+•  14 calendar-day turnaround, $3.70/page
+•  07 calendar-day turnaround, $4.30/page
+•  03 calendar-day turnaround, $4.70/page
+ 
+For everything else, we offer the following page rates:
+
+•  30 calendar-day turnaround, $3.50/page
+•  14 calendar-day turnaround, $4.10/page
+•  07 calendar-day turnaround, $4.70/page
+•  03 calendar-day turnaround, $5.30/page
+•  same day/overnight turnaround, $5.95/page
+
+
+So for <Audiolength> hours at 45 pages per audio hour, you’d be looking at <PageCount> pages approximately and the following estimates for the rates I just listed above:
+ 
+•  30 calendar-day turnaround, $<Subtotal1>
+•  14 calendar-day turnaround, $<Subtotal1>
+•  07 calendar-day turnaround, $<Subtotal1>
+•  03 calendar-day turnaround, $<Subtotal1>
+
+In terms of file transmission, we have a website where you can upload it or we can order it from the court on your behalf and there may or may not be an additional charge for that, depending on the jurisdiction (most places are free, some aren't).
+
+A list of what is included in our rates may be found at https://www.aquoco.co/Court-Transcription.html.  Our rates include:
+
+•	Velobound 28-lb paper copies (unless electronic only)
+•	Color, custom weather-proof labeled CD of your transcript + audio where allowed (unless electronic only)
+•	Hyperlinked headings & tables of content
+•	Hyperlinked case law & authorities where possible (.gov websites or freely publicly accessible websites with a long history)
+•	Table of authorities
+•	Condensed version, your choice of 2/page or 4/page
+•	“working” copy, Word version where you can use all the regular features of Word with the transcript such highlight and bold.
+
+
+Let me know if you have any questions.  
+
+If you would like to order, please reply to this e-mail with the following information:
+(table)
+Do you want a hard copy?	Yes/No
+Is this for an appeal?	Yes/No
+Exact case caption as should appear on transcript:	
+Exact case number(s) as appears on transcript:	
+Adversary number if applicable:	
+Jurisdiction:	USBC Eastern District of Washington 
+Chapter	if applicable
+Appearances (only need names of attorneys or parties appearing on their behalf at the hearing; can look up rest of contact info as necessary):	
+Any other information you feel is relevant:	
+
+It's helpful though not necessary to include the reporter's log notes, statement of arrangements, or minute/docket entry related to the transcribed audio.  Thank you very much and have a great day.
+
+(signature)
+
+
+
+
+
+
+
+    .HTMLBody = "<font='Arial'>" & "Hello there Kim," & "<br><br>" & "I have attached an invoice I would like" _
+    & " to factor.  Let me know if you have any questions.  Thank you very much and have a great day." & "<br><br>" & "Sincerely," & "<br><br>" & _
+    "Erica L Ingram" & "<br>" & "Certified Electronic Court Reporter & Transcriber, CERT**D-521" & "<br>" & _
+    "Notary Public in and for the State of Washington" & "<br>" & "   |   " & "Microsoft Office Master 2016" & "<br>" & "A Quo Co." & "<br>" & "320 W Republican, Suite 207 | Seattle, WA 98119" & _
+    "<br>" & "p 206 693 2390 | f 866 220 0887" & "<br>" & "MSN/Skype inquiries@aquoco.co" & "<br>" & _
+    "Facebook http://www.facebook.com/aquocotranscripts" & "<br>" & "Twitter http://www.twitter.com/aquocotrans" & "<br>" & "CONFIDENTIALITY NOTICE:" & _
+    "<br>" & "<font size='3'>" & "This E-mail (including attachments) is covered by the Electronic Communications Privacy Act, 18 U.S.C. 2510-2521 and" & _
+    " may contain information that is privileged, confidential and exempt from disclosure under applicable law. It is intended to be " & _
+    "viewed only by the individual or entity to which it is addressed. If you are not the intended addressee/recipient, you are hereby " & _
+    "notified that any use of, disclosure, copying, dissemination, distribution or reliance on the contents of this E-Mail information is " & _
+    "strictly prohibited without permission and may result in legal action against you. If the reader of this message is not the intended " & _
+    "recipient, or the employee or agent responsible for delivering the message to the intended recipient, please reply to the sender advising " & _
+    "of the error in transmission and immediately delete/destroy the original message and any accompanying documents and any copies from your " & _
+    "computer system. Nothing in this communication is intended to operate as an electronic signature under applicable law." & "</font>" & "</font>"
+
