@@ -23,6 +23,6 @@ DB Table Schema @ https://github.com/evoingram/VBProjects/blob/master/database/d
 DB SQL Queries @ https://github.com/evoingram/VBProjects/blob/master/database/SQL_Queries.pdf<br>
 DB Forms Info @ https://github.com/evoingram/VBProjects/blob/master/database/Forms_Info.pdf<br>
 DB Relationship Report @ https://github.com/evoingram/VBProjects/blob/master/database/RelationshipReport.pdf<br>
-Speech Recognition Batch Files & Components @ https://github.com/evoingram/VBProjects/blob/master/database/speech/<br>
+Speech Recognition Batch Files @ https://github.com/evoingram/VBProjects/blob/master/database/speech/<br>
 References/Libraries Used @ https://github.com/evoingram/VBProjects/wiki/1.-General----References-Libraries<br>
 Batch Files/VBScripts Used @ https://github.com/evoingram/VBProjects/tree/master/database/scripts<br>
