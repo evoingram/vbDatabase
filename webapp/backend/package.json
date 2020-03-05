@@ -4,8 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "server": "nodemon",  
-    "start": "node index.js" 
+    "server": "nodemon",
+    "start": "node index.js",
+    "test": "cross-env DB_ENV=testing jest --watch"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
