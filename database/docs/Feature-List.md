@@ -1,0 +1,82 @@
+
+# Feature List
+
+- [ ] auto-fill templates
+- [ ] check FTP for new files & download
+- [ ] enter new job
+    - check for previous case/customer info
+- [ ] price quote & availability
+- [ ] email price quote
+- [ ] next action tasks
+- [ ] at a glance production mgmt
+- [ ] track emails/document history with every job
+- [ ] sales/income/expenses reports
+- [ ] search citations
+- [ ] roman numeral converter
+- [ ] search jobs
+- [ ] be able to pull up jurisdiction reference folder
+- [ ] view job info
+- [ ] find & replace in rough draft
+    - dynamic speakers
+    - static speakers
+    - jurors
+    - doctors
+- [ ] view/edit shorthand for proper names
+- [ ] view both speaker lists
+- [ ] view reporter notes/minute entry
+- [ ] generate shipping
+- [ ] view job folder
+- [ ] interact w/ paypal (edit, create, delete invoices)
+- [ ] interact w/ teams (add/edit projects)
+- [ ] process stage 1
+- [ ] process stage 2
+- [ ] process stage 3
+- [ ] process stage 4
+- [ ] auto-generate bookmarks
+- [ ] auto-generate TOC/TOA
+- [ ] auto-hyperlink/mark authority
+- [ ] generate various documents: 
+    - SOA
+    - cd label
+    - autocorrect backup
+    - cid income report
+    - deposit invoice
+    - deposit paid receipt
+    - order confirmation
+    - package-enclosed letter
+    - price quote email
+    - rough draft
+    - cover page
+    - word index
+    - transcript complete but info needed email
+    - transcript date index
+    - shipped email
+    - thank you note
+    - balance/refund due email
+    - refund issued email
+    - pp button
+    - payment made email
+    - notice of service
+    - king county invoice
+    - factoring email
+    - factored invoice
+    - factoring customer aproval
+    - envelope KCI
+    - envelope blank
+    - contractor transcripts ready email
+    - transcripts ready email
+    - cid final income report
+- [ ] apply styles in documents generated
+- [ ] how to file in approved jurisdictions
+- [ ] assign file in web app
+- [ ] 'complete' audio
+- [ ] load audio into player
+- [ ] notifications for new jobs
+- [ ] auto-complete statuses/tasks as job is produced
+- [ ] create regular/2up/4up pdfs
+- [ ] create working & final copies
+- [ ] create/insert auto-generated headers
+- [ ] create audio/transcript/both zips
+- [ ] transcript delivery
+- [ ] upload final files to server
+- [ ] speech recognition
