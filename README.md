@@ -3,4 +3,4 @@
 Learning how to use VB.net instead of VBA; porting this to a [React/Redux version](https://github.com/evoingram/webapp-frontend) with a [back end](https://github.com/evoingram/webapp-backend) via Node, Express, and PostgreSQL.
 
 
-Check out the Wiki for more info!  https://github.com/evoingram/VBProjects/wiki
+Check out the [Wiki](https://github.com/evoingram/VBProjects/wiki) for more info!
