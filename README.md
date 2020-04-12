@@ -1,6 +1,6 @@
 # VBProjects
 
-In Progress:  Porting this online.
-/Database/ holds all the relevant database code.<br><br>
+Learning how to use VB.net instead of VBA; porting this to a [React/Redux version](https://github.com/evoingram/webapp-frontend) with a [back end](https://github.com/evoingram/webapp-backend) via Node, Express, and PostgreSQL.
+
 
 Check out the Wiki for more info!  https://github.com/evoingram/VBProjects/wiki
