@@ -4,7 +4,7 @@
 
 ## Project Description
 
-Deployed version is offline.  Porting this to a [React/Redux version](https://github.com/evoingram/webapp-frontend) with a [back end](https://github.com/evoingram/webapp-backend) via Node, Express, and PostgreSQL.  Back end is largely completed; front end in planning stages.
+Developed pre-Lambda School.  Deployed version is offline.  Porting this to a [React/Redux version](https://github.com/evoingram/webapp-frontend) with a [back end](https://github.com/evoingram/webapp-backend) via Node, Express, and PostgreSQL.  Back end is largely completed; front end in planning stages.
 
 This is my company's VB database, which is used for transcript production and workflow management.  The VB database does everything from scheduling to automated shorthand to automated hyperlinking and document formatting, shipping, production, management of company financials, and other business operations.  Copyright 2020 Erica Ingram.
 
