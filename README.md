@@ -2,6 +2,10 @@
 
 # Visual Basic Database Software
 
+## My Role
+
+This was a solo project.
+
 ## Project Description
 
 Developed pre-Lambda School.  Deployed version is offline.  Porting this to a [React/Redux version](https://github.com/evoingram/webapp-frontend) with a [back end](https://github.com/evoingram/webapp-backend) via Node, Express, and PostgreSQL.  Back end is largely completed; front end in planning stages.
