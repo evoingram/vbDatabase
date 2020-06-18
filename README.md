@@ -32,7 +32,7 @@ This is my company's VB database, which is used for transcript production and wo
 Software runs in `Microsoft Access` and built using:
 
 - [Visual Basic](https://github.com/dotnet/vblang): Visual Basic is an approachable language with a simple syntax for building type-safe, object-oriented apps.
-- [SQL](https://en.wikipedia.org/wiki/SQL)a domain-specific language used in programming and designed for managing data held in an RDBMS or stream processing in an RDSMS
+- [SQL](https://en.wikipedia.org/wiki/SQL):  a domain-specific language used in programming and designed for managing data held in an RDBMS or stream processing in an RDSMS
 
 ## APIs
 
