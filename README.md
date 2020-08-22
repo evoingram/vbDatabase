@@ -47,4 +47,4 @@ Software runs in `Microsoft Access` and built using:
 
 ## Documentation
 
-Check out the [Wiki](https://github.com/evoingram/vbDatabase/wiki) for more info on general production workflow, file and ffolder organization, database-related information, templates, classes, modules and various functions within the software.
+Check out the [Wiki](https://github.com/evoingram/vbDatabase/wiki) for more info on general production workflow, file and folder organization, database-related information, templates, classes, modules and various functions within the software.
