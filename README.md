@@ -21,7 +21,7 @@ This is my company's VB database, which is used for transcript production and wo
 - Auto-imports electronic communication
 - Automatically hyperlinks authority within transcripts via CourtListener API
 - Manipulates PDFs to auto-generate bookmarks and create different transcript versions
-- Auto-creates and formats Word versions
+- Auto-creates and formats Word versions of documents
 - Tracks communication and document history of each transcript order
 - Manages and plays audio and reporter notes
 - Integrated with Office, Acrobat, and WinSCP libraries and several APIs such as CourtListener, PayPal, OneNote, and others
