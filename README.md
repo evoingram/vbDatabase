@@ -16,7 +16,7 @@ This is my company's VB database, which is used for transcript production and wo
 
 - Live solo project
 - Integrates GTD principles into workflow
-- Generates 25 to 30 different documents automatically such as price quotes, invoices, cover pages, indexes, and others
+- Generates 25 to 30 different documents automatically such as price quotes, invoices, cover pages, indexes, and others in Microsoft Word, Publisher, and Outlook
 - Manages schedule and production workflow
 - Auto-imports electronic communication
 - Automatically hyperlinks authority within transcripts via CourtListener API
